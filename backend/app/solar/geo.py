@@ -44,6 +44,7 @@ def resolve_coordinates(city: str | None, latitude: float | None, longitude: flo
 
     Explicit coordinates win; otherwise the city name is geocoded. Raises
     :class:`InvalidBirthDataError` when neither yields a usable location.
+    Used by systems needing both axes (e.g. Western houses / ascendant).
     """
     if latitude is not None and longitude is not None:
         return latitude, longitude
@@ -53,3 +54,20 @@ def resolve_coordinates(city: str | None, latitude: float | None, longitude: flo
             return matches[0].latitude, matches[0].longitude
         raise InvalidBirthDataError(f"Unknown city: {city}. Provide latitude/longitude instead.")
     raise InvalidBirthDataError("Birth location is required: supply city or latitude/longitude.")
+
+
+def resolve_longitude(city: str | None, longitude: float | None) -> float:
+    """Resolve only the longitude from an explicit value or a city name.
+
+    True Solar Time depends solely on longitude, so Chinese-system charts use
+    this lighter resolver. Explicit longitude wins; otherwise the city is
+    geocoded. Raises :class:`InvalidBirthDataError` when neither is available.
+    """
+    if longitude is not None:
+        return longitude
+    if city:
+        matches = search_cities(city, limit=1)
+        if matches:
+            return matches[0].longitude
+        raise InvalidBirthDataError(f"Unknown city: {city}. Provide longitude instead.")
+    raise InvalidBirthDataError("Longitude is required: supply a city or an explicit longitude.")

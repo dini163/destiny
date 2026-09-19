@@ -3,7 +3,7 @@
 import pytest
 
 from app.core.errors import InvalidBirthDataError
-from app.solar.geo import resolve_coordinates, search_cities
+from app.solar.geo import resolve_coordinates, resolve_longitude, search_cities
 
 
 def test_search_cities_matches_exact_name() -> None:
@@ -46,3 +46,16 @@ def test_resolve_coordinates_unknown_city_raises() -> None:
 def test_resolve_coordinates_without_location_raises() -> None:
     with pytest.raises(InvalidBirthDataError):
         resolve_coordinates(None, None, None)
+
+
+def test_resolve_longitude_prefers_explicit_value() -> None:
+    assert resolve_longitude(None, 104.1) == 104.1
+
+
+def test_resolve_longitude_geocodes_city_name() -> None:
+    assert resolve_longitude("成都", None) == pytest.approx(104.0668)
+
+
+def test_resolve_longitude_without_location_raises() -> None:
+    with pytest.raises(InvalidBirthDataError):
+        resolve_longitude(None, None)
