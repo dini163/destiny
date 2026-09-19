@@ -1,0 +1,189 @@
+/* Celestial Obsidian design tokens — ported from design/celestial_obsidian/DESIGN.md.
+ *
+ * Layered as: raw CSS custom properties (the source-of-truth palette, type roles,
+ * elevation and spacing) -> Tailwind base reset -> reusable component classes used
+ * across the AppShell and result surfaces. Colours mirror the Tailwind theme in
+ * tailwind.config.ts; the variables exist so non-Tailwind contexts (SVG, canvas,
+ * inline styles) can reference the same values.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+
+    /* Void & canvas (obsidian deep) */
+    --void: #0b0d13;
+    --surface-1: #121622;
+    --surface-2: #171c2b;
+    --field-bg: #0e111a;
+
+    /* Celestial gold */
+    --gold: #d4af37;
+    --gold-bright: #f5d77f;
+    --gold-soft: #e6c65c;
+    --gold-muted: #997b24;
+
+    /* Foreground ink */
+    --ink: #e2e2eb;
+    --ink-variant: #d0c5af;
+    --ink-muted: #948c79;
+
+    /* Western celestial & esoteric accents */
+    --astral: #818cf8;
+    --arcane: #a855f7;
+
+    /* Eastern five elements (wuxing) */
+    --wuxing-wood: #2dd4bf;
+    --wuxing-fire: #f43f5e;
+    --wuxing-earth: #eab308;
+    --wuxing-metal: #f1f5f9;
+    --wuxing-water: #38bdf8;
+
+    /* Hairline gilded rims */
+    --rim: rgba(212, 175, 55, 0.14);
+    --rim-soft: rgba(212, 175, 55, 0.1);
+    --rim-strong: rgba(212, 175, 55, 0.4);
+
+    /* Layout rhythm */
+    --gutter: 1.5rem;
+    --margin: 2.5rem;
+    --radius-element: 4px;
+    --radius-card: 8px;
+
+    /* Atmospheric elevation */
+    --rim-inset: inset 0 1px 0 0 rgba(245, 215, 127, 0.2);
+    --shadow-card: 0 8px 32px -4px rgba(0, 0, 0, 0.6);
+    --shadow-focus: 0 0 40px -10px rgba(212, 175, 55, 0.25), 0 20px 40px -15px rgba(0, 0, 0, 0.9);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-void font-body text-ink antialiased;
+    min-height: 100vh;
+    background-attachment: fixed;
+    /* Void substrate: faint gold/astral nebulae plus a sparse starfield (Level 0). */
+    background-image:
+      radial-gradient(1100px 620px at 50% -12%, rgba(212, 175, 55, 0.07), transparent 62%),
+      radial-gradient(900px 520px at 104% 4%, rgba(129, 140, 248, 0.06), transparent 58%),
+      radial-gradient(760px 480px at -6% 96%, rgba(168, 85, 247, 0.05), transparent 60%),
+      radial-gradient(1.4px 1.4px at 18% 26%, rgba(245, 215, 127, 0.55), transparent),
+      radial-gradient(1.2px 1.2px at 72% 16%, rgba(226, 226, 235, 0.4), transparent),
+      radial-gradient(1.6px 1.6px at 84% 62%, rgba(245, 215, 127, 0.4), transparent),
+      radial-gradient(1.1px 1.1px at 34% 78%, rgba(226, 226, 235, 0.32), transparent),
+      radial-gradient(1.3px 1.3px at 58% 44%, rgba(245, 215, 127, 0.3), transparent),
+      radial-gradient(1.1px 1.1px at 8% 60%, rgba(226, 226, 235, 0.28), transparent);
+  }
+
+  ::selection {
+    background: rgba(212, 175, 55, 0.28);
+    color: var(--gold-bright);
+  }
+
+  /* Slim gilded scrollbar to match the observatory chrome. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold-muted) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(153, 123, 36, 0.5);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.6);
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  /* Level 1 — standard glass surface. */
+  .panel {
+    @apply rounded-card border border-rim bg-surface/80 backdrop-blur-xl;
+    box-shadow: var(--rim-inset);
+  }
+
+  /* Level 2 — elevated card / chart canvas. */
+  .panel-raised {
+    @apply rounded-card border border-rim bg-surface-raised/85 backdrop-blur-2xl;
+    box-shadow: var(--rim-inset), var(--shadow-card);
+  }
+
+  /* Telemetry label: uppercase, wide-tracked Space Grotesk. */
+  .label-caps {
+    @apply font-numeric uppercase text-ink-muted;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 14px;
+    letter-spacing: 0.14em;
+  }
+
+  /* Tabular numerals for degrees, timestamps and TST offsets (no jitter). */
+  .numeric {
+    @apply font-numeric;
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+
+  /* Antique burnished-bronze decorative divider. */
+  .gold-rule {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(90deg, transparent, var(--gold-muted), transparent);
+  }
+
+  /* Natal input field: dark tint with a crisp gold focus ring. */
+  .field {
+    @apply rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none transition;
+  }
+  .field::placeholder {
+    @apply text-ink-muted;
+  }
+  .field:focus {
+    border-color: var(--rim-strong);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.16);
+  }
+
+  /* Primary CTA — refined brass gold fill. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-element px-5 py-2.5 font-body text-sm font-semibold transition;
+    color: #3c2f00;
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    box-shadow: 0 6px 20px -8px rgba(212, 175, 55, 0.7);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.06);
+  }
+  .btn-primary:disabled {
+    @apply cursor-not-allowed opacity-50;
+    filter: none;
+  }
+
+  /* Secondary / ghost control framed by a hairline rim. */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-element border border-rim px-4 py-2 font-body text-sm text-ink-variant transition;
+  }
+  .btn-ghost:hover {
+    @apply border-rim-strong text-ink;
+    background: rgba(212, 175, 55, 0.06);
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums slashed-zero;
+  }
+  .text-glow-gold {
+    text-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+  }
+}

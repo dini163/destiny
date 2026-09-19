@@ -31,11 +31,27 @@ export default {
         // Western celestial & esoteric accents
         astral: '#818CF8',
         arcane: '#A855F7',
+        // Foreground ink (on-surface / parchment variant / muted label)
+        ink: {
+          DEFAULT: '#E2E2EB',
+          variant: '#D0C5AF',
+          muted: '#948C79',
+        },
+        // Hairline gilded wireframe used to frame glass surfaces
+        rim: {
+          DEFAULT: 'rgba(212, 175, 55, 0.14)',
+          soft: 'rgba(212, 175, 55, 0.10)',
+          strong: 'rgba(212, 175, 55, 0.40)',
+        },
       },
       fontFamily: {
-        display: ['"Noto Serif"', 'serif'],
-        body: ['Inter', 'sans-serif'],
-        numeric: ['"Space Grotesk"', 'monospace'],
+        display: ['"Noto Serif SC"', '"Noto Serif"', '"Songti SC"', 'serif'],
+        body: ['Inter', '"Noto Sans SC"', 'system-ui', 'sans-serif'],
+        numeric: ['"Space Grotesk"', '"Noto Sans SC"', 'monospace'],
+      },
+      spacing: {
+        gutter: '1.5rem',
+        margin: '2.5rem',
       },
       borderRadius: {
         element: '4px',
