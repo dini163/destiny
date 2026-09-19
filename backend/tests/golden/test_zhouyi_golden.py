@@ -30,6 +30,14 @@ from app.content.zhouyi_najia import (
     liushen_for_day_gan,
     najia_for_hexagram,
 )
+from app.content.zhouyi_text import (
+    YAO_CI,
+    YAO_CI_COUNT,
+    gua_ci,
+    line_name,
+    yao_ci,
+    yong_ci,
+)
 from app.content.zhouyi_trigrams import (
     TRIGRAMS,
     TRIGRAM_BY_BINARY,
@@ -37,6 +45,8 @@ from app.content.zhouyi_trigrams import (
     TRIGRAM_BY_MEIHUA,
     TRIGRAM_BY_NATURE,
 )
+from app.content.zhouyi_yaoci_lower import YAO_CI_LOWER, YAO_CI_LOWER_COUNT
+from app.content.zhouyi_yaoci_upper import YAO_CI_UPPER, YAO_CI_UPPER_COUNT
 from app.core.errors import InvalidCastInputError
 from app.engines.zhouyi import cast_hexagram
 from app.schemas.zhouyi import CastMethod
@@ -191,6 +201,53 @@ def test_yong_ci_exists_only_for_qian_and_kun() -> None:
     assert set(YONG_CI) == {1, 2}
     assert YONG_CI[1][0] == "用九" and YONG_CI[1][1] == "见群龙无首，吉。"
     assert YONG_CI[2][0] == "用六" and YONG_CI[2][1] == "利永贞。"
+
+
+# --- Classical text: 爻辞 (line statements) ---------------------------------
+
+
+def test_yao_ci_canons_split_the_sequence_and_merge_to_384() -> None:
+    assert YAO_CI_UPPER_COUNT == 30 and sorted(YAO_CI_UPPER) == list(range(1, 31))
+    assert YAO_CI_LOWER_COUNT == 34 and sorted(YAO_CI_LOWER) == list(range(31, 65))
+    assert YAO_CI_COUNT == 384
+    assert sorted(YAO_CI) == list(range(1, 65))
+    assert sum(len(texts) for texts in YAO_CI.values()) == 384
+
+
+def test_every_hexagram_has_six_nonempty_line_statements() -> None:
+    for number, texts in YAO_CI.items():
+        assert len(texts) == 6, number
+        for text in texts:
+            assert isinstance(text, str) and text.strip(), number
+            assert text.endswith("。"), number
+
+
+def test_yao_ci_matches_the_received_text_for_known_lines() -> None:
+    assert yao_ci(1, 1) == "潜龙勿用。"                       # 乾 初九
+    assert yao_ci(1, 5) == "飞龙在天，利见大人。"             # 乾 九五
+    assert yao_ci(1, 6) == "亢龙有悔。"                       # 乾 上九
+    assert yao_ci(2, 1) == "履霜，坚冰至。"                   # 坤 初六
+    assert yao_ci(2, 6) == "龙战于野，其血玄黄。"             # 坤 上六
+    assert yao_ci(15, 1) == "谦谦君子，用涉大川，吉。"        # 谦 初六
+    assert yao_ci(64, 6) == "有孚于饮酒，无咎，濡其首，有孚失是。"  # 未济 上九
+
+
+def test_line_name_derives_the_classical_title() -> None:
+    assert line_name(1, True) == "初九" and line_name(1, False) == "初六"
+    assert line_name(2, True) == "九二" and line_name(2, False) == "六二"
+    assert line_name(3, False) == "六三" and line_name(4, True) == "九四"
+    assert line_name(5, True) == "九五" and line_name(5, False) == "六五"
+    assert line_name(6, True) == "上九" and line_name(6, False) == "上六"
+
+
+def test_text_accessors_agree_with_the_raw_tables() -> None:
+    assert gua_ci(1) == GUA_CI[1]
+    assert yong_ci(1) == YONG_CI[1]
+    assert yong_ci(3) is None
+    for number in range(1, 65):
+        assert gua_ci(number) == GUA_CI[number]
+        for position in range(1, 7):
+            assert yao_ci(number, position) == YAO_CI[number][position - 1]
 
 
 # --- Casting and derivation -------------------------------------------------
