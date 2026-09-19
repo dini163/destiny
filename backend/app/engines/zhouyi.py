@@ -1,9 +1,9 @@
 """Zhouyi / Liuyao (周易六爻) casting and derivation engine.
 
 The engine casts six lines, resolves them to a hexagram via the curated tables,
-and dresses the primary (本卦) hexagram with 纳甲 (stem/branch), 六亲, 六神 and
-世应. It also derives the changed (变卦) and nuclear (互卦) hexagrams. Three
-casting methods are supported (PRD 6.x):
+and dresses the primary (本卦) hexagram with 纳甲 (stem/branch), 六亲, 六神,
+世应 and the classical 卦辞/爻辞. It also derives the changed (变卦) and nuclear
+(互卦) hexagrams. Three casting methods are supported (PRD 6.x):
 
 * ``three_coin`` — six throws of three coins, simulated with :mod:`secrets`.
 * ``manual``     — the caller supplies the six throws of three coins.
@@ -19,6 +19,7 @@ import secrets
 
 from lunar_python import Solar
 
+from app.content import zhouyi_text
 from app.content.wuxing import CONTROLLED_BY, GENERATES, GENERATED_BY, ZHI_ELEMENT
 from app.content.zhouyi_hexagrams import Hexagram, hexagram_from_lines, hexagram_from_trigrams
 from app.content.zhouyi_najia import liushen_for_day_gan, najia_for_hexagram
@@ -141,6 +142,7 @@ def _hexagram_info(hexagram: Hexagram) -> HexagramInfo:
     """Project a content :class:`Hexagram` into its response schema."""
     lower = TRIGRAM_BY_KEY[hexagram.lower]
     upper = TRIGRAM_BY_KEY[hexagram.upper]
+    yong = zhouyi_text.yong_ci(hexagram.number)   # (title, text) for 乾/坤, else None
     return HexagramInfo(
         number=hexagram.number,
         name_zh=hexagram.name_zh,
@@ -161,6 +163,8 @@ def _hexagram_info(hexagram: Hexagram) -> HexagramInfo:
         generation=hexagram.generation,
         shi=hexagram.shi,
         ying=hexagram.ying,
+        gua_ci=zhouyi_text.gua_ci(hexagram.number),
+        yong_ci=yong[1] if yong is not None else None,
     )
 
 
@@ -211,6 +215,8 @@ def cast_hexagram(
             liushen=liushen[position - 1],
             is_shi=position == ben.shi,
             is_ying=position == ben.ying,
+            yao_name=zhouyi_text.line_name(position, bool(bit)),
+            yao_ci=zhouyi_text.yao_ci(ben.number, position),
         )
         for position, (value, bit) in enumerate(zip(values, bits), start=1)
     ]

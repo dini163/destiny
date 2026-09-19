@@ -376,6 +376,41 @@ def test_manual_cast_rejects_missing_or_malformed_coins() -> None:
         _manual([[3, 2, 4]] + [[3, 2, 2]] * 5)      # invalid coin face
 
 
+# --- Classical text carried by a cast ---------------------------------------
+
+
+def test_qian_cast_carries_gua_ci_yong_jiu_and_yang_line_titles() -> None:
+    result = _manual([[3, 2, 2]] * 6)  # 乾为天, all young yang, no moving lines
+    assert result.ben.gua_ci == "元亨利贞。"
+    assert result.ben.yong_ci == "见群龙无首，吉。"                       # 乾 用九
+    assert [ln.yao_name for ln in result.lines] == ["初九", "九二", "九三", "九四", "九五", "上九"]
+    assert result.lines[0].yao_ci == "潜龙勿用。"
+    assert result.lines[4].yao_ci == "飞龙在天，利见大人。"
+
+
+def test_kun_cast_uses_yin_line_titles_and_yong_liu() -> None:
+    result = _manual([[2, 2, 2]] * 6)  # 坤为地, all young yin
+    assert result.ben.number == 2
+    assert result.ben.yong_ci == "利永贞。"                              # 坤 用六
+    assert [ln.yao_name for ln in result.lines] == ["初六", "六二", "六三", "六四", "六五", "上六"]
+    assert result.lines[0].yao_ci == "履霜，坚冰至。"
+
+
+def test_moving_line_reads_yao_ci_from_the_primary_hexagram() -> None:
+    result = _manual([[3, 3, 3]] + [[3, 2, 2]] * 5)  # 乾 line 1 moving -> 天风姤
+    assert result.ben.number == 1 and result.bian is not None and result.bian.number == 44
+    assert result.lines[0].moving is True
+    assert result.lines[0].yao_name == "初九"
+    assert result.lines[0].yao_ci == "潜龙勿用。"                        # from 乾, not 姤
+
+
+def test_non_qian_kun_hexagram_has_no_yong_ci() -> None:
+    result = cast_hexagram(method=CastMethod.TIME, cast_time=CAST_TIME)  # 天山遁 (33)
+    assert result.ben.number == 33
+    assert result.ben.gua_ci == "亨，小利贞。"
+    assert result.ben.yong_ci is None
+
+
 # --- HTTP adapter -----------------------------------------------------------
 
 
@@ -392,8 +427,11 @@ def test_zhouyi_cast_endpoint(client: TestClient) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["ben"]["number"] == 1
+    assert body["ben"]["gua_ci"] == "元亨利贞。"
     assert body["bian"] is None
     assert len(body["lines"]) == 6
+    assert body["lines"][0]["yao_name"] == "初九"
+    assert body["lines"][0]["yao_ci"] == "潜龙勿用。"
     assert body["engine"] == "liuyao-najia"
 
 

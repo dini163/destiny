@@ -1,8 +1,10 @@
 """Pydantic schemas for the Zhouyi / Liuyao (周易六爻) system.
 
 Field names are snake_case end-to-end. The primary (本卦) hexagram's six lines
-are fully dressed with 纳甲 (stem/branch), 六亲, 六神 and 世应; the changed
-(变卦) and nuclear (互卦) hexagrams are reported structurally.
+are fully dressed with 纳甲 (stem/branch), 六亲, 六神, 世应 and the classical
+爻题/爻辞; the changed (变卦) and nuclear (互卦) hexagrams are reported
+structurally. Every hexagram carries its 卦辞, and 乾/坤 additionally carry the
+用九/用六 line.
 """
 
 from datetime import datetime
@@ -52,10 +54,12 @@ class ZhouyiLine(BaseModel):
     liushen: str = Field(description="六神 assigned from the day stem.")
     is_shi: bool = Field(description="Whether this is the 世 (self) line.")
     is_ying: bool = Field(description="Whether this is the 应 (response) line.")
+    yao_name: str = Field(description="爻题 — classical line title, e.g. 初九 / 六二 / 上六.")
+    yao_ci: str = Field(description="爻辞 — the classical line statement of the primary hexagram.")
 
 
 class HexagramInfo(BaseModel):
-    """Structural identity of a hexagram (no classical text)."""
+    """Structural identity of a hexagram plus its classical 卦辞."""
 
     number: int = Field(description="King Wen sequence number 1-64.")
     name_zh: str = Field(description="Short name, e.g. 屯.")
@@ -76,6 +80,10 @@ class HexagramInfo(BaseModel):
     generation: str = Field(description="本宫/一世…五世/游魂/归魂.")
     shi: int = Field(description="世 line position 1-6.")
     ying: int = Field(description="应 line position 1-6.")
+    gua_ci: str = Field(description="卦辞 — the classical hexagram judgment.")
+    yong_ci: str | None = Field(
+        default=None, description="用九/用六 line (乾/坤 only); null for the other 62 hexagrams."
+    )
 
 
 class ZhouyiCast(BaseModel):
