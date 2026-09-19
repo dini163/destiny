@@ -1,0 +1,159 @@
+# ---------------------------------------------------------------------------
+# Destiny — .gitignore
+# Covers: OS cruft, editor/IDE files, secrets, Python (lunar-python/pyswisseph/
+# skyfield compute layer), Node/frontend build output, logs, temp, local data.
+# NOTE: design assets (*.html, *.png, *.md) and prd/*.md are intentionally
+#       TRACKED — do not add broad image/html ignores here.
+# ---------------------------------------------------------------------------
+
+# --- Operating system -------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Editor / IDE -----------------------------------------------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.iml
+*.swp
+*.swo
+*.swn
+*~
+.qoder/
+
+# --- Environment & secrets (never commit credentials) -----------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# --- Python (compute / ephemeris layer) -------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+# Swiss ephemeris large binary data fetched at runtime (keep repo lean)
+*.se1
+sweph/ephe/*.se1
+
+# --- Node / frontend build output ------------------------------------------
+node_modules/
+jspm_packages/
+bower_components/
+.npm/
+.npmrc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+dist/
+dist-ssr/
+build/
+out/
+.next/
+.nuxt/
+.out/
+.svelte-kit/
+.vite/
+.parcel-cache/
+.cache/
+.serverless/
+.vercel/
+.netlify/
+*.tsbuildinfo
+
+# --- Logs & runtime ---------------------------------------------------------
+logs/
+*.log
+run/
+*.pid
+*.seed
+*.pid.lock
+
+# --- Local databases / private user data (E2EE vaults stay off-repo) --------
+*.db
+*.sqlite
+*.sqlite3
+*.duckdb
+data/local/
+IndexedDB/
+*.ldif
+
+# --- Temp / scratch ---------------------------------------------------------
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+*.rej
+.cache_tmp/
+
+# --- Test / golden artifacts generated at runtime ---------------------------
+tests/golden/.cache/
+.golden-cache/
+
+# --- Packaging / archives ---------------------------------------------------
+*.zip
+*.tar.gz
+*.rar
+!design/**/*.zip
+
+# --- Design-tool source cruft (keep exported png/html, drop editable bins) --
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xd
+# Figma/Stitch export intermediates
+*.stitch/
