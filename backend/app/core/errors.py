@@ -28,6 +28,12 @@ class UnsupportedMethodError(DestinyError):
     status_code = 422
 
 
+class InvalidCastInputError(DestinyError):
+    """Casting input (e.g. manual coin throws) is missing or malformed."""
+
+    code = "invalid_cast_input"
+
+
 class EphemerisError(DestinyError):
     """The astronomical ephemeris could not produce a result."""
 
