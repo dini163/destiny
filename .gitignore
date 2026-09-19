@@ -157,3 +157,11 @@ tests/golden/.cache/
 *.xd
 # Figma/Stitch export intermediates
 *.stitch/
+
+# --- Monorepo build/test extras --------------------------------------------
+# (design/ and prd/ remain TRACKED; only generated artifacts are ignored)
+frontend/coverage/
+backend/coverage/
+.eslintcache
+*.tsbuildinfo
+.vite/
