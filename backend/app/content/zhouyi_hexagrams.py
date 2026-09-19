@@ -125,8 +125,8 @@ class Hexagram:
 
     @property
     def symbol(self) -> str:
-        """Unicode hexagram glyph, composed from the two trigram symbols."""
-        return TRIGRAM_BY_KEY[self.upper].symbol + TRIGRAM_BY_KEY[self.lower].symbol
+        """Unicode hexagram glyph (U+4DC0.. are ordered by the King Wen sequence)."""
+        return chr(0x4DC0 + self.number - 1)
 
 
 def _parse_trigrams(full_name_zh: str) -> tuple[str, str]:
