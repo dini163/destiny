@@ -18,6 +18,14 @@ from datetime import date, datetime, time
 
 from lunar_python import Lunar, Solar
 
+from app.content.wuxing import (
+    CONTROLS,
+    CONTROLLED_BY,
+    ELEMENT_ORDER,
+    GAN_ELEMENT,
+    GENERATES,
+    GENERATED_BY,
+)
 from app.schemas.bazi import (
     BaziChart,
     BaziPillar,
@@ -34,22 +42,7 @@ from app.solar.true_solar_time import (
 )
 
 # --- Fixed classical reference tables (standard, not computed) ---------------
-
-ELEMENT_ORDER = ("木", "火", "土", "金", "水")
-
-# Heavenly-stem -> element.
-GAN_ELEMENT = {
-    "甲": "木", "乙": "木", "丙": "火", "丁": "火", "戊": "土",
-    "己": "土", "庚": "金", "辛": "金", "壬": "水", "癸": "水",
-}
-
-# 五行相生 (X generates Y): 木生火, 火生土, 土生金, 金生水, 水生木.
-GENERATES = {"木": "火", "火": "土", "土": "金", "金": "水", "水": "木"}
-# 五行相克 (X controls Y): 木克土, 土克水, 水克火, 火克金, 金克木.
-CONTROLS = {"木": "土", "土": "水", "水": "火", "火": "金", "金": "木"}
-# Inverses: element -> what generates it (印), and what controls it (官杀).
-GENERATED_BY = {value: key for key, value in GENERATES.items()}
-CONTROLLED_BY = {value: key for key, value in CONTROLS.items()}
+# The five-element cycles and stem/branch elements live in app.content.wuxing.
 
 # Ten-gods that strengthen the day master (同党: 印 + 比劫).
 SHISHEN_SUPPORT = frozenset({"比肩", "劫财", "正印", "偏印"})
