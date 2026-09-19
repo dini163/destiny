@@ -13,6 +13,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.content.wuxing import ZHI_ELEMENT
+from app.content.zhouyi_guaci import GUA_CI, GUA_CI_COUNT, YONG_CI
 from app.content.zhouyi_hexagrams import (
     HEXAGRAMS,
     HEXAGRAM_BY_LINES,
@@ -165,6 +166,31 @@ def test_liushen_assignment_starts_from_day_stem_beast() -> None:
     assert set(beasts) == set(LIUSHEN_ORDER)
     # 壬/癸 day starts with 玄武.
     assert liushen_for_day_gan("壬")[0] == "玄武"
+
+
+# --- Classical text: 卦辞 (hexagram judgments) -------------------------------
+
+
+def test_all_sixty_four_gua_ci_are_present_and_nonempty() -> None:
+    assert GUA_CI_COUNT == 64
+    assert sorted(GUA_CI) == list(range(1, 65))
+    for number, text in GUA_CI.items():
+        assert isinstance(text, str) and text.strip(), number
+        assert text.endswith("。"), number
+
+
+def test_gua_ci_matches_the_received_text_for_known_hexagrams() -> None:
+    assert GUA_CI[1] == "元亨利贞。"                       # 乾
+    assert GUA_CI[2].startswith("元亨，利牝马之贞。")        # 坤
+    assert GUA_CI[3] == "元亨利贞，勿用有攸往，利建侯。"    # 屯
+    assert GUA_CI[44] == "女壮，勿用取女。"                 # 姤
+    assert GUA_CI[63] == "亨小，利贞，初吉终乱。"           # 既济
+
+
+def test_yong_ci_exists_only_for_qian_and_kun() -> None:
+    assert set(YONG_CI) == {1, 2}
+    assert YONG_CI[1][0] == "用九" and YONG_CI[1][1] == "见群龙无首，吉。"
+    assert YONG_CI[2][0] == "用六" and YONG_CI[2][1] == "利永贞。"
 
 
 # --- Casting and derivation -------------------------------------------------
