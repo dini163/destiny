@@ -23,6 +23,11 @@ def test_search_cities_matches_substring() -> None:
     assert {"北京", "南京"} <= names
 
 
+def test_search_cities_prefers_exact_name_over_province_matches() -> None:
+    """吉林 is a city *and* a province label; the city must win."""
+    assert search_cities("吉林")[0].name == "吉林"
+
+
 def test_search_cities_empty_query_returns_default_page() -> None:
     results = search_cities("")
     assert 0 < len(results) <= 10

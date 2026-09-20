@@ -31,11 +31,18 @@ def _load_cities() -> tuple[City, ...]:
 
 
 def search_cities(query: str, limit: int = 10) -> list[City]:
-    """Return cities whose name contains the query (case-insensitive)."""
+    """Return cities whose name or province contains the query, exact names first.
+
+    Exact-match-first matters because the resolvers below take the head of this list:
+    吉林 is both a city and a province label, and a plain substring scan would hand
+    back 长春 for it.
+    """
     needle = query.strip().lower()
+    cities = _load_cities()
     if not needle:
-        return list(_load_cities()[:limit])
-    matches = [c for c in _load_cities() if needle in c.name.lower() or needle in c.province.lower()]
+        return list(cities[:limit])
+    matches = [c for c in cities if needle in c.name.lower() or needle in c.province.lower()]
+    matches.sort(key=lambda city: city.name.lower() != needle)
     return matches[:limit]
 
 
