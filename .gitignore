@@ -112,6 +112,10 @@ out/
 .vercel/
 .netlify/
 *.tsbuildinfo
+# Frontend `src/lib/` is real source code — re-include it (and everything under
+# it) so the bare `lib/` Python-artifact rule above does not swallow it.
+!frontend/src/lib/
+!frontend/src/lib/**
 
 # --- Logs & runtime ---------------------------------------------------------
 logs/
