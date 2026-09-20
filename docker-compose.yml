@@ -1,9 +1,18 @@
+# Destiny — local/production compose stack.
+#
+# `docker compose up --build` serves the web client on http://localhost:8080 and
+# proxies /api to the backend; the API itself is reachable on :8000 for direct
+# probing and OpenAPI docs. A .env file is optional — every setting has a
+# container-safe default (see .env.example).
 services:
   backend:
     build:
       context: ./backend
+    image: destiny-backend:0.1.0
+    container_name: destiny-backend
     env_file:
-      - .env
+      - path: .env
+        required: false
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -11,8 +20,11 @@ services:
   frontend:
     build:
       context: ./frontend
+    image: destiny-frontend:0.1.0
+    container_name: destiny-frontend
     ports:
       - "8080:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: unless-stopped
