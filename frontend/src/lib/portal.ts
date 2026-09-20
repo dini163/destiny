@@ -1,0 +1,255 @@
+/**
+ * Portal (聚合测算大厅) catalogue — the multi-civilisation entry matrix.
+ *
+ * This is curated *navigational* content (which systems exist, what each one is,
+ * which are live now), not computed results, so it honours the no-mock rule: the
+ * four MVP systems point at real routes from `nav.ts` (the single source of truth
+ * for paths), and every other system is declared Phase-2 with `route: null` and an
+ * honest build status. Blurbs describe each discipline factually; no chart value,
+ * reading or almanac verdict is invented here.
+ */
+
+import type { IconName } from '../components/ui/Icon';
+import { ROUTES } from '../nav';
+
+/** Civilisation groupings, aligned with the secondary nav in `nav.ts`. */
+export type PortalCategoryId = 'chinese' | 'western' | 'vedicNorse';
+
+export interface PortalCategory {
+  id: PortalCategoryId;
+  label: string;
+}
+
+/** Filter tabs; counts are derived from the catalogue, never hard-coded. */
+export const PORTAL_CATEGORIES: readonly PortalCategory[] = [
+  { id: 'chinese', label: '华夏术数' },
+  { id: 'western', label: '西洋秘学' },
+  { id: 'vedicNorse', label: '吠陀与北欧' },
+];
+
+export interface PortalSystem {
+  /** Stable slug, matching the nav where the system is navigable. */
+  slug: string;
+  nameZh: string;
+  nameEn: string;
+  category: PortalCategoryId;
+  /** One-line factual description of the discipline. */
+  blurb: string;
+  /** One or two short capability tags. */
+  highlights: string[];
+  /** Call-to-action label (MVP only). */
+  cta: string;
+  /** Absolute route when live; null marks a Phase-2 system. */
+  route: string | null;
+  /** Phase-2 build status; null for a live MVP system. */
+  status: string | null;
+  icon: IconName;
+}
+
+/** A system is navigable exactly when it has a real route (the four MVP). */
+export function isLive(system: PortalSystem): boolean {
+  return system.route !== null;
+}
+
+/**
+ * The full 16-system roadmap. The four MVP systems lead (八字 / 周易 / 西洋本命 /
+ * 塔罗), each wired to its real route; the remaining twelve are Phase-2 and carry
+ * an honest status instead of a link.
+ */
+export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
+  {
+    slug: 'bazi-natal',
+    nameZh: '八字命理',
+    nameEn: 'BAZI NATAL',
+    category: 'chinese',
+    blurb: '《渊海子平》正宗四柱推演，以天干地支五行生克制化，厘定身强身弱与十神大运走势。',
+    highlights: ['十神精微', '真太阳时'],
+    cta: '立即排盘',
+    route: ROUTES.baziNatal,
+    status: null,
+    icon: 'timeline',
+  },
+  {
+    slug: 'zhouyi-divination',
+    nameZh: '周易六爻',
+    nameEn: 'I CHING',
+    category: 'chinese',
+    blurb: '文王六十四卦精研，京房纳甲卦变。铜钱三掷起卦，定世应六亲六神，附通行本卦爻辞原文。',
+    highlights: ['古籍原文', '世应动爻'],
+    cta: '摇铜求卦',
+    route: ROUTES.zhouyi,
+    status: null,
+    icon: 'compass',
+  },
+  {
+    slug: 'western-astrology',
+    nameZh: '西洋本命星盘',
+    nameEn: 'NATAL CHART',
+    category: 'western',
+    blurb: '基于普拉西德分宫制与精密黄道，解构日月升、十行星落座落宫、相位与守护格局。',
+    highlights: ['瑞士星历', '精密相位'],
+    cta: '测绘星图',
+    route: ROUTES.westernNatal,
+    status: null,
+    icon: 'sun',
+  },
+  {
+    slug: 'tarot-oracle',
+    nameZh: '经典塔罗神谕',
+    nameEn: 'TAROT ORACLE',
+    category: 'western',
+    blurb: '78 张伟特系大小阿卡纳原生牌阵，凯尔特十字、时间之流与关系牌阵深度洞察。',
+    highlights: ['洗牌抽卡', '牌阵解析'],
+    cta: '开启抽牌',
+    route: ROUTES.tarot,
+    status: null,
+    icon: 'sparkle',
+  },
+  {
+    slug: 'ziwei-doushu',
+    nameZh: '紫微斗数',
+    nameEn: 'ZI WEI',
+    category: 'chinese',
+    blurb: '十二宫垣星曜罗列，紫微天府南北斗交辉，四化飞星直断流年大限气数。',
+    highlights: ['十二宫四化体系'],
+    cta: '',
+    route: null,
+    status: '研发中',
+    icon: 'vault',
+  },
+  {
+    slug: 'qimen-dunjia',
+    nameZh: '奇门遁甲',
+    nameEn: 'QI MEN',
+    category: 'chinese',
+    blurb: '帝王之术，九星八门八神九宫定局，天地人神四盘交错，谋定决策时空场。',
+    highlights: ['时家转盘法'],
+    cta: '',
+    route: null,
+    status: '研发中',
+    icon: 'gauge',
+  },
+  {
+    slug: 'plum-blossom',
+    nameZh: '梅花易数',
+    nameEn: 'PLUM BLOSSOM',
+    category: 'chinese',
+    blurb: '邵康节灵应法门，随感随应、物象心机，报数方位声色皆可起体用卦象。',
+    highlights: ['体用互变论'],
+    cta: '',
+    route: null,
+    status: '算法验证中',
+    icon: 'seal',
+  },
+  {
+    slug: 'name-metric',
+    nameZh: '五格姓名学',
+    nameEn: 'NAME METRIC',
+    category: 'chinese',
+    blurb: '康熙字典原笔画核定，天格地格人格总格外格相生相克数理吉凶。',
+    highlights: ['81 数理吉凶表'],
+    cta: '',
+    route: null,
+    status: '字典比对中',
+    icon: 'search',
+  },
+  {
+    slug: 'physiognomy',
+    nameZh: '麻衣面相神鉴',
+    nameEn: 'PHYSIOGNOMY',
+    category: 'chinese',
+    blurb: '十三部位总歌与十二宫气色流年，三停六府骨相分野，辅以计算机视觉微特征锚点。',
+    highlights: ['视觉关键点测绘'],
+    cta: '',
+    route: null,
+    status: 'CV 模型校准',
+    icon: 'pin',
+  },
+  {
+    slug: 'lenormand-cards',
+    nameZh: '雷诺曼神谕',
+    nameEn: 'LENORMAND',
+    category: 'western',
+    blurb: '欧式 36 张生活微观象征图画，大画卷（Grand Tableau）全景排布直析吉凶线索。',
+    highlights: ['36 张全景大阵'],
+    cta: '',
+    route: null,
+    status: '美工渲染中',
+    icon: 'vault',
+  },
+  {
+    slug: 'astrology-transit',
+    nameZh: '行运次限推运',
+    nameEn: 'TRANSIT & SEC.',
+    category: 'western',
+    blurb: '外行星过境、太阳弧与次限法双重时间轴对碰，动态叠加本命盘。',
+    highlights: ['多盘动态重叠'],
+    cta: '',
+    route: null,
+    status: '研发中',
+    icon: 'timeline',
+  },
+  {
+    slug: 'numerology-matrix',
+    nameZh: '毕达哥拉斯灵数',
+    nameEn: 'NUMEROLOGY',
+    category: 'western',
+    blurb: '生命道路数、表现数与灵魂渴求数，以数字震动频率洞察天赋潜能与流年周期。',
+    highlights: ['九宫九星数阵'],
+    cta: '',
+    route: null,
+    status: '架构中',
+    icon: 'gauge',
+  },
+  {
+    slug: 'kabbalah-tree',
+    nameZh: '卡巴拉生命之树',
+    nameEn: 'KABBALAH',
+    category: 'western',
+    blurb: '十原质（Sephiroth）与 22 条神圣路径，对应塔罗大阿卡纳与希伯来字母创世密源。',
+    highlights: ['原质路径升华'],
+    cta: '',
+    route: null,
+    status: '文献整理',
+    icon: 'compass',
+  },
+  {
+    slug: 'synastry-composite',
+    nameZh: '合盘与相契度',
+    nameEn: 'SYNASTRY',
+    category: 'western',
+    blurb: '双人本命比较盘、组合盘（Composite）及八字三元合婚纳音法，直击因缘契合力学。',
+    highlights: ['双轨关系合力'],
+    cta: '',
+    route: null,
+    status: '架构中',
+    icon: 'check',
+  },
+  {
+    slug: 'vedic-astrology',
+    nameZh: '吠陀乔蒂什',
+    nameEn: 'JYOTISH',
+    category: 'vedicNorse',
+    blurb: '基于恒星黄道（Lahiri Ayanamsa）及 27 宿（Nakshatras），推演业力因果与达夏大运。',
+    highlights: ['南印 / 北印方盘'],
+    cta: '',
+    route: null,
+    status: '内测中',
+    icon: 'sun',
+  },
+  {
+    slug: 'norse-runes',
+    nameZh: '北欧卢恩符文',
+    nameEn: 'ELDER FUTHARK',
+    category: 'vedicNorse',
+    blurb: '古老弗萨克 24 字符石，融合奥丁智慧诗篇与命运三女神（Norns）纺线织网。',
+    highlights: ['乌尔德泉水阵'],
+    cta: '',
+    route: null,
+    status: '研发中',
+    icon: 'seal',
+  },
+];
+
+/** Count of live (MVP) systems, for the hero copy. */
+export const LIVE_SYSTEM_COUNT = PORTAL_SYSTEMS.filter(isLive).length;
