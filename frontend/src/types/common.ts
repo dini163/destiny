@@ -1,0 +1,47 @@
+/**
+ * Shared API types mirroring `backend/app/schemas/common.py`.
+ *
+ * Field names stay snake_case to match the JSON contract exactly, so responses are
+ * consumed without a mapping layer. Python `date`/`time` arrive as ISO strings.
+ */
+
+/** Calendar system of the supplied birth date. */
+export type CalendarType = 'solar' | 'lunar';
+
+/** Subject gender; required by systems whose luck pillars depend on it. */
+export type Gender = 'male' | 'female';
+
+/** Common birth-data input shared by the natal-chart systems. */
+export interface BirthInput {
+  /** Birth date, ISO `yyyy-mm-dd`. */
+  birth_date: string;
+  /** Birth time, `HH:MM` or `HH:MM:SS`. */
+  birth_time: string;
+  calendar?: CalendarType;
+  city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  gender?: Gender | null;
+}
+
+/** True Solar Time preview shown in the input console. */
+export interface TrueSolarTimeResponse {
+  standard_time: string;
+  true_solar_time: string;
+  offset_minutes: number;
+  longitude: number;
+}
+
+/** A geocoded city returned by the location picker. */
+export interface City {
+  name: string;
+  province: string;
+  latitude: number;
+  longitude: number;
+}
+
+/** Liveness probe response from `GET /health`. */
+export interface HealthResponse {
+  status: string;
+  service: string;
+}
