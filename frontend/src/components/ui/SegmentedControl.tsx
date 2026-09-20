@@ -33,7 +33,7 @@ export function SegmentedControl<T extends string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className={`inline-flex rounded-element border border-rim bg-[#0e111a] p-0.5 ${className ?? ''}`}
+      className={`inline-flex shrink-0 rounded-element border border-rim bg-[#0e111a] p-0.5 ${className ?? ''}`}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -46,8 +46,8 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={
               active
-                ? 'rounded-[3px] bg-gradient-to-b from-gold-bright to-gold px-3 py-1.5 text-sm font-semibold text-[#3c2f00] transition'
-                : 'rounded-[3px] px-3 py-1.5 text-sm text-ink-muted transition hover:text-ink'
+                ? 'whitespace-nowrap rounded-[3px] bg-gradient-to-b from-gold-bright to-gold px-3 py-1.5 text-sm font-semibold text-[#3c2f00] transition'
+                : 'whitespace-nowrap rounded-[3px] px-3 py-1.5 text-sm text-ink-muted transition hover:text-ink'
             }
           >
             {option.label}
