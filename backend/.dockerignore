@@ -1,0 +1,16 @@
+# Local interpreter, caches and packaging artefacts never belong in the image.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# The suite runs in CI and locally; the runtime image does not need it.
+tests/
+
+.env
+.env.*
