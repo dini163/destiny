@@ -1,0 +1,37 @@
+/**
+ * Destiny brand lockup — the eight-pointed observatory star beside the wordmark.
+ *
+ * Purely presentational (no routing) so it can sit inside the header link or the
+ * footer seal. The star geometry matches `public/favicon.svg` for one identity.
+ */
+export function BrandMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className="flex items-center gap-3">
+      <svg viewBox="0 0 64 64" className="h-8 w-8 shrink-0" role="img" aria-label="Destiny">
+        <g fill="none" stroke="#D4AF37" strokeWidth={1.25}>
+          <circle cx="32" cy="32" r="23" opacity="0.45" />
+          <circle cx="32" cy="32" r="17" opacity="0.3" />
+        </g>
+        <path
+          d="M32 5 L36.6 27.4 L59 32 L36.6 36.6 L32 59 L27.4 36.6 L5 32 L27.4 27.4 Z"
+          fill="#D4AF37"
+        />
+        <g stroke="#F5D77F" strokeWidth={1.1} opacity="0.65">
+          <path d="M14.5 14.5 L26 26" />
+          <path d="M49.5 14.5 L38 26" />
+          <path d="M49.5 49.5 L38 38" />
+          <path d="M14.5 49.5 L26 38" />
+        </g>
+        <circle cx="32" cy="32" r="2.6" fill="#0B0D13" />
+      </svg>
+      {!compact && (
+        <span className="flex flex-col leading-none">
+          <span className="font-display text-lg font-semibold tracking-[0.18em] text-gold">
+            DESTINY
+          </span>
+          <span className="label-caps mt-1.5">ASTRAL OBSERVATORY</span>
+        </span>
+      )}
+    </span>
+  );
+}

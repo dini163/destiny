@@ -1,22 +1,15 @@
+import { RouterProvider } from 'react-router-dom';
+
+import { router } from './router';
+
 /**
- * Application root.
+ * Application root — mounts the router.
  *
- * Scaffold step: renders a branded splash that exercises the Celestial Obsidian
- * tokens (display/body/numeric fonts, gold palette, glass panel component class).
- * The next step replaces this body with the router-mounted global AppShell.
+ * The persistent AppShell layout (nav, status bar, footer disclaimer) and all
+ * route definitions live in `router.tsx`. TanStack Query is layered on in Step 10
+ * when the API client and query hooks arrive. The `v7_startTransition` future flag
+ * opts into React Router v7's transition-wrapped state updates early (React 18).
  */
 export default function App() {
-  return (
-    <main className="flex min-h-screen items-center justify-center px-margin">
-      <div className="panel-raised px-12 py-10 text-center">
-        <p className="label-caps">Astral Observatory</p>
-        <h1 className="mt-4 font-display text-5xl font-semibold text-gold-bright text-glow-gold">
-          Destiny
-        </h1>
-        <div className="gold-rule mx-auto my-5 w-40" />
-        <p className="font-display text-lg text-ink-variant">跨文明命运测算聚合平台</p>
-        <p className="mt-2 text-sm text-ink-muted">前端基座已就绪 · 全局导航与路由构建中</p>
-      </div>
-    </main>
-  );
+  return <RouterProvider router={router} future={{ v7_startTransition: true }} />;
 }
