@@ -30,6 +30,14 @@ interface InputBarProps {
   badge?: string;
   /** Show the 公历/农历 toggle (Chinese systems); Western natal is Gregorian-only. */
   showCalendar?: boolean;
+  /**
+   * Require a latitude as well as a longitude before enabling submit. Western
+   * charts need the full geographic position because houses and the ascendant
+   * depend on latitude, not just longitude.
+   */
+  requireLatitude?: boolean;
+  /** Overrides the default True Solar Time preview (e.g. the Western UTC-offset note). */
+  footerSlot?: ReactNode;
   /** System-specific controls (e.g. gender, house system) rendered in the grid. */
   children?: ReactNode;
   /** Primary button label. */
@@ -55,6 +63,8 @@ export function InputBar({
   subtitle,
   badge,
   showCalendar = false,
+  requireLatitude = false,
+  footerSlot,
   children,
   submitLabel,
   pending = false,
@@ -69,7 +79,11 @@ export function InputBar({
     longitude: null,
   });
 
-  const ready = birthDate !== '' && birthTime !== '' && location.longitude != null;
+  const ready =
+    birthDate !== '' &&
+    birthTime !== '' &&
+    location.longitude != null &&
+    (!requireLatitude || location.latitude != null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -157,13 +171,19 @@ export function InputBar({
         {children ? <div className="flex flex-col gap-3 xl:col-span-3">{children}</div> : null}
       </div>
 
-      <TrueSolarTimeBadge
-        date={birthDate || null}
-        time={birthTime || null}
-        longitude={location.longitude ?? null}
-      />
+      {footerSlot ?? (
+        <TrueSolarTimeBadge
+          date={birthDate || null}
+          time={birthTime || null}
+          longitude={location.longitude ?? null}
+        />
+      )}
       {!ready ? (
-        <p className="label-caps text-ink-muted">填写出生日期、时间并完成定位后即可排盘。</p>
+        <p className="label-caps text-ink-muted">
+          {requireLatitude
+            ? '填写出生日期、时间并完成经纬度定位后即可排盘。'
+            : '填写出生日期、时间并完成定位后即可排盘。'}
+        </p>
       ) : null}
     </form>
   );
