@@ -38,6 +38,11 @@ interface InputBarProps {
   requireLatitude?: boolean;
   /** Overrides the default True Solar Time preview (e.g. the Western UTC-offset note). */
   footerSlot?: ReactNode;
+  /**
+   * Pre-fill the fields, for a page reached from a link whose query string carries
+   * the birth data. Seeds the boxes once; a mounted console stays under the user's edits.
+   */
+  initial?: BirthInputValues;
   /** System-specific controls (e.g. gender, house system) rendered in the grid. */
   children?: ReactNode;
   /** Primary button label. */
@@ -65,18 +70,19 @@ export function InputBar({
   showCalendar = false,
   requireLatitude = false,
   footerSlot,
+  initial,
   children,
   submitLabel,
   pending = false,
   onSubmit,
 }: InputBarProps) {
-  const [birthDate, setBirthDate] = useState('');
-  const [birthTime, setBirthTime] = useState('');
-  const [calendar, setCalendar] = useState<CalendarType>('solar');
+  const [birthDate, setBirthDate] = useState(initial?.birth_date ?? '');
+  const [birthTime, setBirthTime] = useState(initial?.birth_time ?? '');
+  const [calendar, setCalendar] = useState<CalendarType>(initial?.calendar ?? 'solar');
   const [location, setLocation] = useState<LocationValue>({
-    city: null,
-    latitude: null,
-    longitude: null,
+    city: initial?.city ?? null,
+    latitude: initial?.latitude ?? null,
+    longitude: initial?.longitude ?? null,
   });
 
   const ready =
