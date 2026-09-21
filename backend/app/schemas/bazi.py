@@ -6,6 +6,10 @@ the frontend can consume responses without a mapping layer.
 
 from pydantic import BaseModel, Field
 
+from app.schemas.bazi_breakdown import DayunDetail, Provenance, TenGodReading
+from app.schemas.bazi_interpret import BaziInterpretation
+from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
+from app.schemas.bazi_strength import GeJu, HiddenStemWeight, Yongshen
 from app.schemas.common import BirthInput, Gender
 from app.schemas.scoring import ScoreValue
 
@@ -70,16 +74,14 @@ class DayMasterAnalysis(BaseModel):
     borderline: bool = Field(
         description="距 65/45 分界不足 3 分：档位可信但命局偏中和，UI 须明示临界。"
     )
-    support_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
-    drain_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
-    strength_ratio: float = Field(
-        description="已弃用：旧的 support/(support+drain) 比例，无古籍出处；"
-        "日主强弱的可核对口径是 strength: ScoreValue（得令/得地/得势三因子账本）。"
-    )
     level: str = Field(description="weak | balanced | strong")
     label: str = Field(description="Chinese label, e.g. 身弱")
-    favorable_elements: list[str] = Field(description="Favourable elements (喜用神)")
-    unfavorable_elements: list[str] = Field(description="Unfavourable elements (忌神)")
+    favorable_elements: list[str] = Field(
+        description="喜用神：三法合并结果，镜像 `yongshen.favorable_elements`（spec §6.5）。"
+    )
+    unfavorable_elements: list[str] = Field(
+        description="忌神：三法合并结果，镜像 `yongshen.unfavorable_elements`。"
+    )
     summary: str = Field(description="Concise human-readable restatement of the analysis")
 
 
@@ -109,6 +111,7 @@ class BaziChart(BaseModel):
     """Complete BaZi natal chart produced by :mod:`app.engines.bazi`."""
 
     # Provenance / input echo
+    name: str | None = Field(default=None, description="命主称谓，仅回显，不参与任何计算。")
     standard_datetime: str = Field(description="Civil standard-time input, e.g. 1988-02-15 23:30")
     calendar: str = Field(description="Calendar of the supplied date: solar | lunar")
     true_solar_time: str | None = Field(description="True Solar Time used for charting, if applied")
@@ -130,7 +133,9 @@ class BaziChart(BaseModel):
 
     # Five elements + analysis
     wuxing: list[WuxingScore] = Field(description="Five-element scores in 木火土金水 order")
-    missing_elements: list[str] = Field(description="Elements absent from the eight characters")
+    missing_elements: list[str] = Field(
+        description="主字与藏干皆无的五行（与 `wuxing.count` 口径不同：后者不含藏干）。"
+    )
     analysis: DayMasterAnalysis
 
     # Luck cycles
@@ -138,5 +143,17 @@ class BaziChart(BaseModel):
     dayun_start_solar: str | None = Field(description="Solar date the first luck pillar begins")
     dayun: list[DayunStep]
     current_liunian: list[LiunianYear] = Field(description="Annual fortunes within the current dayun")
+
+    # Interpretation breakdown (spec §7)
+    geju: GeJu | None = None
+    yongshen: Yongshen | None = None
+    shensha: list[ShenShaEntry] = Field(default_factory=list)
+    ten_god_readings: list[TenGodReading] = Field(default_factory=list)
+    relations: list[RelationPair] = Field(default_factory=list)
+    branch_groups: list[BranchGroup] = Field(default_factory=list)
+    hidden_stem_ledger: list[HiddenStemWeight] = Field(default_factory=list)
+    dayun_current: DayunDetail | None = None
+    interpretation: BaziInterpretation | None = None
+    provenance: Provenance | None = None
 
     engine: str = Field(default="lunar-python", description="Authoritative computation engine")
