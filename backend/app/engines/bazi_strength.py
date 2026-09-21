@@ -1,10 +1,16 @@
-"""三因子日主旺衰（得令/得地/得势）+ 扶抑取用，逐项留账。
+"""三因子日主旺衰（得令/得地/得势）+ 月令定格 + 藏干权重账本 + 扶抑喜忌，逐项留账。
 
 本模块是 spec §6.1/§6.4/§6.5 第 1 法的直译：权重、阈值、间距都在下面显式声明为
 模型参数，`source` 一律引用 ``MODEL_PARAM_SOURCE``。引擎不产中文明细文案，只产
 规则键与数字（spec §5）；账本 `label` 里带上算式，使每个数都能就地复核。
+格局判语（`GeJu.notes`）是从 `content/bazi_geju` 的署名条目里**整句选出**，
+引擎只做十神查表与选择，不组句、不改写。
 """
 
+from collections.abc import Sequence
+
+from app.content.bazi_geju import GejuRule, geju_rule
+from app.content.bazi_shensha import shen_sha_rule
 from app.content.bazi_wangshuai import WANG_SHUAI_VALUE, wang_shuai
 from app.content.wuxing import (
     CONTROLLED_BY,
@@ -15,6 +21,7 @@ from app.content.wuxing import (
     ZHI_ELEMENT,
 )
 from app.schemas.bazi import BaziPillar
+from app.schemas.bazi_strength import GeJu, HiddenStemWeight
 from app.schemas.scoring import MODEL_PARAM_SOURCE, ScoreFactor, ScoreValue, build_ledger
 from pydantic import BaseModel, Field
 
@@ -22,6 +29,9 @@ from pydantic import BaseModel, Field
 HIDDEN_STEM_WEIGHTS: tuple[float, float, float] = (0.6, 0.3, 0.1)
 SINGLE_HIDDEN_STEM_WEIGHT: float = 1.0
 STEM_WEIGHT = 1.0
+HIDDEN_STEM_ROLES = ("本气", "中气", "余气")
+# 比劫不分取用：月支本气是比劫时，该支不 alone 成格，退藏干次层或落禄刃（spec §6.4）。
+PARALLEL_GODS = frozenset({"比肩", "劫财"})
 # 三因子权重与档位分界（spec §6.4，模型参数）。
 FACTOR_WEIGHTS: tuple[float, float, float] = (0.4, 0.4, 0.2)
 STRONG_CUT = 65.0
@@ -173,3 +183,65 @@ def fuyin_choices(
     if level == "weak":
         return rank(support), rank(drain)
     return rank(drain), rank(support)
+
+
+def detect_geju(pillars: list[BaziPillar]) -> GeJu:
+    """Month-branch hidden stems set the structure, main qi first (spec §6.4)."""
+    month = next(pillar for pillar in pillars if pillar.position == "month")
+    day = next(pillar for pillar in pillars if pillar.position == "day")
+    ten_god = next((g for g in month.shishen_zhi if g not in PARALLEL_GODS), None)
+    if ten_god is None:
+        # 整支皆比劫的月支只可能是日干之禄或刃：阳干见刃支为月刃，阴干无刃、其支即禄。
+        name = "月刃格" if month.zhi in shen_sha_rule("羊刃").table.get(day.gan, ()) else "建禄格"
+        ten_god = "比肩"
+    else:
+        name = f"{ten_god}格"
+    rule = geju_rule(name)
+    is_success, notes = geju_verdict(rule, _transparent_gods(pillars))
+    return GeJu(
+        name=name,
+        from_pillar="month",
+        ten_god=ten_god,
+        is_success=is_success,
+        notes=notes,
+        source=rule.source,
+    )
+
+
+def _transparent_gods(pillars: list[BaziPillar]) -> list[str]:
+    """年/月/时三天干的十神，去重保柱序 —— 古法所谓"透干"，藏干不参与判格。"""
+    gods: list[str] = []
+    for pillar in pillars:
+        if pillar.position != "day" and pillar.shishen_gan not in gods:
+            gods.append(pillar.shishen_gan)
+    return gods
+
+
+def geju_verdict(rule: GejuRule, transparent_gods: Sequence[str]) -> tuple[bool, list[str]]:
+    """破格优先于成格之助；两不命中记 unsupported，不默认成格（spec §6.4）。"""
+    broken = [rule.breaking[god] for god in transparent_gods if god in rule.breaking]
+    if broken:
+        return False, broken
+    supported = [rule.supporting[god] for god in transparent_gods if god in rule.supporting]
+    if supported:
+        return True, supported
+    return False, [rule.unsupported]
+
+
+def hidden_stem_ledger(pillars: list[BaziPillar]) -> list[HiddenStemWeight]:
+    """One row per hidden stem with its role, weight and ten-god (spec §6.1, §7)."""
+    return [
+        HiddenStemWeight(
+            position=pillar.position,
+            branch=pillar.zhi,
+            stem=stem,
+            role=HIDDEN_STEM_ROLES[index],
+            weight=hidden_stem_weight(index, len(pillar.hidden_stems)),
+            ten_god=ten_god,
+            source=MODEL_PARAM_SOURCE,
+        )
+        for pillar in pillars
+        for index, (stem, ten_god) in enumerate(
+            zip(pillar.hidden_stems, pillar.shishen_zhi, strict=True)
+        )
+    ]
