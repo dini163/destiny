@@ -16,3 +16,14 @@ const PILLAR_LABEL: Record<string, string> = {
 export function pillarLabel(position: string): string {
   return PILLAR_LABEL[position] ?? '运';
 }
+
+/**
+ * Full pillar caption for readers: 年柱 / 月柱 / 日柱 / 时柱.
+ *
+ * `extra<n>` slots have no palace of their own — they are the 大运/流年 pillars the
+ * engine scans against the four — so they caption as 运 rather than a fifth 柱.
+ */
+export function pillarColumnLabel(position: string): string {
+  const head = PILLAR_LABEL[position];
+  return head ? `${head}柱` : '运';
+}
