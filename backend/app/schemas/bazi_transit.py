@@ -1,9 +1,9 @@
-"""岁运（流年 / 流月）的响应形态：spec §7.3 的结构，snake_case 直出前端，无映射层。
+"""岁运（流年 / 流月）的一进五出：spec §7 的结构，snake_case 直出前端，无映射层。
 
-本文件是"一页岁运"的四件事：一条命中的规则（`TransitFired`）、一个流年（`TransitYear`）、
-一个节气月（`TransitMonth`）、整页（`BaziTransitResult`）。请求模型 `BaziTransitRequest`
-在 Task 11 追加于此后 —— 四者同源于 `engines/bazi_transit.py::compute_transit` 的一次
-装配，分开定义只是让"一年长什么样"这件事先于"整页长什么样"稳定下来。
+本文件是岁运的一进五出：一页的入参（`BaziTransitRequest`）、一条命中的规则
+（`TransitFired`）、一个流年（`TransitYear`）、一个节气月（`TransitMonth`）、整页
+（`BaziTransitResult`）。五者同源于 `engines/bazi_transit.py::compute_transit` 的一次
+装配；响应侧把"一年长什么样"排在"整页长什么样"之前，是因为后者逐字段引用前者。
 
 `fired` 是账本的人类可读镜像：一行账（`ScoreFactor`）配一句判语（`reading`）与一个
 族名（`family`，前端按族折叠）。二者由同一个命中集派生，不可能分家。月段的行在 `key`
@@ -17,10 +17,32 @@
 
 from pydantic import BaseModel, Field
 
-from app.schemas.bazi import BaziPillar, DayunStep
+from app.schemas.bazi import BaziNatalRequest, BaziPillar, DayunStep
 from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.scoring import ScoreValue
+
+
+class BaziTransitRequest(BaziNatalRequest):
+    """岁运页入参：命盘入参 + 三个可空年份。
+
+    继承 `BaziNatalRequest` 因而 `gender` 必填（大运顺逆是本页骨架），生辰、城市、
+    真太阳时、称谓、参考日一并复用。三个年份一律不做 pydantic 校验：`end < start`、
+    跨度超上限、区间早于出生年，都是要前端能分支的域错误，各带机器码与 `context`
+    （spec §7.2 —— `model_validator` 会被 FastAPI 包成 `validation_error`，机器码就丢了）。
+    补齐也只在这里留空，交给引擎做唯一一次（`resolve_transit_range`），于是响应回显的
+    区间与请求里那几个空值之间不存在第二套口径。
+    """
+
+    start_year: int | None = Field(
+        default=None, description="区间起始年（含）。缺省 = 参考日所在年，或 `end_year - 4`。"
+    )
+    end_year: int | None = Field(
+        default=None, description="区间结束年（含）。缺省 = `start_year + 4`；跨度上限 10 年。"
+    )
+    focus_year: int | None = Field(
+        default=None, description="给出则额外展开该年十二节气流月；须落在区间之内。"
+    )
 
 
 class TransitFired(BaseModel):
