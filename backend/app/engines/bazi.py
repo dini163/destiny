@@ -9,11 +9,10 @@ adds two deterministic computations:
 * a day-master strength / useful-god assessment (日主旺衰 / 用神喜忌).
 
 The classical tables in play are lunar-python's: four pillars, ten-gods, hidden
-stems, nayin and luck cycles. The weighting below that line — stem weight,
-hidden-stem tiers, the 月令 factor and the two strength thresholds — is a set of
-local model parameters, not a rule any classic states. It is being replaced by a
-documented three-factor ledger, after which these constants are deleted; until
-then ``BaziChart.analysis`` still feeds the day-master card, so they stay.
+stems, nayin and luck cycles. Everything this module adds on top of them is a
+documented derivation with its own score ledger: the hidden-stem weights and the
+three strength factors live in ``app.engines.bazi_strength``, and each score
+there carries the arithmetic that produced it (spec §6.1/§6.4).
 
 True Solar Time (PRD 7) is applied *before* constructing ``Solar(...)`` because
 ``lunar-python`` uses the supplied wall-clock time verbatim with no astronomical
@@ -24,14 +23,8 @@ from datetime import date, datetime, time
 
 from lunar_python import Lunar, Solar
 
-from app.content.wuxing import (
-    CONTROLS,
-    CONTROLLED_BY,
-    ELEMENT_ORDER,
-    GAN_ELEMENT,
-    GENERATES,
-    GENERATED_BY,
-)
+from app.content.wuxing import ELEMENT_ORDER, GAN_ELEMENT
+from app.engines.bazi_strength import assess_strength, element_weight_scores, fuyin_choices
 from app.schemas.bazi import (
     BaziChart,
     BaziPillar,
@@ -49,23 +42,8 @@ from app.solar.true_solar_time import (
 
 # --- Fixed classical reference tables (standard, not computed) ---------------
 # The five-element cycles and stem/branch elements live in app.content.wuxing.
-
-# Ten-gods that strengthen the day master (同党: 印 + 比劫).
-SHISHEN_SUPPORT = frozenset({"比肩", "劫财", "正印", "偏印"})
-# Ten-gods that weaken the day master (异党: 食伤 + 财 + 官杀).
-SHISHEN_DRAIN = frozenset({"食神", "伤官", "正财", "偏财", "正官", "七杀"})
-
-# Strength weighting: local model parameters. No classic assigns these numbers;
-# they are the shape of this system's heuristic, and are stated as such wherever
-# a score derived from them is returned.
-STEM_WEIGHT = 1.0                       # each visible heavenly stem
-HIDDEN_STEM_WEIGHTS = (1.0, 0.5, 0.2)   # 本气 / 中气 / 余气 within a branch
-MONTH_BRANCH_FACTOR = 1.5               # 月令 (seasonal command) emphasis
-
-# Strength classification thresholds on support / (support + drain); likewise
-# model parameters, not a classical cut.
-STRONG_THRESHOLD = 0.55
-WEAK_THRESHOLD = 0.45
+# The hidden-stem weights and the strength bands live in app.engines.bazi_strength,
+# which keeps its own score ledger; this module only reads them.
 
 # (schema position, lunar-python method fragment, Chinese label).
 _PILLARS = (
@@ -119,85 +97,60 @@ def _build_pillar(ec: object, position: str, method: str, label: str) -> BaziPil
     )
 
 
-def _tally_elements(pillars: list[BaziPillar]) -> tuple[dict[str, int], dict[str, float]]:
-    """Return (headcount, weighted score) per element across the chart.
+def _count_primary_characters(pillars: list[BaziPillar]) -> dict[str, int]:
+    """Headcount of each element among the eight primary characters (四干 + 四支).
 
-    The two figures answer different questions and must not be merged. The
-    headcount is the distribution of the eight primary characters (four stems +
-    four branch main elements) — the "五行分布" the PRD asks for — so a card
-    labelled with a count keeps that meaning. The weighted score additionally
-    folds in each branch's hidden stems, with the month branch emphasised
-    (月令司令) by ``MONTH_BRANCH_FACTOR``, a local model parameter.
+    Kept separate from the weighted tally on purpose: the two answer different
+    questions and must not be merged. The count is the "五行分布" the PRD asks
+    for, so a card labelled with a count keeps that meaning; the weighted figure
+    beside it comes from ``bazi_strength.element_weight_scores`` — four stems at
+    1.0 plus each hidden stem by its 本/中/余气 role.
     """
     counts = {element: 0 for element in ELEMENT_ORDER}
-    scores = {element: 0.0 for element in ELEMENT_ORDER}
     for pillar in pillars:
         counts[pillar.gan_element] += 1
         counts[pillar.zhi_element] += 1
-
-        scores[pillar.gan_element] += STEM_WEIGHT
-        factor = MONTH_BRANCH_FACTOR if pillar.position == "month" else 1.0
-        for index, hidden_element in enumerate(pillar.hidden_stem_elements):
-            weight = HIDDEN_STEM_WEIGHTS[min(index, len(HIDDEN_STEM_WEIGHTS) - 1)] * factor
-            scores[hidden_element] += weight
-    return counts, scores
+    return counts
 
 
-def _analyze_day_master(ec: object, day_master: str, day_master_element: str, month_zhi: str) -> DayMasterAnalysis:
+def _analyze_day_master(
+    pillars: list[BaziPillar],
+    element_scores: dict[str, float],
+    day_master: str,
+    day_master_element: str,
+    month_zhi: str,
+) -> DayMasterAnalysis:
     """Assess day-master strength and derive the useful / unfavourable gods.
 
-    Support and drain are tallied from the library-provided ten-gods, weighting
-    visible stems and branch hidden stems, with the month branch emphasised. The
-    day stem itself is the reference point and is excluded from the tally.
+    The three factors (得令/得地/得势) and the 扶抑 choice live in
+    ``app.engines.bazi_strength``, which returns a score ledger; this function only
+    assembles the response and the summary sentence. ``element_scores`` is the same
+    weighted tally the 五行分布 bars are drawn from, so the chart computes it once.
     """
-    support = 0.0
-    drain = 0.0
-    for _position, method, _label in _PILLARS:
-        if method != "Day":  # the day stem is the anchor, not a supporter
-            shishen = getattr(ec, f"get{method}ShiShenGan")()
-            if shishen in SHISHEN_SUPPORT:
-                support += STEM_WEIGHT
-            elif shishen in SHISHEN_DRAIN:
-                drain += STEM_WEIGHT
-        factor = MONTH_BRANCH_FACTOR if method == "Month" else 1.0
-        for index, shishen in enumerate(getattr(ec, f"get{method}ShiShenZhi")()):
-            weight = HIDDEN_STEM_WEIGHTS[min(index, len(HIDDEN_STEM_WEIGHTS) - 1)] * factor
-            if shishen in SHISHEN_SUPPORT:
-                support += weight
-            elif shishen in SHISHEN_DRAIN:
-                drain += weight
-
-    total = support + drain
-    ratio = support / total if total else 0.0
-    if ratio >= STRONG_THRESHOLD:
-        level, label = "strong", "身强"
-    elif ratio <= WEAK_THRESHOLD:
-        level, label = "weak", "身弱"
-    else:
-        level, label = "balanced", "中和"
-
-    if ratio > 0.5:  # strong-leaning: favour the draining gods (食伤/财/官杀)
-        favorable = [GENERATES[day_master_element], CONTROLS[day_master_element], CONTROLLED_BY[day_master_element]]
-    else:            # weak-leaning: favour the supporting gods (印/比劫)
-        favorable = [GENERATED_BY[day_master_element], day_master_element]
-    unfavorable = [element for element in ELEMENT_ORDER if element not in favorable]
+    strength = assess_strength(pillars)
+    favourable, unfavourable = fuyin_choices(strength.level, day_master_element, element_scores)
 
     summary = (
         f"日主{day_master}（{day_master_element}）生于{month_zhi}月，"
-        f"生扶{support:.2f} / 克泄{drain:.2f}（{ratio:.0%}），判为{label}；"
-        f"喜用{'、'.join(favorable)}，忌{'、'.join(unfavorable)}。"
+        f"三因子合分{strength.score.value:.2f}，判为{strength.label}"
+        f"{'（临界）' if strength.borderline else ''}；"
+        f"喜用{'、'.join(favourable) or '无所偏取'}，忌{'、'.join(unfavourable) or '无所偏忌'}。"
     )
     return DayMasterAnalysis(
         day_master=day_master,
         day_master_element=day_master_element,
-        support_score=round(support, 2),
-        drain_score=round(drain, 2),
-        strength_ratio=round(ratio, 4),
-        level=level,
-        label=label,
-        favorable_elements=favorable,
-        unfavorable_elements=unfavorable,
+        # 旧口径的加权和没有出处，已随三因子账本一起作废；字段此时仍是必填，
+        # 只能如实留空，Task 10 连同字段一并删除。
+        support_score=0.0,
+        drain_score=0.0,
+        strength_ratio=round(strength.score.value / 100.0, 4),
+        level=strength.level,
+        label=strength.label,
+        favorable_elements=favourable,
+        unfavorable_elements=unfavourable,
         summary=summary,
+        strength=strength.score,
+        borderline=strength.borderline,
     )
 
 
@@ -278,11 +231,14 @@ def compute_bazi_chart(
     eight_char = lunar.getEightChar()
 
     pillars = [_build_pillar(eight_char, position, method, label) for position, method, label in _PILLARS]
-    counts, scores = _tally_elements(pillars)
+    counts = _count_primary_characters(pillars)
+    element_scores = element_weight_scores(pillars)
 
     day_master = eight_char.getDayGan()
     day_master_element = eight_char.getDayWuXing()[0]
-    analysis = _analyze_day_master(eight_char, day_master, day_master_element, eight_char.getMonthZhi())
+    analysis = _analyze_day_master(
+        pillars, element_scores, day_master, day_master_element, eight_char.getMonthZhi()
+    )
     dayun_direction, dayun_start, dayun_steps, current_liunian = _build_dayun(eight_char, gender, reference_date)
 
     return BaziChart(
@@ -303,7 +259,7 @@ def compute_bazi_chart(
         tai_yuan=eight_char.getTaiYuan(),
         tai_yuan_nayin=eight_char.getTaiYuanNaYin(),
         wuxing=[
-            WuxingScore(element=element, count=counts[element], score=round(scores[element], 2))
+            WuxingScore(element=element, count=counts[element], score=round(element_scores[element], 2))
             for element in ELEMENT_ORDER
         ],
         missing_elements=[element for element in ELEMENT_ORDER if counts[element] == 0],

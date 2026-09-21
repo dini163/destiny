@@ -7,6 +7,7 @@ the frontend can consume responses without a mapping layer.
 from pydantic import BaseModel, Field
 
 from app.schemas.common import BirthInput, Gender
+from app.schemas.scoring import ScoreValue
 
 
 class BaziNatalRequest(BirthInput):
@@ -52,8 +53,8 @@ class WuxingScore(BaseModel):
     )
     score: float = Field(
         ge=0,
-        description="含藏干的加权合计（天干 1.0、本中余 1.0/0.5/0.2、月令 ×1.5）。"
-        "这四个数是本地模型参数、无古籍出处；它是分布条的长度，不是吉凶分数，"
+        description="含藏干的加权合计（天干 1.0、本中余 0.6/0.3/0.1，单藏干支本气 1.0）。"
+        "这组权重是本地模型参数、非古籍赋分（spec §6.1）；它是分布条的长度，不是吉凶分数，"
         "日主强弱的可核对账本在 DayMasterAnalysis.strength。",
     )
 
@@ -63,6 +64,12 @@ class DayMasterAnalysis(BaseModel):
 
     day_master: str = Field(description="Day stem, e.g. 庚")
     day_master_element: str = Field(description="Element of the day master, e.g. 金")
+    strength: ScoreValue = Field(
+        description="得令/得地/得势三因子账本（spec §6.4）；Σ factors[].delta == value。"
+    )
+    borderline: bool = Field(
+        description="距 65/45 分界不足 3 分：档位可信但命局偏中和，UI 须明示临界。"
+    )
     support_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
     drain_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
     strength_ratio: float = Field(

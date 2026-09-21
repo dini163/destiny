@@ -78,14 +78,17 @@ def test_wuxing_count_is_the_eight_primary_characters() -> None:
 
 
 def test_day_master_strength_is_weak_metal() -> None:
-    chart = _chart()
-    analysis = chart.analysis
+    """Reference chart: 庚金 born in 寅月 is 囚 → 身弱, supported by 土(印) and 金(比劫)."""
+    analysis = _chart().analysis
     assert analysis.level == "weak"
     assert analysis.label == "身弱"
-    assert analysis.strength_ratio < 0.5
-    # Weak metal is supported by earth (印) and metal (比劫).
+    assert analysis.strength.value == pytest.approx(25.85, abs=0.01)
+    assert analysis.strength.tier == "身弱"
+    assert analysis.borderline is False
+    # 通关 does not fire here (1.70/2.20 = 0.77 < 0.80), so the classical 土金 answer stands.
     assert set(analysis.favorable_elements) == {"土", "金"}
     assert "木" in analysis.unfavorable_elements
+    assert "火" not in analysis.favorable_elements
 
 
 def test_male_dayun_sequence_is_forward() -> None:
