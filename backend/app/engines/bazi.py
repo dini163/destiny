@@ -218,12 +218,13 @@ def _dayun_current(dayun: list[DayunStep], pillars: list[BaziPillar]) -> DayunDe
 
 
 def _build_dayun(
-    ec: object, gender: Gender | None, reference_date: date | None
+    ec: object, gender: Gender | None, reference: date
 ) -> tuple[str | None, str | None, list[DayunStep], list[LiunianYear]]:
     """Build the luck-pillar (大运) sequence and the current year's 流年.
 
     Returns ``(direction, start_solar, steps, current_liunian)``. Without a
     gender the luck pillars are undefined, so empty results are returned.
+    ``reference`` is the already-resolved cutoff date (see ``compute_bazi_chart``).
     """
     if gender is None:
         return None, None, [], []
@@ -248,15 +249,14 @@ def _build_dayun(
     ]
 
     current_liunian: list[LiunianYear] = []
-    if reference_date is not None:
-        for position, step in enumerate(steps):
-            if step.start_year <= reference_date.year <= step.end_year:
-                step.is_current = True
-                current_liunian = [
-                    LiunianYear(year=item.getYear(), age=item.getAge(), ganzhi=item.getGanZhi())
-                    for item in raw_dayun[position].getLiuNian()
-                ]
-                break
+    for position, step in enumerate(steps):
+        if step.start_year <= reference.year <= step.end_year:
+            step.is_current = True
+            current_liunian = [
+                LiunianYear(year=item.getYear(), age=item.getAge(), ganzhi=item.getGanZhi())
+                for item in raw_dayun[position].getLiuNian()
+            ]
+            break
     return direction, start_solar, steps, current_liunian
 
 
@@ -273,11 +273,14 @@ def compute_bazi_chart(
 ) -> BaziChart:
     """Compute a complete BaZi natal chart from validated birth data.
 
-    Pure function: no HTTP, no I/O. ``longitude`` drives the True Solar Time
-    correction (PRD 7); ``reference_date`` (optional) marks the current luck
-    pillar and its annual fortunes, keeping the core chart deterministic.
+    No HTTP, no I/O; the only thing that varies with when you call it is the
+    reference-date default, so ``longitude`` drives the True Solar Time
+    correction (PRD 7) and ``reference_date`` marks the current luck pillar and
+    its annual fortunes. It defaults to the server date, resolved once here, so
+    the flagged step and ``provenance.reference_date`` cannot disagree.
     ``name`` is echoed into the response only — it never enters a calculation.
     """
+    reference = reference_date or date.today()
     standard_dt = _resolve_standard_datetime(birth_date, birth_time, calendar)
 
     if apply_true_solar_time:
@@ -312,7 +315,7 @@ def compute_bazi_chart(
     analysis = _analyze_day_master(
         day_master, day_master_element, month_zhi, strength, yongshen
     )
-    dayun_direction, dayun_start, dayun_steps, current_liunian = _build_dayun(eight_char, gender, reference_date)
+    dayun_direction, dayun_start, dayun_steps, current_liunian = _build_dayun(eight_char, gender, reference)
 
     # Breakdown（spec §7）：以下全部只读上面已算好的结论，没有第二次 assess_strength。
     geju = detect_geju(pillars)
@@ -369,7 +372,7 @@ def compute_bazi_chart(
             branch_groups=branch_groups,
         ),
         provenance=Provenance(
-            reference_date=(reference_date or date.today()).isoformat(),
+            reference_date=reference.isoformat(),
             engine="lunar-python",
             tables=[
                 ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
