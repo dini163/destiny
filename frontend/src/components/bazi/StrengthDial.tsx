@@ -20,9 +20,12 @@ interface StrengthDialProps {
 /**
  * Day-master strength dial (命局核心判定).
  *
- * The ring fills to `strength_ratio` (support ÷ total). Everything shown — level,
- * support/drain scores, favourable (喜用神) and unfavourable (忌神) elements and the
- * summary — is the engine's deterministic analysis; no interpretive copy is invented.
+ * The ring fills to `strength_ratio`, which is the three-factor score on the same
+ * 0-100 axis as `strength`. Everything shown — level, favourable (喜用神) and
+ * unfavourable (忌神) elements and the summary — is the engine's deterministic
+ * analysis; no interpretive copy is invented. The retired 扶助/克泄 sums are not
+ * rendered: they have no source and Task 14 replaces this card's numbers with the
+ * expandable `strength` ledger.
  */
 export function StrengthDial({ analysis }: StrengthDialProps) {
   const ratio = Math.min(1, Math.max(0, analysis.strength_ratio));
@@ -67,12 +70,6 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
             <span className="text-gold">
               {analysis.day_master}（{analysis.day_master_element}）
             </span>
-          </StatRow>
-          <StatRow label="扶助分">
-            <span className="numeric">{analysis.support_score.toFixed(1)}</span>
-          </StatRow>
-          <StatRow label="克泄分">
-            <span className="numeric">{analysis.drain_score.toFixed(1)}</span>
           </StatRow>
           <StatRow label="定格">{LEVEL_LABEL[analysis.level] ?? analysis.level}</StatRow>
         </dl>
