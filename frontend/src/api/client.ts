@@ -18,7 +18,7 @@ export type QueryParams = Record<string, string | number | boolean | null | unde
 
 /** The backend domain-error envelope. */
 interface ErrorEnvelope {
-  error?: { code?: string; message?: string };
+  error?: { code?: string; message?: string; context?: Record<string, unknown> };
   detail?: unknown;
 }
 
@@ -34,12 +34,20 @@ export class ApiError extends Error {
   readonly status: number;
   /** Stable machine code from the backend envelope. */
   readonly code: string;
+  /** 机器可读的补充事实（如 `ambiguous_traditional` 的候选字列表）。 */
+  readonly context: Record<string, unknown> | undefined;
 
-  constructor(status: number, code: string, message: string) {
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
+    this.context = context;
   }
 }
 
@@ -104,12 +112,14 @@ function buildUrl(path: string, query?: QueryParams): string {
 async function toApiError(response: Response): Promise<ApiError> {
   let code = 'http_error';
   let message = `请求失败（HTTP ${response.status}）。`;
+  let context: Record<string, unknown> | undefined;
 
   try {
     const payload = (await response.json()) as ErrorEnvelope;
     if (payload.error?.message) {
       code = payload.error.code ?? code;
       message = payload.error.message;
+      context = payload.error.context;
     } else if (payload.detail !== undefined) {
       code = 'validation_error';
       message = formatValidationDetail(payload.detail);
@@ -118,7 +128,7 @@ async function toApiError(response: Response): Promise<ApiError> {
     // Non-JSON error body — keep the generic status message.
   }
 
-  return new ApiError(response.status, code, message);
+  return new ApiError(response.status, code, message, context);
 }
 
 /** Render FastAPI's `{ detail: [...] }` validation payload as a readable message. */
