@@ -15,40 +15,39 @@ export function HiddenStemTable({ rows }: { rows: HiddenStemWeight[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {positions.map((position) => (
-        <div key={position} className="flex flex-col gap-1">
-          <span className="label-caps text-ink-muted" title={position}>
-            {pillarColumnLabel(position)}
-          </span>
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-left text-ink-muted">
-                <th scope="col" className="font-normal">
-                  藏干
-                </th>
-                <th scope="col" className="font-normal">
-                  十神
-                </th>
-                <th scope="col" className="font-normal">
-                  本中余
-                </th>
-                <th scope="col" className="numeric text-right">
-                  权重
-                </th>
-                <th scope="col" className="text-right font-normal">
-                  出处
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows
-                .filter((row) => row.position === position)
-                .map((row) => (
+      {positions.map((position) => {
+        const group = rows.filter((row) => row.position === position);
+        // 一柱只有一支：branch 是整组的主语，写进表头，免得"戊辰"被读成一柱干支。
+        const heading = `${pillarColumnLabel(position)} · ${group[0]?.branch ?? ''}`;
+        return (
+          <div key={position} className="flex flex-col gap-1">
+            <span className="label-caps text-ink-muted" title={position}>
+              {heading}
+            </span>
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-ink-muted">
+                  <th scope="col" className="font-normal">
+                    藏干
+                  </th>
+                  <th scope="col" className="font-normal">
+                    十神
+                  </th>
+                  <th scope="col" className="font-normal">
+                    本中余
+                  </th>
+                  <th scope="col" className="numeric text-right">
+                    权重
+                  </th>
+                  <th scope="col" className="text-right font-normal">
+                    出处
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {group.map((row) => (
                   <tr key={`${row.position}-${row.stem}`} className="border-t border-rim">
-                    <td className="py-1.5 text-ink">
-                      {row.stem}
-                      <span className="ml-1.5 text-ink-muted">{row.branch}</span>
-                    </td>
+                    <td className="py-1.5 text-ink">{row.stem}</td>
                     <td className="py-1.5 text-ink-variant">{row.ten_god}</td>
                     <td className="py-1.5 text-ink-muted">{row.role}</td>
                     <td className="numeric py-1.5 text-right text-ink">{row.weight.toFixed(2)}</td>
@@ -57,10 +56,11 @@ export function HiddenStemTable({ rows }: { rows: HiddenStemWeight[] }) {
                     </td>
                   </tr>
                 ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
     </div>
   );
 }
