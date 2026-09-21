@@ -171,3 +171,53 @@ def test_luck_pillar_joins_the_scan_for_fu_yin() -> None:
     ]
     # 柱位距离只有三档，大运落在四柱之外，比"远位"更远就是"远位"，不另立第四档。
     assert fuyin[0].strength == "远位"
+
+
+def test_transit_ganzhi_joins_the_shensha_scan() -> None:
+    """流年甲辰：辰落申子辰局之华盖，extras 不参与时看不见。"""
+    without = {e.name: e.matches for e in _hits()}
+    with_transit = derive_shensha(
+        CHART.pillars, day_master=CHART.day_master, extra_ganzhi=["甲辰"]
+    )
+    huagai = next(e for e in with_transit if e.name == "华盖")
+    assert [(m.position, m.character, m.at) for m in huagai.matches] == [
+        ("year", "辰", "zhi"),
+        ("extra0", "辰", "zhi"),
+    ]
+    assert all(
+        m.position != "extra0" for matches in without.values() for m in matches
+    ), "默认调用不得凭空多出岁运落点"
+
+
+def test_day_pillar_scoped_shensha_ignore_transit_characters() -> None:
+    """魁罡只论日柱、空亡只查命局四支：岁支辰虽在日柱旬空（辰巳）内也不算命中。"""
+    hits = derive_shensha(CHART.pillars, day_master=CHART.day_master, extra_ganzhi=["壬辰"])
+    assert "魁罡" not in {e.name for e in hits}
+    void = next(e for e in hits if e.name == "空亡")
+    assert [m.position for m in void.matches] == ["year"]
+
+
+def test_default_call_path_is_unchanged() -> None:
+    """加参数不改默认行为：与既有命局结果逐字相等（spec §9.2 第三条）。"""
+    assert derive_shensha(CHART.pillars, day_master=CHART.day_master) == _hits()
+    assert derive_branch_groups(CHART.pillars) == derive_branch_groups(CHART.pillars, [])
+
+
+def test_transit_branch_can_complete_a_three_harmony() -> None:
+    """命局只有辰、子，流年补申 → 申子辰三支齐见成局。"""
+    groups = derive_branch_groups(CHART.pillars, ["戊申"])
+    sanhe = next(g for g in groups if g.kind == "三合" and g.element == "水")
+    assert sanhe.is_complete is True
+    assert [(m.pillar, m.branch) for m in sanhe.members] == [
+        ("year", "辰"),
+        ("day", "子"),
+        ("extra0", "申"),
+    ]
+    assert sanhe.members[-1].ten_god == ""  # _god 查的是命局四柱，extra 恒空串（spec §7.5）
+
+
+def test_a_lone_transit_branch_cannot_form_a_group() -> None:
+    """岁支巳对本命（辰寅子亥）不成任何局：三合须三支齐见，半合须含旺支，都不满足。"""
+    natal = derive_branch_groups(CHART.pillars)
+    with_transit = derive_branch_groups(CHART.pillars, ["乙巳"])
+    assert [(g.kind, g.element) for g in with_transit] == [(g.kind, g.element) for g in natal]

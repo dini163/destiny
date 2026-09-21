@@ -88,17 +88,32 @@ def _shensha_base_and_targets(
     raise ValueError(f"未知神煞基准：{rule.lookup}（{rule.name}）")
 
 
-def derive_shensha(pillars: list[BaziPillar], *, day_master: str) -> list[ShenShaEntry]:
-    """Return every 神煞 that actually hits; a rule with no match is omitted (spec §6.2)."""
-    slots = _slots(pillars)
+def derive_shensha(
+    pillars: list[BaziPillar],
+    *,
+    day_master: str,
+    extra_ganzhi: Sequence[str] = (),
+) -> list[ShenShaEntry]:
+    """Return every 神煞 that actually hits; a rule with no match is omitted (spec §6.2).
+
+    `extra_ganzhi` 是岁运之柱（流年、流月、大运）：煞以命立、应期在岁运，所以神煞
+    的落点要连同它们一起扫。两个例外按各自的定义域收窄 —— 魁罡只论日柱、空亡以
+    日柱旬空查命局四支，岁运之字落在里头也不算命中（spec §7.5）。默认不传时输出
+    与命局扫描逐字相等（spec §9.2）。
+    """
+    slots = _slots(pillars, extra_ganzhi)
     entries: list[ShenShaEntry] = []
     for rule in SHENSHA_RULES.values():
         if rule.lookup == "life_stage":
             continue  # 十二长生只在 pillar.di_shi 呈现一次，不在神煞行复读
         checked_from, targets, side = _shensha_base_and_targets(rule, slots, day_master)
-        # 魁罡只看日柱（spec §6.2 的查表范围），其余基准扫命局四柱；
-        # 若也扫四柱，时柱壬辰会被报成魁罡，而 checked_from 说的是日柱，两处口径就打架了。
-        scope = [slots[2]] if side == "pillar" else slots[: len(POSITIONS)]
+        if side == "pillar":
+            scope = [slots[2]]  # 魁罡只看日柱：若也扫四柱，时柱壬辰会被报成魁罡，
+            # 而 checked_from 说的是日柱，两处口径就打架了。
+        elif rule.lookup == "void":
+            scope = slots[: len(POSITIONS)]  # 空亡的查法是"命局四支"，不落岁运。
+        else:
+            scope = slots  # 命局四柱 + 岁运之柱。
         matches = _shensha_matches(scope, targets, side)
         if matches:
             entries.append(
@@ -181,9 +196,16 @@ def derive_relations(
 
 
 # ---------------------------------------------------------------- 合局（spec §6.3）
-def derive_branch_groups(pillars: list[BaziPillar]) -> list[BranchGroup]:
-    """Three-harmony / half-combination / three-meeting, as *groups* with their members."""
-    slots = _slots(pillars)
+def derive_branch_groups(
+    pillars: list[BaziPillar], extra_ganzhi: Sequence[str] = ()
+) -> list[BranchGroup]:
+    """Three-harmony / half-combination / three-meeting, as *groups* with their members.
+
+    `extra_ganzhi` 参与成局：岁支可以是三合局的第三支（申子辰只缺申，流年补申即
+    成局）。成员落在岁运柱上时 `ten_god` 仍为空串 —— 十神是命局内部的坐标，
+    不给四柱之外的柱立十神（spec §7.5）。
+    """
+    slots = _slots(pillars, extra_ganzhi)
     groups: list[BranchGroup] = []
     for rule in RELATION_TABLES.values():
         if rule.scope != "group":
