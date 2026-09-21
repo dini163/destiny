@@ -3,7 +3,7 @@
  *
  * This is curated *navigational* content (which systems exist, what each one is,
  * which are live now), not computed results, so it honours the no-mock rule: the
- * four MVP systems point at real routes from `nav.ts` (the single source of truth
+ * five live systems point at real routes from `nav.ts` (the single source of truth
  * for paths), and every other system is declared Phase-2 with `route: null` and an
  * honest build status. Blurbs describe each discipline factually; no chart value,
  * reading or almanac verdict is invented here.
@@ -46,15 +46,16 @@ export interface PortalSystem {
   icon: IconName;
 }
 
-/** A system is navigable exactly when it has a real route (the four MVP). */
+/** A system is navigable exactly when it has a real route (the five live ones). */
 export function isLive(system: PortalSystem): boolean {
   return system.route !== null;
 }
 
 /**
- * The full 16-system roadmap. The four MVP systems lead (八字 / 周易 / 西洋本命 /
- * 塔罗), each wired to its real route; the remaining twelve are Phase-2 and carry
- * an honest status instead of a link.
+ * The full 16-system roadmap. Five of them are live and carry a real route: the
+ * four Phase-1 MVP systems lead the list (八字 / 周易 / 西洋本命 / 塔罗), and
+ * 姓名学 sits at its catalogue position inside the 华夏术数 block. The remaining
+ * eleven are Phase-2 and carry an honest status instead of a link.
  */
 export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
   {
@@ -148,9 +149,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'chinese',
     blurb: '康熙字典原笔画核定，天格地格人格总格外格相生相克数理吉凶。',
     highlights: ['81 数理吉凶表'],
-    cta: '',
-    route: null,
-    status: '字典比对中',
+    cta: '核定笔画',
+    route: ROUTES.nameMetric,
+    status: null,
     icon: 'search',
   },
   {

@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { ROUTES } from './nav';
 import { BaziNatalPage } from './pages/BaziNatalPage';
+import { NamePage } from './pages/NamePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PortalPage } from './pages/PortalPage';
 import { TarotPage } from './pages/TarotPage';
@@ -30,6 +31,7 @@ export const router = createBrowserRouter([
       { path: segment(ROUTES.westernNatal), element: <WesternNatalPage /> },
       { path: segment(ROUTES.tarot), element: <TarotPage /> },
       { path: segment(ROUTES.zhouyi), element: <ZhouyiPage /> },
+      { path: segment(ROUTES.nameMetric), element: <NamePage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

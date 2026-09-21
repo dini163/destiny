@@ -29,8 +29,8 @@ const FILTER_OPTIONS: ReadonlyArray<{ value: SystemFilter; label: string }> = [
  *
  * Section 1 pairs an atmospheric gateway headline with the live astronomical time
  * broadcast (`DailyTimePanel`, fed by the real meta true-solar-time + health
- * endpoints). Section 2 is the 16-system entry matrix: the four MVP systems are
- * live links, the twelve Phase-2 systems carry an honest build status; a category
+ * endpoints). Section 2 is the 16-system entry matrix: the five live systems are
+ * real links, the eleven Phase-2 systems carry an honest build status; a category
  * filter narrows the grid.
  *
  * The mockup's fabricated 今日天象 pillars (岁次干支 / 月相 / 行星落座 / 黄历宜忌)

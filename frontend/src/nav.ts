@@ -3,21 +3,23 @@
  *
  * Mirrors the multi-civilization nav in the design mockups: a primary bar of the
  * Phase-1 destinations plus a secondary, categorized bar spanning the full
- * 16-system roadmap. Only the five Phase-1 routes are navigable; every other
- * system is declared here with `to: null` so the "全域" nav is complete now and a
- * later phase merely points a slug at a real route — no shell re-architecture.
+ * 16-system roadmap. Only the five Phase-1 routes plus 姓名学 are navigable;
+ * every other system is declared here with `to: null` so the "全域" nav is
+ * complete now and a later phase merely points a slug at a real route — no shell
+ * re-architecture.
  *
  * `ROUTES` is the single source of truth for router paths, shared by the nav, the
  * router and in-app links so they can never drift apart.
  */
 
-/** Canonical absolute router paths for the Phase-1 destinations. */
+/** Canonical absolute router paths for every navigable destination. */
 export const ROUTES = {
   overview: '/overview',
   baziNatal: '/bazi-natal',
   westernNatal: '/western-astrology',
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',
+  nameMetric: '/name-metric',
 } as const;
 
 /** A single navigation entry. `to === null` marks a roadmap system not yet built. */
@@ -56,6 +58,7 @@ export const SECONDARY_NAV: NavGroup[] = [
       { slug: 'qimen-dunjia', label: '奇门遁甲', to: null },
       { slug: 'zhouyi-divination', label: '文王六爻', to: ROUTES.zhouyi },
       { slug: 'plum-blossom', label: '梅花易数', to: null },
+      { slug: 'name-metric', label: '五格姓名学', to: ROUTES.nameMetric },
     ],
   },
   {
