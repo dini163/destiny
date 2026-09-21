@@ -84,6 +84,9 @@ function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
               ) : null}
             </span>
             <span className="w-full text-ink-variant sm:w-auto sm:max-w-md">{row.reading}</span>
+            <span className="self-end">
+              <SourceNote source={row.source} />
+            </span>
           </li>
         ))}
       </ul>
@@ -122,8 +125,7 @@ function GroupBlock({ groups }: { groups: BranchGroup[] }) {
                   className="text-ink-muted"
                   title={member.pillar}
                 >
-                  {member.branch}
-                  {pillarColumnLabel(member.pillar)}
+                  {pillarColumnLabel(member.pillar)}·{member.branch}
                 </span>
               ))}
               <span className="label-caps text-ink-muted">
