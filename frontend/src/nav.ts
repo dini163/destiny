@@ -16,6 +16,9 @@
 export const ROUTES = {
   overview: '/overview',
   baziNatal: '/bazi-natal',
+  /** 岁运推演（切片 2）。刻意不进 `SECONDARY_NAV` 与 `PORTAL_SYSTEMS`：它是主盘之外的
+   * 子页，不是一新一大体系，列进去会让"几大核心体系"这个数字虚增一格（spec 决策 8）。 */
+  baziTransit: '/bazi-transit',
   westernNatal: '/western-astrology',
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',

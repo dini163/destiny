@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
 import { ROUTES } from './nav';
 import { BaziNatalPage } from './pages/BaziNatalPage';
+import { BaziTransitPage } from './pages/BaziTransitPage';
 import { NamePage } from './pages/NamePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { PortalPage } from './pages/PortalPage';
@@ -18,7 +19,9 @@ const segment = (absolutePath: string): string => absolutePath.replace(/^\//, ''
  *
  * The AppShell is the single layout route, so the persistent nav / status /
  * disclaimer chrome wraps every destination. The index redirects to the portal and
- * any unmatched path falls through to the 404 page.
+ * any unmatched path falls through to the 404 page. `/bazi-transit` is routed but
+ * deliberately absent from the nav bars: it is a sub-page of the BaZi chart, entered
+ * from the 大运 block with the birth data carried in the query string (spec 决策 8).
  */
 export const router = createBrowserRouter([
   {
@@ -28,6 +31,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to={ROUTES.overview} replace /> },
       { path: segment(ROUTES.overview), element: <PortalPage /> },
       { path: segment(ROUTES.baziNatal), element: <BaziNatalPage /> },
+      { path: segment(ROUTES.baziTransit), element: <BaziTransitPage /> },
       { path: segment(ROUTES.westernNatal), element: <WesternNatalPage /> },
       { path: segment(ROUTES.tarot), element: <TarotPage /> },
       { path: segment(ROUTES.zhouyi), element: <ZhouyiPage /> },
