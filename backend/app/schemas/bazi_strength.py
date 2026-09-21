@@ -1,4 +1,4 @@
-"""Wire types for the structure / hidden-stem layer (spec §6.1, §6.4, §7)."""
+"""Wire types for the structure / hidden-stem / useful-god layer (spec §6.1, §6.4, §6.5, §7)."""
 
 from pydantic import BaseModel, Field
 
@@ -20,3 +20,33 @@ class HiddenStemWeight(BaseModel):
     weight: float = Field(ge=0, le=1, description="0.6/0.3/0.1；单藏干支 1.0。")
     ten_god: str = Field(description="该藏干对日主的十神。")
     source: str
+
+
+class YongshenMethod(BaseModel):
+    method: str = Field(description="扶抑 | 通关 | 调候")
+    fired_rule: str = Field(
+        description="机器可读的取舍键；未触发也要写清是哪个键，不靠空值表达沉默。"
+    )
+    chosen_elements: list[str] = Field(
+        default_factory=list, description="本法自己的选法，不是合并结果；未选法时为空。"
+    )
+    already_present: bool = Field(
+        description="本法选定了、却未新增进喜用集（基准集已有，或对治行占比已够）。"
+    )
+    source: str
+
+
+class YongshenConflict(BaseModel):
+    element: str
+    suppressed_by: str = Field(description="被压过的那一法，恒为 扶抑（基准集来源）。")
+    reason: str
+    source: str
+
+
+class Yongshen(BaseModel):
+    """三法各报一条取舍，合并后如实并列冲突；格局不回显于此（spec §6.5、§7）。"""
+
+    favorable_elements: list[str]
+    unfavorable_elements: list[str]
+    methods: list[YongshenMethod]
+    conflict: YongshenConflict | None = None
