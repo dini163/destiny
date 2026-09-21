@@ -11,12 +11,15 @@
 两个口径。所以它从 `compute_bazi_chart` 里原样搬来，主命盘改为消费它。
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, time
 
 from lunar_python import Lunar, Solar
 
+from app.content.bazi_transit_rules import transit_rule
 from app.core.errors import TransitRangeError
+from app.schemas.bazi_rules import BranchGroup, RelationPair
 from app.schemas.common import CalendarType
 from app.solar.true_solar_time import true_solar_offset_minutes, true_solar_time
 
@@ -174,3 +177,132 @@ def _standard_datetime(birth_date: date, birth_time: time, calendar: CalendarTyp
             solar.getSecond(),
         )
     return datetime.combine(birth_date, birth_time)
+
+
+# ------------------------------------------------------------------ 命中判定（spec §6.2）
+#: 岁运之柱在 `bazi_rules._slots` 里的槽位名：extras 从 `extra0` 起追加在四柱之后。
+#: 判定层认的就是这个名字 —— 命局内部两柱之间的关系不属于岁运的账（决策 3）。
+_TRANSIT_SLOT = "extra0"
+#: 刑有四张表，岁运只问"这一柱受不受刑"，不给四张表分凶序。
+_PUNISH_KINDS: tuple[str, ...] = ("无恩之刑", "恃势之刑", "无礼之刑", "自刑")
+
+
+@dataclass(frozen=True)
+class _Judgement:
+    """一条岁运干支在打分前需要知道的全部事实，由装配段（Task 8/9/10）填好。
+
+    谓词只看它，不回查历法，也不回头调 `derive_relations`。这样"命中什么"与"什么时候
+    算出来的"两件事分开：同一个上下文在单测里手搭即可，装配段换法不影响判定。
+    """
+
+    scope: str  # sui | yue
+    ganzhi: str
+    gan: str
+    zhi: str
+    gan_element: str
+    ben_qi_element: str  # 支主气（本气藏干）的五行
+    di_shi: str
+    dayun_ganzhi: str | None  # 童年段（未起运）为 None：整个 dayun 族不评估
+    year_zhi: str  # 本命年支 —— 太岁以此为准，不是当岁之支
+    relations: tuple[RelationPair, ...]
+    groups: tuple[BranchGroup, ...]
+    shensha_names: frozenset[str]
+    favourable: frozenset[str]
+    unfavourable: frozenset[str]
+
+    def kinds_with(self, position: str) -> frozenset[str]:
+        """该柱与岁运之柱之间成了哪几种象（两端无序，柱位对上了才算）。"""
+        return frozenset(
+            relation.kind
+            for relation in self.relations
+            if {relation.pillar_a, relation.pillar_b} == {position, _TRANSIT_SLOT}
+        )
+
+    def has(self, kind: str) -> bool:
+        """岁运之柱与命局任一柱成此象 —— 伏吟、反吟论整柱，不限定落在哪一柱。"""
+        return any(
+            relation.kind == kind and _TRANSIT_SLOT in (relation.pillar_a, relation.pillar_b)
+            for relation in self.relations
+        )
+
+    def punishes(self, position: str) -> bool:
+        return bool(self.kinds_with(position) & frozenset(_PUNISH_KINDS))
+
+    def group_elements(self, kind: str) -> frozenset[str]:
+        """岁运参与合出的局的五行；不含岁运成员的局是命局自己的账。"""
+        return frozenset(
+            group.element
+            for group in self.groups
+            if group.kind == kind
+            and any(member.pillar == _TRANSIT_SLOT for member in group.members)
+        )
+
+    def has_star(self, name: str) -> bool:
+        return name in self.shensha_names
+
+    @property
+    def has_dayun(self) -> bool:
+        return bool(self.dayun_ganzhi)
+
+
+def _group_faces(j: _Judgement, kind: str, *, favourable: bool) -> bool:
+    """局本身不论吉凶：合出的五行落进喜用集才算顺、落进忌神集才算逆（spec §6.2）。"""
+    elements = j.group_elements(kind)
+    return bool(elements & (j.favourable if favourable else j.unfavourable))
+
+
+Predicate = Callable[[_Judgement], bool]
+
+#: 键序 == `TRANSIT_RULES` 的表序 == 账本行序；一键一谓词，由 Task 7 末尾的完备性
+#: 断言钉住。谓词本身不含古籍字 —— 文案在 `reading` 里，分数在 `delta` 里。
+_PREDICATES: tuple[tuple[str, Predicate], ...] = (
+    # --- yongshen（4）：喜忌集来自 `select_yongshen`，此处只问落不落在里头
+    ("yongshen.gan_favourable", lambda j: j.gan_element in j.favourable),
+    ("yongshen.gan_unfavourable", lambda j: j.gan_element in j.unfavourable),
+    ("yongshen.zhi_favourable", lambda j: j.ben_qi_element in j.favourable),
+    ("yongshen.zhi_unfavourable", lambda j: j.ben_qi_element in j.unfavourable),
+    # --- taisui（6）：只论年支，岁专属
+    ("taisui.chong", lambda j: "地支六冲" in j.kinds_with("year")),
+    ("taisui.value", lambda j: j.zhi == j.year_zhi),
+    ("taisui.harm", lambda j: "地支六害" in j.kinds_with("year")),
+    ("taisui.punish", lambda j: j.punishes("year")),
+    ("taisui.break", lambda j: "地支六破" in j.kinds_with("year")),
+    ("taisui.combine", lambda j: "地支六合" in j.kinds_with("year")),
+    # --- palace（8）：提纲与日支为至近之地，两宫各四行
+    ("palace.chong_month", lambda j: "地支六冲" in j.kinds_with("month")),
+    ("palace.chong_day", lambda j: "地支六冲" in j.kinds_with("day")),
+    ("palace.punish_month", lambda j: j.punishes("month")),
+    ("palace.punish_day", lambda j: j.punishes("day")),
+    ("palace.combine_month", lambda j: "地支六合" in j.kinds_with("month")),
+    ("palace.combine_day", lambda j: "地支六合" in j.kinds_with("day")),
+    ("palace.harm_month", lambda j: "地支六害" in j.kinds_with("month")),
+    ("palace.harm_day", lambda j: "地支六害" in j.kinds_with("day")),
+    # --- heyue（6）：三合 / 半合 / 三会 × 向背
+    ("heyue.sanhe_favourable", lambda j: _group_faces(j, "三合", favourable=True)),
+    ("heyue.sanhe_unfavourable", lambda j: _group_faces(j, "三合", favourable=False)),
+    ("heyue.anhe_favourable", lambda j: _group_faces(j, "半合", favourable=True)),
+    ("heyue.anhe_unfavourable", lambda j: _group_faces(j, "半合", favourable=False)),
+    ("heyue.sanhui_favourable", lambda j: _group_faces(j, "三会", favourable=True)),
+    ("heyue.sanhui_unfavourable", lambda j: _group_faces(j, "三会", favourable=False)),
+    # --- ganzhi（2）：天干只论日主一柱
+    ("ganzhi.combine_day_master", lambda j: "天干五合" in j.kinds_with("day")),
+    ("ganzhi.chong_day_master", lambda j: "天干相冲" in j.kinds_with("day")),
+    # --- fuyin（2）：整柱比对由 `derive_relations` 判，这里只认它报了什么
+    ("fuyin.fuyin", lambda j: j.has("伏吟")),
+    ("fuyin.fanyin", lambda j: j.has("反吟")),
+    # dayun / dishi / shensha 三族 18 键在 Task 7 追加。
+)
+
+
+def _hit_keys(judgement: _Judgement) -> list[str]:
+    """这条岁运命中了哪些规则 —— 顺序即账本顺序，`scopes` 过滤也在这里。
+
+    月段拿到的上下文带着整年的关系扫描结果，但 `taisui` 与 `dayun` 两族的 `scopes`
+    不含 `yue`，于是它们不会在流月里重复计价；过滤放在这一处而不是放在装配段，是
+    为了"什么算命中"只有一种问法。
+    """
+    return [
+        key
+        for key, predicate in _PREDICATES
+        if judgement.scope in transit_rule(key).scopes and predicate(judgement)
+    ]
