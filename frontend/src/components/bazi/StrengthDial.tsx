@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { wuxingChip } from '../../lib/wuxing';
+import { ScoreLedger } from './ScoreLedger';
 import type { DayMasterAnalysis } from '../../types/bazi';
 
 /** Bilingual labels for the deterministic strength classification. */
@@ -20,16 +21,15 @@ interface StrengthDialProps {
 /**
  * Day-master strength dial (命局核心判定).
  *
- * The ring fills to `strength.value`, the three-factor ledger total on a 0-100
- * axis. Everything shown — level, favourable (喜用神) and unfavourable (忌神)
- * elements and the summary — is the engine's deterministic analysis; no
- * interpretive copy is invented. The retired 扶助/克泄 sums are not rendered:
- * they had no source, and Task 14 replaces this card's figure with the
- * expandable `ScoreLedger` over the same `strength` value.
+ * The ring, the figure in its centre and the expandable ledger underneath all
+ * read the same `strength` ScoreValue, so the arc length can be traced back to
+ * the 得令/得地/得势 rows. Everything else shown — level, favourable (喜用神) and
+ * unfavourable (忌神) elements and the summary — is the engine's deterministic
+ * analysis; no interpretive copy is invented.
  */
 export function StrengthDial({ analysis }: StrengthDialProps) {
-  const percent = Math.min(100, Math.max(0, Math.round(analysis.strength.value)));
-  const offset = RING_CIRCUMFERENCE * (1 - percent / 100);
+  const score = analysis.strength;
+  const offset = RING_CIRCUMFERENCE * (1 - Math.min(1, Math.max(0, score.value / 100)));
 
   return (
     <div className="flex flex-col gap-4">
@@ -60,7 +60,9 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
             <span className="font-display text-2xl font-bold text-gold-bright">{analysis.label}</span>
-            <span className="numeric mt-0.5 text-xs text-ink-muted">{percent}/100</span>
+            <span className="numeric mt-0.5 text-xs text-ink-muted">
+              {score.value.toFixed(1)}/100
+            </span>
           </div>
         </div>
 
@@ -73,6 +75,8 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
           <StatRow label="定格">{LEVEL_LABEL[analysis.level] ?? analysis.level}</StatRow>
         </dl>
       </div>
+
+      <ScoreLedger score={score} label="强弱三因子合计（得令 / 得地 / 得势）" />
 
       <div className="flex flex-col gap-2">
         <ElementTags label="喜用神" tone="favorable" elements={analysis.favorable_elements} />
