@@ -49,7 +49,7 @@ class TransitMonth(BaseModel):
     start_solar: str = Field(description="交节日（ISO）：立春起寅月，非农历初一。")
     end_solar: str = Field(description="下一交节前一日（ISO）。")
     score: ScoreValue = Field(description="两段账本：该流年全部命中行 + 该流月命中行。")
-    fired: list[TransitFired] = Field(description="逐行可见，年段行无因、月段行带 `yue.` 前缀。")
+    fired: list[TransitFired] = Field(description="逐行可见：年段行无 `yue.` 前缀，月段行带。")
 
 
 class TransitYear(BaseModel):

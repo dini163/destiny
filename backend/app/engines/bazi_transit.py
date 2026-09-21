@@ -9,11 +9,15 @@
 `resolve_natal_moment` 住在这里是刻意的：岁运要再走一次 `getYun()` 才拿得到流年与
 流月对象，而那一刻必须先和主命盘用同一个真太阳时校正 —— 校正逻辑有两份，迟早分出
 两个口径。所以它从 `compute_bazi_chart` 里原样搬来，主命盘改为消费它。
+
+节气月界（`_jieqi_boundaries`）也住在这里：`LiuYue` 只给干支、序号与月名，一个日期都
+不给，十二段起止得自己从 `getJieQiTable()` 的滚动窗口里采十二节推出来。切片 3 的流日
+要的是同一份采集，写在装配里它就只能重写一遍。
 """
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 
 from lunar_python import Lunar, Solar
 
@@ -564,13 +568,18 @@ def _narrative(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> str:
 # ---------------------------------------------------------------- 流年对象（spec §7.3）
 @dataclass(frozen=True)
 class _AnnualLuck:
-    """lunar-python 给的一个流年：干支、虚岁，加上它所从出的那一步大运。"""
+    """lunar-python 给的一个流年：干支、虚岁，加上它所从出的那一步大运。
+
+    `liunian` 是历法里的原对象，留着不为别的：流月只能由 `LiuNian.getLiuYue()` 给，
+    而这一层已经把那个对象摊平出来了 —— 要月份时再按年份回头找一次，是两个入口。
+    """
 
     year: int
     age: int
     ganzhi: str
     dayun_index: int
     dayun_ganzhi: str | None
+    liunian: object  # lunar_python.LiunianYear；流月要从它身上取
 
 
 def _annual_luck_by_year(
@@ -594,19 +603,18 @@ def _annual_luck_by_year(
                 ganzhi=liu_nian.getGanZhi(),
                 dayun_index=step.getIndex(),
                 dayun_ganzhi=step.getGanZhi() or None,
+                liunian=liu_nian,
             )
     return luck
 
 
-def _transit_year(
-    natal: _Natal, luck: _AnnualLuck, *, months: list[TransitMonth] | None = None
-) -> TransitYear:
-    """装配一个流年：合成柱、单段账本、三张岁运明细、十神释义与断语。
+def _year_scan(natal: _Natal, luck: _AnnualLuck) -> _Scan:
+    """流年那一柱的扫描 —— 装配与流月段共用的唯一定义。
 
-    `months` 由流月那一段（Task 9）在聚焦年传入；其余年为 None，前端整块不渲染，
-    而不是渲染十二个空月。
+    月账本要以它为前缀（spec §6.4），所以"年段命中了什么"只能有一处算法；两处各算
+    一遍的话，年卡和月卡对同一年给出两套行，前端无从解释。
     """
-    scan = _scan(
+    return _scan(
         natal,
         luck.ganzhi,
         position="transit_year",
@@ -614,7 +622,17 @@ def _transit_year(
         scope="sui",
         dayun_ganzhi=luck.dayun_ganzhi,
     )
-    rows = _hit_rows(_hit_keys(scan.judgement), [])
+
+
+def _transit_year(natal: _Natal, luck: _AnnualLuck, *, focus: bool = False) -> TransitYear:
+    """装配一个流年：合成柱、单段账本、三张岁运明细、十神释义与断语。
+
+    `focus` 即请求里的 `focus_year` 是否就是这一年：给 12 段节气月，其余年留 None，
+    前端整块不渲染，而不是摆出十二个空月。
+    """
+    scan = _year_scan(natal, luck)
+    year_keys = _hit_keys(scan.judgement)
+    rows = _hit_rows(year_keys, [])
     corpus = ten_god_meaning(scan.pillar.shishen_gan)
     return TransitYear(
         year=luck.year,
@@ -633,5 +651,103 @@ def _transit_year(
         relations=scan.relations,
         shensha=scan.shensha,
         branch_groups=scan.branch_groups,
-        months=months,
+        months=_transit_months(natal, luck, year_keys) if focus else None,
     )
+
+
+# ---------------------------------------------------------------- 节气月界（spec §6.4）
+#: 十二"节"：月以节交，中间的"气"（雨水、春分……）不交月令，一个都不进这张表。
+#: 序从立春起，与 `LiuYue.getIndex()` 的 0..11 逐位对齐 —— 立春之后才是正月（寅月）。
+_JIE_NAMES: tuple[str, ...] = (
+    "立春", "惊蛰", "清明", "立夏", "芒种", "小暑",
+    "立秋", "白露", "寒露", "立冬", "大雪", "小寒",
+)
+#: `getJieQiTable()` 一名两键：中文名给落在窗口之内的那一次交节，大写拼音给落到窗口
+#: 之外的另一次。只认中文名会在窗口边界上整年地漂 —— 实测 2026-02-01 探针里 `立春` 是
+#: 2026-02-04 而 `LI_CHUN` 是 2027-02-04，`大雪` 是 2026-12-07 而 `DA_XUE` 反倒是
+#: 2025-12-07。两名并收，缺的才真的是缺。
+_JIE_PINYIN: tuple[str, ...] = (
+    "LI_CHUN", "JING_ZHE", "QING_MING", "LI_XIA", "MANG_ZHONG", "XIAO_SHU",
+    "LI_QIU", "BAI_LU", "HAN_LU", "LI_DONG", "DA_XUE", "XIAO_HAN",
+)
+
+
+def _jieqi_harvest(year: int) -> dict[tuple[str, int], date]:
+    """把 `year` 与 `year + 1` 两次探针里的十二节收成 `(节名, 公历年) -> 交节日`。
+
+    两次探针是必需的，不是一份表偷个懒：`getJieQiTable()` 是滚动窗口，实测以 2 月 1 日
+    为基准时覆盖"上一个冬至 → 当年大雪"，于是本年的 小寒 属上一年、次年的 小寒 又还没
+    进窗口，两头各差一节。键里带公历年，为的正是把跨年那一节记在它自己该在的年份里。
+    """
+    harvest: dict[tuple[str, int], date] = {}
+    for probe_year in (year, year + 1):
+        table = Solar.fromYmd(probe_year, 2, 1).getLunar().getJieQiTable()
+        for name, pinyin in zip(_JIE_NAMES, _JIE_PINYIN, strict=True):
+            for key in (name, pinyin):
+                term = table.get(key)
+                if term is not None:
+                    harvest[(name, term.getYear())] = date(
+                        term.getYear(), term.getMonth(), term.getDay()
+                    )
+    return harvest
+
+
+def _jieqi_boundaries(year: int) -> list[tuple[date, date]]:
+    """`year` 年十二个节气月的起止日：寅月起于本年立春，丑月止于次年立春前一日。
+
+    一节不多、一节不少 —— 少一节则后面每一段都跟着错位，而月账本还在照常加分，没有
+    任何一处会喊。所以缺节是 `ValueError`，不是"给个大概"。
+    """
+    #: 前十二个是各月之始，第十三个（次年立春）只作末段的终点。
+    marks = [(name, year) for name in _JIE_NAMES[:-1]]
+    marks += [("小寒", year + 1), ("立春", year + 1)]
+    harvest = _jieqi_harvest(year)
+    missing = [f"{name}（{when} 年）" for name, when in marks if (name, when) not in harvest]
+    if missing:
+        raise ValueError(f"{year} 年缺少交节：{'、'.join(missing)}")
+    edges = [harvest[key] for key in marks]
+    return [
+        (start, following - timedelta(days=1))
+        for start, following in zip(edges, edges[1:], strict=False)  # 13 条边 → 12 段
+    ]
+
+
+def _transit_months(
+    natal: _Natal, luck: _AnnualLuck, year_keys: Sequence[str]
+) -> list[TransitMonth]:
+    """聚焦年的十二段节气月，每段一份"年段 + 月段"的两段账本（spec §6.4）。
+
+    `year_keys` 是那一年命中的规则键，由 `_transit_year` 现算现给：月段不回头重扫年柱，
+    否则年卡与月卡对同一年各算一套命中，前缀就不成立了。
+
+    月段以 `scope="yue"` 计价：太岁与大运两族的 `scopes` 不含 `yue`，`_hit_keys` 当场就
+    把它们挡掉，一年一次的账不会因换了一根月柱再记一遍；`dayun_ganzhi` 同时留 None，
+    同一件事的两道保险。月柱的干支、序号、月名一律取 lunar-python 的 `LiuYue`（五虎遁
+    在历法手里），引擎只负责把它和 `_jieqi_boundaries` 推出来的月界逐位对齐。
+    """
+    months: list[TransitMonth] = []
+    boundaries = _jieqi_boundaries(luck.year)
+    for liu_yue, (start, end) in zip(luck.liunian.getLiuYue(), boundaries, strict=True):
+        ganzhi = liu_yue.getGanZhi()
+        scan = _scan(
+            natal,
+            ganzhi,
+            position="transit_month",
+            label="流月",
+            scope="yue",
+            dayun_ganzhi=None,
+        )
+        rows = _hit_rows(year_keys, _hit_keys(scan.judgement))
+        months.append(
+            TransitMonth(
+                index=liu_yue.getIndex(),
+                month_in_chinese=liu_yue.getMonthInChinese(),
+                ganzhi=ganzhi,
+                pillar=scan.pillar,
+                start_solar=start.isoformat(),
+                end_solar=end.isoformat(),
+                score=_ledger(rows),
+                fired=_fired(rows),
+            )
+        )
+    return months

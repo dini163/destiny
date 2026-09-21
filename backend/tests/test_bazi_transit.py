@@ -18,10 +18,15 @@
 由 Σ `delta == value`、`fired` 与账本行一一对应来钉，不需要任何具体分值（分值的
 对错在 golden 里对拍）；后者只在装配层才测得动 —— 判定层的谓词拿到的是手搭上下文，
 真扫描会不会把命局内部的关系灌进岁运账本，得让引擎真跑一次才知道。
+
+流月一条线（spec §6.4）：月界不来自 lunar-python（`LiuYue` 一个日期都不给），是引擎
+自己从 `getJieQiTable()` 的滚动窗口里采十二节推出来的，所以这里两头都要测 —— 一头钉
+月界自己成形（首尾相接、覆盖整年），另一头钉它和历法给的月序对得上。中间那条最重要
+的不变式是"年段行是月段行的前缀"：一份月账本读起来就是"今年的账 + 这个月加减的账"。
 """
 
 from dataclasses import replace
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from functools import cache
 
 import pytest
@@ -45,18 +50,22 @@ from app.engines.bazi_transit import (
     _fired,
     _hit_keys,
     _hit_rows,
+    _jieqi_boundaries,
     _ledger,
     _narrative,
     _natal_projection,
     _tier,
+    _transit_months,
     _transit_year,
+    _year_scan,
     resolve_natal_moment,
     resolve_transit_range,
 )
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_rules import BranchGroup, BranchMember, RelationPair
-from app.schemas.bazi_transit import TransitYear
+from app.schemas.bazi_transit import TransitMonth, TransitYear
 from app.schemas.common import CalendarType, Gender
+from app.schemas.scoring import ScoreFactor, ScoreValue
 
 _WINDOW = {"supported_from": 1988, "supported_to": 2083}
 
@@ -602,3 +611,110 @@ def test_the_ten_god_block_quotes_the_corpus_for_the_transit_stem() -> None:
         assert transit.ten_god.god == transit.pillar.shishen_gan != "日主"
         assert transit.ten_god.meaning == corpus.meaning
         assert transit.ten_god.source == corpus.source
+
+
+# ---------------------------------------------------------------- 流月（spec §6.4）
+def _iso(day: str) -> date:
+    return date.fromisoformat(day)
+
+
+def _contributions(score: ScoreValue) -> list[ScoreFactor]:
+    """账本里的命中行：基准行与截断行都不算 —— 前者每份账本都有，后者是账本的收尾。
+
+    两段账本要比的正是"命中了什么、按什么次序"，把这两行留在里面就成了比格式。
+    """
+    excluded = {"transit.base", "score.clamped"}
+    return [factor for factor in score.factors if factor.rule not in excluded]
+
+
+@cache
+def _months() -> list[TransitMonth]:
+    """2026（丙午）的 12 节气月：年段键先查出来，月段账本要接着它往下记。"""
+    _, natal = _natal()
+    luck = _luck()[2026]
+    return _transit_months(natal, luck, _hit_keys(_year_scan(natal, luck).judgement))
+
+
+def test_the_twelve_jieqi_months_are_contiguous_and_span_one_whole_solar_year() -> None:
+    """月界无重叠无空洞：立春起、次年立春前一日止，逐段首尾相接（spec §9.4）。"""
+    months = _months()
+    assert [month.index for month in months] == list(range(12))
+    assert [month.month_in_chinese for month in months] == [
+        "正", "二", "三", "四", "五", "六", "七", "八", "九", "十", "冬", "腊",
+    ]
+    assert months[0].start_solar == "2026-02-04"  # 立春
+    assert months[-1].end_solar == "2027-02-03"  # 次年立春前一日
+    for earlier, later in zip(months, months[1:], strict=False):  # 12 段 → 11 个接缝
+        assert _iso(earlier.end_solar) + timedelta(days=1) == _iso(later.start_solar)
+
+
+@pytest.mark.parametrize("year", [1988, 2000, 2026, 2027, 2083])
+def test_the_jieqi_window_holds_all_twelve_nodes_in_every_reachable_year(year: int) -> None:
+    """`getJieQiTable()` 是滚动窗口，窄一节就少一段月界。探针年份取大运可及的首尾与闰年附近。"""
+    spans = _jieqi_boundaries(year)
+    assert len(spans) == 12
+    for index, (start, end) in enumerate(spans):
+        assert start <= end, f"{year} 年第 {index} 段月界倒挂"
+        if index:
+            assert spans[index - 1][1] + timedelta(days=1) == start
+    assert date(year, 2, 3) <= spans[0][0] <= date(year, 2, 5)  # 立春只在 2/3—2/5 之间交节
+    assert date(year + 1, 2, 2) <= spans[-1][1] + timedelta(days=1) <= date(year + 1, 2, 5)
+
+
+def test_the_month_stems_and_branches_come_from_lunar_python_not_from_a_renumbering() -> None:
+    """月柱逐字取 `LiuYue.getGanZhi()`（五虎遁在历法手里），引擎只把它和序号、月名对齐。
+
+    2026 是丙午年，丙辛之年以庚寅起首 —— 逐段差一位干，整张月表就跟着错一年。
+    """
+    raw = _luck()[2026].liunian.getLiuYue()
+    assert [(m.index, m.ganzhi, m.month_in_chinese) for m in _months()] == [
+        (lyue.getIndex(), lyue.getGanZhi(), lyue.getMonthInChinese()) for lyue in raw
+    ]
+    assert [m.ganzhi for m in _months()] == [
+        "庚寅", "辛卯", "壬辰", "癸巳", "甲午", "乙未",
+        "丙申", "丁酉", "戊戌", "己亥", "庚子", "辛丑",
+    ]
+
+
+def test_the_month_ledger_is_the_year_ledger_with_the_month_rows_appended() -> None:
+    """两段账本不变式（spec §6.4）：年段行是月段行的前缀，月段行一律带 `yue.` 前缀。
+
+    整表比不了 —— 一份月账本里同一条规则可以出现两次（年段一次、月段一次），那正是
+    前缀要分辨的事；剥掉基准行之后，前 len(年段) 行必须逐行相等。
+    """
+    year_rows = _contributions(_years()[2026].score)
+    for month in _months():
+        rows = _contributions(month.score)
+        assert rows[: len(year_rows)] == year_rows
+        assert all(factor.rule.startswith("yue.") for factor in rows[len(year_rows) :])
+        assert all("（流月）" in factor.label for factor in rows[len(year_rows) :])
+        assert sum(factor.delta for factor in month.score.factors) == pytest.approx(
+            month.score.value
+        )
+        assert [item.key for item in month.fired] == [factor.rule for factor in rows]
+
+
+def test_no_month_segment_reprices_a_year_only_family() -> None:
+    """太岁与大运两族的 `scopes` 不含 `yue`：月账本里它们一行都不该出现（spec §6.2）。"""
+    month_rows = [
+        factor.rule[len("yue.") :]
+        for month in _months()
+        for factor in _contributions(month.score)
+        if factor.rule.startswith("yue.")
+    ]
+    assert [row for row in month_rows if row.split(".", maxsplit=1)[0] in ("taisui", "dayun")] == []
+
+
+def test_a_month_pillar_is_synthesised_as_a_transit_month() -> None:
+    """月柱与年柱同一条合成路：`position` 为 transit_month、`label` 为 流月，宫位不套。"""
+    for month in _months():
+        assert month.pillar.position == "transit_month"
+        assert month.pillar.label == "流月"
+        assert month.pillar.ganzhi == month.ganzhi
+
+
+def test_the_focused_year_carries_its_months_and_the_others_carry_none() -> None:
+    """`focus` 是逐年开关：聚焦年给 12 段，其余年为 None，前端整块不渲染而非十二个空月。"""
+    _, natal = _natal()
+    assert _transit_year(natal, _luck()[2026], focus=True).months is not None
+    assert [t.months for t in _years().values()].count(None) == 5
