@@ -55,7 +55,7 @@ export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTable
               {familiesOf(year).map((family) => (
                 <span
                   key={family}
-                  className="label-caps rounded-element border border-rim-strong px-1.5 py-0.5 text-ink-muted"
+                  className="label-caps normal-case rounded-element border border-rim-strong px-1.5 py-0.5 text-ink-muted"
                 >
                   {family}
                 </span>
