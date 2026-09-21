@@ -23,12 +23,12 @@ there carries the arithmetic that produced it (spec §6.1/§6.4).
 
 True Solar Time (PRD 7) is applied *before* constructing ``Solar(...)`` because
 ``lunar-python`` uses the supplied wall-clock time verbatim with no astronomical
-or geographic correction.
+or geographic correction. That whole step lives in ``bazi_transit.resolve_natal_moment``,
+which this module consumes: the transit engine has to cast the same moment a second
+time, and two copies of the correction would drift into two 口径.
 """
 
-from datetime import date, datetime, time
-
-from lunar_python import Lunar, Solar
+from datetime import date, time
 
 from app.content import CONTENT_SOURCES, CONTENT_VERSION
 from app.content.bazi_shishen import TEN_GOD_MEANING, ten_god_meaning
@@ -42,6 +42,7 @@ from app.engines.bazi_strength import (
     element_weight_scores,
     hidden_stem_ledger,
 )
+from app.engines.bazi_transit import resolve_natal_moment
 from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.bazi import (
     BaziChart,
@@ -54,11 +55,7 @@ from app.schemas.bazi import (
 from app.schemas.bazi_breakdown import DayunDetail, Provenance, ProvenanceTable, TenGodReading
 from app.schemas.bazi_strength import Yongshen
 from app.schemas.common import CalendarType, Gender
-from app.solar.true_solar_time import (
-    STANDARD_MERIDIAN_CN,
-    true_solar_offset_minutes,
-    true_solar_time,
-)
+from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
 # --- Fixed classical reference tables (standard, not computed) ---------------
 # The five-element cycles and stem/branch elements live in app.content.wuxing.
@@ -72,26 +69,6 @@ _PILLARS = (
     ("day", "Day", "日柱"),
     ("hour", "Time", "时柱"),
 )
-
-
-def _resolve_standard_datetime(birth_date: date, birth_time: time, calendar: CalendarType) -> datetime:
-    """Return the civil standard-time datetime for the supplied birth data.
-
-    A lunar-calendar date is converted to its Gregorian equivalent (preserving
-    the wall-clock time) so that the True Solar Time correction and pillar
-    derivation both operate on a standard civil datetime.
-    """
-    if calendar is CalendarType.LUNAR:
-        lunar = Lunar.fromYmdHms(
-            birth_date.year, birth_date.month, birth_date.day,
-            birth_time.hour, birth_time.minute, birth_time.second,
-        )
-        solar = lunar.getSolar()
-        return datetime(
-            solar.getYear(), solar.getMonth(), solar.getDay(),
-            solar.getHour(), solar.getMinute(), solar.getSecond(),
-        )
-    return datetime.combine(birth_date, birth_time)
 
 
 def _build_pillar(ec: object, position: str, method: str, label: str) -> BaziPillar:
@@ -281,22 +258,18 @@ def compute_bazi_chart(
     ``name`` is echoed into the response only — it never enters a calculation.
     """
     reference = reference_date or date.today()
-    standard_dt = _resolve_standard_datetime(birth_date, birth_time, calendar)
-
-    if apply_true_solar_time:
-        chart_dt = true_solar_time(standard_dt, longitude)
-        offset_minutes: float | None = round(true_solar_offset_minutes(standard_dt, longitude), 2)
-        tst_text: str | None = chart_dt.strftime("%Y-%m-%d %H:%M")
-    else:
-        chart_dt = standard_dt
-        offset_minutes = None
-        tst_text = None
-
-    solar = Solar.fromYmdHms(
-        chart_dt.year, chart_dt.month, chart_dt.day, chart_dt.hour, chart_dt.minute, chart_dt.second
+    moment = resolve_natal_moment(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        calendar=calendar,
+        longitude=longitude,
+        apply_true_solar_time=apply_true_solar_time,
     )
-    lunar = solar.getLunar()
-    eight_char = lunar.getEightChar()
+    standard_dt = moment.standard_datetime
+    lunar = moment.lunar
+    eight_char = moment.eight_char
+    tst_text = moment.true_solar_time_text
+    offset_minutes = moment.offset_minutes
 
     pillars = [_build_pillar(eight_char, position, method, label) for position, method, label in _PILLARS]
     counts = _count_primary_characters(pillars)

@@ -59,6 +59,25 @@ class NameInputError(DestinyError):
         self.code = code
 
 
+class TransitRangeError(DestinyError):
+    """岁运区间无法推演。
+
+    四个机器码由 `code` 区分（spec §7.2）：`transit_range_reversed` /
+    `transit_range_too_wide` / `transit_range_unsupported` /
+    `transit_focus_out_of_range`。它们过不了 pydantic 的字段校验，因为每个字段单独
+    看都合法 —— 坏的是它们之间的关系，以及它们与该命盘大运窗口的关系，而窗口是排盘
+    之后才知道的事实。所以这里给 422 而不是 400：请求成形，只是推不出东西来。
+    """
+
+    status_code = 422
+
+    def __init__(
+        self, code: str, message: str, context: dict[str, object] | None = None
+    ) -> None:
+        super().__init__(message, context)
+        self.code = code
+
+
 def register_error_handlers(app: FastAPI) -> None:
     """Map :class:`DestinyError` subclasses to a consistent JSON error envelope."""
 
