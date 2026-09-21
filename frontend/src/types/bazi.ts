@@ -5,6 +5,7 @@
  * without a mapping layer.
  */
 import type { BirthInput, CalendarType, Gender } from './common';
+import type { ScoreValue } from './scoring';
 
 /** Which of the four pillars a {@link BaziPillar} represents. */
 export type PillarPosition = 'year' | 'month' | 'day' | 'hour';
@@ -20,6 +21,10 @@ export interface BaziNatalRequest extends BirthInput {
   gender: Gender;
   /** Correct standard time to True Solar Time before charting (default true). */
   apply_true_solar_time?: boolean;
+  /** Display-only label, echoed back unchanged. */
+  name?: string | null;
+  /** Cutoff for the current luck pillar; defaults to the server date. */
+  reference_date?: string | null;
 }
 
 /** One of the four pillars (year / month / day / hour). */
@@ -63,10 +68,10 @@ export interface WuxingScore {
 export interface DayMasterAnalysis {
   day_master: string;
   day_master_element: string;
-  support_score: number;
-  drain_score: number;
-  /** support / (support + drain), in [0, 1]. */
-  strength_ratio: number;
+  /** Three-factor ledger behind `level`; open it to see the arithmetic. */
+  strength: ScoreValue;
+  /** Score sits within `BORDERLINE_BAND` (3.0) of a band cut (spec §6.4). */
+  borderline: boolean;
   level: StrengthLevel;
   /** Chinese label, e.g. 身弱. */
   label: string;
@@ -96,8 +101,151 @@ export interface LiunianYear {
   ganzhi: string;
 }
 
+/** Dimension names in output order; 婚姻 is absent when the chart has no gender. */
+export type DimensionName = '事业' | '财运' | '婚姻' | '健康' | '学业' | '人际';
+
+/** Which side of a pillar a shensha hit landed on. */
+export type CharacterSide = 'gan' | 'zhi' | 'pillar';
+
+export interface ShenShaMatch {
+  /** `year | month | day | hour | extra<n>`: extra slots are 大运/流年 pillars. */
+  position: string;
+  character: string;
+  at: CharacterSide;
+}
+
+export interface ShenShaEntry {
+  name: string;
+  quality: '吉' | '凶' | '中性';
+  /** What the lookup is anchored to, e.g. 申子辰局. */
+  checked_from: string;
+  matches: ShenShaMatch[];
+  meaning: string;
+  source: string;
+}
+
+export interface RelationPair {
+  kind: string;
+  /** `year | month | day | hour | extra<n>`. */
+  pillar_a: string;
+  pillar_b: string;
+  character_a: string;
+  character_b: string;
+  strength: '紧临' | '隔位' | '远位';
+  /** 合化目标, never an already-transformed result (spec §6.3). */
+  transforming_element: string | null;
+  reading: string;
+  source: string;
+}
+
+export interface BranchMember {
+  pillar: string;
+  branch: string;
+  ten_god: string;
+}
+
+export interface BranchGroup {
+  kind: '三合' | '半合' | '三会';
+  element: string;
+  members: BranchMember[];
+  is_complete: boolean;
+  reading: string;
+  source: string;
+}
+
+export interface GeJu {
+  name: string;
+  from_pillar: string;
+  ten_god: string;
+  is_success: boolean;
+  /** Whole sentences taken verbatim from the corpus, in pillar order. */
+  notes: string[];
+  source: string;
+}
+
+export interface HiddenStemWeight {
+  position: PillarPosition;
+  branch: string;
+  stem: string;
+  role: '本气' | '中气' | '余气';
+  weight: number;
+  ten_god: string;
+  source: string;
+}
+
+export interface YongshenMethod {
+  method: '扶抑' | '通关' | '调候';
+  /** Machine key of the branch taken — recorded even when the method stays silent. */
+  fired_rule: string;
+  chosen_elements: string[];
+  already_present: boolean;
+  source: string;
+}
+
+export interface YongshenConflict {
+  element: string;
+  suppressed_by: string;
+  reason: string;
+  source: string;
+}
+
+export interface Yongshen {
+  favorable_elements: string[];
+  unfavorable_elements: string[];
+  methods: YongshenMethod[];
+  conflict: YongshenConflict | null;
+}
+
+export interface TenGodReading {
+  ten_god: string;
+  count: number;
+  /** e.g. `month.gan`, `day.zhi(癸)`. */
+  positions: string[];
+  meaning: string;
+  six_relation: string | null;
+  source: string;
+}
+
+export interface DayunDetail {
+  index: number;
+  ganzhi: string;
+  start_age: number;
+  end_age: number;
+  relations: RelationPair[];
+}
+
+export interface ProvenanceTable {
+  name: string;
+  version: string;
+  source: string;
+}
+
+export interface Provenance {
+  /** ISO date; the cutoff that decided `dayun_current`, echoed back by the API. */
+  reference_date: string;
+  engine: string;
+  tables: ProvenanceTable[];
+}
+
+export interface DimensionReading {
+  dimension: DimensionName;
+  score: ScoreValue;
+  strengths: string[];
+  cautions: string[];
+  /** Fired rules' `reading` joined by 「；」— no sentence is composed in the frontend. */
+  narrative: string;
+  source: string;
+}
+
+export interface BaziInterpretation {
+  six_dimensions: DimensionReading[];
+  summary: string;
+}
+
 /** Complete BaZi natal chart produced by the backend engine. */
 export interface BaziChart {
+  /** Name supplied with the request, echoed back untouched. */
+  name?: string | null;
   /** Civil standard-time input, e.g. `1988-02-15 23:30`. */
   standard_datetime: string;
   calendar: CalendarType;
@@ -129,6 +277,18 @@ export interface BaziChart {
   dayun_start_solar: string | null;
   dayun: DayunStep[];
   current_liunian: LiunianYear[];
+
+  /** Interpretation breakdown — optional here because 流月/合婚 share the chart type. */
+  geju?: GeJu | null;
+  yongshen?: Yongshen | null;
+  shensha?: ShenShaEntry[];
+  ten_god_readings?: TenGodReading[];
+  relations?: RelationPair[];
+  branch_groups?: BranchGroup[];
+  hidden_stem_ledger?: HiddenStemWeight[];
+  dayun_current?: DayunDetail | null;
+  interpretation?: BaziInterpretation | null;
+  provenance?: Provenance | null;
 
   engine: string;
 }

@@ -20,17 +20,16 @@ interface StrengthDialProps {
 /**
  * Day-master strength dial (命局核心判定).
  *
- * The ring fills to `strength_ratio`, which is the three-factor score on the same
- * 0-100 axis as `strength`. Everything shown — level, favourable (喜用神) and
- * unfavourable (忌神) elements and the summary — is the engine's deterministic
- * analysis; no interpretive copy is invented. The retired 扶助/克泄 sums are not
- * rendered: they have no source and Task 14 replaces this card's numbers with the
- * expandable `strength` ledger.
+ * The ring fills to `strength.value`, the three-factor ledger total on a 0-100
+ * axis. Everything shown — level, favourable (喜用神) and unfavourable (忌神)
+ * elements and the summary — is the engine's deterministic analysis; no
+ * interpretive copy is invented. The retired 扶助/克泄 sums are not rendered:
+ * they had no source, and Task 14 replaces this card's figure with the
+ * expandable `ScoreLedger` over the same `strength` value.
  */
 export function StrengthDial({ analysis }: StrengthDialProps) {
-  const ratio = Math.min(1, Math.max(0, analysis.strength_ratio));
-  const offset = RING_CIRCUMFERENCE * (1 - ratio);
-  const percent = Math.round(ratio * 100);
+  const percent = Math.min(100, Math.max(0, Math.round(analysis.strength.value)));
+  const offset = RING_CIRCUMFERENCE * (1 - percent / 100);
 
   return (
     <div className="flex flex-col gap-4">
