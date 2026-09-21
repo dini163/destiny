@@ -1,0 +1,1077 @@
+{
+ "unicode_version": "18.0.0",
+ "corpus_date": "2026-07-31",
+ "source": "Unihan kRSUnicode 首位部首号 + 该部首正字 kTotalStrokes 推导（Unicode 18.0.0，非手抄）",
+ "items": [
+  {
+   "radical_no": 1,
+   "char": "一",
+   "strokes": 1
+  },
+  {
+   "radical_no": 2,
+   "char": "丨",
+   "strokes": 1
+  },
+  {
+   "radical_no": 3,
+   "char": "丶",
+   "strokes": 1
+  },
+  {
+   "radical_no": 4,
+   "char": "丿",
+   "strokes": 1
+  },
+  {
+   "radical_no": 5,
+   "char": "乙",
+   "strokes": 1
+  },
+  {
+   "radical_no": 6,
+   "char": "亅",
+   "strokes": 1
+  },
+  {
+   "radical_no": 7,
+   "char": "二",
+   "strokes": 2
+  },
+  {
+   "radical_no": 8,
+   "char": "亠",
+   "strokes": 2
+  },
+  {
+   "radical_no": 9,
+   "char": "人",
+   "strokes": 2
+  },
+  {
+   "radical_no": 10,
+   "char": "儿",
+   "strokes": 2
+  },
+  {
+   "radical_no": 11,
+   "char": "入",
+   "strokes": 2
+  },
+  {
+   "radical_no": 12,
+   "char": "八",
+   "strokes": 2
+  },
+  {
+   "radical_no": 13,
+   "char": "冂",
+   "strokes": 2
+  },
+  {
+   "radical_no": 14,
+   "char": "冖",
+   "strokes": 2
+  },
+  {
+   "radical_no": 15,
+   "char": "冫",
+   "strokes": 2
+  },
+  {
+   "radical_no": 16,
+   "char": "几",
+   "strokes": 2
+  },
+  {
+   "radical_no": 17,
+   "char": "凵",
+   "strokes": 2
+  },
+  {
+   "radical_no": 18,
+   "char": "刀",
+   "strokes": 2
+  },
+  {
+   "radical_no": 19,
+   "char": "力",
+   "strokes": 2
+  },
+  {
+   "radical_no": 20,
+   "char": "勹",
+   "strokes": 2
+  },
+  {
+   "radical_no": 21,
+   "char": "匕",
+   "strokes": 2
+  },
+  {
+   "radical_no": 22,
+   "char": "匚",
+   "strokes": 2
+  },
+  {
+   "radical_no": 23,
+   "char": "匸",
+   "strokes": 2
+  },
+  {
+   "radical_no": 24,
+   "char": "十",
+   "strokes": 2
+  },
+  {
+   "radical_no": 25,
+   "char": "卜",
+   "strokes": 2
+  },
+  {
+   "radical_no": 26,
+   "char": "卩",
+   "strokes": 2
+  },
+  {
+   "radical_no": 27,
+   "char": "厂",
+   "strokes": 2
+  },
+  {
+   "radical_no": 28,
+   "char": "厶",
+   "strokes": 2
+  },
+  {
+   "radical_no": 29,
+   "char": "又",
+   "strokes": 2
+  },
+  {
+   "radical_no": 30,
+   "char": "口",
+   "strokes": 3
+  },
+  {
+   "radical_no": 31,
+   "char": "囗",
+   "strokes": 3
+  },
+  {
+   "radical_no": 32,
+   "char": "土",
+   "strokes": 3
+  },
+  {
+   "radical_no": 33,
+   "char": "士",
+   "strokes": 3
+  },
+  {
+   "radical_no": 34,
+   "char": "夂",
+   "strokes": 3
+  },
+  {
+   "radical_no": 35,
+   "char": "夊",
+   "strokes": 3
+  },
+  {
+   "radical_no": 36,
+   "char": "夕",
+   "strokes": 3
+  },
+  {
+   "radical_no": 37,
+   "char": "大",
+   "strokes": 3
+  },
+  {
+   "radical_no": 38,
+   "char": "女",
+   "strokes": 3
+  },
+  {
+   "radical_no": 39,
+   "char": "子",
+   "strokes": 3
+  },
+  {
+   "radical_no": 40,
+   "char": "宀",
+   "strokes": 3
+  },
+  {
+   "radical_no": 41,
+   "char": "寸",
+   "strokes": 3
+  },
+  {
+   "radical_no": 42,
+   "char": "小",
+   "strokes": 3
+  },
+  {
+   "radical_no": 43,
+   "char": "尢",
+   "strokes": 3
+  },
+  {
+   "radical_no": 44,
+   "char": "尸",
+   "strokes": 3
+  },
+  {
+   "radical_no": 45,
+   "char": "屮",
+   "strokes": 3
+  },
+  {
+   "radical_no": 46,
+   "char": "山",
+   "strokes": 3
+  },
+  {
+   "radical_no": 47,
+   "char": "巛",
+   "strokes": 3
+  },
+  {
+   "radical_no": 48,
+   "char": "工",
+   "strokes": 3
+  },
+  {
+   "radical_no": 49,
+   "char": "己",
+   "strokes": 3
+  },
+  {
+   "radical_no": 50,
+   "char": "巾",
+   "strokes": 3
+  },
+  {
+   "radical_no": 51,
+   "char": "干",
+   "strokes": 3
+  },
+  {
+   "radical_no": 52,
+   "char": "幺",
+   "strokes": 3
+  },
+  {
+   "radical_no": 53,
+   "char": "广",
+   "strokes": 3
+  },
+  {
+   "radical_no": 54,
+   "char": "廴",
+   "strokes": 3
+  },
+  {
+   "radical_no": 55,
+   "char": "廾",
+   "strokes": 3
+  },
+  {
+   "radical_no": 56,
+   "char": "弋",
+   "strokes": 3
+  },
+  {
+   "radical_no": 57,
+   "char": "弓",
+   "strokes": 3
+  },
+  {
+   "radical_no": 58,
+   "char": "彐",
+   "strokes": 3
+  },
+  {
+   "radical_no": 59,
+   "char": "彡",
+   "strokes": 3
+  },
+  {
+   "radical_no": 60,
+   "char": "彳",
+   "strokes": 3
+  },
+  {
+   "radical_no": 61,
+   "char": "心",
+   "strokes": 4
+  },
+  {
+   "radical_no": 62,
+   "char": "戈",
+   "strokes": 4
+  },
+  {
+   "radical_no": 63,
+   "char": "戶",
+   "strokes": 4
+  },
+  {
+   "radical_no": 64,
+   "char": "手",
+   "strokes": 4
+  },
+  {
+   "radical_no": 65,
+   "char": "支",
+   "strokes": 4
+  },
+  {
+   "radical_no": 66,
+   "char": "攴",
+   "strokes": 4
+  },
+  {
+   "radical_no": 67,
+   "char": "文",
+   "strokes": 4
+  },
+  {
+   "radical_no": 68,
+   "char": "斗",
+   "strokes": 4
+  },
+  {
+   "radical_no": 69,
+   "char": "斤",
+   "strokes": 4
+  },
+  {
+   "radical_no": 70,
+   "char": "方",
+   "strokes": 4
+  },
+  {
+   "radical_no": 71,
+   "char": "无",
+   "strokes": 4
+  },
+  {
+   "radical_no": 72,
+   "char": "日",
+   "strokes": 4
+  },
+  {
+   "radical_no": 73,
+   "char": "曰",
+   "strokes": 4
+  },
+  {
+   "radical_no": 74,
+   "char": "月",
+   "strokes": 4
+  },
+  {
+   "radical_no": 75,
+   "char": "木",
+   "strokes": 4
+  },
+  {
+   "radical_no": 76,
+   "char": "欠",
+   "strokes": 4
+  },
+  {
+   "radical_no": 77,
+   "char": "止",
+   "strokes": 4
+  },
+  {
+   "radical_no": 78,
+   "char": "歹",
+   "strokes": 4
+  },
+  {
+   "radical_no": 79,
+   "char": "殳",
+   "strokes": 4
+  },
+  {
+   "radical_no": 80,
+   "char": "毋",
+   "strokes": 4
+  },
+  {
+   "radical_no": 81,
+   "char": "比",
+   "strokes": 4
+  },
+  {
+   "radical_no": 82,
+   "char": "毛",
+   "strokes": 4
+  },
+  {
+   "radical_no": 83,
+   "char": "氏",
+   "strokes": 4
+  },
+  {
+   "radical_no": 84,
+   "char": "气",
+   "strokes": 4
+  },
+  {
+   "radical_no": 85,
+   "char": "水",
+   "strokes": 4
+  },
+  {
+   "radical_no": 86,
+   "char": "火",
+   "strokes": 4
+  },
+  {
+   "radical_no": 87,
+   "char": "爪",
+   "strokes": 4
+  },
+  {
+   "radical_no": 88,
+   "char": "父",
+   "strokes": 4
+  },
+  {
+   "radical_no": 89,
+   "char": "爻",
+   "strokes": 4
+  },
+  {
+   "radical_no": 90,
+   "char": "爿",
+   "strokes": 4
+  },
+  {
+   "radical_no": 91,
+   "char": "片",
+   "strokes": 4
+  },
+  {
+   "radical_no": 92,
+   "char": "牙",
+   "strokes": 4
+  },
+  {
+   "radical_no": 93,
+   "char": "牛",
+   "strokes": 4
+  },
+  {
+   "radical_no": 94,
+   "char": "犬",
+   "strokes": 4
+  },
+  {
+   "radical_no": 95,
+   "char": "玄",
+   "strokes": 5
+  },
+  {
+   "radical_no": 96,
+   "char": "玉",
+   "strokes": 5
+  },
+  {
+   "radical_no": 97,
+   "char": "瓜",
+   "strokes": 5
+  },
+  {
+   "radical_no": 98,
+   "char": "瓦",
+   "strokes": 5
+  },
+  {
+   "radical_no": 99,
+   "char": "甘",
+   "strokes": 5
+  },
+  {
+   "radical_no": 100,
+   "char": "生",
+   "strokes": 5
+  },
+  {
+   "radical_no": 101,
+   "char": "用",
+   "strokes": 5
+  },
+  {
+   "radical_no": 102,
+   "char": "田",
+   "strokes": 5
+  },
+  {
+   "radical_no": 103,
+   "char": "疋",
+   "strokes": 5
+  },
+  {
+   "radical_no": 104,
+   "char": "疒",
+   "strokes": 5
+  },
+  {
+   "radical_no": 105,
+   "char": "癶",
+   "strokes": 5
+  },
+  {
+   "radical_no": 106,
+   "char": "白",
+   "strokes": 5
+  },
+  {
+   "radical_no": 107,
+   "char": "皮",
+   "strokes": 5
+  },
+  {
+   "radical_no": 108,
+   "char": "皿",
+   "strokes": 5
+  },
+  {
+   "radical_no": 109,
+   "char": "目",
+   "strokes": 5
+  },
+  {
+   "radical_no": 110,
+   "char": "矛",
+   "strokes": 5
+  },
+  {
+   "radical_no": 111,
+   "char": "矢",
+   "strokes": 5
+  },
+  {
+   "radical_no": 112,
+   "char": "石",
+   "strokes": 5
+  },
+  {
+   "radical_no": 113,
+   "char": "示",
+   "strokes": 5
+  },
+  {
+   "radical_no": 114,
+   "char": "禸",
+   "strokes": 5
+  },
+  {
+   "radical_no": 115,
+   "char": "禾",
+   "strokes": 5
+  },
+  {
+   "radical_no": 116,
+   "char": "穴",
+   "strokes": 5
+  },
+  {
+   "radical_no": 117,
+   "char": "立",
+   "strokes": 5
+  },
+  {
+   "radical_no": 118,
+   "char": "竹",
+   "strokes": 6
+  },
+  {
+   "radical_no": 119,
+   "char": "米",
+   "strokes": 6
+  },
+  {
+   "radical_no": 120,
+   "char": "糸",
+   "strokes": 6
+  },
+  {
+   "radical_no": 121,
+   "char": "缶",
+   "strokes": 6
+  },
+  {
+   "radical_no": 122,
+   "char": "网",
+   "strokes": 6
+  },
+  {
+   "radical_no": 123,
+   "char": "羊",
+   "strokes": 6
+  },
+  {
+   "radical_no": 124,
+   "char": "羽",
+   "strokes": 6
+  },
+  {
+   "radical_no": 125,
+   "char": "老",
+   "strokes": 6
+  },
+  {
+   "radical_no": 126,
+   "char": "而",
+   "strokes": 6
+  },
+  {
+   "radical_no": 127,
+   "char": "耒",
+   "strokes": 6
+  },
+  {
+   "radical_no": 128,
+   "char": "耳",
+   "strokes": 6
+  },
+  {
+   "radical_no": 129,
+   "char": "聿",
+   "strokes": 6
+  },
+  {
+   "radical_no": 130,
+   "char": "肉",
+   "strokes": 6
+  },
+  {
+   "radical_no": 131,
+   "char": "臣",
+   "strokes": 6
+  },
+  {
+   "radical_no": 132,
+   "char": "自",
+   "strokes": 6
+  },
+  {
+   "radical_no": 133,
+   "char": "至",
+   "strokes": 6
+  },
+  {
+   "radical_no": 134,
+   "char": "臼",
+   "strokes": 6
+  },
+  {
+   "radical_no": 135,
+   "char": "舌",
+   "strokes": 6
+  },
+  {
+   "radical_no": 136,
+   "char": "舛",
+   "strokes": 6
+  },
+  {
+   "radical_no": 137,
+   "char": "舟",
+   "strokes": 6
+  },
+  {
+   "radical_no": 138,
+   "char": "艮",
+   "strokes": 6
+  },
+  {
+   "radical_no": 139,
+   "char": "色",
+   "strokes": 6
+  },
+  {
+   "radical_no": 140,
+   "char": "艸",
+   "strokes": 6
+  },
+  {
+   "radical_no": 141,
+   "char": "虍",
+   "strokes": 6
+  },
+  {
+   "radical_no": 142,
+   "char": "虫",
+   "strokes": 6
+  },
+  {
+   "radical_no": 143,
+   "char": "血",
+   "strokes": 6
+  },
+  {
+   "radical_no": 144,
+   "char": "行",
+   "strokes": 6
+  },
+  {
+   "radical_no": 145,
+   "char": "衣",
+   "strokes": 6
+  },
+  {
+   "radical_no": 146,
+   "char": "襾",
+   "strokes": 6
+  },
+  {
+   "radical_no": 147,
+   "char": "見",
+   "strokes": 7
+  },
+  {
+   "radical_no": 148,
+   "char": "角",
+   "strokes": 7
+  },
+  {
+   "radical_no": 149,
+   "char": "言",
+   "strokes": 7
+  },
+  {
+   "radical_no": 150,
+   "char": "谷",
+   "strokes": 7
+  },
+  {
+   "radical_no": 151,
+   "char": "豆",
+   "strokes": 7
+  },
+  {
+   "radical_no": 152,
+   "char": "豕",
+   "strokes": 7
+  },
+  {
+   "radical_no": 153,
+   "char": "豸",
+   "strokes": 7
+  },
+  {
+   "radical_no": 154,
+   "char": "貝",
+   "strokes": 7
+  },
+  {
+   "radical_no": 155,
+   "char": "赤",
+   "strokes": 7
+  },
+  {
+   "radical_no": 156,
+   "char": "走",
+   "strokes": 7
+  },
+  {
+   "radical_no": 157,
+   "char": "足",
+   "strokes": 7
+  },
+  {
+   "radical_no": 158,
+   "char": "身",
+   "strokes": 7
+  },
+  {
+   "radical_no": 159,
+   "char": "車",
+   "strokes": 7
+  },
+  {
+   "radical_no": 160,
+   "char": "辛",
+   "strokes": 7
+  },
+  {
+   "radical_no": 161,
+   "char": "辰",
+   "strokes": 7
+  },
+  {
+   "radical_no": 162,
+   "char": "辵",
+   "strokes": 7
+  },
+  {
+   "radical_no": 163,
+   "char": "邑",
+   "strokes": 7
+  },
+  {
+   "radical_no": 164,
+   "char": "酉",
+   "strokes": 7
+  },
+  {
+   "radical_no": 165,
+   "char": "釆",
+   "strokes": 7
+  },
+  {
+   "radical_no": 166,
+   "char": "里",
+   "strokes": 7
+  },
+  {
+   "radical_no": 167,
+   "char": "金",
+   "strokes": 8
+  },
+  {
+   "radical_no": 168,
+   "char": "長",
+   "strokes": 8
+  },
+  {
+   "radical_no": 169,
+   "char": "門",
+   "strokes": 8
+  },
+  {
+   "radical_no": 170,
+   "char": "阜",
+   "strokes": 8
+  },
+  {
+   "radical_no": 171,
+   "char": "隶",
+   "strokes": 8
+  },
+  {
+   "radical_no": 172,
+   "char": "隹",
+   "strokes": 8
+  },
+  {
+   "radical_no": 173,
+   "char": "雨",
+   "strokes": 8
+  },
+  {
+   "radical_no": 174,
+   "char": "靑",
+   "strokes": 8
+  },
+  {
+   "radical_no": 175,
+   "char": "非",
+   "strokes": 8
+  },
+  {
+   "radical_no": 176,
+   "char": "面",
+   "strokes": 9
+  },
+  {
+   "radical_no": 177,
+   "char": "革",
+   "strokes": 9
+  },
+  {
+   "radical_no": 178,
+   "char": "韋",
+   "strokes": 9
+  },
+  {
+   "radical_no": 179,
+   "char": "韭",
+   "strokes": 9
+  },
+  {
+   "radical_no": 180,
+   "char": "音",
+   "strokes": 9
+  },
+  {
+   "radical_no": 181,
+   "char": "頁",
+   "strokes": 9
+  },
+  {
+   "radical_no": 182,
+   "char": "風",
+   "strokes": 9
+  },
+  {
+   "radical_no": 183,
+   "char": "飛",
+   "strokes": 9
+  },
+  {
+   "radical_no": 184,
+   "char": "食",
+   "strokes": 9
+  },
+  {
+   "radical_no": 185,
+   "char": "首",
+   "strokes": 9
+  },
+  {
+   "radical_no": 186,
+   "char": "香",
+   "strokes": 9
+  },
+  {
+   "radical_no": 187,
+   "char": "馬",
+   "strokes": 10
+  },
+  {
+   "radical_no": 188,
+   "char": "骨",
+   "strokes": 10
+  },
+  {
+   "radical_no": 189,
+   "char": "高",
+   "strokes": 10
+  },
+  {
+   "radical_no": 190,
+   "char": "髟",
+   "strokes": 10
+  },
+  {
+   "radical_no": 191,
+   "char": "鬥",
+   "strokes": 10
+  },
+  {
+   "radical_no": 192,
+   "char": "鬯",
+   "strokes": 10
+  },
+  {
+   "radical_no": 193,
+   "char": "鬲",
+   "strokes": 10
+  },
+  {
+   "radical_no": 194,
+   "char": "鬼",
+   "strokes": 10
+  },
+  {
+   "radical_no": 195,
+   "char": "魚",
+   "strokes": 11
+  },
+  {
+   "radical_no": 196,
+   "char": "鳥",
+   "strokes": 11
+  },
+  {
+   "radical_no": 197,
+   "char": "鹵",
+   "strokes": 11
+  },
+  {
+   "radical_no": 198,
+   "char": "鹿",
+   "strokes": 11
+  },
+  {
+   "radical_no": 199,
+   "char": "麥",
+   "strokes": 11
+  },
+  {
+   "radical_no": 200,
+   "char": "麻",
+   "strokes": 11
+  },
+  {
+   "radical_no": 201,
+   "char": "黃",
+   "strokes": 12
+  },
+  {
+   "radical_no": 202,
+   "char": "黍",
+   "strokes": 12
+  },
+  {
+   "radical_no": 203,
+   "char": "黑",
+   "strokes": 12
+  },
+  {
+   "radical_no": 204,
+   "char": "黹",
+   "strokes": 12
+  },
+  {
+   "radical_no": 205,
+   "char": "黽",
+   "strokes": 13
+  },
+  {
+   "radical_no": 206,
+   "char": "鼎",
+   "strokes": 13
+  },
+  {
+   "radical_no": 207,
+   "char": "鼓",
+   "strokes": 13
+  },
+  {
+   "radical_no": 208,
+   "char": "鼠",
+   "strokes": 13
+  },
+  {
+   "radical_no": 209,
+   "char": "鼻",
+   "strokes": 14
+  },
+  {
+   "radical_no": 210,
+   "char": "齊",
+   "strokes": 14
+  },
+  {
+   "radical_no": 211,
+   "char": "齒",
+   "strokes": 15
+  },
+  {
+   "radical_no": 212,
+   "char": "龍",
+   "strokes": 16
+  },
+  {
+   "radical_no": 213,
+   "char": "龜",
+   "strokes": 16
+  },
+  {
+   "radical_no": 214,
+   "char": "龠",
+   "strokes": 17
+  }
+ ]
+}
