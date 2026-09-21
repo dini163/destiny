@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { wuxingChip } from '../../lib/wuxing';
 import { ScoreLedger } from './ScoreLedger';
 import type { DayMasterAnalysis } from '../../types/bazi';
 
@@ -23,9 +22,8 @@ interface StrengthDialProps {
  *
  * The ring, the figure in its centre and the expandable ledger underneath all
  * read the same `strength` ScoreValue, so the arc length can be traced back to
- * the 得令/得地/得势 rows. Everything else shown — level, favourable (喜用神) and
- * unfavourable (忌神) elements and the summary — is the engine's deterministic
- * analysis; no interpretive copy is invented.
+ * the 得令/得地/得势 rows. 喜用/忌仇 are not repeated here: `YongshenPanel` shows
+ * them together with the three methods that produced them (Task 15 注 2).
  */
 export function StrengthDial({ analysis }: StrengthDialProps) {
   const score = analysis.strength;
@@ -78,11 +76,6 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
 
       <ScoreLedger score={score} label="强弱三因子合计（得令 / 得地 / 得势）" />
 
-      <div className="flex flex-col gap-2">
-        <ElementTags label="喜用神" tone="favorable" elements={analysis.favorable_elements} />
-        <ElementTags label="忌仇神" tone="unfavorable" elements={analysis.unfavorable_elements} />
-      </div>
-
       <p className="rounded-element border border-rim-soft bg-[#0e111a] p-3 text-sm leading-relaxed text-ink-variant">
         {analysis.summary}
       </p>
@@ -96,41 +89,6 @@ function StatRow({ label, children }: { label: string; children: ReactNode }) {
     <div className="flex items-center justify-between gap-2">
       <dt className="text-ink-muted">{label}</dt>
       <dd className="text-ink">{children}</dd>
-    </div>
-  );
-}
-
-/** A row of five-element tags for the favourable / unfavourable elements. */
-function ElementTags({
-  label,
-  tone,
-  elements,
-}: {
-  label: string;
-  tone: 'favorable' | 'unfavorable';
-  elements: string[];
-}) {
-  const dot = tone === 'favorable' ? 'bg-wuxing-wood' : 'bg-wuxing-fire';
-  return (
-    <div className="flex items-center justify-between gap-2 rounded-element bg-[#0e111a] px-3 py-2">
-      <span className="flex items-center gap-1.5 text-sm text-ink">
-        <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
-        {label}
-      </span>
-      <span className="flex flex-wrap items-center justify-end gap-1.5">
-        {elements.length > 0 ? (
-          elements.map((element) => (
-            <span
-              key={element}
-              className={`rounded-element px-2 py-0.5 text-xs font-medium ${wuxingChip(element)}`}
-            >
-              {element}
-            </span>
-          ))
-        ) : (
-          <span className="text-xs text-ink-muted">—</span>
-        )}
-      </span>
     </div>
   );
 }
