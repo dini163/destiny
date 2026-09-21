@@ -8,7 +8,9 @@ a version bump are one change, because responses echo the version per table and
 ``tests/test_bazi_schema.py`` fails when a table moves without it.
 """
 
+from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
+from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.name_numerology import NUMEROLOGY_SOURCE
 from app.content.name_sancai import SANCAI_SOURCE
@@ -36,4 +38,11 @@ NAME_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kangxi_strokes", KANGXI_STROKE_SOURCE),
     ("name_numerology", NUMEROLOGY_SOURCE),
     ("name_sancai", SANCAI_SOURCE),
+)
+
+#: 岁运两张表。单列一份的理由同 `NAME_CONTENT_SOURCES`：主命盘不引用它们，
+#: 混进 `CONTENT_SOURCES` 等于让 `/natal` 声称引了它没用过的表。
+TRANSIT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("bazi_changsheng", CHANG_SHENG_SOURCE),
+    ("bazi_transit_rules", TRANSIT_RULE_SOURCE),
 )
