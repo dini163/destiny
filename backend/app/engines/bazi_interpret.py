@@ -55,7 +55,7 @@ def ten_god_strength(pillars: list[BaziPillar]) -> dict[str, float]:
 class ChartSignals:
     """六维映射的全部输入；一次构建，逐维只读不算。"""
 
-    gender: Gender
+    gender: Gender | None
     level: str
     day_master_element: str
     element_scores: dict[str, float]
@@ -94,7 +94,7 @@ class ChartSignals:
 
 
 def collect_signals(
-    pillars: list[BaziPillar], *, gender: Gender, strength: StrengthAssessment,
+    pillars: list[BaziPillar], *, gender: Gender | None, strength: StrengthAssessment,
     geju: GeJu, yongshen: Yongshen, shensha: Sequence[ShenShaEntry],
     relations: Sequence[RelationPair], branch_groups: Sequence[BranchGroup],
 ) -> ChartSignals:
@@ -245,16 +245,21 @@ def _dimension_reading(s: ChartSignals, dimension: str) -> DimensionReading:
 
 
 def interpret_chart(
-    pillars: list[BaziPillar], *, gender: Gender, strength: StrengthAssessment, geju: GeJu,
+    pillars: list[BaziPillar], *, gender: Gender | None, strength: StrengthAssessment, geju: GeJu,
     yongshen: Yongshen, shensha: Sequence[ShenShaEntry], relations: Sequence[RelationPair],
     branch_groups: Sequence[BranchGroup],
 ) -> BaziInterpretation:
-    """装配六维详批；只读前序结论，不重新判命（spec §6.6）。"""
+    """装配六维详批；只读前序结论，不重新判命（spec §6.6）。
+
+    婚姻维的配偶星按性别取（女命官杀、男命财），性别未知时整维不输出，而不是
+    默认按男命判 —— 前端对缺失的区整块隐藏（spec §8.4）。
+    """
     signals = collect_signals(
         pillars, gender=gender, strength=strength, geju=geju, yongshen=yongshen,
         shensha=shensha, relations=relations, branch_groups=branch_groups,
     )
-    readings = [_dimension_reading(signals, name) for name in DIMENSION_ORDER]
+    dimensions = [name for name in DIMENSION_ORDER if name != "婚姻" or gender is not None]
+    readings = [_dimension_reading(signals, name) for name in dimensions]
     return BaziInterpretation(
         six_dimensions=readings,
         summary="、".join(f"{r.dimension}{r.score.tier}" for r in readings),

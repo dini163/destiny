@@ -24,11 +24,11 @@ CHART = compute_bazi_chart(  # 基准命 A：戊辰 甲寅 庚子 丁亥
 GENDER = Gender.MALE
 
 
-def _interpretation():
+def _interpretation(gender: Gender | None = GENDER):
     pillars = CHART.pillars
     strength = assess_strength(pillars)
     return interpret_chart(
-        pillars, gender=GENDER, strength=strength, geju=detect_geju(pillars),
+        pillars, gender=gender, strength=strength, geju=detect_geju(pillars),
         yongshen=select_yongshen(
             level=strength.level, day_master_element="金", month_zhi="寅",
             element_scores=element_weight_scores(pillars),
@@ -123,3 +123,12 @@ def test_summary_only_restates_tiers() -> None:
         f"{r.dimension}{r.score.tier}" for r in result.six_dimensions
     )
     assert _reading("事业").source == MODEL_PARAM_SOURCE
+
+
+def test_marriage_dimension_is_omitted_without_gender() -> None:
+    """配偶星按性别取，性别未知时不许猜：整维不出现，而不是给个默认男命。"""
+    result = _interpretation(gender=None)
+    assert [r.dimension for r in result.six_dimensions] == [
+        "事业", "财运", "健康", "学业", "人际",
+    ]
+    assert "婚姻" not in result.summary

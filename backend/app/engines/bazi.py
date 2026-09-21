@@ -3,10 +3,17 @@
 All calendrical and sexagenary computation is delegated to ``lunar-python`` (the
 authoritative library named in PRD Appendix A); this module never derives stems,
 branches, solar terms or luck pillars itself. On top of the library output it
-adds two deterministic computations:
+adds three deterministic computations:
 
-* a weighted five-element distribution (五行分布), and
-* a day-master strength / useful-god assessment (日主旺衰 / 用神喜忌).
+* a weighted five-element distribution (五行分布),
+* a day-master strength / useful-god assessment (日主旺衰 / 用神喜忌),
+* the structure / 神煞 / 关系 / 六维 breakdown the response carries (spec §7).
+
+``compute_bazi_chart`` is the single assembly point for that breakdown: it calls
+the judging engines (``bazi_strength`` / ``bazi_yongshen`` / ``bazi_rules`` /
+``bazi_interpret``), never re-judges anything, and reads each verdict from the
+local variable that produced it — a second ``assess_strength`` call in the same
+chart would be a second, uncheckable 口径.
 
 The classical tables in play are lunar-python's: four pillars, ten-gods, hidden
 stems, nayin and luck cycles. Everything this module adds on top of them is a
@@ -23,11 +30,17 @@ from datetime import date, datetime, time
 
 from lunar_python import Lunar, Solar
 
+from app.content import CONTENT_SOURCES, CONTENT_VERSION
+from app.content.bazi_shishen import TEN_GOD_MEANING, ten_god_meaning
 from app.content.wuxing import ELEMENT_ORDER, GAN_ELEMENT
+from app.engines.bazi_interpret import interpret_chart
+from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import (
     StrengthAssessment,
     assess_strength,
+    detect_geju,
     element_weight_scores,
+    hidden_stem_ledger,
 )
 from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.bazi import (
@@ -38,6 +51,7 @@ from app.schemas.bazi import (
     LiunianYear,
     WuxingScore,
 )
+from app.schemas.bazi_breakdown import DayunDetail, Provenance, ProvenanceTable, TenGodReading
 from app.schemas.bazi_strength import Yongshen
 from app.schemas.common import CalendarType, Gender
 from app.solar.true_solar_time import (
@@ -144,11 +158,6 @@ def _analyze_day_master(
     return DayMasterAnalysis(
         day_master=day_master,
         day_master_element=day_master_element,
-        # 旧口径的加权和没有出处，已随三因子账本一起作废；字段此时仍是必填，
-        # 只能如实留空，Task 10 连同字段一并删除。
-        support_score=0.0,
-        drain_score=0.0,
-        strength_ratio=round(strength.score.value / 100.0, 4),
         level=strength.level,
         label=strength.label,
         favorable_elements=favourable,
@@ -156,6 +165,55 @@ def _analyze_day_master(
         summary=summary,
         strength=strength.score,
         borderline=strength.borderline,
+    )
+
+
+_SIX_RELATION_BY_GENDER = {Gender.MALE: "男命", Gender.FEMALE: "女命"}
+
+
+def _ten_god_readings(pillars: list[BaziPillar], gender: Gender | None) -> list[TenGodReading]:
+    """命局每个现身十神一条摘要；顺序跟语料序（比劫→食伤→财→官杀→印），不跟命中序。"""
+    hits: dict[str, list[str]] = {}
+    for pillar in pillars:
+        if pillar.position != "day":  # 日主自身不计入比劫
+            hits.setdefault(pillar.shishen_gan, []).append(f"{pillar.position}.gan")
+        for stem, god in zip(pillar.hidden_stems, pillar.shishen_zhi, strict=True):
+            hits.setdefault(god, []).append(f"{pillar.position}.zhi({stem})")
+
+    order = list(TEN_GOD_MEANING)
+    relation_key = _SIX_RELATION_BY_GENDER.get(gender) if gender else None
+    readings: list[TenGodReading] = []
+    for god in sorted(hits, key=order.index):
+        positions = hits[god]
+        corpus = ten_god_meaning(god)
+        readings.append(
+            TenGodReading(
+                ten_god=god,
+                count=len(positions),
+                positions=positions,
+                meaning=corpus.meaning,
+                six_relation=corpus.six_relations.get(relation_key) if relation_key else None,
+                source=corpus.source,
+            )
+        )
+    return readings
+
+
+def _dayun_current(dayun: list[DayunStep], pillars: list[BaziPillar]) -> DayunDetail | None:
+    """当前大运与命局的关系摘要（伏吟/反吟等）；童年段无干支，故为 None。"""
+    step = next((item for item in dayun if item.is_current and item.ganzhi), None)
+    if step is None:
+        return None
+    return DayunDetail(
+        index=step.index,
+        ganzhi=step.ganzhi,
+        start_age=step.start_age,
+        end_age=step.end_age,
+        relations=[
+            relation
+            for relation in derive_relations(pillars, [step.ganzhi])
+            if relation.pillar_a.startswith("extra") or relation.pillar_b.startswith("extra")
+        ],
     )
 
 
@@ -211,12 +269,14 @@ def compute_bazi_chart(
     gender: Gender | None = None,
     apply_true_solar_time: bool = True,
     reference_date: date | None = None,
+    name: str | None = None,
 ) -> BaziChart:
     """Compute a complete BaZi natal chart from validated birth data.
 
     Pure function: no HTTP, no I/O. ``longitude`` drives the True Solar Time
     correction (PRD 7); ``reference_date`` (optional) marks the current luck
     pillar and its annual fortunes, keeping the core chart deterministic.
+    ``name`` is echoed into the response only — it never enters a calculation.
     """
     standard_dt = _resolve_standard_datetime(birth_date, birth_time, calendar)
 
@@ -254,7 +314,14 @@ def compute_bazi_chart(
     )
     dayun_direction, dayun_start, dayun_steps, current_liunian = _build_dayun(eight_char, gender, reference_date)
 
+    # Breakdown（spec §7）：以下全部只读上面已算好的结论，没有第二次 assess_strength。
+    geju = detect_geju(pillars)
+    shensha = derive_shensha(pillars, day_master=day_master)
+    relations = derive_relations(pillars)
+    branch_groups = derive_branch_groups(pillars)
+
     return BaziChart(
+        name=name,
         standard_datetime=standard_dt.strftime("%Y-%m-%d %H:%M"),
         calendar=calendar.value,
         true_solar_time=tst_text,
@@ -275,10 +342,38 @@ def compute_bazi_chart(
             WuxingScore(element=element, count=counts[element], score=round(element_scores[element], 2))
             for element in ELEMENT_ORDER
         ],
-        missing_elements=[element for element in ELEMENT_ORDER if counts[element] == 0],
+        # 缺行看的是"主字与藏干皆无"（spec §7）：加权分把四干与藏干记进同一个数，
+        # 它为 0 就是天干与藏干里都没有这个五行（支的五行即其本气，已被藏干覆盖）。
+        missing_elements=[element for element in ELEMENT_ORDER if element_scores[element] == 0.0],
         analysis=analysis,
         dayun_direction=dayun_direction,
         dayun_start_solar=dayun_start,
         dayun=dayun_steps,
         current_liunian=current_liunian,
+        geju=geju,
+        yongshen=yongshen,
+        shensha=shensha,
+        ten_god_readings=_ten_god_readings(pillars, gender),
+        relations=relations,
+        branch_groups=branch_groups,
+        hidden_stem_ledger=hidden_stem_ledger(pillars),
+        dayun_current=_dayun_current(dayun_steps, pillars),
+        interpretation=interpret_chart(
+            pillars,
+            gender=gender,
+            strength=strength,
+            geju=geju,
+            yongshen=yongshen,
+            shensha=shensha,
+            relations=relations,
+            branch_groups=branch_groups,
+        ),
+        provenance=Provenance(
+            reference_date=(reference_date or date.today()).isoformat(),
+            engine="lunar-python",
+            tables=[
+                ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+                for module, source in CONTENT_SOURCES
+            ],
+        ),
     )
