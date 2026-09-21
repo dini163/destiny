@@ -17,8 +17,11 @@ from datetime import date, datetime, time
 
 from lunar_python import Lunar, Solar
 
+from app.content.bazi_relations import relation_pairs
 from app.content.bazi_transit_rules import transit_rule
+from app.content.wuxing import GAN_ELEMENT, GENERATES
 from app.core.errors import TransitRangeError
+from app.engines.bazi_rules import is_fanyin
 from app.schemas.bazi_rules import BranchGroup, RelationPair
 from app.schemas.common import CalendarType
 from app.solar.true_solar_time import true_solar_offset_minutes, true_solar_time
@@ -185,6 +188,14 @@ def _standard_datetime(birth_date: date, birth_time: time, calendar: CalendarTyp
 _TRANSIT_SLOT = "extra0"
 #: 刑有四张表，岁运只问"这一柱受不受刑"，不给四张表分凶序。
 _PUNISH_KINDS: tuple[str, ...] = ("无恩之刑", "恃势之刑", "无礼之刑", "自刑")
+#: 运岁干合的查表入口（表里两向俱存，故只查一个方向）。
+_GAN_HE = relation_pairs("天干五合")
+#: 十二长生分三档定价，沐浴不在任何一档：它既是败地又是桃花，一书两说（spec §6.2）。
+#: 三档合起来覆盖余下 11 位，由测 `test_life_stage_bands_partition_the_eleven_priced_stages`
+#: 与 `content.bazi_changsheng.CHANG_SHENG_ORDER` 对拍钉住。
+_PROSPEROUS: tuple[str, ...] = ("临官", "帝旺")
+_SUPPORTIVE: tuple[str, ...] = ("长生", "冠带", "胎", "养")
+_DECAYING: tuple[str, ...] = ("衰", "病", "死", "墓", "绝")
 
 
 @dataclass(frozen=True)
@@ -202,7 +213,7 @@ class _Judgement:
     gan_element: str
     ben_qi_element: str  # 支主气（本气藏干）的五行
     di_shi: str
-    dayun_ganzhi: str | None  # 童年段（未起运）为 None：整个 dayun 族不评估
+    dayun_ganzhi: str | None  # 童年段（未起运）为空：整个 dayun 族不评估，见 `_on_dayun`
     year_zhi: str  # 本命年支 —— 太岁以此为准，不是当岁之支
     relations: tuple[RelationPair, ...]
     groups: tuple[BranchGroup, ...]
@@ -240,10 +251,6 @@ class _Judgement:
     def has_star(self, name: str) -> bool:
         return name in self.shensha_names
 
-    @property
-    def has_dayun(self) -> bool:
-        return bool(self.dayun_ganzhi)
-
 
 def _group_faces(j: _Judgement, kind: str, *, favourable: bool) -> bool:
     """局本身不论吉凶：合出的五行落进喜用集才算顺、落进忌神集才算逆（spec §6.2）。"""
@@ -252,9 +259,43 @@ def _group_faces(j: _Judgement, kind: str, *, favourable: bool) -> bool:
 
 
 Predicate = Callable[[_Judgement], bool]
+#: 大运谓词多收一个参数：过闸之后的大运干支。谓词因此不必各自判空。
+DayunPredicate = Callable[[_Judgement, str], bool]
 
-#: 键序 == `TRANSIT_RULES` 的表序 == 账本行序；一键一谓词，由 Task 7 末尾的完备性
-#: 断言钉住。谓词本身不含古籍字 —— 文案在 `reading` 里，分数在 `delta` 里。
+
+def _gan_element(ganzhi: str) -> str:
+    """干之五行。运岁生克只以干论：一支藏多气，论支就有一支两种向背。"""
+    return GAN_ELEMENT[ganzhi[0]]
+
+
+def _on_dayun(predicate: DayunPredicate) -> Predicate:
+    """大运族的总闸：童年段 `DaYun.getGanZhi()` 为空串，无运可论则整族不评估。
+
+    闸写在谓词上而不是写在装配段，因为"空串"与"这条岁运没有对应大运"是同一件事的两
+    种说法，装配段以后换法时判定层不该跟着改。
+    """
+
+    def gated(judgement: _Judgement) -> bool:
+        ganzhi = judgement.dayun_ganzhi
+        if not ganzhi:
+            return False
+        return predicate(judgement, ganzhi)
+
+    return gated
+
+
+def _on_star(name: str) -> Predicate:
+    """神煞族的谓词工厂：命中条件只有一句"这颗星落在岁运之柱上"。
+
+    星名与 `TRANSIT_RULES[key].label` 同源（即 `SHENSHA_RULES` 的神煞名）；两处一旦
+    分家，`test_each_shensha_row_reads_exactly_its_own_rule_table_label` 判红。
+    """
+    return lambda judgement: judgement.has_star(name)
+
+
+#: 键序 == `TRANSIT_RULES` 的表序 == 账本行序；一键一谓词，由
+#: `test_every_rule_row_is_consumed_by_exactly_one_predicate` 钉住。谓词本身不含古籍
+#: 字 —— 文案在 `reading` 里，分数在 `delta` 里。
 _PREDICATES: tuple[tuple[str, Predicate], ...] = (
     # --- yongshen（4）：喜忌集来自 `select_yongshen`，此处只问落不落在里头
     ("yongshen.gan_favourable", lambda j: j.gan_element in j.favourable),
@@ -290,7 +331,33 @@ _PREDICATES: tuple[tuple[str, Predicate], ...] = (
     # --- fuyin（2）：整柱比对由 `derive_relations` 判，这里只认它报了什么
     ("fuyin.fuyin", lambda j: j.has("伏吟")),
     ("fuyin.fanyin", lambda j: j.has("反吟")),
-    # dayun / dishi / shensha 三族 18 键在 Task 7 追加。
+    # --- dayun（5）：大运只与流年论，读的是两柱干支本身，不是关系扫描的产物 ---
+    ("dayun.binglin", _on_dayun(lambda j, dayun: j.ganzhi == dayun)),
+    ("dayun.fanyin", _on_dayun(lambda j, dayun: is_fanyin(dayun, j.ganzhi))),
+    (
+        "dayun.yun_sheng_sui",
+        _on_dayun(lambda j, dayun: GENERATES[_gan_element(dayun)] == j.gan_element),
+    ),
+    (
+        "dayun.sui_sheng_yun",
+        _on_dayun(lambda j, dayun: GENERATES[j.gan_element] == _gan_element(dayun)),
+    ),
+    ("dayun.gan_he", _on_dayun(lambda j, dayun: (j.gan, dayun[0]) in _GAN_HE)),
+    # --- dishi（3）：岁运之支对日主的十二长生位次，沐浴室外 ---
+    ("dishi.prosperous", lambda j: j.di_shi in _PROSPEROUS),
+    ("dishi.supportive", lambda j: j.di_shi in _SUPPORTIVE),
+    ("dishi.decaying", lambda j: j.di_shi in _DECAYING),
+    # --- shensha（10）：吉 7 凶 3，中性者不在表里，也就不在这张谓词表里 ---
+    ("shensha.tianyi", _on_star("天乙贵人")),
+    ("shensha.jiangxing", _on_star("将星")),
+    ("shensha.wenchang", _on_star("文昌贵人")),
+    ("shensha.tiande", _on_star("天德贵人")),
+    ("shensha.yuede", _on_star("月德贵人")),
+    ("shensha.jinyu", _on_star("金舆")),
+    ("shensha.taiji", _on_star("太极贵人")),
+    ("shensha.yangren", _on_star("羊刃")),
+    ("shensha.jiesha", _on_star("劫煞")),
+    ("shensha.wangshen", _on_star("亡神")),
 )
 
 

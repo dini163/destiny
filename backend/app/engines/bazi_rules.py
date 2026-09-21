@@ -29,6 +29,11 @@ _GAN_CHONG = RELATION_TABLES["天干相冲"].pairs
 _ZHI_CHONG = RELATION_TABLES["地支六冲"].pairs
 
 
+def is_fanyin(left: str, right: str) -> bool:
+    """两柱反吟 == 干相冲且支六冲。岁运的大运族（运年反吟）与命局扫描共用这一处口径。"""
+    return (left[0], right[0]) in _GAN_CHONG and (left[1], right[1]) in _ZHI_CHONG
+
+
 @dataclass(frozen=True)
 class _Slot:
     """一柱（或一个外来干支）在扫描中的可查投影。"""
@@ -156,7 +161,7 @@ def _pair_hit(rule: RelationRule, a: _Slot, b: _Slot) -> RelationPair | None:
         if rule.kind == "伏吟":
             hit = left == right
         else:  # 反吟：天干相冲 且 地支六冲（表里 reading 已写明这个窄口径）
-            hit = (left[0], right[0]) in _GAN_CHONG and (left[1], right[1]) in _ZHI_CHONG
+            hit = is_fanyin(left, right)
     else:
         side = rule.side or ("gan" if rule.scope == "stem" else "zhi")
         left, right = (a.gan, b.gan) if side == "gan" else (a.zhi, b.zhi)

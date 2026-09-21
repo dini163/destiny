@@ -20,6 +20,7 @@ from datetime import date, datetime, time
 
 import pytest
 
+from app.content.bazi_changsheng import CHANG_SHENG_ORDER
 from app.content.bazi_relations import RELATION_TABLES, transforming_element
 from app.content.bazi_transit_rules import TRANSIT_RULES
 from app.core.errors import TransitRangeError
@@ -341,3 +342,89 @@ def test_the_28_relation_keys_are_all_present() -> None:
     }
     assert relation_driven <= consumed
     assert len(relation_driven) == 28
+
+
+# --------------------------------------------------------- 大运 / 地势 / 神煞（Task 7）
+#: 十二长生里定价的三档。沐浴不在此列：它既是败地又是桃花，一书两说，不给它定价。
+_STAGE_BANDS = {
+    "dishi.prosperous": ("临官", "帝旺"),
+    "dishi.supportive": ("长生", "冠带", "胎", "养"),
+    "dishi.decaying": ("衰", "病", "死", "墓", "绝"),
+}
+
+
+def test_childhood_span_and_month_scope_suppress_the_whole_dayun_family() -> None:
+    """大运族的两道闸：童年段无运可论（spec §2.1），月段不带大运的账（`scopes`）。"""
+    fired = _judgement(dayun_ganzhi="甲辰", ganzhi="甲辰", gan="甲", zhi="辰", gan_element="木")
+    assert "dayun.binglin" in _hit_keys(fired)
+    for blanked in (replace(fired, dayun_ganzhi=None), replace(fired, scope="yue")):
+        assert not any(key.startswith("dayun") for key in _hit_keys(blanked))
+
+
+def test_dayun_bing_lin_and_fanyin_compare_the_whole_pillars() -> None:
+    """并临是全同，反吟是干支两冲 —— 都与合成柱的干支字符串直接比，不走关系扫描。"""
+    same = _hit_keys(
+        _judgement(dayun_ganzhi="甲辰", ganzhi="甲辰", gan="甲", zhi="辰", gan_element="木")
+    )
+    assert "dayun.binglin" in same
+    assert "dayun.fanyin" not in same and "dayun.gan_he" not in same
+    opposed = _hit_keys(
+        _judgement(dayun_ganzhi="甲子", ganzhi="庚午", gan="庚", zhi="午", gan_element="金")
+    )
+    assert "dayun.fanyin" in opposed and "dayun.binglin" not in opposed
+
+
+def test_dayun_relationships_are_read_from_the_five_element_cycle() -> None:
+    """生克以干论（支藏多气，一支之内不止一行）；顺逆两条互斥，合又是独立一问。"""
+    sui_sheng = _hit_keys(
+        _judgement(dayun_ganzhi="戊午", ganzhi="丁未", gan="丁", zhi="未", gan_element="火")
+    )
+    assert "dayun.sui_sheng_yun" in sui_sheng  # 火生土
+    assert "dayun.yun_sheng_sui" not in sui_sheng
+    yun_sheng = _hit_keys(
+        _judgement(dayun_ganzhi="甲子", ganzhi="丁卯", gan="丁", zhi="卯", gan_element="火")
+    )
+    assert "dayun.yun_sheng_sui" in yun_sheng  # 木生火
+    assert "dayun.sui_sheng_yun" not in yun_sheng
+    combined = _hit_keys(
+        _judgement(dayun_ganzhi="己未", ganzhi="甲子", gan="甲", zhi="子", gan_element="木")
+    )
+    assert "dayun.gan_he" in combined  # 甲己合，且木与土无先后
+    assert not {"dayun.sui_sheng_yun", "dayun.yun_sheng_sui"} & set(combined)
+
+
+def test_life_stage_bands_partition_the_eleven_priced_stages() -> None:
+    """三档分完 12 位里定价的 11 位：漏一格是漏一行，重一格是同一柱计两次分。"""
+    priced = [stage for band in _STAGE_BANDS.values() for stage in band]
+    assert sorted([*priced, "沐浴"]) == sorted(CHANG_SHENG_ORDER)
+    assert len(priced) == 11
+    for key, stages in _STAGE_BANDS.items():
+        for stage in stages:
+            hits = [k for k in _hit_keys(_judgement(di_shi=stage)) if k.startswith("dishi")]
+            assert hits == [key], stage
+    assert not any(k.startswith("dishi") for k in _hit_keys(_judgement(di_shi="沐浴")))
+
+
+def test_shensha_rows_fire_by_name_and_neutral_stays_unpriced() -> None:
+    """华盖在 `SHENSHA_RULES` 里是中性：岁运落成华盖不加分，也不该出现在账本里。"""
+    keys = _hit_keys(_judgement(shensha_names=frozenset({"羊刃", "华盖"})))
+    assert [key for key in keys if key.startswith("shensha")] == ["shensha.yangren"]
+
+
+def test_each_shensha_row_reads_exactly_its_own_rule_table_label() -> None:
+    """一行一颗星：谓词里那颗星的名字必须就是规则表的 `label`，且不牵连同族余行。"""
+    for key, rule in TRANSIT_RULES.items():
+        if rule.family != "shensha":
+            continue
+        hits = [
+            k
+            for k in _hit_keys(_judgement(shensha_names=frozenset({rule.label})))
+            if k.startswith("shensha")
+        ]
+        assert hits == [key], f"{key} 的 label {rule.label} 打中的是 {hits}"
+
+
+def test_every_rule_row_is_consumed_by_exactly_one_predicate() -> None:
+    """漂移门：谓词键序 == 规则表键序，46 行一行不多不少。漏一行、多一行、换序都红。"""
+    assert [key for key, _ in _PREDICATES] == list(TRANSIT_RULES)
+    assert len(_PREDICATES) == 46
