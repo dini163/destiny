@@ -81,14 +81,16 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
           body: <SancaiStrip sancai={analysis.sancai} grids={analysis.grids} />,
         }
       : null,
-    {
-      id: 'index',
-      label: '综合指数',
-      title: '姓名综合气象指数',
-      eyebrow: 'INDEX · 五格加权',
-      icon: 'gauge',
-      body: <NameSummaryScore analysis={analysis} />,
-    },
+    analysis.score
+      ? {
+          id: 'index',
+          label: '综合指数',
+          title: '姓名综合气象指数',
+          eyebrow: 'INDEX · 五格加权',
+          icon: 'gauge',
+          body: <NameSummaryScore score={analysis.score} />,
+        }
+      : null,
     {
       id: 'provenance',
       label: '数据溯源',
