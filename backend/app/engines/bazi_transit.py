@@ -1,4 +1,4 @@
-"""岁运（流年 / 流月）引擎：区间解析、排盘时刻共用件，与其后的命中判定与账本装配。
+"""岁运（流年 / 流月）引擎：区间解析、命中判定、账本装配，与最后的总装。
 
 本模块**不重复**任何命局推导：喜忌取自 `select_yongshen` 的合并结果，关系、合局、
 神煞由 `bazi_rules` 的三个 derive 函数带上岁运之柱重扫一遍，柱的十神 / 地势 / 纳音
@@ -6,21 +6,23 @@
 （`content/bazi_transit_rules`，46 条），命局的 39 条判语、旺衰三因子与用神都不参
 与，也不被改写（spec §4 决策 3）。
 
-`resolve_natal_moment` 住在这里是刻意的：岁运要再走一次 `getYun()` 才拿得到流年与
-流月对象，而那一刻必须先和主命盘用同一个真太阳时校正 —— 校正逻辑有两份，迟早分出
-两个口径。所以它从 `compute_bazi_chart` 里原样搬来，主命盘改为消费它。
+排盘时刻走 `bazi_moment.resolve_natal_moment`：岁运要再走一次 `getYun()` 才拿得到流年
+与流月对象，而那一刻必须和主命盘用同一个真太阳时校正 —— 校正逻辑有两份，迟早分出两个
+口径。它不住在本模块里，因为本模块还要消费主命盘（`compute_bazi_chart`），谁住着都得一
+个模块反向 import 另一个。
 
-节气月界（`_jieqi_boundaries`）也住在这里：`LiuYue` 只给干支、序号与月名，一个日期都
+节气月界（`_jieqi_boundaries`）则确实住在这里：`LiuYue` 只给干支、序号与月名，一个日期都
 不给，十二段起止得自己从 `getJieQiTable()` 的滚动窗口里采十二节推出来。切片 3 的流日
 要的是同一份采集，写在装配里它就只能重写一遍。
 """
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
+from datetime import date, time, timedelta
 
-from lunar_python import Lunar, Solar
+from lunar_python import Solar
 
+from app.content import CONTENT_SOURCES, CONTENT_VERSION, TRANSIT_CONTENT_SOURCES
 from app.content.bazi_relations import relation_pairs
 from app.content.bazi_shishen import ten_god_meaning
 from app.content.bazi_transit_rules import (
@@ -31,6 +33,8 @@ from app.content.bazi_transit_rules import (
 )
 from app.content.wuxing import GAN_ELEMENT, GENERATES
 from app.core.errors import TransitRangeError
+from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_pillar import build_transit_pillar
 from app.engines.bazi_rules import (
     derive_branch_groups,
@@ -39,12 +43,19 @@ from app.engines.bazi_rules import (
     is_fanyin,
 )
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
-from app.schemas.bazi import BaziChart, BaziPillar
+from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
+from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
-from app.schemas.bazi_transit import TransitFired, TransitMonth, TransitTenGod, TransitYear
+from app.schemas.bazi_transit import (
+    BaziTransitResult,
+    TransitFired,
+    TransitMonth,
+    TransitTenGod,
+    TransitYear,
+)
 from app.schemas.common import CalendarType, Gender
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
-from app.solar.true_solar_time import true_solar_offset_minutes, true_solar_time
+from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
 #: 缺省区间长度与上限（spec §7.2）：一年一秒都不多给，越线即 422，不做静默裁剪。
 TRANSIT_DEFAULT_YEARS = 5
@@ -116,90 +127,6 @@ def resolve_transit_range(
             {"focus_year": focus_year, "start_year": span_start, "end_year": span_end},
         )
     return TransitRange(start_year=span_start, end_year=span_end, focus_year=focus_year)
-
-
-@dataclass(frozen=True)
-class NatalMoment:
-    """排盘输入经真太阳时校正后的那一刻，与由它起出的 lunar-python 对象。
-
-    `standard_datetime` 是用户填的那一刻（响应里的 `standard_datetime` 字段），
-    `chart_datetime` 是校正后实际起柱的那一刻；关掉校正时两者相同，且
-    `true_solar_time_text` / `offset_minutes` 留空而不是填 0 —— "没校正"和"校正量
-    恰为零"是两件事。
-    """
-
-    standard_datetime: datetime
-    chart_datetime: datetime
-    longitude_used: float
-    true_solar_time_text: str | None
-    offset_minutes: float | None
-    lunar: Lunar
-    eight_char: object  # lunar_python.EightChar；本仓一贯不依赖其类型名
-
-
-def resolve_natal_moment(
-    *,
-    birth_date: date,
-    birth_time: time,
-    calendar: CalendarType,
-    longitude: float,
-    apply_true_solar_time: bool,
-) -> NatalMoment:
-    """Resolve birth input into the instant the chart is actually cast from.
-
-    A lunar-calendar date is converted to its Gregorian equivalent (preserving
-    the wall-clock time) so both the True Solar Time correction and the pillar
-    derivation operate on one standard civil datetime; ``lunar-python`` uses the
-    supplied wall-clock time verbatim, hence the correction is applied *before*
-    ``Solar(...)`` is constructed.
-    """
-    standard_dt = _standard_datetime(birth_date, birth_time, calendar)
-
-    if apply_true_solar_time:
-        chart_dt = true_solar_time(standard_dt, longitude)
-        offset_minutes: float | None = round(true_solar_offset_minutes(standard_dt, longitude), 2)
-        tst_text: str | None = chart_dt.strftime("%Y-%m-%d %H:%M")
-    else:
-        chart_dt = standard_dt
-        offset_minutes = None
-        tst_text = None
-
-    solar = Solar.fromYmdHms(
-        chart_dt.year, chart_dt.month, chart_dt.day, chart_dt.hour, chart_dt.minute, chart_dt.second
-    )
-    lunar = solar.getLunar()
-    return NatalMoment(
-        standard_datetime=standard_dt,
-        chart_datetime=chart_dt,
-        longitude_used=longitude,
-        true_solar_time_text=tst_text,
-        offset_minutes=offset_minutes,
-        lunar=lunar,
-        eight_char=lunar.getEightChar(),
-    )
-
-
-def _standard_datetime(birth_date: date, birth_time: time, calendar: CalendarType) -> datetime:
-    """Return the civil standard-time datetime for the supplied birth data."""
-    if calendar is CalendarType.LUNAR:
-        lunar = Lunar.fromYmdHms(
-            birth_date.year,
-            birth_date.month,
-            birth_date.day,
-            birth_time.hour,
-            birth_time.minute,
-            birth_time.second,
-        )
-        solar = lunar.getSolar()
-        return datetime(
-            solar.getYear(),
-            solar.getMonth(),
-            solar.getDay(),
-            solar.getHour(),
-            solar.getMinute(),
-            solar.getSecond(),
-        )
-    return datetime.combine(birth_date, birth_time)
 
 
 # ------------------------------------------------------------------ 命中判定（spec §6.2）
@@ -751,3 +678,105 @@ def _transit_months(
             )
         )
     return months
+
+
+# ---------------------------------------------------------------- 总装（spec §7.4）
+def _covered_dayun(chart: BaziChart, span: TransitRange) -> list[DayunStep]:
+    """区间跨过的运程，取主命盘算好的那一份而不是另起一次 `getYun()`。
+
+    当前运的旗标（`is_current`）因此与命盘页同源，两页不会各说一个"今年在哪步运里"；
+    童年段也照样给出，它的 `ganzhi` 本就是空串 —— 那是 `DayunStep` 已有的约定。
+    """
+    return [
+        step
+        for step in chart.dayun
+        if step.start_year <= span.end_year and span.start_year <= step.end_year
+    ]
+
+
+def compute_transit(
+    *,
+    birth_date: date,
+    birth_time: time,
+    gender: Gender,
+    calendar: CalendarType = CalendarType.SOLAR,
+    longitude: float = STANDARD_MERIDIAN_CN,
+    apply_true_solar_time: bool = True,
+    start_year: int | None = None,
+    end_year: int | None = None,
+    focus_year: int | None = None,
+    reference_date: date | None = None,
+    name: str | None = None,
+) -> BaziTransitResult:
+    """从生辰与年份区间装配一整页岁运（流年 + 可选的聚焦年十二节气月）。
+
+    无 HTTP、无 I/O；随调用时刻变化的只有 `reference_date` 缺省，它同时决定缺省区间
+    与当前运档，并经 `provenance.reference_date` 回显，所以响应自己就带着复现它的日期。
+
+    排盘走两次同一个入口：`compute_bazi_chart` 出命局（喜忌、大运、溯源，岁运一行都不
+    重算），`resolve_natal_moment` 出岁运还要用的那个 `EightChar`。两次都过同一个校正
+    函数，因而不会出现"命盘用 23:30、岁运用 23:26"的两个口径 —— 这正是校正逻辑只留一份
+    的原因（它在 `bazi_moment`，两个引擎同源于此）。
+
+    性别必填在这里也是结构性的：大运方向定不下来就没有流年可摊，而区间校验要的窗口
+    正是摊出来的首末两年（1988 / 2083 于命 A）。窗口取自同一份摊平结果，请求里的年份
+    便一定查得到，区间之内不设"这年推不出"的第三种说法。
+
+    摘要只带这一页要用的那几件。把整个 `BaziChart` 塞进来看着省事，实际是把"命盘"与
+    "推演"绑成一次输出：主命盘的契约一改，岁运页跟着改，而这两页本就各自独立可达。
+    """
+    reference = reference_date or date.today()
+    chart = compute_bazi_chart(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        calendar=calendar,
+        longitude=longitude,
+        gender=gender,
+        apply_true_solar_time=apply_true_solar_time,
+        reference_date=reference,
+        name=name,
+    )
+    moment = resolve_natal_moment(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        calendar=calendar,
+        longitude=longitude,
+        apply_true_solar_time=apply_true_solar_time,
+    )
+    luck = _annual_luck_by_year(moment.eight_char, gender)
+    span = resolve_transit_range(
+        start_year=start_year,
+        end_year=end_year,
+        focus_year=focus_year,
+        reference_year=reference.year,
+        supported_from=min(luck),
+        supported_to=max(luck),
+    )
+    natal = _natal_projection(chart)
+    return BaziTransitResult(
+        four_pillars=chart.four_pillars,
+        pillars=list(chart.pillars),
+        day_master=chart.day_master,
+        day_master_element=chart.day_master_element,
+        favorable_elements=list(chart.analysis.favorable_elements),
+        unfavorable_elements=list(chart.analysis.unfavorable_elements),
+        true_solar_time=chart.true_solar_time,
+        tst_applied=chart.tst_applied,
+        longitude=chart.longitude,
+        start_year=span.start_year,
+        end_year=span.end_year,
+        focus_year=span.focus_year,
+        dayun_covered=_covered_dayun(chart, span),
+        years=[
+            _transit_year(natal, luck[year], focus=year == span.focus_year)
+            for year in range(span.start_year, span.end_year + 1)
+        ],
+        provenance=Provenance(
+            reference_date=reference.isoformat(),
+            engine="lunar-python",
+            tables=[
+                ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+                for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
+            ],
+        ),
+    )

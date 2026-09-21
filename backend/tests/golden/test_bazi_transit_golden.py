@@ -18,13 +18,13 @@ import pytest
 
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_transit import (
     _AnnualLuck,
     _Natal,
     _annual_luck_by_year,
     _natal_projection,
     _transit_year,
-    resolve_natal_moment,
 )
 from app.schemas.bazi_transit import TransitMonth, TransitYear
 from app.schemas.common import CalendarType, Gender

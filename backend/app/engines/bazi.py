@@ -23,9 +23,12 @@ there carries the arithmetic that produced it (spec §6.1/§6.4).
 
 True Solar Time (PRD 7) is applied *before* constructing ``Solar(...)`` because
 ``lunar-python`` uses the supplied wall-clock time verbatim with no astronomical
-or geographic correction. That whole step lives in ``bazi_transit.resolve_natal_moment``,
+or geographic correction. That whole step lives in ``bazi_moment.resolve_natal_moment``,
 which this module consumes: the transit engine has to cast the same moment a second
-time, and two copies of the correction would drift into two 口径.
+time, and two copies of the correction would drift into two 口径. The resolver is a
+module of its own rather than a tenant of either engine because both engines need it —
+the transit engine imports this one for the natal chart, and a shared symbol hosted by
+either side would close that circle.
 """
 
 from datetime import date, time
@@ -34,6 +37,7 @@ from app.content import CONTENT_SOURCES, CONTENT_VERSION
 from app.content.bazi_shishen import TEN_GOD_MEANING, ten_god_meaning
 from app.content.wuxing import ELEMENT_ORDER, GAN_ELEMENT
 from app.engines.bazi_interpret import interpret_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import (
     StrengthAssessment,
@@ -42,7 +46,6 @@ from app.engines.bazi_strength import (
     element_weight_scores,
     hidden_stem_ledger,
 )
-from app.engines.bazi_transit import resolve_natal_moment
 from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.bazi import (
     BaziChart,

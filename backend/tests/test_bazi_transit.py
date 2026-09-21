@@ -1,4 +1,4 @@
-"""岁运引擎的前四段：区间解析、排盘时刻共用件、命中判定、账本装配。
+"""岁运引擎的六条测线：区间解析、排盘时刻共用件、命中判定、账本装配、流月、总装。
 
 区间一条线（spec §7.2）：缺省补齐 + 四道校验（倒序 / 过宽 / 越出大运窗 / focus 越
 界），错误走 `TransitRangeError` 的 422 而不是 pydantic 的 422 —— 前者是"这个命盘
@@ -23,6 +23,11 @@
 自己从 `getJieQiTable()` 的滚动窗口里采十二节推出来的，所以这里两头都要测 —— 一头钉
 月界自己成形（首尾相接、覆盖整年），另一头钉它和历法给的月序对得上。中间那条最重要
 的不变式是"年段行是月段行的前缀"：一份月账本读起来就是"今年的账 + 这个月加减的账"。
+
+总装一条线（spec §7.4）：`compute_transit` 把前面四段接成一次真排盘，所以这里的断言
+全是**契约形状**的 —— 区间回显、哪些字段该空、哪些字段必须等于语料里的那一份，而不是
+某个具体分数（分数在 golden 里对拍）。唯一一处数值断言是命局摘要那几行，因为它逐字取自
+主命盘，主命盘一变这里就该红。
 """
 
 from dataclasses import replace
@@ -31,12 +36,14 @@ from functools import cache
 
 import pytest
 
+from app.content import CONTENT_SOURCES, CONTENT_VERSION, TRANSIT_CONTENT_SOURCES
 from app.content.bazi_changsheng import CHANG_SHENG_ORDER
 from app.content.bazi_relations import RELATION_TABLES, transforming_element
 from app.content.bazi_shishen import ten_god_meaning
 from app.content.bazi_transit_rules import TRANSIT_BASE, TRANSIT_RULES, transit_rule
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.bazi_transit import (
     _TRANSIT_SLOT,
@@ -58,12 +65,12 @@ from app.engines.bazi_transit import (
     _transit_months,
     _transit_year,
     _year_scan,
-    resolve_natal_moment,
+    compute_transit,
     resolve_transit_range,
 )
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_rules import BranchGroup, BranchMember, RelationPair
-from app.schemas.bazi_transit import TransitMonth, TransitYear
+from app.schemas.bazi_transit import BaziTransitResult, TransitMonth, TransitYear
 from app.schemas.common import CalendarType, Gender
 from app.schemas.scoring import ScoreFactor, ScoreValue
 
@@ -718,3 +725,161 @@ def test_the_focused_year_carries_its_months_and_the_others_carry_none() -> None
     _, natal = _natal()
     assert _transit_year(natal, _luck()[2026], focus=True).months is not None
     assert [t.months for t in _years().values()].count(None) == 5
+
+
+# ---------------------------------------------------------------- 总装（spec §7.3 / §7.4）
+_REFERENCE = date(2026, 9, 21)  # 钉死参考日：当前大运档与缺省区间都跟着它走
+
+
+def _transit(**overrides: object) -> BaziTransitResult:
+    """真走一遍引擎的岁运结果；参考日固定，于是"今年是哪一年"在测里也是可复现的。"""
+    args: dict[str, object] = {**_NATAL_KWARGS, "reference_date": _REFERENCE}
+    args.update(overrides)
+    return compute_transit(**args)  # type: ignore[arg-type]
+
+
+@cache
+def _default() -> BaziTransitResult:
+    """缺省请求（什么都不给）—— 一条断言都不改它，只从各个角度读它。"""
+    return _transit()
+
+
+def test_the_default_request_spans_five_years_from_the_reference_year() -> None:
+    """缺省补齐只在引擎里做一次，回显即最终事实（spec §7.1"前端不必二次推算"）。"""
+    result = _default()
+    assert (result.start_year, result.end_year, result.focus_year) == (2026, 2030, None)
+    assert [year.year for year in result.years] == [2026, 2027, 2028, 2029, 2030]
+    assert [year.pillar.ganzhi for year in result.years] == ["丙午", "丁未", "戊申", "己酉", "庚戌"]
+
+
+def test_an_explicit_span_is_echoed_back_unchanged() -> None:
+    result = _transit(start_year=2030, end_year=2036)
+    assert (result.start_year, result.end_year) == (2030, 2036)
+    assert [year.year for year in result.years] == list(range(2030, 2037))
+
+
+def test_a_span_wider_than_the_cap_or_before_the_chart_is_refused_with_its_own_code() -> None:
+    """区间三道校验在总装里照样是域错误，不是 500 也不是 pydantic 的 validation_error。"""
+    with pytest.raises(TransitRangeError) as too_wide:
+        _transit(start_year=2020, end_year=2031)
+    assert too_wide.value.code == "transit_range_too_wide"
+    with pytest.raises(TransitRangeError) as outside:
+        _transit(start_year=1900, end_year=1904)
+    assert outside.value.code == "transit_range_unsupported"
+    assert outside.value.context["supported_from"] == 1988  # 出生年，大运窗之始
+    assert outside.value.context["supported_to"] == 2083  # lunar-python 摊出来的最末年
+
+
+@pytest.mark.parametrize(
+    ("span", "expected"),
+    [
+        ((2026, 2030), [("戊午", True)]),  # 整段都在第四步运里
+        ((2030, 2036), [("戊午", True), ("己未", False)]),  # 跨段：两段都给出
+        ((1988, 1993), [("", False)]),  # 起运前的童年段：运干为空串，也不是当前运
+    ],
+)
+def test_the_covered_dayun_steps_are_the_ones_the_span_actually_runs_through(
+    span: tuple[int, int], expected: list[tuple[str, bool]]
+) -> None:
+    """`dayun_covered` 是区间与运程的交集，`is_current` 沿用主命盘的旗标而非另判一次。"""
+    result = _transit(start_year=span[0], end_year=span[1])
+    assert [(step.ganzhi, step.is_current) for step in result.dayun_covered] == expected
+
+
+def test_the_childhood_span_reports_no_dayun_yet_still_scores_every_year() -> None:
+    """未起运的六年：`dayun_ganzhi` 逐年为 None，但大运族一行都不进账本，分数照常可核对。"""
+    result = _transit(start_year=1990, end_year=1992)
+    assert [year.dayun_index for year in result.years] == [0, 0, 0]
+    assert [year.dayun_ganzhi for year in result.years] == [None, None, None]
+    for year in result.years:
+        assert [row.family for row in year.fired].count("dayun") == 0
+
+
+def test_only_the_focus_year_carries_twelve_months() -> None:
+    """`months` 为 None 是结构性的：没请求流月就没有十二个空月（spec §7.3）。"""
+    assert all(year.months is None for year in _default().years)
+    focused = _transit(start_year=2026, end_year=2030, focus_year=2027)
+    assert focused.focus_year == 2027
+    assert [year.year for year in focused.years if year.months is not None] == [2027]
+    assert [month.index for month in focused.years[1].months] == list(range(12))
+
+
+def test_a_focus_year_outside_the_span_is_refused_before_any_work() -> None:
+    with pytest.raises(TransitRangeError) as excinfo:
+        _transit(start_year=2026, end_year=2030, focus_year=2035)
+    assert excinfo.value.code == "transit_focus_out_of_range"
+
+
+def test_the_natal_summary_is_the_projection_the_page_shows_and_nothing_else() -> None:
+    """命局摘要逐字取自同一次排盘的主命盘：口径分家时这里先红。"""
+    chart, _ = _natal()
+    result = _default()
+    assert result.four_pillars == "戊辰 甲寅 庚子 丁亥"
+    assert [pillar.position for pillar in result.pillars] == ["year", "month", "day", "hour"]
+    assert (result.day_master, result.day_master_element) == ("庚", "金")
+    assert result.favorable_elements == chart.analysis.favorable_elements
+    assert result.unfavorable_elements == chart.analysis.unfavorable_elements
+    assert result.longitude == 104.1
+
+
+def test_the_true_solar_time_echo_follows_the_correction_switch() -> None:
+    """开着校正给时刻，关着校正给 None；经度两种情况下都照实回显，缺省是东八区标准经线。"""
+    on = _default()
+    assert on.tst_applied is True and on.true_solar_time is not None
+    off = _transit(apply_true_solar_time=False)
+    assert (off.tst_applied, off.true_solar_time) == (False, None)
+    assert off.longitude == 104.1  # 校正关了，但用的经度仍是同一份，回显不该变成 0
+    bare = compute_transit(
+        birth_date=_BIRTH[0],
+        birth_time=_BIRTH[1],
+        gender=Gender.MALE,
+        apply_true_solar_time=False,
+    )
+    assert bare.longitude == 120.0  # 不给经度 → 东经 120°，与 `/natal` 同口径
+
+
+def test_every_detail_on_a_year_card_involves_the_transit_pillar() -> None:
+    """三张扫描明细只留岁运落点：命局自有之象留在命局页（spec §4 决策 3）。"""
+    for year in _default().years:
+        assert all(_TRANSIT_SLOT in (item.pillar_a, item.pillar_b) for item in year.relations)
+        assert all(
+            any(match.position == _TRANSIT_SLOT for match in item.matches) for item in year.shensha
+        )
+        assert all(
+            any(member.pillar == _TRANSIT_SLOT for member in group.members)
+            for group in year.branch_groups
+        )
+
+
+def test_the_ten_god_block_quotes_the_corpus_verbatim() -> None:
+    """引擎不组句：释义与出处逐字等于 `ten_god_meaning` 里的那一条。"""
+    for year in _default().years:
+        corpus = ten_god_meaning(year.pillar.shishen_gan)
+        assert (year.ten_god.god, year.ten_god.meaning, year.ten_god.source) == (
+            corpus.ten_god,
+            corpus.meaning,
+            corpus.source,
+        )
+
+
+def test_the_provenance_lists_the_natal_tables_plus_the_two_transit_ones() -> None:
+    """溯源=真用过的表：主命盘八张在前、岁运两张在后，一张不多一张不少（spec §7.3）。"""
+    tables = _default().provenance.tables
+    assert [(table.name, table.source) for table in tables] == [
+        *CONTENT_SOURCES,
+        *TRANSIT_CONTENT_SOURCES,
+    ]
+    assert {table.version for table in tables} == {CONTENT_VERSION}
+    assert _default().provenance.reference_date == _REFERENCE.isoformat()
+
+
+def test_every_ledger_in_the_response_adds_up_to_its_own_value() -> None:
+    """自洽门：从流年到账本、从流月到两层账本，Σ delta 都等于自己的 value。"""
+    result = _transit(start_year=2026, end_year=2030, focus_year=2026)
+    ledgers = [year.score for year in result.years] + [
+        month.score for year in result.years if year.months for month in year.months
+    ]
+    assert len(ledgers) == 17  # 5 份年账本 + 聚焦年的 12 份月账本
+    for score in ledgers:
+        assert score.factors[0].rule == "transit.base"
+        assert sum(factor.delta for factor in score.factors) == pytest.approx(score.value)
