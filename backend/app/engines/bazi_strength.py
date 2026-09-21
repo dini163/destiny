@@ -40,12 +40,20 @@ BORDERLINE_BAND = 3.0
 
 
 class StrengthAssessment(BaseModel):
-    """A band label plus the ledger that produced it; ``level`` feeds ``fuyin_choices``."""
+    """A band label plus the ledger that produced it; ``level`` feeds ``fuyin_choices``.
+
+    三因子的原值（0-100，未乘权重）同时以标量给出：§6.6 的学业维要看"得地"一项，
+    从 `factors` 里按 `rule` 字符串反抓数值会把计算层与展示层焊死（换个 label 就断）。
+    `score` 仍由这三个值经 `build_ledger` 构造，同一次计算不留第二处口径。
+    """
 
     score: ScoreValue
     level: str = Field(description="weak | balanced | strong")
     label: str = Field(description="身弱 | 中和 | 身强")
     borderline: bool = Field(description="距最近分界 < BORDERLINE_BAND。")
+    deling: float = Field(description="得令：日主五行在月令的旺相休囚死等第（0-100）。")
+    dedi: float = Field(description="得地：通根权重占四支藏干满分之比（0-100）。")
+    deshi: float = Field(description="得势：年/月/时三干中生扶者占比（0-100）。")
 
 
 def hidden_stem_weight(index: int, stem_count: int) -> float:
@@ -158,7 +166,8 @@ def assess_strength(pillars: list[BaziPillar]) -> StrengthAssessment:
         ],
     )
     return StrengthAssessment(
-        score=ledger, level=level, label=label, borderline=_is_borderline(ledger.value)
+        score=ledger, level=level, label=label, borderline=_is_borderline(ledger.value),
+        deling=deling_value, dedi=dedi_value, deshi=deshi_value,
     )
 
 

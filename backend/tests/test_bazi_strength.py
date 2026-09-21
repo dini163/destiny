@@ -11,6 +11,7 @@ import pytest
 
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_strength import (
+    FACTOR_WEIGHTS,
     assess_strength,
     element_weight_scores,
     fuyin_choices,
@@ -66,6 +67,20 @@ def test_de_di_normalises_over_the_full_hidden_weight() -> None:
 def test_de_shi_counts_only_year_month_hour_stems() -> None:
     """戊(偏印)命中，甲(偏财)/丁(正官)不命中 → 1/3*100 = 33.33."""
     assert _factor("strength.deshi").delta == pytest.approx(0.2 * 33.3333, abs=0.01)
+
+
+def test_factor_scalars_are_the_unweighted_values_behind_the_ledger() -> None:
+    """§6.6 学业维要读"得地"一项：标量与账本同源，读者不必再从 rule 字符串反解。"""
+    assessment = assess_strength(BASE.pillars)
+    assert assessment.deling == pytest.approx(30.0)
+    assert assessment.dedi == pytest.approx(17.9487, abs=0.01)
+    assert assessment.deshi == pytest.approx(33.3333, abs=0.01)
+    for prefix, weight, value in (
+        ("strength.deling", FACTOR_WEIGHTS[0], assessment.deling),
+        ("strength.dedi", FACTOR_WEIGHTS[1], assessment.dedi),
+        ("strength.deshi", FACTOR_WEIGHTS[2], assessment.deshi),
+    ):
+        assert _factor(prefix).delta == pytest.approx(weight * value, abs=0.01)
 
 
 def test_strength_value_band_and_borderline() -> None:
