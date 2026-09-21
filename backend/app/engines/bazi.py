@@ -3,11 +3,17 @@
 All calendrical and sexagenary computation is delegated to ``lunar-python`` (the
 authoritative library named in PRD Appendix A); this module never derives stems,
 branches, solar terms or luck pillars itself. On top of the library output it
-adds two deterministic, fully documented analyses:
+adds two deterministic computations:
 
 * a weighted five-element distribution (五行分布), and
-* a day-master strength / useful-god assessment (日主旺衰 / 用神喜忌) based on
-  the library-provided ten-gods (十神) and classical support-vs-drain theory.
+* a day-master strength / useful-god assessment (日主旺衰 / 用神喜忌).
+
+The classical tables in play are lunar-python's: four pillars, ten-gods, hidden
+stems, nayin and luck cycles. The weighting below that line — stem weight,
+hidden-stem tiers, the 月令 factor and the two strength thresholds — is a set of
+local model parameters, not a rule any classic states. It is being replaced by a
+documented three-factor ledger, after which these constants are deleted; until
+then ``BaziChart.analysis`` still feeds the day-master card, so they stay.
 
 True Solar Time (PRD 7) is applied *before* constructing ``Solar(...)`` because
 ``lunar-python`` uses the supplied wall-clock time verbatim with no astronomical
@@ -49,12 +55,15 @@ SHISHEN_SUPPORT = frozenset({"比肩", "劫财", "正印", "偏印"})
 # Ten-gods that weaken the day master (异党: 食伤 + 财 + 官杀).
 SHISHEN_DRAIN = frozenset({"食神", "伤官", "正财", "偏财", "正官", "七杀"})
 
-# Weighting for the strength tally (transparent, documented heuristic).
+# Strength weighting: local model parameters. No classic assigns these numbers;
+# they are the shape of this system's heuristic, and are stated as such wherever
+# a score derived from them is returned.
 STEM_WEIGHT = 1.0                       # each visible heavenly stem
 HIDDEN_STEM_WEIGHTS = (1.0, 0.5, 0.2)   # 本气 / 中气 / 余气 within a branch
 MONTH_BRANCH_FACTOR = 1.5               # 月令 (seasonal command) emphasis
 
-# Strength classification thresholds on support / (support + drain).
+# Strength classification thresholds on support / (support + drain); likewise
+# model parameters, not a classical cut.
 STRONG_THRESHOLD = 0.55
 WEAK_THRESHOLD = 0.45
 
@@ -113,9 +122,12 @@ def _build_pillar(ec: object, position: str, method: str, label: str) -> BaziPil
 def _tally_elements(pillars: list[BaziPillar]) -> tuple[dict[str, int], dict[str, float]]:
     """Return (headcount, weighted score) per element across the chart.
 
-    The headcount covers the eight primary characters (four stems + four branch
-    main elements). The weighted score additionally folds in each branch's
-    hidden stems, with the month branch emphasised (月令司令).
+    The two figures answer different questions and must not be merged. The
+    headcount is the distribution of the eight primary characters (four stems +
+    four branch main elements) — the "五行分布" the PRD asks for — so a card
+    labelled with a count keeps that meaning. The weighted score additionally
+    folds in each branch's hidden stems, with the month branch emphasised
+    (月令司令) by ``MONTH_BRANCH_FACTOR``, a local model parameter.
     """
     counts = {element: 0 for element in ELEMENT_ORDER}
     scores = {element: 0.0 for element in ELEMENT_ORDER}

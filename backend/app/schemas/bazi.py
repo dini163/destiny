@@ -47,8 +47,15 @@ class WuxingScore(BaseModel):
     """Five-element presence: a headcount and a weighted strength score."""
 
     element: str
-    count: int = Field(description="Occurrences among the eight primary characters")
-    score: float = Field(description="Weighted score including hidden stems")
+    count: int = Field(
+        ge=0, le=8, description="八个主字（四干四支）中该五行的个数；不含藏干。"
+    )
+    score: float = Field(
+        ge=0,
+        description="含藏干的加权合计（天干 1.0、本中余 1.0/0.5/0.2、月令 ×1.5）。"
+        "这四个数是本地模型参数、无古籍出处；它是分布条的长度，不是吉凶分数，"
+        "日主强弱的可核对账本在 DayMasterAnalysis.strength。",
+    )
 
 
 class DayMasterAnalysis(BaseModel):
@@ -56,9 +63,12 @@ class DayMasterAnalysis(BaseModel):
 
     day_master: str = Field(description="Day stem, e.g. 庚")
     day_master_element: str = Field(description="Element of the day master, e.g. 金")
-    support_score: float = Field(description="Weighted score of supporting (印/比劫) elements")
-    drain_score: float = Field(description="Weighted score of draining (食伤/财/官杀) elements")
-    strength_ratio: float = Field(description="support / (support + drain), in [0, 1]")
+    support_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
+    drain_score: float = Field(description="已弃用：旧的加权和，无出处；由三因子账本取代。")
+    strength_ratio: float = Field(
+        description="已弃用：旧的 support/(support+drain) 比例，无古籍出处；"
+        "日主强弱的可核对口径是 strength: ScoreValue（得令/得地/得势三因子账本）。"
+    )
     level: str = Field(description="weak | balanced | strong")
     label: str = Field(description="Chinese label, e.g. 身弱")
     favorable_elements: list[str] = Field(description="Favourable elements (喜用神)")

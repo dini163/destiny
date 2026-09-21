@@ -62,9 +62,17 @@ def test_day_pillar_day_master_and_zodiac() -> None:
     assert chart.zodiac == "龙"  # by Start-of-Spring, consistent with year branch 辰
 
 
-def test_wuxing_distribution_over_eight_characters() -> None:
+def test_wuxing_count_is_the_eight_primary_characters() -> None:
+    """The distribution card counts the eight characters, never hidden stems.
+
+    Weights and hidden-stem roots belong to the strength ledger; a bare headcount
+    stays exactly what its label says, so an already-integrated page cannot
+    silently change meaning. Pinned here because the strength engine is being
+    rebuilt on top of the same pillars.
+    """
     chart = _chart()
     counts = {item.element: item.count for item in chart.wuxing}
+    assert sum(counts.values()) == 8
     assert counts == {"木": 2, "火": 1, "土": 2, "金": 1, "水": 2}
     assert chart.missing_elements == []
 
