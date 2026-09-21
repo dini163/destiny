@@ -145,3 +145,26 @@ def test_bazi_natal_requires_location_when_tst_enabled(client: TestClient) -> No
     )
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "invalid_birth_data"
+
+
+def test_bazi_natal_is_reproducible_for_a_fixed_reference_date(client: TestClient) -> None:
+    body = {"birth_date": "1988-02-15", "birth_time": "23:30", "gender": "male",
+            "longitude": 104.1, "reference_date": "2026-09-20", "name": "示例甲"}
+    first = client.post("/api/v1/bazi/natal", json=body).json()
+    assert first == client.post("/api/v1/bazi/natal", json=body).json()   # 同请求逐字节相等
+    assert first["provenance"]["reference_date"] == "2026-09-20"
+    assert first["name"] == "示例甲"
+    assert [step["index"] for step in first["dayun"] if step["is_current"]] == [
+        first["dayun_current"]["index"]
+    ]
+
+
+def test_bazi_natal_without_reference_date_falls_back_to_today(client: TestClient) -> None:
+    """缺省口径必须可见：回显当日而不是留空，否则响应无法复现。"""
+    payload = client.post(
+        "/api/v1/bazi/natal",
+        json={"birth_date": "1988-02-15", "birth_time": "23:30", "gender": "male",
+              "longitude": 104.1},
+    ).json()
+    assert payload["provenance"]["reference_date"] == date.today().isoformat()
+    assert payload["name"] is None

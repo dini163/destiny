@@ -4,6 +4,8 @@ Field names are snake_case end-to-end (JSON contract mirrors these models) so
 the frontend can consume responses without a mapping layer.
 """
 
+from datetime import date
+
 from pydantic import BaseModel, Field
 
 from app.schemas.bazi_breakdown import DayunDetail, Provenance, TenGodReading
@@ -25,6 +27,14 @@ class BaziNatalRequest(BirthInput):
     apply_true_solar_time: bool = Field(
         default=True,
         description="Correct the standard-time input to True Solar Time before charting (PRD 7).",
+    )
+    name: str | None = Field(
+        default=None, max_length=40, description="命主称谓，仅回显，不参与任何计算。"
+    )
+    reference_date: date | None = Field(
+        default=None,
+        description="判定当前大运的截止日；缺省由引擎取服务器当日，并在响应 "
+        "provenance.reference_date 里回显，因此响应自身即可复现。",
     )
 
 
