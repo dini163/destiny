@@ -10,6 +10,15 @@ import type { ScoreValue } from './scoring';
 /** Which of the four pillars a {@link BaziPillar} represents. */
 export type PillarPosition = 'year' | 'month' | 'day' | 'hour';
 
+/**
+ * Synthetic pillars cast against the natal chart by the 岁运 engines.
+ *
+ * A transit pillar keeps the full {@link BaziPillar} shape (十神、藏干、地势 all
+ * recomputed against the day master) but belongs to no palace, so consumers must
+ * not assume a four-pillar position.
+ */
+export type TransitPillarPosition = 'transit_year' | 'transit_month';
+
 /** Day-master strength classification. */
 export type StrengthLevel = 'weak' | 'balanced' | 'strong';
 
@@ -27,9 +36,9 @@ export interface BaziNatalRequest extends BirthInput {
   reference_date?: string | null;
 }
 
-/** One of the four pillars (year / month / day / hour). */
+/** One of the four pillars (year / month / day / hour), or a synthetic 岁运 pillar. */
 export interface BaziPillar {
-  position: PillarPosition;
+  position: PillarPosition | TransitPillarPosition;
   /** Chinese pillar label, e.g. 年柱. */
   label: string;
   /** Full pillar, e.g. 戊辰. */

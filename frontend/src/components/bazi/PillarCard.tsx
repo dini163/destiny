@@ -1,7 +1,7 @@
 import { wuxingBg, wuxingText } from '../../lib/wuxing';
 import type { BaziPillar, HiddenStemWeight } from '../../types/bazi';
 
-/** Fixed palace captions per pillar position (standard 四柱 terminology). */
+/** Fixed palace captions per natal position (standard 四柱 terminology). */
 const PALACE_CAPTION: Record<string, string> = {
   year: '祖荫宫',
   month: '提纲令',
@@ -29,7 +29,8 @@ interface PillarCardProps {
  */
 export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
   const isDay = pillar.position === 'day';
-  const palace = PALACE_CAPTION[pillar.position] ?? '';
+  // 岁运合成柱（transit_year / transit_month）不在四宫之内，标题只留柱名。
+  const palace: string | undefined = PALACE_CAPTION[pillar.position];
   const ledger = hidden_stem_rows ?? [];
   // 账本行只带干名，五行仍取自本柱的 hidden_stem_elements（同一地支的两份视图）。
   const elementOf = (stem: string): string =>
@@ -47,7 +48,7 @@ export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
 
       <div className="flex items-center justify-between gap-2">
         <span className={`label-caps ${isDay ? 'text-gold' : ''}`}>
-          {pillar.label} · {palace}
+          {palace ? `${pillar.label} · ${palace}` : pillar.label}
         </span>
         {isDay ? (
           <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[#3c2f00]">
