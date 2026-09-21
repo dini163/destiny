@@ -92,3 +92,18 @@ class NameAnalysis(BaseModel):
     score: ScoreValue | None
     warnings: list[str] = Field(default_factory=list, description="机器码，如 stroke_unresolved:玄。")
     provenance: NameProvenance
+
+
+class NameAnalyzeRequest(BaseModel):
+    """`POST /name/analyze` 的入参。
+
+    长度用 pydantic 兜（返回 FastAPI 的 detail 形状）；是不是汉字交给引擎，因为
+    非汉字要回 422 + 机器码 `not_han`，而不是 `validation_error`。
+    """
+
+    surname: str = Field(min_length=1, max_length=2, description="姓（1–2 字）。")
+    given: str = Field(min_length=1, max_length=3, description="名（1–3 字）。")
+    variants: dict[str, str] | None = Field(
+        default=None,
+        description="简体字 → 指定正体字；对该字在姓名中的每次出现都生效，多余的键忽略。",
+    )
