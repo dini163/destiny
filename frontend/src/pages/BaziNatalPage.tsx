@@ -1,17 +1,32 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { DayunTimeline } from '../components/bazi/DayunTimeline';
+import { DimensionGrid } from '../components/bazi/DimensionGrid';
+import { GeJuCard } from '../components/bazi/GeJuCard';
+import { HiddenStemTable } from '../components/bazi/HiddenStemTable';
 import { PillarCard } from '../components/bazi/PillarCard';
+import { ProvenancePanel } from '../components/bazi/ProvenancePanel';
+import { RelationChips } from '../components/bazi/RelationChips';
+import { ShenShaList } from '../components/bazi/ShenShaList';
 import { StrengthDial } from '../components/bazi/StrengthDial';
 import { WuxingBars } from '../components/bazi/WuxingBars';
+import { YongshenPanel } from '../components/bazi/YongshenPanel';
 import { Icon } from '../components/ui/Icon';
+import type { IconName } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { pillarSlotLabel } from '../lib/pillars';
 import { useBaziNatal } from '../hooks/useBaziNatal';
-import type { BaziChart, BaziNatalRequest } from '../types/bazi';
+import type {
+  BaziChart,
+  BaziNatalRequest,
+  DayunDetail,
+  TenGodReading,
+} from '../types/bazi';
 import type { Gender } from '../types/common';
 
 const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
@@ -23,13 +38,16 @@ const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
  * BaZi natal chart page (四柱推命).
  *
  * The input console collects birth data; on submit the chart is computed by the
- * backend (`useBaziNatal`) and rendered from real engine output only — four pillars,
- * day-master strength, five-element distribution and the luck-pillar axis. Nothing is
- * fabricated on the client (PRD no-mock rule).
+ * backend (`useBaziNatal`) and rendered in the ten sections of spec §8.2 — four
+ * pillars, hidden-stem weights, five-element distribution, strength ledger and
+ * 格局, 用神三法, 神煞, 刑冲合害, 大运, 六维详批 and the provenance footer. Every
+ * figure opens into its score ledger and every reading carries its own citation;
+ * nothing is composed on the client (PRD no-mock rule).
  */
 export function BaziNatalPage() {
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
+  const [name, setName] = useState('');
   const bazi = useBaziNatal();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -37,6 +55,7 @@ export function BaziNatalPage() {
       ...values,
       gender,
       apply_true_solar_time: applyTrueSolarTime,
+      name: name.trim() || null,
     };
     bazi.mutate(request);
   }
@@ -58,6 +77,15 @@ export function BaziNatalPage() {
             options={GENDER_OPTIONS}
             value={gender}
             onChange={(next) => setGender(next)}
+          />
+        </LabeledField>
+        <LabeledField label="命主称谓（可选，仅回显）">
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            maxLength={40}
+            placeholder="如：示例命主"
+            className="w-full rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
           />
         </LabeledField>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-variant">
@@ -87,53 +115,234 @@ export function BaziNatalPage() {
   );
 }
 
+/** One rendered region of spec §8.2: its anchor, card chrome and body. */
+interface SectionSpec {
+  id: string;
+  /** Short name in the sticky anchor nav. */
+  label: string;
+  title: string;
+  eyebrow: string;
+  icon: IconName;
+  body: ReactNode;
+}
+
+/**
+ * The section order of spec §8.2, as same-page anchors rather than tabs.
+ *
+ * One list owns the nav entries and the bodies, so a section the response did
+ * not fill is absent from the nav as well as the page — an anchor that jumps to
+ * nothing would be a broken promise (spec §8.2 规则 2、3).
+ */
+function sectionsFor(chart: BaziChart): SectionSpec[] {
+  const ledger = chart.hidden_stem_ledger ?? [];
+  const relations = chart.relations ?? [];
+  const branchGroups = chart.branch_groups ?? [];
+
+  const specs: Array<SectionSpec | null> = [
+    {
+      id: 'pillars',
+      label: '四柱',
+      title: '四柱命造干支矩阵',
+      eyebrow: 'FOUR PILLARS MATRIX',
+      icon: 'compass',
+      body: (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {chart.pillars.map((pillar) => (
+            <PillarCard
+              key={pillar.position}
+              pillar={pillar}
+              hidden_stem_rows={ledger.filter((row) => row.position === pillar.position)}
+            />
+          ))}
+        </div>
+      ),
+    },
+    ledger.length > 0
+      ? {
+          id: 'stems',
+          label: '藏干十神',
+          title: '地支藏干权重与十神',
+          eyebrow: 'HIDDEN STEMS',
+          icon: 'seal',
+          body: (
+            <div className="flex flex-col gap-4">
+              <HiddenStemTable rows={ledger} />
+              <TenGodList readings={chart.ten_god_readings ?? []} />
+            </div>
+          ),
+        }
+      : null,
+    {
+      id: 'wuxing',
+      label: '五行',
+      title: '五行能量量化分布',
+      eyebrow: 'WUXING',
+      icon: 'sparkle',
+      body: <WuxingBars scores={chart.wuxing} missing={chart.missing_elements} />,
+    },
+    {
+      id: 'strength',
+      label: '强弱格局',
+      title: '日主强弱与格局',
+      eyebrow: 'STRENGTH & STRUCTURE',
+      icon: 'gauge',
+      body: (
+        <div className="flex flex-col gap-4">
+          <StrengthDial analysis={chart.analysis} />
+          {chart.geju ? <GeJuCard geju={chart.geju} /> : null}
+        </div>
+      ),
+    },
+    chart.yongshen
+      ? {
+          id: 'yongshen',
+          label: '用神三法',
+          title: '用神三法（扶抑 / 通关 / 调候）',
+          eyebrow: 'USEFUL GOD',
+          icon: 'compass',
+          body: <YongshenPanel yongshen={chart.yongshen} />,
+        }
+      : null,
+    chart.shensha
+      ? {
+          id: 'shensha',
+          label: '神煞',
+          title: '神煞命中',
+          eyebrow: 'SHENSHA',
+          icon: 'vault',
+          body: <ShenShaList entries={chart.shensha} />,
+        }
+      : null,
+    relations.length > 0 || branchGroups.length > 0
+      ? {
+          id: 'relations',
+          label: '刑冲合害',
+          title: '刑冲合害破与合会局',
+          eyebrow: 'RELATIONS',
+          icon: 'compass',
+          body: <RelationChips relations={relations} groups={branchGroups} />,
+        }
+      : null,
+    {
+      id: 'dayun',
+      label: '大运',
+      title: '大运流变时间轴',
+      eyebrow: 'DAYUN · 十年一步',
+      icon: 'timeline',
+      body: (
+        <div className="flex flex-col gap-4">
+          <DayunTimeline
+            direction={chart.dayun_direction}
+            startSolar={chart.dayun_start_solar}
+            steps={chart.dayun}
+            liunian={chart.current_liunian}
+          />
+          {chart.dayun_current ? <CurrentDayun detail={chart.dayun_current} /> : null}
+        </div>
+      ),
+    },
+    chart.interpretation
+      ? {
+          id: 'dimensions',
+          label: '六维详批',
+          title: '六维详批',
+          eyebrow: 'SIX DIMENSIONS',
+          icon: 'sparkle',
+          body: <DimensionGrid reading={chart.interpretation} />,
+        }
+      : null,
+    chart.provenance
+      ? {
+          id: 'provenance',
+          label: '数据溯源',
+          title: '数据溯源',
+          eyebrow: 'PROVENANCE',
+          icon: 'seal',
+          body: <ProvenancePanel provenance={chart.provenance} />,
+        }
+      : null,
+  ];
+
+  return specs.filter((spec): spec is SectionSpec => spec !== null);
+}
+
 /** The full chart composition rendered once a real result is available. */
 function BaziResults({ chart }: { chart: BaziChart }) {
+  const sections = sectionsFor(chart);
+
   return (
     <>
       <ChartSummary chart={chart} />
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-        <ResultCard
-          className="lg:col-span-8"
-          title="四柱命造干支矩阵"
-          eyebrow="FOUR PILLARS MATRIX"
-          icon="compass"
-          actions={
-            <span className="label-caps text-ink-muted">
-              {chart.calendar === 'solar' ? '公历' : '农历'} · {chart.standard_datetime}
-            </span>
-          }
-          elevated
-        >
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {chart.pillars.map((pillar) => (
-              <PillarCard key={pillar.position} pillar={pillar} />
-            ))}
+      <nav
+        aria-label="命盘分区"
+        className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-rim bg-void/85 py-2 backdrop-blur"
+      >
+        {sections.map((section) => (
+          <a
+            key={section.id}
+            href={`#${section.id}`}
+            className="label-caps text-ink-muted hover:text-gold-soft"
+          >
+            {section.label}
+          </a>
+        ))}
+      </nav>
+
+      <div className="flex flex-col gap-6">
+        {sections.map((section) => (
+          <div key={section.id} id={section.id} className="scroll-mt-20">
+            <ResultCard
+              title={section.title}
+              eyebrow={section.eyebrow}
+              icon={section.icon}
+              elevated
+            >
+              {section.body}
+            </ResultCard>
           </div>
-        </ResultCard>
-
-        <div className="flex flex-col gap-6 lg:col-span-4">
-          <ResultCard title="命局核心判定" eyebrow="DAY MASTER" icon="gauge" elevated>
-            <StrengthDial analysis={chart.analysis} />
-          </ResultCard>
-          <ResultCard title="五行能量量化分布" eyebrow="WUXING" icon="seal" elevated>
-            <WuxingBars scores={chart.wuxing} missing={chart.missing_elements} />
-          </ResultCard>
-        </div>
+        ))}
       </div>
-
-      <ResultCard title="大运流变时间轴" eyebrow="DAYUN · 十年一步" icon="timeline" elevated>
-        <DayunTimeline
-          direction={chart.dayun_direction}
-          startSolar={chart.dayun_start_solar}
-          steps={chart.dayun}
-          liunian={chart.current_liunian}
-        />
-      </ResultCard>
-
-      <Provenance engine={chart.engine} />
     </>
+  );
+}
+
+/** 十神清点：命局出现的每个十神一条，落点与释义都来自后端。 */
+function TenGodList({ readings }: { readings: TenGodReading[] }) {
+  if (readings.length === 0) return null;
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {readings.map((reading) => (
+        <li
+          key={reading.ten_god}
+          className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1.5 text-xs"
+          title={`${reading.meaning}｜${reading.source}`}
+        >
+          <span className="text-ink">{reading.ten_god}</span>
+          <span className="numeric text-gold-soft">{reading.count}</span>
+          <span className="text-ink-muted">{reading.positions.map(pillarSlotLabel).join('、')}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** 当前大运与命局的伏吟/反吟（`dayun_current`，只有关系，不含神煞）。 */
+function CurrentDayun({ detail }: { detail: DayunDetail }) {
+  return (
+    <div className="flex flex-col gap-2 rounded-element border border-rim bg-[#0e111a] p-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="label-caps text-gold-soft">当前大运 · {detail.ganzhi}</span>
+        <span className="numeric text-xs text-ink-muted">
+          {detail.start_age}—{detail.end_age} 岁
+        </span>
+      </div>
+      {detail.relations.length > 0 ? (
+        <RelationChips relations={detail.relations} groups={[]} />
+      ) : (
+        <p className="text-xs text-ink-muted">此运与四柱之间未构成伏吟或反吟。</p>
+      )}
+    </div>
   );
 }
 
@@ -148,6 +357,7 @@ function ChartSummary({ chart }: { chart: BaziChart }) {
     <div className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
+          {chart.name ? <span className="text-sm text-ink-variant">{chart.name}</span> : null}
           <span className="label-caps">四柱命造 · FOUR PILLARS</span>
           <span className="font-display text-3xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-4xl">
             {chart.four_pillars}
@@ -158,6 +368,9 @@ function ChartSummary({ chart }: { chart: BaziChart }) {
           <Chip label="日元" value={`${chart.day_master}（${chart.day_master_element}）`} />
           <Chip label="命宫" value={`${chart.ming_gong} · ${chart.ming_gong_nayin}`} />
           <Chip label="胎元" value={`${chart.tai_yuan} · ${chart.tai_yuan_nayin}`} />
+          {chart.provenance ? (
+            <Chip label="参照日" value={chart.provenance.reference_date} />
+          ) : null}
         </div>
       </div>
       <div className="gold-rule" />
@@ -184,24 +397,5 @@ function Chip({ label, value }: { label: string; value: string }) {
       <span className="label-caps">{label}</span>
       <span className="text-ink">{value}</span>
     </span>
-  );
-}
-
-/** Methodology + provenance note anchored to the real computation engine. */
-function Provenance({ engine }: { engine: string }) {
-  return (
-    <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">术数数理模型与文献溯源</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            四柱干支、十神、藏干、纳音与大运流年均由 <span className="text-gold-soft">{engine}</span>{' '}
-            权威历算库排定；开启真太阳时时，先按出生经度与均时差校正再定日柱时柱。命理释义为传统阴阳五行数理文化的量化推演，仅供文化参考。
-          </p>
-        </div>
-      </div>
-      <span className="label-caps shrink-0 text-ink-muted">ENGINE · {engine}</span>
-    </div>
   );
 }

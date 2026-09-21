@@ -27,3 +27,18 @@ export function pillarColumnLabel(position: string): string {
   const head = PILLAR_LABEL[position];
   return head ? `${head}柱` : '运';
 }
+
+/**
+ * Caption for a single slot the API names in `TenGodReading.positions`:
+ * `month.gan` → 月干, `day.zhi(癸)` → 日支藏癸.
+ *
+ * A key that doesn't parse is echoed untouched rather than guessed at — the
+ * slot grammar is the engine's, so silently rendering it as 运干 would invent
+ * a placement the response never claimed.
+ */
+export function pillarSlotLabel(key: string): string {
+  const match = /^([^.]+)\.(gan|zhi)(?:\((.+)\))?$/.exec(key);
+  if (!match) return key;
+  const head = `${pillarLabel(match[1] ?? '')}${match[2] === 'gan' ? '干' : '支'}`;
+  return match[3] ? `${head}藏${match[3]}` : head;
+}
