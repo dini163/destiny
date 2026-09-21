@@ -4,7 +4,7 @@
  * snake_case is preserved end-to-end so the frontend consumes chart responses
  * without a mapping layer.
  */
-import type { BirthInput, CalendarType, Gender } from './common';
+import type { BirthInput, CalendarType, Gender, ProvenanceTable } from './common';
 import type { ScoreValue } from './scoring';
 
 /** Which of the four pillars a {@link BaziPillar} represents. */
@@ -212,12 +212,6 @@ export interface DayunDetail {
   start_age: number;
   end_age: number;
   relations: RelationPair[];
-}
-
-export interface ProvenanceTable {
-  name: string;
-  version: string;
-  source: string;
 }
 
 export interface Provenance {

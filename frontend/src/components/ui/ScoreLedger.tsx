@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { Icon } from '../ui/Icon';
-import { SourceNote } from '../ui/SourceNote';
+import { Icon } from './Icon';
+import { SourceNote } from './SourceNote';
 import type { ScoreValue } from '../../types/scoring';
 
 interface ScoreLedgerProps {

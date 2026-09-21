@@ -45,3 +45,10 @@ export interface HealthResponse {
   status: string;
   service: string;
 }
+
+/** 一份被引用的数据表，镜像 `schemas/common.py:ProvenanceTable`（系统无关）。 */
+export interface ProvenanceTable {
+  name: string;
+  version: string;
+  source: string;
+}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { ScoreLedger } from './ScoreLedger';
+import { ScoreLedger } from '../ui/ScoreLedger';
 import type { DayMasterAnalysis } from '../../types/bazi';
 
 /** Bilingual labels for the deterministic strength classification. */

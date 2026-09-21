@@ -6,7 +6,7 @@ import { DimensionGrid } from '../components/bazi/DimensionGrid';
 import { GeJuCard } from '../components/bazi/GeJuCard';
 import { HiddenStemTable } from '../components/bazi/HiddenStemTable';
 import { PillarCard } from '../components/bazi/PillarCard';
-import { ProvenancePanel } from '../components/bazi/ProvenancePanel';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { RelationChips } from '../components/bazi/RelationChips';
 import { ShenShaList } from '../components/bazi/ShenShaList';
 import { StrengthDial } from '../components/bazi/StrengthDial';
@@ -258,7 +258,23 @@ function sectionsFor(chart: BaziChart): SectionSpec[] {
           title: '数据溯源',
           eyebrow: 'PROVENANCE',
           icon: 'seal',
-          body: <ProvenancePanel provenance={chart.provenance} />,
+          body: (
+            <ProvenancePanel
+              tables={chart.provenance.tables}
+              meta={[
+                { label: '排盘引擎', value: chart.provenance.engine },
+                {
+                  label: '大运参照日',
+                  value: chart.provenance.reference_date,
+                  title: '请求未指定时取服务器当日',
+                },
+              ]}
+              notes={[
+                '格局未纳入从格与合化（spec §6.4 的口径边界）。',
+                'design 稿的干支示例与实算不符时，一律以引擎输出为准（spec §2.1）。',
+              ]}
+            />
+          ),
         }
       : null,
   ];

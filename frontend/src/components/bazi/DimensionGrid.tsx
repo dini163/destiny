@@ -1,4 +1,4 @@
-import { ScoreLedger } from './ScoreLedger';
+import { ScoreLedger } from '../ui/ScoreLedger';
 import { SourceNote } from '../ui/SourceNote';
 import type { BaziInterpretation, DimensionReading } from '../../types/bazi';
 
