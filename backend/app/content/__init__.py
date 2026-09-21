@@ -9,6 +9,9 @@ a version bump are one change, because responses echo the version per table and
 """
 
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
+from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
+from app.content.name_numerology import NUMEROLOGY_SOURCE
+from app.content.name_sancai import SANCAI_SOURCE
 from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 CONTENT_VERSION = "2026.09"
@@ -25,4 +28,12 @@ CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_shensha", "《三命通会》《渊海子平》"),
     ("bazi_relations", "《三命通会》《渊海子平》《滴天髓》"),
     ("bazi_dimensions", f"引文为判语（健康维只署本系统） · {MODEL_PARAM_SOURCE}"),
+)
+
+#: 姓名学三表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:378`
+#: 整表回显进每一个八字响应，把姓名学语料混进去就是让八字声称自己引用了它没用的表。
+NAME_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("kangxi_strokes", KANGXI_STROKE_SOURCE),
+    ("name_numerology", NUMEROLOGY_SOURCE),
+    ("name_sancai", SANCAI_SOURCE),
 )

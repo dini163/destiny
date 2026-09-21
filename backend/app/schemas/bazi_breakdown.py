@@ -7,6 +7,7 @@
 from pydantic import BaseModel, Field
 
 from app.schemas.bazi_rules import RelationPair
+from app.schemas.common import ProvenanceTable
 
 
 class TenGodReading(BaseModel):
@@ -26,12 +27,6 @@ class DayunDetail(BaseModel):
     relations: list[RelationPair] = Field(
         description="该运干支与命局四柱的二元关系（伏吟/反吟）；不含命局自身已有关系。"
     )
-
-
-class ProvenanceTable(BaseModel):
-    name: str = Field(description="语料模块名，如 bazi_shensha。")
-    version: str = Field(description="语料版本号，全表共用 content.CONTENT_VERSION。")
-    source: str = Field(description="书级出处，或 模型参数/本系统纲要 声明。")
 
 
 class Provenance(BaseModel):

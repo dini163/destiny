@@ -39,3 +39,11 @@ class TrueSolarTimeResponse(BaseModel):
     true_solar_time: str
     offset_minutes: float
     longitude: float
+
+
+class ProvenanceTable(BaseModel):
+    """一份被引用的数据表（系统无关，八字与姓名学共用）。"""
+
+    name: str = Field(description="语料模块名，如 bazi_shensha。")
+    version: str = Field(description="语料版本号，全表共用 content.CONTENT_VERSION。")
+    source: str = Field(description="书级出处，或 模型参数/本系统纲要 声明。")
