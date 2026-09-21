@@ -16,7 +16,7 @@
 
 from dataclasses import dataclass
 
-BRANCH_ORDER = "子丑寅卯辰巳午未申酉戌亥"
+_BRANCH_ORDER = "子丑寅卯辰巳午未申酉戌亥"
 
 SAN_HE_GROUPS: tuple[tuple[str, str, str], ...] = (
     ("申", "子", "辰"), ("亥", "卯", "未"), ("寅", "午", "戌"), ("巳", "酉", "丑"),
@@ -48,7 +48,7 @@ def san_he_group(zhi: str) -> str | None:
 
 def _advance(zhi: str, steps: int) -> str:
     """支序上前移若干辰，用于按'禄前 n 辰'一族规则铺表。"""
-    return BRANCH_ORDER[(BRANCH_ORDER.index(zhi) + steps) % len(BRANCH_ORDER)]
+    return _BRANCH_ORDER[(_BRANCH_ORDER.index(zhi) + steps) % len(_BRANCH_ORDER)]
 
 
 _LU_BY_GAN: dict[str, str] = {

@@ -30,13 +30,13 @@ class RelationRule:
     source: str
 
 
-SAN_HE_ELEMENTS: dict[str, str] = {
+_SAN_HE_ELEMENTS: dict[str, str] = {
     "申子辰": "水", "寅午戌": "火", "巳酉丑": "金", "亥卯未": "木",
 }
-SAN_HE_PEAKS: dict[str, str] = {
+_SAN_HE_PEAKS: dict[str, str] = {
     "申子辰": "子", "寅午戌": "午", "巳酉丑": "酉", "亥卯未": "卯",
 }
-SAN_HUI_ELEMENTS: dict[str, str] = {
+_SAN_HUI_ELEMENTS: dict[str, str] = {
     "寅卯辰": "木", "巳午未": "火", "申酉戌": "金", "亥子丑": "水",
 }
 
@@ -101,15 +101,15 @@ RELATION_TABLES: dict[str, RelationRule] = {
     ),
     "三合": RelationRule(
         kind="三合", scope="group", side=None,
-        pairs=frozenset(), element=None, groups=dict(SAN_HE_ELEMENTS), peaks=None,
+        pairs=frozenset(), element=None, groups=dict(_SAN_HE_ELEMENTS), peaks=None,
         reading="三合者，如人一身之运用：生即产，旺即成，库即收，有生有成有收，"
                 "万物得始得终，乃自然之理。凡命有合，要得局为佳。",
         source="《三命通会·论支元三合》",
     ),
     "半合": RelationRule(
         kind="半合", scope="group", side=None,
-        pairs=frozenset(), element=None, groups=dict(SAN_HE_ELEMENTS),
-        peaks=dict(SAN_HE_PEAKS),
+        pairs=frozenset(), element=None, groups=dict(_SAN_HE_ELEMENTS),
+        peaks=dict(_SAN_HE_PEAKS),
         reading="三合局中见二字且含旺支（即三合中位），本系统以半合标之。"
                 "《三命通会·论支元三合》明言『若三字缺一则化不成局，不可以三合化局论』，"
                 "故此条只记局势之半，不论其化。",
@@ -117,7 +117,7 @@ RELATION_TABLES: dict[str, RelationRule] = {
     ),
     "三会": RelationRule(
         kind="三会", scope="group", side=None,
-        pairs=frozenset(), element=None, groups=dict(SAN_HUI_ELEMENTS), peaks=None,
+        pairs=frozenset(), element=None, groups=dict(_SAN_HUI_ELEMENTS), peaks=None,
         reading="方是方兮局是局，方要得方莫混局。如寅卯辰，东方也，杂以亥卯未则太过，"
                 "岂不为混局哉；三会者，一方专气之全。",
         source="《滴天髓·方局论》",
