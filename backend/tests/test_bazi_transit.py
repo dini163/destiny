@@ -1,4 +1,4 @@
-"""岁运引擎的前三段：区间解析、排盘时刻共用件、关系驱动的命中判定。
+"""岁运引擎的前四段：区间解析、排盘时刻共用件、命中判定、账本装配。
 
 区间一条线（spec §7.2）：缺省补齐 + 四道校验（倒序 / 过宽 / 越出大运窗 / focus 越
 界），错误走 `TransitRangeError` 的 422 而不是 pydantic 的 422 —— 前者是"这个命盘
@@ -13,29 +13,50 @@
 文是手搭的。手搭也要搭得真 —— `_pair` 的字对从 `RELATION_TABLES` 里取，`_group`
 的释义与出处也是，测试指给它们的只有柱位。判定这一层认的是 `kind` 与柱位，字对是
 什么它看都不看，所以假字对写进测里，测的就成了"我抄的那个 kind 恰好对得上"。
+
+装配一条线（spec §6.3 / §4 决策 3）：这里测的是"账本自洽"与"命局不脏"两件事。前者
+由 Σ `delta == value`、`fired` 与账本行一一对应来钉，不需要任何具体分值（分值的
+对错在 golden 里对拍）；后者只在装配层才测得动 —— 判定层的谓词拿到的是手搭上下文，
+真扫描会不会把命局内部的关系灌进岁运账本，得让引擎真跑一次才知道。
 """
 
 from dataclasses import replace
 from datetime import date, datetime, time
+from functools import cache
 
 import pytest
 
 from app.content.bazi_changsheng import CHANG_SHENG_ORDER
 from app.content.bazi_relations import RELATION_TABLES, transforming_element
-from app.content.bazi_transit_rules import TRANSIT_RULES
+from app.content.bazi_shishen import ten_god_meaning
+from app.content.bazi_transit_rules import TRANSIT_BASE, TRANSIT_RULES, transit_rule
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.bazi_transit import (
+    _TRANSIT_SLOT,
     TransitRange,
     _Judgement,
+    _Natal,
     _PREDICATES,
     _PUNISH_KINDS,
+    _AnnualLuck,
+    _annual_luck_by_year,
+    _fired,
     _hit_keys,
+    _hit_rows,
+    _ledger,
+    _narrative,
+    _natal_projection,
+    _tier,
+    _transit_year,
     resolve_natal_moment,
     resolve_transit_range,
 )
+from app.schemas.bazi import BaziChart
 from app.schemas.bazi_rules import BranchGroup, BranchMember, RelationPair
-from app.schemas.common import CalendarType
+from app.schemas.bazi_transit import TransitYear
+from app.schemas.common import CalendarType, Gender
 
 _WINDOW = {"supported_from": 1988, "supported_to": 2083}
 
@@ -428,3 +449,156 @@ def test_every_rule_row_is_consumed_by_exactly_one_predicate() -> None:
     """漂移门：谓词键序 == 规则表键序，46 行一行不多不少。漏一行、多一行、换序都红。"""
     assert [key for key, _ in _PREDICATES] == list(TRANSIT_RULES)
     assert len(_PREDICATES) == 46
+
+
+# ---------------------------------------------------------------- 账本装配（spec §6.3）
+_NATAL_KWARGS: dict[str, object] = {
+    "birth_date": _BIRTH[0],
+    "birth_time": _BIRTH[1],
+    "calendar": CalendarType.SOLAR,
+    "longitude": 104.1,
+    "gender": Gender.MALE,
+    "apply_true_solar_time": True,
+}
+
+
+def _natal() -> tuple[BaziChart, _Natal]:
+    """基准命 A 的命盘，与岁运要读的那一份投影 —— 同源于同一次排盘。"""
+    chart = compute_bazi_chart(**_NATAL_KWARGS)  # type: ignore[arg-type]
+    return chart, _natal_projection(chart)
+
+
+#: 摊平一次大运要走完十个流年段，比整张命盘还贵；这两份结果全程只读，故就地缓存。
+@cache
+def _luck() -> dict[int, _AnnualLuck]:
+    """大运段摊平出来的逐年流年（童年段也在其中，`dayun_ganzhi` 为空）。"""
+    moment = resolve_natal_moment(
+        birth_date=_BIRTH[0],
+        birth_time=_BIRTH[1],
+        calendar=CalendarType.SOLAR,
+        longitude=104.1,
+        apply_true_solar_time=True,
+    )
+    return _annual_luck_by_year(moment.eight_char, Gender.MALE)
+
+
+@cache
+def _years() -> dict[int, TransitYear]:
+    """基准命 A 的 2024–2028 五年装配 —— 自洽测与污染测共用的那一份输入。"""
+    _, natal = _natal()
+    luck = _luck()
+    return {year: _transit_year(natal, luck[year]) for year in range(2024, 2029)}
+
+
+def test_the_baseline_chart_is_what_every_transit_ledger_is_read_against() -> None:
+    """装配段的地板：命 A 的四柱、强弱与喜忌集。它们变了，下面的分档全都不必再看。"""
+    chart, natal = _natal()
+    assert chart.four_pillars == "戊辰 甲寅 庚子 丁亥"
+    assert chart.analysis.strength.value == pytest.approx(25.85, abs=0.01)
+    assert (natal.day_master, natal.year_zhi) == ("庚", "辰")
+    assert natal.favourable == frozenset({"土", "金"})
+    assert natal.unfavourable == frozenset({"木", "水", "火"})
+
+
+def test_the_transit_assembly_never_mutates_the_natal_chart() -> None:
+    """污染红线：把命盘交给岁运跑完五年，它必须还是原来那份，逐字段相等（spec §2.4）。"""
+    chart, natal = _natal()
+    before = chart.model_dump()
+    luck = _luck()
+    for year in range(2024, 2029):
+        _transit_year(natal, luck[year])
+    assert chart.model_dump() == before
+
+
+def test_a_transit_year_carries_only_details_that_land_on_the_transit_pillar() -> None:
+    """污染红线的另一半：三张明细里不许混进命局自有的象 —— 那是命局的账。"""
+    for transit in _years().values():
+        assert all(
+            _TRANSIT_SLOT in (relation.pillar_a, relation.pillar_b)
+            for relation in transit.relations
+        )
+        assert all(
+            any(match.position == _TRANSIT_SLOT for match in entry.matches)
+            for entry in transit.shensha
+        )
+        assert all(
+            any(member.pillar == _TRANSIT_SLOT for member in group.members)
+            for group in transit.branch_groups
+        )
+
+
+def test_every_transit_ledger_adds_up_to_its_own_value() -> None:
+    """账本可核对：Σ delta == value，且第一行永远是基准行（spec §3 的 no-mock 形态）。"""
+    for transit in _years().values():
+        factors = transit.score.factors
+        assert factors[0].rule == "transit.base"
+        assert factors[0].delta == TRANSIT_BASE
+        assert sum(factor.delta for factor in factors) == pytest.approx(transit.score.value)
+
+
+def test_the_fired_list_is_the_ledger_with_its_own_reading() -> None:
+    """`fired` 是账本的镜像而非第二份结论：键、短名、分值逐行对齐，断语就是判语连缀。"""
+    for transit in _years().values():
+        rows = transit.score.factors[1:]
+        assert [item.key for item in transit.fired] == [row.rule for row in rows]
+        assert [item.label for item in transit.fired] == [row.label for row in rows]
+        assert [item.delta for item in transit.fired] == [row.delta for row in rows]
+        assert [item.family for item in transit.fired] == [
+            row.rule.split(".", maxsplit=1)[0] for row in rows
+        ]
+        for item in transit.fired:
+            assert item.reading == transit_rule(item.key.removeprefix("yue.")).reading
+        assert transit.narrative == "；".join(item.reading for item in transit.fired) + "。"
+
+
+def test_a_transit_with_nothing_fired_is_still_a_base_only_ledger() -> None:
+    """一条未中不是"没有结论"：账本剩基准 50 分 / 档"平"，断语是空串而不是一个句号。"""
+    rows = _hit_rows([], [])
+    score = _ledger(rows)
+    assert (score.value, score.tier) == (50.0, "平")
+    assert [factor.rule for factor in score.factors] == ["transit.base"]
+    assert _fired(rows) == []
+    assert _narrative(rows) == ""
+
+
+def test_the_same_rule_is_priced_once_in_the_year_row_and_once_in_the_month_row() -> None:
+    """两段账本里同一条规则各记一行，月段带 `yue.` 前缀与"（流月）"后缀，分值同源。"""
+    rows = _hit_rows(["palace.chong_day"], ["palace.chong_day"])
+    year_row, month_row = rows
+    rule = TRANSIT_RULES["palace.chong_day"]
+    assert year_row[0].rule == "palace.chong_day"
+    assert month_row[0].rule == "yue.palace.chong_day"
+    assert month_row[0].label == f"{rule.label}（流月）"
+    assert year_row[0].label == rule.label
+    assert {year_row[0].delta, month_row[0].delta} == {rule.delta}
+
+
+def test_the_score_bands_use_the_same_cuts_as_the_strength_ledger() -> None:
+    """分档不另立阈值：65 / 45 两道线由旺衰那两处常量供给（spec §6.3）。"""
+    assert _tier(STRONG_CUT) == "顺"
+    assert _tier(STRONG_CUT - 0.01) == "平"
+    assert _tier(WEAK_CUT) == "平"
+    assert _tier(WEAK_CUT - 0.01) == "滞"
+
+
+def test_each_year_carries_the_luck_pillar_it_belongs_to() -> None:
+    """2024–2028 俱在戊午运内：运段序号与干支来自摊平的那一步，不是再查一次历法。"""
+    assert {transit.dayun_index for transit in _years().values()} == {4}
+    assert {transit.dayun_ganzhi for transit in _years().values()} == {"戊午"}
+
+
+def test_the_pre_luck_childhood_span_has_no_luck_pillar_to_reason_from() -> None:
+    """未起运之年：`dayun_ganzhi` 为 None，整个大运族一行都不记账（不是记 0 分）。"""
+    _, natal = _natal()
+    transit = _transit_year(natal, _luck()[1990])
+    assert transit.dayun_ganzhi is None
+    assert [item.key for item in transit.fired if item.key.startswith("dayun.")] == []
+
+
+def test_the_ten_god_block_quotes_the_corpus_for_the_transit_stem() -> None:
+    """十神只作释义：名字就是合成柱的干十神，句子逐字来自《渊海子平》，引擎不组句。"""
+    for transit in _years().values():
+        corpus = ten_god_meaning(transit.pillar.shishen_gan)
+        assert transit.ten_god.god == transit.pillar.shishen_gan != "日主"
+        assert transit.ten_god.meaning == corpus.meaning
+        assert transit.ten_god.source == corpus.source
