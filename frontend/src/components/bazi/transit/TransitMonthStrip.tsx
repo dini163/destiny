@@ -1,0 +1,60 @@
+import { useState } from 'react';
+
+import { Icon } from '../../ui/Icon';
+import { ScoreLedger } from '../../ui/ScoreLedger';
+import { TransitFiredList } from './TransitFiredList';
+import type { TransitMonth } from '../../../types/baziTransit';
+
+/**
+ * 聚焦年的十二节气月。
+ *
+ * 月界取自响应里的 `start_solar` / `end_solar`（立春起寅月，非农历初一，逐段由交节
+ * 推出），前端不排节气、也不补"腊月"之外的第 13 段。每段的分数是两段账本之和：
+ * 该流年全部命中行 + 该流月命中行（spec §6.4），所以展开账本的前若干行与该年年卡
+ * 逐行相同 —— 这是设计而非重复，凶年里的吉月要看得见是谁把分加回来的。
+ *
+ * 月段行在 `label` 上自带「（流月）」后缀，无需前端再加标记。
+ */
+export function TransitMonthStrip({ months }: { months: TransitMonth[] }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {months.map((month) => (
+        <MonthCard key={`${month.index}-${month.ganzhi}`} month={month} />
+      ))}
+    </div>
+  );
+}
+
+/** One 节气月: caption, date span, ledger and its own fired rows. */
+function MonthCard({ month }: { month: TransitMonth }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col gap-3 rounded-element border border-rim bg-[#0e111a] p-4">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="flex items-baseline gap-2">
+          <span className="font-display text-base text-ink">{month.month_in_chinese}月</span>
+          <span className="text-sm text-gold-soft">{month.ganzhi}</span>
+        </span>
+        <span className="label-caps text-ink-muted">{month.pillar.di_shi}</span>
+      </div>
+
+      <p className="numeric text-xs text-ink-muted">
+        {month.start_solar} ~ {month.end_solar}
+      </p>
+
+      <ScoreLedger score={month.score} label="流月气数" />
+
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        className="label-caps flex items-center gap-1 self-start text-ink-muted hover:text-gold-soft"
+      >
+        <Icon name="chevronDown" size={12} className={open ? 'rotate-180' : undefined} />
+        {open ? '收起本月命中' : `展开本月命中 ${month.fired.length} 行`}
+      </button>
+
+      {open ? <TransitFiredList rows={month.fired} /> : null}
+    </div>
+  );
+}
