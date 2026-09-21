@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 import { DayunTimeline } from '../components/bazi/DayunTimeline';
 import { DimensionGrid } from '../components/bazi/DimensionGrid';
@@ -20,6 +21,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { pillarSlotLabel } from '../lib/pillars';
+import { buildTransitHref } from '../lib/transitLink';
 import { useBaziNatal } from '../hooks/useBaziNatal';
 import type {
   BaziChart,
@@ -48,6 +50,8 @@ export function BaziNatalPage() {
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
   const [name, setName] = useState('');
+  /** 这一造的岁运链接，随每次排盘同步；未排过时为 null，入口也随之消失。 */
+  const [transitHref, setTransitHref] = useState<string | null>(null);
   const bazi = useBaziNatal();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -57,6 +61,7 @@ export function BaziNatalPage() {
       apply_true_solar_time: applyTrueSolarTime,
       name: name.trim() || null,
     };
+    setTransitHref(buildTransitHref(values, { gender, applyTrueSolarTime }));
     bazi.mutate(request);
   }
 
@@ -110,7 +115,7 @@ export function BaziNatalPage() {
         <p className="label-caps text-ink-muted">正在依据真太阳时排定四柱…</p>
       ) : null}
 
-      {bazi.data ? <BaziResults chart={bazi.data} /> : null}
+      {bazi.data ? <BaziResults chart={bazi.data} transitHref={transitHref} /> : null}
     </div>
   );
 }
@@ -132,8 +137,11 @@ interface SectionSpec {
  * One list owns the nav entries and the bodies, so a section the response did
  * not fill is absent from the nav as well as the page — an anchor that jumps to
  * nothing would be a broken promise (spec §8.2 规则 2、3).
+ *
+ * `transitHref` rides along into the 大运 block only: 岁运 is the next step of the
+ * same question the luck pillars ask, and it needs this chart's birth data to run.
  */
-function sectionsFor(chart: BaziChart): SectionSpec[] {
+function sectionsFor(chart: BaziChart, transitHref: string | null): SectionSpec[] {
   const ledger = chart.hidden_stem_ledger ?? [];
   const relations = chart.relations ?? [];
   const branchGroups = chart.branch_groups ?? [];
@@ -237,6 +245,12 @@ function sectionsFor(chart: BaziChart): SectionSpec[] {
             steps={chart.dayun}
             liunian={chart.current_liunian}
           />
+          {transitHref ? (
+            <Link to={transitHref} className="btn-ghost self-start">
+              <Icon name="timeline" size={16} />
+              推演此造岁运流年
+            </Link>
+          ) : null}
           {chart.dayun_current ? <CurrentDayun detail={chart.dayun_current} /> : null}
         </div>
       ),
@@ -283,8 +297,14 @@ function sectionsFor(chart: BaziChart): SectionSpec[] {
 }
 
 /** The full chart composition rendered once a real result is available. */
-function BaziResults({ chart }: { chart: BaziChart }) {
-  const sections = sectionsFor(chart);
+function BaziResults({
+  chart,
+  transitHref,
+}: {
+  chart: BaziChart;
+  transitHref: string | null;
+}) {
+  const sections = sectionsFor(chart, transitHref);
 
   return (
     <>

@@ -13,6 +13,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import type { ApiError } from '../api/client';
 import { useBaziTransit } from '../hooks/useBaziTransit';
+import { parseTransitLink } from '../lib/transitLink';
 import type { BaziTransitRequest, BaziTransitResult, TransitYear } from '../types/baziTransit';
 import type { Gender } from '../types/common';
 
@@ -35,16 +36,6 @@ interface TransitRangeField {
   start_year: number | null;
   end_year: number | null;
 }
-
-/** 查询串还原出的一次可提交请求。 */
-interface TransitLink {
-  values: BirthInputValues;
-  gender: Gender;
-  applyTrueSolarTime: boolean;
-}
-
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const TIME_PATTERN = /^\d{2}:\d{2}$/;
 
 /**
  * 页顶四个 422 码的 `context` 键名 → 中文标签。
@@ -90,51 +81,6 @@ function parseYear(raw: string): number | null {
   return Number(trimmed);
 }
 
-function parseCoordinate(raw: string | null, limit: number): number | null {
-  if (raw === null || raw.trim() === '') {
-    return null;
-  }
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) && Math.abs(parsed) <= limit ? parsed : null;
-}
-
-/**
- * 把主盘页大运区块拼出的查询串还原成一次请求。
- *
- * 只认 `birth_date / birth_time / calendar / city / latitude / longitude / gender / tst`。
- * 任一项形状不合格即整体返回 null —— 半份来路不明的数据不该自动发出请求，宁可退回手填。
- * 经度是硬要求（与 `InputBar` 自己的 `ready` 同一道闸），只给城市名的链接留给定位后再查。
- */
-function parseLink(params: URLSearchParams): TransitLink | null {
-  const birthDate = params.get('birth_date');
-  const birthTime = params.get('birth_time');
-  if (!birthDate || !DATE_PATTERN.test(birthDate)) return null;
-  if (!birthTime || !TIME_PATTERN.test(birthTime)) return null;
-
-  const calendar = params.get('calendar');
-  if (calendar !== null && calendar !== 'solar' && calendar !== 'lunar') return null;
-
-  const gender = params.get('gender');
-  if (gender !== null && gender !== 'male' && gender !== 'female') return null;
-
-  const longitude = parseCoordinate(params.get('longitude'), 180);
-  if (longitude === null) return null;
-  const city = params.get('city');
-
-  return {
-    values: {
-      birth_date: birthDate,
-      birth_time: birthTime,
-      calendar: calendar ?? 'solar',
-      city: city && city.trim() !== '' ? city : null,
-      latitude: parseCoordinate(params.get('latitude'), 90),
-      longitude,
-    },
-    gender: gender ?? 'male',
-    applyTrueSolarTime: params.get('tst') !== '0',
-  };
-}
-
 /**
  * 岁运推演页（PRD §6.1.4）。
  *
@@ -147,7 +93,7 @@ function parseLink(params: URLSearchParams): TransitLink | null {
  */
 export function BaziTransitPage() {
   const [searchParams] = useSearchParams();
-  const link = useMemo(() => parseLink(searchParams), [searchParams]);
+  const link = useMemo(() => parseTransitLink(searchParams), [searchParams]);
 
   const [gender, setGender] = useState<Gender>(link?.gender ?? 'male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(
