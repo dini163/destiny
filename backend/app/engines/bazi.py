@@ -24,7 +24,12 @@ from datetime import date, datetime, time
 from lunar_python import Lunar, Solar
 
 from app.content.wuxing import ELEMENT_ORDER, GAN_ELEMENT
-from app.engines.bazi_strength import assess_strength, element_weight_scores, fuyin_choices
+from app.engines.bazi_strength import (
+    StrengthAssessment,
+    assess_strength,
+    element_weight_scores,
+)
+from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.bazi import (
     BaziChart,
     BaziPillar,
@@ -33,6 +38,7 @@ from app.schemas.bazi import (
     LiunianYear,
     WuxingScore,
 )
+from app.schemas.bazi_strength import Yongshen
 from app.schemas.common import CalendarType, Gender
 from app.solar.true_solar_time import (
     STANDARD_MERIDIAN_CN,
@@ -114,21 +120,20 @@ def _count_primary_characters(pillars: list[BaziPillar]) -> dict[str, int]:
 
 
 def _analyze_day_master(
-    pillars: list[BaziPillar],
-    element_scores: dict[str, float],
     day_master: str,
     day_master_element: str,
     month_zhi: str,
+    strength: StrengthAssessment,
+    yongshen: Yongshen,
 ) -> DayMasterAnalysis:
-    """Assess day-master strength and derive the useful / unfavourable gods.
+    """Assemble the day-master block and its summary sentence.
 
-    The three factors (得令/得地/得势) and the 扶抑 choice live in
-    ``app.engines.bazi_strength``, which returns a score ledger; this function only
-    assembles the response and the summary sentence. ``element_scores`` is the same
-    weighted tally the 五行分布 bars are drawn from, so the chart computes it once.
+    The judging itself lives in ``app.engines.bazi_strength``（三因子账本）and
+    ``app.engines.bazi_yongshen``（用神三法）; this function only formats what the two
+    already decided, so ``analysis`` and ``yongshen`` cannot drift apart (spec §7).
     """
-    strength = assess_strength(pillars)
-    favourable, unfavourable = fuyin_choices(strength.level, day_master_element, element_scores)
+    favourable = yongshen.favorable_elements
+    unfavourable = yongshen.unfavorable_elements
 
     summary = (
         f"日主{day_master}（{day_master_element}）生于{month_zhi}月，"
@@ -236,8 +241,16 @@ def compute_bazi_chart(
 
     day_master = eight_char.getDayGan()
     day_master_element = eight_char.getDayWuXing()[0]
+    month_zhi = eight_char.getMonthZhi()
+    strength = assess_strength(pillars)
+    yongshen = select_yongshen(
+        level=strength.level,
+        day_master_element=day_master_element,
+        month_zhi=month_zhi,
+        element_scores=element_scores,
+    )
     analysis = _analyze_day_master(
-        pillars, element_scores, day_master, day_master_element, eight_char.getMonthZhi()
+        day_master, day_master_element, month_zhi, strength, yongshen
     )
     dayun_direction, dayun_start, dayun_steps, current_liunian = _build_dayun(eight_char, gender, reference_date)
 
