@@ -3,8 +3,10 @@
 from fastapi import APIRouter
 
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_liuri import compute_liuri_matrix
 from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart, BaziNatalRequest
+from app.schemas.bazi_liuri import BaziLiuriRequest, BaziLiuriResult
 from app.schemas.bazi_transit import BaziTransitRequest, BaziTransitResult
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
@@ -70,6 +72,33 @@ async def bazi_liuyue(request: BaziTransitRequest) -> BaziTransitResult:
         start_year=request.start_year,
         end_year=request.end_year,
         focus_year=request.focus_year,
+        reference_date=request.reference_date,
+        name=request.name,
+    )
+
+
+@router.post(
+    "/liuri/matrix", response_model=BaziLiuriResult, summary="Project a whole month of daily luck"
+)
+async def bazi_liuri_matrix(request: BaziLiuriRequest) -> BaziLiuriResult:
+    """输出锚点日所在那一整个节气月的逐日吉凶，`focus_date` 时该日再下钻成三段明细。
+
+    路由名带 `/matrix` 后缀是刻意的：粒度族名（`liuyue` / `liuri` / `liushi`）留给切片 4
+    的"日内十二时辰"一个不撞名的位置（spec 决策 12）。
+
+    两个日期一律原样透传：段定位与聚焦日归属都在引擎里判，失败时抛 `TransitRangeError`，
+    经域错误处理器带着机器码与 `context` 出去 —— 这里若先用 pydantic 拦一道，前端就只剩
+    `validation_error`，拿不到"这一段其实到 2028-02-03 为止"那两个日期。
+    """
+    return compute_liuri_matrix(
+        birth_date=request.birth_date,
+        birth_time=request.birth_time,
+        calendar=request.calendar,
+        longitude=_chart_longitude(request),
+        gender=request.gender,
+        apply_true_solar_time=request.apply_true_solar_time,
+        anchor_date=request.anchor_date,
+        focus_date=request.focus_date,
         reference_date=request.reference_date,
         name=request.name,
     )
