@@ -5,10 +5,10 @@ import type { Gender } from '../types/common';
 /**
  * 岁运、流日与流时这三条下钻链接。
  *
- * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块、`BaziTransitPage` 的月卡与
- * `BaziLiuriPage` 的聚焦卡，拆串在 `BaziTransitPage`、`BaziLiuriPage` 与 `BaziLiushiPage`
- * 挂载时，键名一旦漂移，症状是"点进去要手填"这种没人会立刻报牌的退化，所以它们必须同生
- * 同老。
+ * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块、`BaziTransitPage` 的月卡、
+ * `BaziLiuriPage` 的聚焦卡与 `BaziLiushiPage` 的页头（后一条是上钻），拆串在
+ * `BaziTransitPage`、`BaziLiuriPage` 与 `BaziLiushiPage` 挂载时，键名一旦漂移，症状是
+ * "点进去要手填"这种没人会立刻报牌的退化，所以它们必须同生同老。
  *
  * 走查询串而不是 `location.state`：`state` 刷新即丢，而推演的结论必须可分享、可回访
  * （spec §8）。`name` 不在其列 —— 称谓只是主命盘的回显，三个推演页既不收也不显示。
@@ -121,6 +121,9 @@ export interface LiuriLink extends TransitLink {
 
 /**
  * 拼出 `/bazi-liuri?birth_date=…&…&anchor=2028-01-06`。
+ *
+ * 两个方向共用它：岁运月卡往下钻时只给 `anchor`（那一段的交节日，不带 `focus`），流时页
+ * 往回钻时 `anchor` 与 `focus` 给同一天（回到那一日的矩阵且那一日是展开的）。
  *
  * 生辰那半段整块走 {@link buildTransitHref} 的参数表，只在其后 `set` 两个日期键 ——
  * 两条链接的字段名因此不可能各改一半。

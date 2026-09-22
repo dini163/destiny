@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { yiPreview } from '../liuri/LiuriDayCell';
 import type { ShiftDirection } from '../liuri/LiuriSegmentHeader';
@@ -31,21 +32,26 @@ function Fact({ label, value }: { label: string; value: string | number | null |
 }
 
 /**
- * 页头：这一天的年月日段回显 + 换日三键 + 日头那三段账与历注。
+ * 页头：这一天的年月日段回显 + 上钻一条 + 换日三键 + 日头那三段账与历注。
  *
  * 它把"十二格是从哪一天摊出来的"说清楚：`{year_ganzhi}年 {month_ganzhi}月 · {day_ganzhi}日`
  * 一整串都取自响应，前端不重算月界（决策 9）。宜忌走 `yiPreview`，与流日矩阵格同一口径
  * —— 两处两种截法会让读者以为它们在说不同的事。
+ *
+ * `liuriHref` 由页面拼好交进来（生辰只在页面上有，与聚焦卡那条下钻链接同一分工）：
+ * 这三页只有向下的一条线，没有回头路可走的话，读者只能靠浏览器后退。
  *
  * 「本日命中」默认折起：十二格与波形才是这一页的主角，日头那十行摊开会把它们推到下屏。
  */
 export function LiushiDayHeader({
   result,
   busy,
+  liuriHref,
   onShift,
 }: {
   result: BaziLiushiResult;
   busy: boolean;
+  liuriHref?: string;
   onShift: (direction: ShiftDirection) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -57,6 +63,14 @@ export function LiushiDayHeader({
       icon="sun"
       actions={
         <span className="flex items-center gap-2">
+          {liuriHref ? (
+            <Link
+              to={liuriHref}
+              className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
+            >
+              回流日矩阵
+            </Link>
+          ) : null}
           {DAY_SHIFT_ACTIONS.map((action) => (
             <button
               key={action.direction}

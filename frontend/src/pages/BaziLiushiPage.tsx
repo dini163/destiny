@@ -17,7 +17,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
 import { shiftIso } from '../lib/isoDate';
-import { buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
+import { buildLiuriHref, buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
 import type { BaziLiushiRequest, TransitHourCell } from '../types/baziLiushi';
 import type { Gender } from '../types/common';
 
@@ -171,6 +171,21 @@ export function BaziLiushiPage() {
   const result = liushi.data;
   const peak = result ? peakIndexOf(result.hours) : 0;
 
+  /**
+   * 上钻回流日：`anchor` 与 `focus` 都交这一天，于是落点正是"这一日所在的节气月矩阵 +
+   * 这一日的详批"。两个键给同一个日期不是偷懒——`anchor` 只管定段，缺了 `focus` 就会
+   * 回到"未聚焦任何一天"的空态，读者从时辰页退回来却看到一张没点开日子的矩阵。
+   */
+  const liuriHref =
+    result && lastRequest
+      ? buildLiuriHref(lastRequest, {
+          gender,
+          applyTrueSolarTime,
+          anchor: result.solar_date,
+          focus: result.solar_date,
+        })
+      : undefined;
+
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
@@ -223,7 +238,12 @@ export function BaziLiushiPage() {
         <>
           <TransitNatalBar natal={result} />
 
-          <LiushiDayHeader result={result} busy={liushi.isPending} onShift={handleShift} />
+          <LiushiDayHeader
+            result={result}
+            busy={liushi.isPending}
+            liuriHref={liuriHref}
+            onShift={handleShift}
+          />
 
           <ResultCard
             eyebrow="QI WAVEFORM"
