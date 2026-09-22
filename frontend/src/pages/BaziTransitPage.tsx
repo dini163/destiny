@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { TransitNatalBar } from '../components/bazi/transit/TransitNatalBar';
+import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
 import { TransitYearCard } from '../components/bazi/transit/TransitYearCard';
 import { TransitYearTable } from '../components/bazi/transit/TransitYearTable';
 import { Icon } from '../components/ui/Icon';
@@ -11,10 +12,14 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
-import type { ApiError } from '../api/client';
 import { useBaziTransit } from '../hooks/useBaziTransit';
-import { parseTransitLink } from '../lib/transitLink';
-import type { BaziTransitRequest, BaziTransitResult, TransitYear } from '../types/baziTransit';
+import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
+import type {
+  BaziTransitRequest,
+  BaziTransitResult,
+  TransitMonth,
+  TransitYear,
+} from '../types/baziTransit';
 import type { Gender } from '../types/common';
 
 const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
@@ -41,7 +46,8 @@ interface TransitRangeField {
  * 页顶四个 422 码的 `context` 键名 → 中文标签。
  *
  * 数值一律取自 `error.context`（spec §8）：文案是后端写的，数字也是后端算的，
- * 前端只是把它们换个能排版的形状摆出来，不改写、不补算。
+ * 前端只是把它们换个能排版的形状摆出来，不改写、不补算。呈现由共用的
+ * `TransitErrorNote` 负责，流日页带着自己那三个日期键的标签表用同一件。
  */
 const CONTEXT_LABEL: Record<string, string> = {
   start_year: '区间起',
@@ -105,8 +111,11 @@ export function BaziTransitPage() {
   const [collapsed, setCollapsed] = useState(false);
 
   const transit = useBaziTransit();
-  /** 最近一次提交的生辰，年表下钻时复用它，控件本身只有一份状态。 */
-  const lastValues = useRef<BirthInputValues | null>(null);
+  /**
+   * 最近一次提交的生辰：年表下钻与「看本段逐日」的链接都要在它上面拼，所以它得是
+   * 渲染期读得到的 state 而不是 ref —— href 在 render 里算，ref 读到的只会是上一次的。
+   */
+  const [lastValues, setLastValues] = useState<BirthInputValues | null>(null);
   const autoSubmitted = useRef(false);
 
   useEffect(() => {
@@ -114,7 +123,7 @@ export function BaziTransitPage() {
       return;
     }
     autoSubmitted.current = true;
-    lastValues.current = link.values;
+    setLastValues(link.values);
     transit.mutate(
       makeRequest(link.values, link.gender, link.applyTrueSolarTime, {
         start_year: null,
@@ -135,14 +144,14 @@ export function BaziTransitPage() {
   }
 
   function handleSubmit(values: BirthInputValues): void {
-    lastValues.current = values;
+    setLastValues(values);
     setCollapsed(false);
     transit.mutate(makeRequest(values, gender, applyTrueSolarTime, rangeFields(), null));
   }
 
   /** 点行 = 请这一年下钻；再点当前年 = 收回。聚焦年之后由服务端回显，不是本地状态。 */
   function handleFocus(year: number): void {
-    const values = lastValues.current;
+    const values = lastValues;
     if (transit.data?.focus_year === year) {
       setCollapsed((shown) => !shown);
       return;
@@ -161,6 +170,19 @@ export function BaziTransitPage() {
 
   const showLinkNotice = link === null && [...searchParams.keys()].length > 0;
   const focused: TransitYear | null = focusYear(transit.data, collapsed);
+
+  /**
+   * 月卡 → 流日矩阵的 href：`anchor` 交给该段的交节日，点进去就落在那一段上。
+   * 组件自己不拼链接（决定 10）—— 生辰只在这里有，月卡拿到的是一条成品 href。
+   */
+  const liuriHrefFor = lastValues
+    ? (month: TransitMonth) =>
+        buildLiuriHref(lastValues, {
+          gender,
+          applyTrueSolarTime,
+          anchor: month.start_solar,
+        })
+    : undefined;
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
@@ -227,7 +249,13 @@ export function BaziTransitPage() {
         <p className="label-caps text-ink-muted">链接参数不完整，请手动填写后查询。</p>
       ) : null}
 
-      {transit.error ? <TransitErrorNote error={transit.error} /> : null}
+      {transit.error ? (
+        <TransitErrorNote
+          error={transit.error}
+          captions={CONTEXT_LABEL}
+          hint="改过起始年或跨度后可重新推演。"
+        />
+      ) : null}
 
       {transit.isPending && !transit.data ? (
         <p className="label-caps text-ink-muted">正在按本命喜忌结算岁运…</p>
@@ -250,7 +278,7 @@ export function BaziTransitPage() {
             />
           </ResultCard>
 
-          {focused ? <TransitYearCard year={focused} /> : null}
+          {focused ? <TransitYearCard year={focused} hrefFor={liuriHrefFor} /> : null}
 
           {transit.data.provenance ? (
             <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
@@ -318,49 +346,4 @@ function RangeEcho({ result }: { result: BaziTransitResult }) {
       ) : null}
     </span>
   );
-}
-
-/**
- * 区间不成立时的四类 422。
- *
- * 文案照后端原句（"区间跨度 11 年，超出 10 年上限"），数字另取 `context` 排成可扫读的
- * 一行，让读者知道该把表单改成什么 —— 两处同源，不可能互相打架。
- */
-function TransitErrorNote({ error }: { error: ApiError }) {
-  const isRange =
-    error.code.startsWith('transit_range_') || error.code === 'transit_focus_out_of_range';
-  const facts = isRange ? contextFacts(error.context) : [];
-
-  return (
-    <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-4 py-3 text-sm text-ink">
-      <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-wuxing-fire" />
-      <div className="flex flex-col gap-1.5">
-        <span>{error.message}</span>
-        {facts.length > 0 ? (
-          <span className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
-            {facts.map((fact) => (
-              <span key={fact.label}>
-                {fact.label}
-                <span className="numeric ml-1 text-ink">{fact.value}</span>
-              </span>
-            ))}
-          </span>
-        ) : null}
-        {isRange ? <span className="text-xs text-ink-muted">改过起始年或跨度后可重新推演。</span> : null}
-      </div>
-    </div>
-  );
-}
-
-/** `context` 里的数值项 → 中文标签 + 原值；非数字（如候选字列表）留给文案自己说。 */
-function contextFacts(
-  context: Record<string, unknown> | undefined,
-): Array<{ label: string; value: number }> {
-  const facts: Array<{ label: string; value: number }> = [];
-  for (const [key, value] of Object.entries(context ?? {})) {
-    if (typeof value === 'number') {
-      facts.push({ label: CONTEXT_LABEL[key] ?? key, value });
-    }
-  }
-  return facts;
 }

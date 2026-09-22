@@ -6,7 +6,7 @@ import { ScoreLedger } from '../../ui/ScoreLedger';
 import { SourceNote } from '../../ui/SourceNote';
 import { TransitFiredList } from './TransitFiredList';
 import { TransitMonthStrip } from './TransitMonthStrip';
-import type { TransitYear } from '../../../types/baziTransit';
+import type { TransitMonth, TransitYear } from '../../../types/baziTransit';
 
 /**
  * 单年详批：合成柱、气数账本、命中断语、十神古籍与三张岁运扫描明细。
@@ -16,8 +16,16 @@ import type { TransitYear } from '../../../types/baziTransit';
  * 整块不渲染，不给它补一句"未构成刑冲合害"（那句话在本命盘页说的是另一件事）。
  *
  * 十神不计分（spec §6.3）：它单独一块只印《渊海子平》原句，加减分一律在账本里。
+ *
+ * `hrefFor` 整块透传给月条（「看本段逐日」），本年卡片自己不拼链接。
  */
-export function TransitYearCard({ year }: { year: TransitYear }) {
+export function TransitYearCard({
+  year,
+  hrefFor,
+}: {
+  year: TransitYear;
+  hrefFor?: (month: TransitMonth) => string;
+}) {
   return (
     <ResultCard
       eyebrow={`${year.year} 流年 · 虚岁 ${year.age}`}
@@ -73,7 +81,7 @@ export function TransitYearCard({ year }: { year: TransitYear }) {
       {year.months ? (
         <div className="flex flex-col gap-3">
           <span className="label-caps text-ink-muted">十二节气月</span>
-          <TransitMonthStrip months={year.months} />
+          <TransitMonthStrip months={year.months} hrefFor={hrefFor} />
         </div>
       ) : null}
     </ResultCard>

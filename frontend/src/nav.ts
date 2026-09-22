@@ -19,6 +19,9 @@ export const ROUTES = {
   /** 岁运推演（切片 2）。刻意不进 `SECONDARY_NAV` 与 `PORTAL_SYSTEMS`：它是主盘之外的
    * 子页，不是一新一大体系，列进去会让"几大核心体系"这个数字虚增一格（spec 决策 8）。 */
   baziTransit: '/bazi-transit',
+  /** 全月流日矩阵（切片 3）。与 `baziTransit` 同一条理由不进导航：它是岁运页月卡的下钻，
+   * 无生辰即无意义，不是一新一大体系（spec 决策 8）。 */
+  baziLiuri: '/bazi-liuri',
   westernNatal: '/western-astrology',
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',

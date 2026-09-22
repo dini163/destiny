@@ -7,9 +7,10 @@ import type { BaziLiuriResult } from '../../../types/baziLiuri';
 
 /**
  * 段切换的三个意图：-1 = 上一段（`month_start − 1 天`），0 = 今日，1 = 下一段
- * （`month_end + 1 天`）。本组件只发意图、不算日期 —— 日期加减留在页面上做。
+ * （`month_end + 1 天`）。本组件只发意图、不算日期 —— 日期加减留在页面上做，
+ * 所以这一份意图类型由页面 import 过去，两边共用同一个枚举。
  */
-type ShiftDirection = -1 | 0 | 1;
+export type ShiftDirection = -1 | 0 | 1;
 
 const SHIFT_ACTIONS: ReadonlyArray<{ direction: ShiftDirection; label: string }> = [
   { direction: -1, label: '上一段' },

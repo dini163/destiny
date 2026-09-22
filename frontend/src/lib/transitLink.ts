@@ -3,13 +3,14 @@ import { ROUTES } from '../nav';
 import type { Gender } from '../types/common';
 
 /**
- * 主命盘 → 岁运推演的那一条链接。
+ * 岁运与流日这两条下钻链接。
  *
- * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块，拆串在 `BaziTransitPage` 挂载时，
- * 键名一旦漂移，症状是"点进去要手填"这种没人会立刻报牌的退化，所以它们必须同生同老。
+ * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块与 `BaziTransitPage` 的月卡，拆串在
+ * `BaziTransitPage` 与 `BaziLiuriPage` 挂载时，键名一旦漂移，症状是"点进去要手填"这种
+ * 没人会立刻报牌的退化，所以它们必须同生同老。
  *
- * 走查询串而不是 `location.state`：`state` 刷新即丢，而岁运的结论必须可分享、可回访
- * （spec §8）。`name` 不在其列 —— 称谓只是主命盘的回显，岁运页既不收也不显示。
+ * 走查询串而不是 `location.state`：`state` 刷新即丢，而推演的结论必须可分享、可回访
+ * （spec §8）。`name` 不在其列 —— 称谓只是主命盘的回显，两个推演页既不收也不显示。
  */
 
 /** 拆开的链接：一份可直接提交的命盘输入，加上岁运页的两项本地状态。 */
@@ -32,6 +33,19 @@ export function buildTransitHref(
   values: BirthInputValues,
   options: { gender: Gender; applyTrueSolarTime: boolean },
 ): string {
+  return `${ROUTES.baziTransit}?${birthParams(values, options).toString()}`;
+}
+
+/**
+ * 生辰 + 造向 + 校正开关 → 查询参数。
+ *
+ * 岁运与流日两条链接共用这一份，流日只在它上面再 `set` 自己的两个日期键 —— 少一次
+ * "复制粘贴字段清单"就少一处能漂移的地方。
+ */
+function birthParams(
+  values: BirthInputValues,
+  options: { gender: Gender; applyTrueSolarTime: boolean },
+): URLSearchParams {
   const params = new URLSearchParams();
   const wanted: Record<string, string | number | null | undefined> = {
     birth_date: values.birth_date,
@@ -48,7 +62,7 @@ export function buildTransitHref(
       params.set(key, String(value));
     }
   }
-  return `${ROUTES.baziTransit}?${params.toString()}`;
+  return params;
 }
 
 /**
@@ -96,4 +110,50 @@ function parseCoordinate(raw: string | null, limit: number): number | null {
   }
   const parsed = Number(raw);
   return Number.isFinite(parsed) && Math.abs(parsed) <= limit ? parsed : null;
+}
+
+/** 岁运月卡 → 流日矩阵：`anchor` 定段，`focus` 可选。缺 `anchor` 时页面按参考日开窗。 */
+export interface LiuriLink extends TransitLink {
+  anchor: string | null;
+  focus: string | null;
+}
+
+/**
+ * 拼出 `/bazi-liuri?birth_date=…&…&anchor=2028-01-06`。
+ *
+ * 生辰那半段整块走 {@link buildTransitHref} 的参数表，只在其后 `set` 两个日期键 ——
+ * 两条链接的字段名因此不可能各改一半。
+ */
+export function buildLiuriHref(
+  values: BirthInputValues,
+  options: { gender: Gender; applyTrueSolarTime: boolean; anchor: string; focus?: string },
+): string {
+  const params = birthParams(values, options);
+  params.set('anchor', options.anchor);
+  if (options.focus) {
+    params.set('focus', options.focus);
+  }
+  return `${ROUTES.baziLiuri}?${params.toString()}`;
+}
+
+/**
+ * 解流日链接：生辰半段整块交给 {@link parseTransitLink}，再补两个日期。
+ *
+ * 两个日期都是「给了就必须合形」：空 → `null`（页面按参考日开窗），不合形 → 整条链接
+ * 作废退回手填。作废与生辰半段作废是同一件事，前端只需要一个落点。
+ */
+export function parseLiuriLink(params: URLSearchParams): LiuriLink | null {
+  const natal = parseTransitLink(params);
+  if (!natal) {
+    return null;
+  }
+  const anchor = params.get('anchor');
+  const focus = params.get('focus');
+  if (
+    (anchor !== null && !DATE_PATTERN.test(anchor)) ||
+    (focus !== null && !DATE_PATTERN.test(focus))
+  ) {
+    return null;
+  }
+  return { ...natal, anchor, focus };
 }
