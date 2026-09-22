@@ -20,10 +20,10 @@ from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_transit import (
-    _AnnualLuck,
-    _Natal,
-    _annual_luck_by_year,
-    _natal_projection,
+    AnnualLuck,
+    TransitNatal,
+    annual_luck_by_year,
+    natal_projection,
     _transit_year,
 )
 from app.schemas.bazi_transit import TransitMonth, TransitYear
@@ -123,7 +123,7 @@ YEARS: dict[int, dict[str, object]] = {
 
 #: 摊平一次大运要走完十个流年段，比整张命盘还贵；本文件全程只读，故就地缓存。
 @cache
-def _fixture() -> tuple[_Natal, dict[int, _AnnualLuck]]:
+def _fixture() -> tuple[TransitNatal, dict[int, AnnualLuck]]:
     """命 A 的命局投影与摊平好的十年大运 —— 年表与月表共用的那一份输入。"""
     chart = compute_bazi_chart(**_BIRTH)
     moment = resolve_natal_moment(
@@ -133,7 +133,7 @@ def _fixture() -> tuple[_Natal, dict[int, _AnnualLuck]]:
         longitude=104.1,
         apply_true_solar_time=True,
     )
-    return _natal_projection(chart), _annual_luck_by_year(moment.eight_char, Gender.MALE)
+    return natal_projection(chart), annual_luck_by_year(moment.eight_char, Gender.MALE)
 
 
 @cache

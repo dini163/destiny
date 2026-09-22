@@ -11,7 +11,7 @@
 口径。它不住在本模块里，因为本模块还要消费主命盘（`compute_bazi_chart`），谁住着都得一
 个模块反向 import 另一个。
 
-节气月界（`_jieqi_boundaries`）则确实住在这里：`LiuYue` 只给干支、序号与月名，一个日期都
+节气月界（`jieqi_boundaries`）则确实住在这里：`LiuYue` 只给干支、序号与月名，一个日期都
 不给，十二段起止得自己从 `getJieQiTable()` 的滚动窗口里采十二节推出来。切片 3 的流日
 要的是同一份采集，写在装配里它就只能重写一遍。
 """
@@ -146,7 +146,7 @@ _DECAYING: tuple[str, ...] = ("衰", "病", "死", "墓", "绝")
 
 
 @dataclass(frozen=True)
-class _Judgement:
+class TransitJudgement:
     """一条岁运干支在打分前需要知道的全部事实，由装配段（Task 8/9/10）填好。
 
     谓词只看它，不回查历法，也不回头调 `derive_relations`。这样"命中什么"与"什么时候
@@ -199,15 +199,15 @@ class _Judgement:
         return name in self.shensha_names
 
 
-def _group_faces(j: _Judgement, kind: str, *, favourable: bool) -> bool:
+def _group_faces(j: TransitJudgement, kind: str, *, favourable: bool) -> bool:
     """局本身不论吉凶：合出的五行落进喜用集才算顺、落进忌神集才算逆（spec §6.2）。"""
     elements = j.group_elements(kind)
     return bool(elements & (j.favourable if favourable else j.unfavourable))
 
 
-Predicate = Callable[[_Judgement], bool]
+Predicate = Callable[[TransitJudgement], bool]
 #: 大运谓词多收一个参数：过闸之后的大运干支。谓词因此不必各自判空。
-DayunPredicate = Callable[[_Judgement, str], bool]
+DayunPredicate = Callable[[TransitJudgement, str], bool]
 
 
 def _gan_element(ganzhi: str) -> str:
@@ -222,7 +222,7 @@ def _on_dayun(predicate: DayunPredicate) -> Predicate:
     种说法，装配段以后换法时判定层不该跟着改。
     """
 
-    def gated(judgement: _Judgement) -> bool:
+    def gated(judgement: TransitJudgement) -> bool:
         ganzhi = judgement.dayun_ganzhi
         if not ganzhi:
             return False
@@ -308,7 +308,7 @@ _PREDICATES: tuple[tuple[str, Predicate], ...] = (
 )
 
 
-def _hit_keys(judgement: _Judgement) -> list[str]:
+def transit_hit_keys(judgement: TransitJudgement) -> list[str]:
     """这条岁运命中了哪些规则 —— 顺序即账本顺序，`scopes` 过滤也在这里。
 
     月段拿到的上下文带着整年的关系扫描结果，但 `taisui` 与 `dayun` 两族的 `scopes`
@@ -324,7 +324,7 @@ def _hit_keys(judgement: _Judgement) -> list[str]:
 
 # ---------------------------------------------------------------- 命局投影（spec §4 决策 3）
 @dataclass(frozen=True)
-class _Natal:
+class TransitNatal:
     """命局交给岁运读的那五件事：四柱、日主、本命年支、喜用集、忌神集。
 
     它是一次**投影**而不是第二次排盘：喜忌取 `select_yongshen` 三法合出来的结果，
@@ -339,9 +339,9 @@ class _Natal:
     unfavourable: frozenset[str]
 
 
-def _natal_projection(chart: BaziChart) -> _Natal:
+def natal_projection(chart: BaziChart) -> TransitNatal:
     """从已算好的命盘里取出岁运要读的字段。"""
-    return _Natal(
+    return TransitNatal(
         pillars=list(chart.pillars),
         day_master=chart.day_master,
         year_zhi=chart.pillars[0].zhi,  # 年柱之支即本命，太岁以此为准
@@ -352,7 +352,7 @@ def _natal_projection(chart: BaziChart) -> _Natal:
 
 # ---------------------------------------------------------------- 岁运扫描（spec §7.3）
 @dataclass(frozen=True)
-class _Scan:
+class TransitScan:
     """一根岁运柱扫完的结果：合成柱、打分上下文，与随响应发出的三张明细。
 
     三张明细都只留一端落在 `_TRANSIT_SLOT` 的条目。命局四柱内部本来就有的象是命局
@@ -360,25 +360,25 @@ class _Scan:
     """
 
     pillar: BaziPillar
-    judgement: _Judgement
+    judgement: TransitJudgement
     relations: list[RelationPair]
     shensha: list[ShenShaEntry]
     branch_groups: list[BranchGroup]
 
 
-def _scan(
-    natal: _Natal,
+def scan_transit_pillar(
+    natal: TransitNatal,
     ganzhi: str,
     *,
     position: str,
     label: str,
     scope: str,
     dayun_ganzhi: str | None,
-) -> _Scan:
+) -> TransitScan:
     """以命局四柱为体、岁运一柱为用，重扫关系 / 合局 / 神煞，并留下岁运落点。
 
-    `scope` 决定这条柱按岁还是按月计价（`_hit_keys` 用规则的 `scopes` 过滤）；
-    `dayun_ganzhi` 只有流年给得出，流月留 None —— 大运只与流年论（spec §6.2）。
+    `scope` 决定这根柱按岁、月还是日计价（`transit_hit_keys` 用规则的 `scopes` 过滤）；
+    `dayun_ganzhi` 只有流年给得出，流月与流日留 None —— 大运只与流年论（spec §6.2）。
     """
     pillar = build_transit_pillar(
         ganzhi, position=position, label=label, day_master=natal.day_master
@@ -400,7 +400,7 @@ def _scan(
         for group in derive_branch_groups(natal.pillars, [ganzhi])
         if any(member.pillar == _TRANSIT_SLOT for member in group.members)
     ]
-    judgement = _Judgement(
+    judgement = TransitJudgement(
         scope=scope,
         ganzhi=ganzhi,
         gan=pillar.gan,
@@ -416,7 +416,7 @@ def _scan(
         favourable=natal.favourable,
         unfavourable=natal.unfavourable,
     )
-    return _Scan(
+    return TransitScan(
         pillar=pillar,
         judgement=judgement,
         relations=relations,
@@ -433,7 +433,7 @@ def _tier(value: float) -> str:
     return "平" if value >= WEAK_CUT else "滞"
 
 
-def _hit_rows(
+def hit_rows(
     year_keys: Sequence[str], month_keys: Sequence[str]
 ) -> list[tuple[ScoreFactor, TransitRule]]:
     """命中集 → (账本行, 规则) 成对。
@@ -460,7 +460,7 @@ def _hit_rows(
     return rows
 
 
-def _ledger(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> ScoreValue:
+def transit_ledger(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> ScoreValue:
     """命中行 → 自解释账本；截断由 `build_ledger` 记成它自己的一行。"""
     raw_total = TRANSIT_BASE + sum(factor.delta for factor, _ in rows)
     return build_ledger(
@@ -471,7 +471,7 @@ def _ledger(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> ScoreValue:
     )
 
 
-def _fired(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> list[TransitFired]:
+def transit_fired(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> list[TransitFired]:
     """账本行的人类可读镜像：键与短名逐字取自那一行，判语取自规则表。"""
     return [
         TransitFired(
@@ -485,7 +485,7 @@ def _fired(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> list[TransitFired
     ]
 
 
-def _narrative(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> str:
+def transit_narrative(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> str:
     """命中判语连缀，与六维详批同法。一条未中时返回空串，而不是一个孤零零的句号。"""
     if not rows:
         return ""
@@ -494,7 +494,7 @@ def _narrative(rows: Sequence[tuple[ScoreFactor, TransitRule]]) -> str:
 
 # ---------------------------------------------------------------- 流年对象（spec §7.3）
 @dataclass(frozen=True)
-class _AnnualLuck:
+class AnnualLuck:
     """lunar-python 给的一个流年：干支、虚岁，加上它所从出的那一步大运。
 
     `liunian` 是历法里的原对象，留着不为别的：流月只能由 `LiuNian.getLiuYue()` 给，
@@ -509,9 +509,9 @@ class _AnnualLuck:
     liunian: object  # lunar_python.LiunianYear；流月要从它身上取
 
 
-def _annual_luck_by_year(
+def annual_luck_by_year(
     eight_char: object, gender: Gender | None
-) -> dict[int, _AnnualLuck]:
+) -> dict[int, AnnualLuck]:
     """`getYun().getDaYun()[i].getLiuNian()` 摊平成 `公历年 -> 流年`。
 
     流年必须从大运段里取，不能按公历年自己算干支：起运前的童年段也排在 `getDaYun()`
@@ -521,10 +521,10 @@ def _annual_luck_by_year(
     """
     if gender is None:
         return {}
-    luck: dict[int, _AnnualLuck] = {}
+    luck: dict[int, AnnualLuck] = {}
     for step in eight_char.getYun(1 if gender is Gender.MALE else 0).getDaYun():
         for liu_nian in step.getLiuNian():
-            luck[liu_nian.getYear()] = _AnnualLuck(
+            luck[liu_nian.getYear()] = AnnualLuck(
                 year=liu_nian.getYear(),
                 age=liu_nian.getAge(),
                 ganzhi=liu_nian.getGanZhi(),
@@ -535,13 +535,13 @@ def _annual_luck_by_year(
     return luck
 
 
-def _year_scan(natal: _Natal, luck: _AnnualLuck) -> _Scan:
+def year_scan(natal: TransitNatal, luck: AnnualLuck) -> TransitScan:
     """流年那一柱的扫描 —— 装配与流月段共用的唯一定义。
 
     月账本要以它为前缀（spec §6.4），所以"年段命中了什么"只能有一处算法；两处各算
     一遍的话，年卡和月卡对同一年给出两套行，前端无从解释。
     """
-    return _scan(
+    return scan_transit_pillar(
         natal,
         luck.ganzhi,
         position="transit_year",
@@ -551,15 +551,15 @@ def _year_scan(natal: _Natal, luck: _AnnualLuck) -> _Scan:
     )
 
 
-def _transit_year(natal: _Natal, luck: _AnnualLuck, *, focus: bool = False) -> TransitYear:
+def _transit_year(natal: TransitNatal, luck: AnnualLuck, *, focus: bool = False) -> TransitYear:
     """装配一个流年：合成柱、单段账本、三张岁运明细、十神释义与断语。
 
     `focus` 即请求里的 `focus_year` 是否就是这一年：给 12 段节气月，其余年留 None，
     前端整块不渲染，而不是摆出十二个空月。
     """
-    scan = _year_scan(natal, luck)
-    year_keys = _hit_keys(scan.judgement)
-    rows = _hit_rows(year_keys, [])
+    scan = year_scan(natal, luck)
+    year_keys = transit_hit_keys(scan.judgement)
+    rows = hit_rows(year_keys, [])
     corpus = ten_god_meaning(scan.pillar.shishen_gan)
     return TransitYear(
         year=luck.year,
@@ -572,9 +572,9 @@ def _transit_year(natal: _Natal, luck: _AnnualLuck, *, focus: bool = False) -> T
             meaning=corpus.meaning,
             source=corpus.source,
         ),
-        score=_ledger(rows),
-        fired=_fired(rows),
-        narrative=_narrative(rows),
+        score=transit_ledger(rows),
+        fired=transit_fired(rows),
+        narrative=transit_narrative(rows),
         relations=scan.relations,
         shensha=scan.shensha,
         branch_groups=scan.branch_groups,
@@ -619,7 +619,7 @@ def _jieqi_harvest(year: int) -> dict[tuple[str, int], date]:
     return harvest
 
 
-def _jieqi_boundaries(year: int) -> list[tuple[date, date]]:
+def jieqi_boundaries(year: int) -> list[tuple[date, date]]:
     """`year` 年十二个节气月的起止日：寅月起于本年立春，丑月止于次年立春前一日。
 
     一节不多、一节不少 —— 少一节则后面每一段都跟着错位，而月账本还在照常加分，没有
@@ -640,23 +640,23 @@ def _jieqi_boundaries(year: int) -> list[tuple[date, date]]:
 
 
 def _transit_months(
-    natal: _Natal, luck: _AnnualLuck, year_keys: Sequence[str]
+    natal: TransitNatal, luck: AnnualLuck, year_keys: Sequence[str]
 ) -> list[TransitMonth]:
     """聚焦年的十二段节气月，每段一份"年段 + 月段"的两段账本（spec §6.4）。
 
     `year_keys` 是那一年命中的规则键，由 `_transit_year` 现算现给：月段不回头重扫年柱，
     否则年卡与月卡对同一年各算一套命中，前缀就不成立了。
 
-    月段以 `scope="yue"` 计价：太岁与大运两族的 `scopes` 不含 `yue`，`_hit_keys` 当场就
+    月段以 `scope="yue"` 计价：太岁与大运两族的 `scopes` 不含 `yue`，`transit_hit_keys` 当场就
     把它们挡掉，一年一次的账不会因换了一根月柱再记一遍；`dayun_ganzhi` 同时留 None，
     同一件事的两道保险。月柱的干支、序号、月名一律取 lunar-python 的 `LiuYue`（五虎遁
-    在历法手里），引擎只负责把它和 `_jieqi_boundaries` 推出来的月界逐位对齐。
+    在历法手里），引擎只负责把它和 `jieqi_boundaries` 推出来的月界逐位对齐。
     """
     months: list[TransitMonth] = []
-    boundaries = _jieqi_boundaries(luck.year)
+    boundaries = jieqi_boundaries(luck.year)
     for liu_yue, (start, end) in zip(luck.liunian.getLiuYue(), boundaries, strict=True):
         ganzhi = liu_yue.getGanZhi()
-        scan = _scan(
+        scan = scan_transit_pillar(
             natal,
             ganzhi,
             position="transit_month",
@@ -664,7 +664,7 @@ def _transit_months(
             scope="yue",
             dayun_ganzhi=None,
         )
-        rows = _hit_rows(year_keys, _hit_keys(scan.judgement))
+        rows = hit_rows(year_keys, transit_hit_keys(scan.judgement))
         months.append(
             TransitMonth(
                 index=liu_yue.getIndex(),
@@ -673,8 +673,8 @@ def _transit_months(
                 pillar=scan.pillar,
                 start_solar=start.isoformat(),
                 end_solar=end.isoformat(),
-                score=_ledger(rows),
-                fired=_fired(rows),
+                score=transit_ledger(rows),
+                fired=transit_fired(rows),
             )
         )
     return months
@@ -743,7 +743,7 @@ def compute_transit(
         longitude=longitude,
         apply_true_solar_time=apply_true_solar_time,
     )
-    luck = _annual_luck_by_year(moment.eight_char, gender)
+    luck = annual_luck_by_year(moment.eight_char, gender)
     span = resolve_transit_range(
         start_year=start_year,
         end_year=end_year,
@@ -752,7 +752,7 @@ def compute_transit(
         supported_from=min(luck),
         supported_to=max(luck),
     )
-    natal = _natal_projection(chart)
+    natal = natal_projection(chart)
     return BaziTransitResult(
         four_pillars=chart.four_pillars,
         pillars=list(chart.pillars),

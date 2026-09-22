@@ -9,7 +9,7 @@
 所以它的测法是"搬完仍等价" —— 拿它复现主命盘已经对外承诺的那几个字段，而不是另
 造一套断言。
 
-命中判定一条线（spec §6.2）：谓词只读 `_Judgement`，不回头查历法，所以这里的上下
+命中判定一条线（spec §6.2）：谓词只读 `TransitJudgement`，不回头查历法，所以这里的上下
 文是手搭的。手搭也要搭得真 —— `_pair` 的字对从 `RELATION_TABLES` 里取，`_group`
 的释义与出处也是，测试指给它们的只有柱位。判定这一层认的是 `kind` 与柱位，字对是
 什么它看都不看，所以假字对写进测里，测的就成了"我抄的那个 kind 恰好对得上"。
@@ -48,23 +48,23 @@ from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.bazi_transit import (
     _TRANSIT_SLOT,
     TransitRange,
-    _Judgement,
-    _Natal,
+    TransitJudgement,
+    TransitNatal,
     _PREDICATES,
     _PUNISH_KINDS,
-    _AnnualLuck,
-    _annual_luck_by_year,
-    _fired,
-    _hit_keys,
-    _hit_rows,
-    _jieqi_boundaries,
-    _ledger,
-    _narrative,
-    _natal_projection,
+    AnnualLuck,
+    annual_luck_by_year,
+    transit_fired,
+    transit_hit_keys,
+    hit_rows,
+    jieqi_boundaries,
+    transit_ledger,
+    transit_narrative,
+    natal_projection,
     _tier,
     _transit_months,
     _transit_year,
-    _year_scan,
+    year_scan,
     compute_transit,
     resolve_transit_range,
 )
@@ -247,7 +247,7 @@ def _group(
     )
 
 
-def _judgement(**overrides: object) -> _Judgement:
+def _judgement(**overrides: object) -> TransitJudgement:
     """一条中性流年（乙丑：干木支土、坐沐浴）+ 空扫描集，单测只改它要断言的那几项。
 
     `di_shi` 取沐浴是"中性"的另一半：十二长生里只有沐浴不定价（既是败地又是桃花，
@@ -269,13 +269,13 @@ def _judgement(**overrides: object) -> _Judgement:
         "favourable": frozenset({"土", "金"}),
         "unfavourable": frozenset({"木", "水", "火"}),
     }
-    return _Judgement(**{**base, **overrides})
+    return TransitJudgement(**{**base, **overrides})
 
 
 def test_favourable_and_unfavourable_gods_fire_from_the_five_elements() -> None:
     """干看干本身、支看支本气，两条各自独立；输出序即规则表序（账本序）。"""
-    assert _hit_keys(_judgement()) == ["yongshen.gan_unfavourable", "yongshen.zhi_favourable"]
-    assert _hit_keys(_judgement(gan_element="金", ben_qi_element="火")) == [
+    assert transit_hit_keys(_judgement()) == ["yongshen.gan_unfavourable", "yongshen.zhi_favourable"]
+    assert transit_hit_keys(_judgement(gan_element="金", ben_qi_element="火")) == [
         "yongshen.gan_favourable",
         "yongshen.zhi_unfavourable",
     ]
@@ -290,16 +290,16 @@ def test_taisui_rows_all_read_the_year_branch() -> None:
         ("地支六合", "taisui.combine"),
         ("无恩之刑", "taisui.punish"),
     ):
-        keys = _hit_keys(_judgement(relations=(_pair(kind, "year", "extra0"),)))
+        keys = transit_hit_keys(_judgement(relations=(_pair(kind, "year", "extra0"),)))
         assert key in keys, kind
-    assert "taisui.value" in _hit_keys(_judgement(zhi="辰"))
-    assert "taisui.value" not in _hit_keys(_judgement(zhi="戌"))
+    assert "taisui.value" in transit_hit_keys(_judgement(zhi="辰"))
+    assert "taisui.value" not in transit_hit_keys(_judgement(zhi="戌"))
 
 
 def test_natal_relations_do_not_enter_the_transit_ledger() -> None:
     """污染红线（spec §4 决策 3）：同一种冲，双方都是命局柱 → 岁运一行都不许多出。"""
     natal = _pair("地支六冲", "year", "month")
-    assert _hit_keys(_judgement(relations=(natal,))) == [
+    assert transit_hit_keys(_judgement(relations=(natal,))) == [
         "yongshen.gan_unfavourable",
         "yongshen.zhi_favourable",
     ]
@@ -308,14 +308,14 @@ def test_natal_relations_do_not_enter_the_transit_ledger() -> None:
 def test_all_four_punishment_tables_count_as_a_single_row() -> None:
     """刑有四张表（无恩 / 恃势 / 无礼 / 自刑）：漏任何一张就是漏一条凶。"""
     for kind in _PUNISH_KINDS:
-        keys = _hit_keys(_judgement(relations=(_pair(kind, "month", "extra0"),)))
+        keys = transit_hit_keys(_judgement(relations=(_pair(kind, "month", "extra0"),)))
         assert "palace.punish_month" in keys, kind
         assert "taisui.punish" not in keys, kind  # 月支受刑不是太岁受刑
 
 
 def test_palace_and_stem_rows_read_their_own_palace() -> None:
     """提纲（月支）与夫妻宫（日支）各自成行；天干两行只认日主那一柱。"""
-    branches = _hit_keys(
+    branches = transit_hit_keys(
         _judgement(
             relations=(
                 _pair("地支六冲", "month", "extra0"),
@@ -325,47 +325,47 @@ def test_palace_and_stem_rows_read_their_own_palace() -> None:
     )
     assert {"palace.chong_month", "palace.combine_day"} <= set(branches)
     assert "palace.chong_day" not in branches and "palace.combine_month" not in branches
-    year_stem = _hit_keys(_judgement(relations=(_pair("天干相冲", "year", "extra0"),)))
+    year_stem = transit_hit_keys(_judgement(relations=(_pair("天干相冲", "year", "extra0"),)))
     assert not any(key.startswith("ganzhi") for key in year_stem), year_stem
-    day_stem = _hit_keys(_judgement(relations=(_pair("天干五合", "day", "extra0"),)))
+    day_stem = transit_hit_keys(_judgement(relations=(_pair("天干五合", "day", "extra0"),)))
     assert "ganzhi.combine_day_master" in day_stem
 
 
 def test_transit_only_groups_count() -> None:
     """局里没有岁运成员就不算岁运的账；向背由合出的五行定，不由局的种类定。"""
     natal_only = _group("半合", "水", (("year", "辰"), ("day", "子")), complete=False)
-    assert not any(key.startswith("heyue") for key in _hit_keys(_judgement(groups=(natal_only,))))
+    assert not any(key.startswith("heyue") for key in transit_hit_keys(_judgement(groups=(natal_only,))))
     triad_water = _group(
         "三合", "水", (("year", "辰"), ("day", "子"), ("extra0", "申")), complete=True
     )
-    assert "heyue.sanhe_unfavourable" in _hit_keys(_judgement(groups=(triad_water,)))
+    assert "heyue.sanhe_unfavourable" in transit_hit_keys(_judgement(groups=(triad_water,)))
     triad_metal = _group(
         "三合", "金", (("year", "巳"), ("month", "酉"), ("extra0", "丑")), complete=True
     )
-    assert "heyue.sanhe_favourable" in _hit_keys(_judgement(groups=(triad_metal,)))
+    assert "heyue.sanhe_favourable" in transit_hit_keys(_judgement(groups=(triad_metal,)))
     half = _group("半合", "火", (("month", "寅"), ("extra0", "午")), complete=False)
-    assert "heyue.anhe_unfavourable" in _hit_keys(_judgement(groups=(half,)))
+    assert "heyue.anhe_unfavourable" in transit_hit_keys(_judgement(groups=(half,)))
     meeting = _group(
         "三会", "木", (("year", "寅"), ("month", "卯"), ("extra0", "辰")), complete=True
     )
-    assert "heyue.sanhui_unfavourable" in _hit_keys(_judgement(groups=(meeting,)))
+    assert "heyue.sanhui_unfavourable" in transit_hit_keys(_judgement(groups=(meeting,)))
 
 
 def test_fu_yin_rows_read_whatever_the_scan_reported() -> None:
     """伏吟 / 反吟由 `derive_relations` 逐柱判字，判定这一层只认 kind 与柱位。"""
-    assert "fuyin.fuyin" in _hit_keys(
+    assert "fuyin.fuyin" in transit_hit_keys(
         _judgement(relations=(_pillar_pair("伏吟", "day", "庚子", "extra0", "庚子"),))
     )
-    assert "fuyin.fanyin" in _hit_keys(
+    assert "fuyin.fanyin" in transit_hit_keys(
         _judgement(relations=(_pillar_pair("反吟", "month", "甲寅", "extra0", "庚申"),))
     )
 
 
 def test_year_only_families_vanish_in_the_month_scope() -> None:
-    """scopes 过滤在 `_hit_keys` 里做：同一个太岁上下文，月段一行都不出。"""
+    """scopes 过滤在 `transit_hit_keys` 里做：同一个太岁上下文，月段一行都不出。"""
     year = _judgement(zhi="戌", relations=(_pair("地支六冲", "year", "extra0"),))
-    assert "taisui.chong" in _hit_keys(year)
-    assert _hit_keys(replace(year, scope="yue")) == [
+    assert "taisui.chong" in transit_hit_keys(year)
+    assert transit_hit_keys(replace(year, scope="yue")) == [
         "yongshen.gan_unfavourable",
         "yongshen.zhi_favourable",
     ]
@@ -393,19 +393,19 @@ _STAGE_BANDS = {
 def test_childhood_span_and_month_scope_suppress_the_whole_dayun_family() -> None:
     """大运族的两道闸：童年段无运可论（spec §2.1），月段不带大运的账（`scopes`）。"""
     fired = _judgement(dayun_ganzhi="甲辰", ganzhi="甲辰", gan="甲", zhi="辰", gan_element="木")
-    assert "dayun.binglin" in _hit_keys(fired)
+    assert "dayun.binglin" in transit_hit_keys(fired)
     for blanked in (replace(fired, dayun_ganzhi=None), replace(fired, scope="yue")):
-        assert not any(key.startswith("dayun") for key in _hit_keys(blanked))
+        assert not any(key.startswith("dayun") for key in transit_hit_keys(blanked))
 
 
 def test_dayun_bing_lin_and_fanyin_compare_the_whole_pillars() -> None:
     """并临是全同，反吟是干支两冲 —— 都与合成柱的干支字符串直接比，不走关系扫描。"""
-    same = _hit_keys(
+    same = transit_hit_keys(
         _judgement(dayun_ganzhi="甲辰", ganzhi="甲辰", gan="甲", zhi="辰", gan_element="木")
     )
     assert "dayun.binglin" in same
     assert "dayun.fanyin" not in same and "dayun.gan_he" not in same
-    opposed = _hit_keys(
+    opposed = transit_hit_keys(
         _judgement(dayun_ganzhi="甲子", ganzhi="庚午", gan="庚", zhi="午", gan_element="金")
     )
     assert "dayun.fanyin" in opposed and "dayun.binglin" not in opposed
@@ -413,17 +413,17 @@ def test_dayun_bing_lin_and_fanyin_compare_the_whole_pillars() -> None:
 
 def test_dayun_relationships_are_read_from_the_five_element_cycle() -> None:
     """生克以干论（支藏多气，一支之内不止一行）；顺逆两条互斥，合又是独立一问。"""
-    sui_sheng = _hit_keys(
+    sui_sheng = transit_hit_keys(
         _judgement(dayun_ganzhi="戊午", ganzhi="丁未", gan="丁", zhi="未", gan_element="火")
     )
     assert "dayun.sui_sheng_yun" in sui_sheng  # 火生土
     assert "dayun.yun_sheng_sui" not in sui_sheng
-    yun_sheng = _hit_keys(
+    yun_sheng = transit_hit_keys(
         _judgement(dayun_ganzhi="甲子", ganzhi="丁卯", gan="丁", zhi="卯", gan_element="火")
     )
     assert "dayun.yun_sheng_sui" in yun_sheng  # 木生火
     assert "dayun.sui_sheng_yun" not in yun_sheng
-    combined = _hit_keys(
+    combined = transit_hit_keys(
         _judgement(dayun_ganzhi="己未", ganzhi="甲子", gan="甲", zhi="子", gan_element="木")
     )
     assert "dayun.gan_he" in combined  # 甲己合，且木与土无先后
@@ -437,14 +437,14 @@ def test_life_stage_bands_partition_the_eleven_priced_stages() -> None:
     assert len(priced) == 11
     for key, stages in _STAGE_BANDS.items():
         for stage in stages:
-            hits = [k for k in _hit_keys(_judgement(di_shi=stage)) if k.startswith("dishi")]
+            hits = [k for k in transit_hit_keys(_judgement(di_shi=stage)) if k.startswith("dishi")]
             assert hits == [key], stage
-    assert not any(k.startswith("dishi") for k in _hit_keys(_judgement(di_shi="沐浴")))
+    assert not any(k.startswith("dishi") for k in transit_hit_keys(_judgement(di_shi="沐浴")))
 
 
 def test_shensha_rows_fire_by_name_and_neutral_stays_unpriced() -> None:
     """华盖在 `SHENSHA_RULES` 里是中性：岁运落成华盖不加分，也不该出现在账本里。"""
-    keys = _hit_keys(_judgement(shensha_names=frozenset({"羊刃", "华盖"})))
+    keys = transit_hit_keys(_judgement(shensha_names=frozenset({"羊刃", "华盖"})))
     assert [key for key in keys if key.startswith("shensha")] == ["shensha.yangren"]
 
 
@@ -455,7 +455,7 @@ def test_each_shensha_row_reads_exactly_its_own_rule_table_label() -> None:
             continue
         hits = [
             k
-            for k in _hit_keys(_judgement(shensha_names=frozenset({rule.label})))
+            for k in transit_hit_keys(_judgement(shensha_names=frozenset({rule.label})))
             if k.startswith("shensha")
         ]
         assert hits == [key], f"{key} 的 label {rule.label} 打中的是 {hits}"
@@ -478,15 +478,15 @@ _NATAL_KWARGS: dict[str, object] = {
 }
 
 
-def _natal() -> tuple[BaziChart, _Natal]:
+def _natal() -> tuple[BaziChart, TransitNatal]:
     """基准命 A 的命盘，与岁运要读的那一份投影 —— 同源于同一次排盘。"""
     chart = compute_bazi_chart(**_NATAL_KWARGS)  # type: ignore[arg-type]
-    return chart, _natal_projection(chart)
+    return chart, natal_projection(chart)
 
 
 #: 摊平一次大运要走完十个流年段，比整张命盘还贵；这两份结果全程只读，故就地缓存。
 @cache
-def _luck() -> dict[int, _AnnualLuck]:
+def _luck() -> dict[int, AnnualLuck]:
     """大运段摊平出来的逐年流年（童年段也在其中，`dayun_ganzhi` 为空）。"""
     moment = resolve_natal_moment(
         birth_date=_BIRTH[0],
@@ -495,7 +495,7 @@ def _luck() -> dict[int, _AnnualLuck]:
         longitude=104.1,
         apply_true_solar_time=True,
     )
-    return _annual_luck_by_year(moment.eight_char, Gender.MALE)
+    return annual_luck_by_year(moment.eight_char, Gender.MALE)
 
 
 @cache
@@ -569,17 +569,17 @@ def test_the_fired_list_is_the_ledger_with_its_own_reading() -> None:
 
 def test_a_transit_with_nothing_fired_is_still_a_base_only_ledger() -> None:
     """一条未中不是"没有结论"：账本剩基准 50 分 / 档"平"，断语是空串而不是一个句号。"""
-    rows = _hit_rows([], [])
-    score = _ledger(rows)
+    rows = hit_rows([], [])
+    score = transit_ledger(rows)
     assert (score.value, score.tier) == (50.0, "平")
     assert [factor.rule for factor in score.factors] == ["transit.base"]
-    assert _fired(rows) == []
-    assert _narrative(rows) == ""
+    assert transit_fired(rows) == []
+    assert transit_narrative(rows) == ""
 
 
 def test_the_same_rule_is_priced_once_in_the_year_row_and_once_in_the_month_row() -> None:
     """两段账本里同一条规则各记一行，月段带 `yue.` 前缀与"（流月）"后缀，分值同源。"""
-    rows = _hit_rows(["palace.chong_day"], ["palace.chong_day"])
+    rows = hit_rows(["palace.chong_day"], ["palace.chong_day"])
     year_row, month_row = rows
     rule = TRANSIT_RULES["palace.chong_day"]
     assert year_row[0].rule == "palace.chong_day"
@@ -639,7 +639,7 @@ def _months() -> list[TransitMonth]:
     """2026（丙午）的 12 节气月：年段键先查出来，月段账本要接着它往下记。"""
     _, natal = _natal()
     luck = _luck()[2026]
-    return _transit_months(natal, luck, _hit_keys(_year_scan(natal, luck).judgement))
+    return _transit_months(natal, luck, transit_hit_keys(year_scan(natal, luck).judgement))
 
 
 def test_the_twelve_jieqi_months_are_contiguous_and_span_one_whole_solar_year() -> None:
@@ -658,7 +658,7 @@ def test_the_twelve_jieqi_months_are_contiguous_and_span_one_whole_solar_year() 
 @pytest.mark.parametrize("year", [1988, 2000, 2026, 2027, 2083])
 def test_the_jieqi_window_holds_all_twelve_nodes_in_every_reachable_year(year: int) -> None:
     """`getJieQiTable()` 是滚动窗口，窄一节就少一段月界。探针年份取大运可及的首尾与闰年附近。"""
-    spans = _jieqi_boundaries(year)
+    spans = jieqi_boundaries(year)
     assert len(spans) == 12
     for index, (start, end) in enumerate(spans):
         assert start <= end, f"{year} 年第 {index} 段月界倒挂"
