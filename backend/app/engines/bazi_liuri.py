@@ -7,6 +7,11 @@
 它也不自己算月：段界来自 `jieqi_boundaries`，月柱与月名来自 lunar-python 的 `LiuYue`，
 日柱来自 `Solar → Lunar.getDayInGanZhi()`（平柱，spec §2.2）。本模块只负责"哪一天属
 哪一段"与"这一天的账怎么装"，历法事实一个都不自造。
+
+四个内核心（`LiuriMonthSegment` / `LiuriMonthBase` / `LiuriDayRow` / `liuri_day_row`）
+与 `liuri_provenance` 是模块级的：切片 4 的 `bazi_liushi` 要拿"日所在的段、段的基准、
+那一日的三段账本与十二长生、以及那 11 行溯源"，而跨模块传私有名等于把切片 3 §5.4 的
+纪律作废。
 """
 
 from dataclasses import dataclass
@@ -55,7 +60,7 @@ from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
 
 @dataclass(frozen=True)
-class _MonthSegment:
+class LiuriMonthSegment:
     """一个节气月段：起止、月柱，与它所从出的那个流年对象。
 
     `owner_year` 是段所属的**流年**年，段尾跨年时它与 `end` 的公历年不同（实测
@@ -73,7 +78,7 @@ class _MonthSegment:
     liunian: object  # lunar_python.LiunianYear
 
 
-def resolve_liuri_month(anchor: date, luck: dict[int, AnnualLuck]) -> _MonthSegment:
+def resolve_liuri_month(anchor: date, luck: dict[int, AnnualLuck]) -> LiuriMonthSegment:
     """把锚点日定位到一个节气月段 —— 探两次月界，不是一次。
 
     `jieqi_boundaries(y)` 的第 0 段起于本年立春，所以 `anchor ≥ 立春` 必落在
@@ -88,7 +93,7 @@ def resolve_liuri_month(anchor: date, luck: dict[int, AnnualLuck]) -> _MonthSegm
         for index, (start, end) in enumerate(jieqi_boundaries(probe_year)):
             if start <= anchor <= end:
                 liu_yue = annual.liunian.getLiuYue()[index]
-                return _MonthSegment(
+                return LiuriMonthSegment(
                     owner_year=probe_year,
                     index=index,
                     month_ganzhi=liu_yue.getGanZhi(),
@@ -110,7 +115,7 @@ def resolve_liuri_month(anchor: date, luck: dict[int, AnnualLuck]) -> _MonthSegm
 
 
 @dataclass(frozen=True)
-class _MonthBase:
+class LiuriMonthBase:
     """整段恒定的那半份账：流年命中键、月段命中键，与段基准的两段账本。
 
     一根段恒属一个流年（立春本身就是"节"，段界与年界重合），所以年段与月段在段内逐日
@@ -124,7 +129,9 @@ class _MonthBase:
     fired: list[TransitFired]
 
 
-def month_base(natal: TransitNatal, annual: AnnualLuck, segment: _MonthSegment) -> _MonthBase:
+def month_base(
+    natal: TransitNatal, annual: AnnualLuck, segment: LiuriMonthSegment
+) -> LiuriMonthBase:
     """段基准 = 流年那一柱的命中 + 该月那一柱的命中，两段账（与切片 2 的月卡同一装配）。"""
     year_keys = transit_hit_keys(year_scan(natal, annual).judgement)
     month_keys = transit_hit_keys(
@@ -138,7 +145,7 @@ def month_base(natal: TransitNatal, annual: AnnualLuck, segment: _MonthSegment) 
         ).judgement
     )
     rows = hit_rows(year_keys, month_keys)
-    return _MonthBase(
+    return LiuriMonthBase(
         year_keys=year_keys,
         month_keys=month_keys,
         score=transit_ledger(rows),
@@ -147,7 +154,7 @@ def month_base(natal: TransitNatal, annual: AnnualLuck, segment: _MonthSegment) 
 
 
 @dataclass(frozen=True)
-class _DayRow:
+class LiuriDayRow:
     """一格的全部内部事实：简表与聚焦卡都由 `_cell_fields` 从这一份读，不另算第二遍。
 
     `scan` 带着合成柱与三张已按 `extra0` 筛过的明细 —— 聚焦日卡要的就是这一份，
@@ -168,11 +175,11 @@ class _DayRow:
 
 
 def liuri_days(
-    natal: TransitNatal, base: _MonthBase, segment: _MonthSegment
-) -> list[_DayRow]:
+    natal: TransitNatal, base: LiuriMonthBase, segment: LiuriMonthSegment
+) -> list[LiuriDayRow]:
     """段内逐日 +1 枚举（枚举的是段，不是公历月，所以没有"月末"分支）。"""
     return [
-        _day_row(natal, base, day)
+        liuri_day_row(natal, base, day)
         for day in _enumerate_days(segment.start, segment.end)
     ]
 
@@ -181,7 +188,7 @@ def _enumerate_days(start: date, end: date) -> list[date]:
     return [start + timedelta(days=offset) for offset in range((end - start).days + 1)]
 
 
-def _day_row(natal: TransitNatal, base: _MonthBase, day: date) -> _DayRow:
+def liuri_day_row(natal: TransitNatal, base: LiuriMonthBase, day: date) -> LiuriDayRow:
     solar = Solar.fromYmd(day.year, day.month, day.day)
     lunar = solar.getLunar()
     ganzhi = lunar.getDayInGanZhi()
@@ -194,7 +201,7 @@ def _day_row(natal: TransitNatal, base: _MonthBase, day: date) -> _DayRow:
         dayun_ganzhi=None,
     )
     rows = hit_rows(base.year_keys, base.month_keys, transit_hit_keys(scan.judgement))
-    return _DayRow(
+    return LiuriDayRow(
         solar_date=day.isoformat(),
         weekday=(solar.getWeek() + 6) % 7,
         lunar_day=f"{lunar.getMonthInChinese()}{lunar.getDayInChinese()}",
@@ -209,7 +216,7 @@ def _day_row(natal: TransitNatal, base: _MonthBase, day: date) -> _DayRow:
 
 
 # ---------------------------------------------------------------- 总装（spec §7.3 / §7.4）
-def _cell_fields(row: _DayRow) -> dict[str, object]:
+def _cell_fields(row: LiuriDayRow) -> dict[str, object]:
     """简表那六件，聚焦卡与格子共用一次构造 —— 同一天的两组事实不各算一遍。"""
     return {
         "solar_date": row.solar_date,
@@ -227,7 +234,7 @@ def _cell_fields(row: _DayRow) -> dict[str, object]:
     }
 
 
-def _day_detail(row: _DayRow) -> TransitDayDetail:
+def _day_detail(row: LiuriDayRow) -> TransitDayDetail:
     corpus = ten_god_meaning(row.scan.pillar.shishen_gan)
     return TransitDayDetail(
         **_cell_fields(row),
@@ -242,7 +249,9 @@ def _day_detail(row: _DayRow) -> TransitDayDetail:
     )
 
 
-def _focused_row(rows: list[_DayRow], focus_date: date | None, segment: _MonthSegment) -> _DayRow | None:
+def _focused_row(
+    rows: list[LiuriDayRow], focus_date: date | None, segment: LiuriMonthSegment
+) -> LiuriDayRow | None:
     """聚焦日必须落在解析出的段内。判序即依赖序：段已经定完，才轮到它（spec §7.2）。"""
     if focus_date is None:
         return None
@@ -258,6 +267,29 @@ def _focused_row(rows: list[_DayRow], focus_date: date | None, segment: _MonthSe
             "month_start_solar": segment.start.isoformat(),
             "month_end_solar": segment.end.isoformat(),
         },
+    )
+
+
+def liuri_provenance(reference: date) -> Provenance:
+    """溯源那 11 行：主命盘 8 + 岁运 2 + 历注 1（切片 3 spec §7.4）。
+
+    提到模块级是流时那一轮的事：一页 = 一日十二时，用的是同一批表、同一个版本口径，
+    而再复制一份 `tables` 清单等于给"多一行是谎称引用、少一行是不认账"这条纪律开出
+    第二个执行点。
+    """
+    return Provenance(
+        reference_date=reference.isoformat(),
+        engine="lunar-python",
+        tables=[
+            *(
+                ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+                for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
+            ),
+            *(
+                ProvenanceTable(name=module, version=ALMANAC_CONTENT_VERSION, source=source)
+                for module, source in ALMANAC_CONTENT_SOURCES
+            ),
+        ],
     )
 
 
@@ -334,18 +366,5 @@ def compute_liuri_matrix(
         month_fired=base.fired,
         days=[TransitDayCell(**_cell_fields(row)) for row in rows],
         focused=None if focused is None else _day_detail(focused),
-        provenance=Provenance(
-            reference_date=reference.isoformat(),
-            engine="lunar-python",
-            tables=[
-                *(
-                    ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
-                    for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
-                ),
-                *(
-                    ProvenanceTable(name=module, version=ALMANAC_CONTENT_VERSION, source=source)
-                    for module, source in ALMANAC_CONTENT_SOURCES
-                ),
-            ],
-        ),
+        provenance=liuri_provenance(reference),
     )
