@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { LiushiDayHeader } from '../components/bazi/liushi/LiushiDayHeader';
@@ -88,17 +88,24 @@ export function BaziLiushiPage() {
   const [lastRequest, setLastRequest] = useState<BaziLiushiRequest | null>(null);
 
   const liushi = useBaziLiushi();
-  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  /**
+   * 入口链接只允许自动发一次，闸门由 `send` 亲手落下。
+   *
+   * 必须是同步的 ref 而不是 state，因为有两处会把这条 effect 再点一次：① 本仓开着
+   * `StrictMode`，挂载时 effect 跑两遍，两遍读到的都是同一帧的 `false`；② `send` 把自己
+   * 那两键写回地址栏，`link` 因此变化并重跑 —— 那是本页写的一笔，不是新的下钻入口。两者
+   * 的症状都是「一次查询发两份流时请求」（每份约 1.9 秒、35 KB）。流日页没有这一课，因为它
+   * 不写查询串；这一页写，所以闸门必须落在发送的那一帧里。
+   */
+  const autoSubmitted = useRef(false);
 
   useEffect(() => {
-    if (!link || autoSubmitted) {
+    if (!link || autoSubmitted.current) {
       return;
     }
-    setAutoSubmitted(true);
     send(makeRequest(link.values, link.gender, link.applyTrueSolarTime, link.date, link.hour));
-    // 依赖只留 `link`：这条链只允许在带合格查询串进入时放一次，跟着推演状态重跑就会
-    // 反复发同一份请求（与流日页同一条纪律）。
-  }, [link, autoSubmitted]);
+    // 依赖只留 `link`：跟着推演状态重跑就会反复发同一份请求（与流日页同一条纪律）。
+  }, [link]);
 
   /**
    * 发一次，并把自己那两键写回查询串（决策 12）。
@@ -108,6 +115,7 @@ export function BaziLiushiPage() {
    * "地址是成都、画面上是北京"的错位。
    */
   function send(request: BaziLiushiRequest): void {
+    autoSubmitted.current = true;
     setLastRequest(request);
     setSearchParams(
       buildLiushiQuery(request, {
