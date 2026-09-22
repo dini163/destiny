@@ -589,6 +589,23 @@ def test_the_same_rule_is_priced_once_in_the_year_row_and_once_in_the_month_row(
     assert {year_row[0].delta, month_row[0].delta} == {rule.delta}
 
 
+def test_a_day_row_is_prefixed_and_suffixed_like_the_month_row() -> None:
+    """同一条规则可以一份账本里出现三次（年、月、日各一次），前缀是唯一的分辨手段。"""
+    rows = hit_rows(["yongshen.gan_favourable"], ["yongshen.gan_favourable"], ["yongshen.gan_favourable"])
+    assert [(factor.rule, factor.label) for factor, _ in rows] == [
+        ("yongshen.gan_favourable", "运干入喜用"),
+        ("yue.yongshen.gan_favourable", "运干入喜用（流月）"),
+        ("ri.yongshen.gan_favourable", "运干入喜用（流日）"),
+    ]
+
+
+def test_the_three_segments_keep_year_month_day_order() -> None:
+    rows = hit_rows(["dishi.prosperous"], ["shensha.tianyi"], ["fuyin.fanyin"])
+    assert [factor.rule for factor, _ in rows] == ["dishi.prosperous", "yue.shensha.tianyi", "ri.fuyin.fanyin"]
+    assert [factor.delta for factor, _ in rows] == [7.0, 5.0, -8.0]
+    assert [rule.family for _, rule in rows] == ["dishi", "shensha", "fuyin"]
+
+
 def test_the_score_bands_use_the_same_cuts_as_the_strength_ledger() -> None:
     """分档不另立阈值：65 / 45 两道线由旺衰那两处常量供给（spec §6.3）。"""
     assert _tier(STRONG_CUT) == "顺"

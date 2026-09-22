@@ -433,24 +433,34 @@ def _tier(value: float) -> str:
     return "平" if value >= WEAK_CUT else "滞"
 
 
+#: 账本三段的 (rule 前缀, 短名后缀)，序为年、月、日。年段是基准那一段，不加任何标记；
+#: 月、日两段各加一层 —— 一条规则在一份账本里最多出现三次，前缀是唯一的分辨手段（spec §6.3）。
+_LEDGER_SEGMENTS: tuple[tuple[str, str], ...] = (("", ""), ("yue.", "（流月）"), ("ri.", "（流日）"))
+
+
 def hit_rows(
-    year_keys: Sequence[str], month_keys: Sequence[str]
+    year_keys: Sequence[str],
+    month_keys: Sequence[str],
+    day_keys: Sequence[str] = (),
 ) -> list[tuple[ScoreFactor, TransitRule]]:
-    """命中集 → (账本行, 规则) 成对。
+    """命中集 → (账本行, 规则) 成对，序为年段、月段、日段。
 
     账本与 `fired` 读同一份产出，所以"逐行可见的判语"与"这一行的分值"不可能分家；
-    月段在键前加 `yue.`、在短名后加"（流月）"，因为一条规则可以在一份月账本里出现
-    两次（年段一次、月段一次），不带前缀就读不出那一行是谁加的分。
+    月段在键前加 `yue.`、日段加 `ri.`，短名各带"（流月）"或"（流日）"后缀，因为一条
+    规则可以在同一份账本里出现三次，不带前缀就读不出那一行是谁加的分。
+    `day_keys` 缺省为空：流年与流月那两页本来就没有日段，它们不该各补一个 `[]`。
     """
     rows: list[tuple[ScoreFactor, TransitRule]] = []
-    for keys, is_month in ((year_keys, False), (month_keys, True)):
+    for keys, (prefix, suffix) in zip(
+        (year_keys, month_keys, day_keys), _LEDGER_SEGMENTS, strict=True
+    ):
         for key in keys:
             rule = transit_rule(key)
             rows.append(
                 (
                     ScoreFactor(
-                        rule=f"yue.{key}" if is_month else key,
-                        label=f"{rule.label}（流月）" if is_month else rule.label,
+                        rule=f"{prefix}{key}",
+                        label=rule.label + suffix,
                         delta=rule.delta,
                         source=TRANSIT_RULE_SOURCE,
                     ),
