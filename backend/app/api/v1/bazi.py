@@ -4,9 +4,11 @@ from fastapi import APIRouter
 
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import compute_liuri_matrix
+from app.engines.bazi_liushi import compute_liushi_day
 from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart, BaziNatalRequest
 from app.schemas.bazi_liuri import BaziLiuriRequest, BaziLiuriResult
+from app.schemas.bazi_liushi import BaziLiushiRequest, BaziLiushiResult
 from app.schemas.bazi_transit import BaziTransitRequest, BaziTransitResult
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
@@ -99,6 +101,33 @@ async def bazi_liuri_matrix(request: BaziLiuriRequest) -> BaziLiuriResult:
         apply_true_solar_time=request.apply_true_solar_time,
         anchor_date=request.anchor_date,
         focus_date=request.focus_date,
+        reference_date=request.reference_date,
+        name=request.name,
+    )
+
+
+@router.post(
+    "/liushi/day", response_model=BaziLiushiResult, summary="Project a day of twelve hours"
+)
+async def bazi_liushi_day(request: BaziLiushiRequest) -> BaziLiushiResult:
+    """输出一个八字日的十二时辰吉凶，`focus_hour_zhi` 时该时辰再下钻成四段明细。
+
+    路由叫 `/day` 而不是 `/matrix`：一页就是一天，十二格恒在，没有"整段"可选。日界取
+    23:00 属次日，所以 `solar_date` 是**八字日**而不是钟面上的那一天（spec §2.1）。
+
+    两个入参一律原样透传：段定位与时辰归属都在引擎里判，失败时抛 `TransitRangeError`，
+    经域错误处理器带着机器码与 `context` 出去 —— 这里若先用 pydantic 拦一道，前端就只剩
+    `validation_error`，拿不到"可推年份 1988—2083"那两个数字。
+    """
+    return compute_liushi_day(
+        birth_date=request.birth_date,
+        birth_time=request.birth_time,
+        calendar=request.calendar,
+        longitude=_chart_longitude(request),
+        gender=request.gender,
+        apply_true_solar_time=request.apply_true_solar_time,
+        solar_date=request.solar_date,
+        focus_hour_zhi=request.focus_hour_zhi,
         reference_date=request.reference_date,
         name=request.name,
     )

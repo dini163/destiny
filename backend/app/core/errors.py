@@ -60,11 +60,12 @@ class NameInputError(DestinyError):
 
 
 class TransitRangeError(DestinyError):
-    """岁运与流日推不出请求要的那段。
+    """岁运、流日与流时推不出请求要的那段。
 
-    六个机器码由 `code` 区分（岁运 spec §7.2、流日 spec §7.2）：
+    八个机器码由 `code` 区分（岁运 spec §7.2、流日 spec §7.2、流时 spec §7.2）：
     `transit_range_reversed` / `transit_range_too_wide` / `transit_range_unsupported` /
-    `transit_focus_out_of_range` / `liuri_month_unsupported` / `liuri_focus_out_of_month`。
+    `transit_focus_out_of_range` / `liuri_month_unsupported` / `liuri_focus_out_of_month` /
+    `liushi_date_unsupported` / `liushi_hour_out_of_day`。
     它们过不了 pydantic 的字段校验，因为每个字段单独看都合法 —— 坏的是它们之间的关系，
     以及它们与该命盘大运窗口的关系，而窗口是排盘之后才知道的事实。所以这里给 422
     而不是 400：请求成形，只是推不出东西来。
