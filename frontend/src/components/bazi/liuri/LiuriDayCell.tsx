@@ -2,11 +2,11 @@ import type { TransitDayCell } from '../../../types/baziLiuri';
 import { tierClass } from './tier';
 
 /** 「馀事勿取」在库给的 `yi` 里时，它是"今日诸事不宜"的唯一信号 —— 排第一且永不被截掉。 */
-const FALL_BACK_YI = '馀事勿取';
-const PREVIEW_COUNT = 2;
+export const FALL_BACK_YI = '馀事勿取';
+export const PREVIEW_COUNT = 2;
 
 /** 决策 6：它占位但不让位。它排第一，其余按库序补到 2 条为止。 */
-function yiPreview(yi: string[]): string[] {
+export function yiPreview(yi: string[]): string[] {
   const head = yi.includes(FALL_BACK_YI) ? [FALL_BACK_YI] : [];
   const rest = yi.filter((item) => item !== FALL_BACK_YI);
   return [...head, ...rest].slice(0, PREVIEW_COUNT);
