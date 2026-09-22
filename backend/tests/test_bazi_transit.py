@@ -606,6 +606,36 @@ def test_the_three_segments_keep_year_month_day_order() -> None:
     assert [rule.family for _, rule in rows] == ["dishi", "shensha", "fuyin"]
 
 
+def test_a_hour_row_is_prefixed_and_suffixed_like_the_day_row() -> None:
+    """同一条规则一份账本里最多四次（年、月、日、时），前缀仍是唯一分辨手段。"""
+    rows = hit_rows(
+        ["yongshen.gan_favourable"],
+        ["yongshen.gan_favourable"],
+        ["yongshen.gan_favourable"],
+        ["yongshen.gan_favourable"],
+    )
+    assert [(factor.rule, factor.label) for factor, _ in rows] == [
+        ("yongshen.gan_favourable", "运干入喜用"),
+        ("yue.yongshen.gan_favourable", "运干入喜用（流月）"),
+        ("ri.yongshen.gan_favourable", "运干入喜用（流日）"),
+        ("shi.yongshen.gan_favourable", "运干入喜用（流时）"),
+    ]
+
+
+def test_the_four_segments_keep_year_month_day_hour_order() -> None:
+    rows = hit_rows(
+        ["dishi.prosperous"], ["shensha.tianyi"], ["fuyin.fanyin"], ["heyue.anhe_unfavourable"]
+    )
+    assert [factor.rule for factor, _ in rows] == [
+        "dishi.prosperous",
+        "yue.shensha.tianyi",
+        "ri.fuyin.fanyin",
+        "shi.heyue.anhe_unfavourable",
+    ]
+    assert [factor.delta for factor, _ in rows] == [7.0, 5.0, -8.0, -3.0]
+    assert [rule.family for _, rule in rows] == ["dishi", "shensha", "fuyin", "heyue"]
+
+
 def test_the_score_bands_use_the_same_cuts_as_the_strength_ledger() -> None:
     """分档不另立阈值：65 / 45 两道线由旺衰那两处常量供给（spec §6.3）。"""
     assert _tier(STRONG_CUT) == "顺"
