@@ -6,12 +6,12 @@
 真值来源；键序即账本序，`engines/bazi_transit._PREDICATES` 一项对一行。
 
 `scopes` 是粒度域：`taisui`（太岁只论年支）与 `dayun`（大运只与流年论生克）不参与
-流月与流日，其余 35 条岁、月、日通用。中性神煞一律不定价 —— 给中性者定价等于凭空
+流月、流日与流时，其余 35 条岁、月、日、时通用。中性神煞一律不定价 —— 给中性者定价等于凭空
 发明吉凶（见 §6.2 表末说明），它们仍随 `ShenShaEntry` 呈现。
 
 术语口径：**除 `dayun` 族外，本表的「运」恒指当前粒度那一根岁运柱** —— 年卡指流年、
-月卡指流月、日卡指流日。短名不随粒度 fork，靠 `（流月）`/`（流日）` 后缀与段名消歧
-（spec §6.4 决策 10 展开三条路与代价）。
+月卡指流月、日卡指流日、时卡指流时。短名不随粒度 fork，靠 `（流月）`/`（流日）`/
+`（流时）` 后缀与段名消歧（切片 4 spec §6.4：那条比较仍在，四格 fork 的代价只会更大）。
 
 delta 与 `DimensionRule` 同理，全是本系统模型参数：四书只给定性条件，从不给数。
 判语为单句、不带句读，引文从署名章里截取到可读的最短一段。
@@ -35,7 +35,9 @@ class TransitRule(BaseModel):
     label: str = Field(description="账本行短名；神煞族逐字等于 SHENSHA_RULES 的神煞名。")
     family: str = Field(description="九族之一，键的前缀必须与之一致。")
     delta: float = Field(description="分值增减，本系统模型参数（古籍不给数）。")
-    scopes: tuple[str, ...] = Field(description='粒度域："sui" 流年、"yue" 流月、"ri" 流日。')
+    scopes: tuple[str, ...] = Field(
+        description='粒度域："sui" 流年、"yue" 流月、"ri" 流日、"shi" 流时。'
+    )
     reading: str = Field(description="单句判语，无句读，末尾自署四书或'本系统'。")
 
 
@@ -45,7 +47,7 @@ def _rule(key: str, label: str, family: str, delta: float, scopes: tuple[str, ..
     )
 
 
-_BOTH = ("sui", "yue", "ri")  # 35 条：岁、月、日通用（spec §6.1）
+_BOTH = ("sui", "yue", "ri", "shi")  # 35 条：岁、月、日、时通用（spec §6.1）
 _SUI = ("sui",)  # 11 条：太岁 6 + 大运 5，只论年
 
 _RULE_LIST: tuple[TransitRule, ...] = (

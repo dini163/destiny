@@ -102,16 +102,29 @@ def test_shensha_rows_are_the_priced_ten_and_no_neutral_one() -> None:
     } == priced, "中性神煞不许出现在账本里，吉凶则一条不能漏"
 
 
-def test_the_day_scope_shadows_the_month_scope_exactly() -> None:
-    """粒度取值只能来自受控词表，而"论月者必论日、只论年者两者不论"是本轮新钉的。
+def test_the_hour_scope_shadows_the_day_scope_exactly() -> None:
+    """粒度取值只能来自受控词表，而「论月者必论日、论日者必论时、只论年者三者不论」是切片 4 换的轴。
 
-    第三行是换轴后新增的、更严的一条：谁给某条偷偷只加 `"ri"`（想让某天单走一条规则），
+    末行是换轴后新增的、更严的一条：谁给某条偷偷只加 `"shi"`（想让某个时辰单走一条规则），
     当场红。
     """
     for rule in TRANSIT_RULES.values():
-        assert set(rule.scopes) <= {"sui", "yue", "ri"}, rule.key
+        assert set(rule.scopes) <= {"sui", "yue", "ri", "shi"}, rule.key
         assert ("yue" in rule.scopes) is (rule.family not in _YEAR_ONLY), rule.key
         assert ("ri" in rule.scopes) == ("yue" in rule.scopes), rule.key
+        assert ("shi" in rule.scopes) == ("ri" in rule.scopes), rule.key
+
+
+def test_the_shi_scope_covers_the_same_rows_as_the_ri_scope() -> None:
+    """35 条可落时段，且可落时段者与可落日段者是同一批键（spec §6.2）。
+
+    与下面那条计数测的分工：那条钉"日"的 35/11 划分，这条钉"时 == 日"的集合相等，
+    于是太岁 6 + 大运 5 不论时不需要再数一遍（切片 4 spec §9.4）。
+    """
+    with_shi = {rule.key for rule in TRANSIT_RULES.values() if "shi" in rule.scopes}
+    with_ri = {rule.key for rule in TRANSIT_RULES.values() if "ri" in rule.scopes}
+    assert len(with_shi) == 35
+    assert with_shi == with_ri
 
 
 def test_the_ri_scope_covers_exactly_the_thirty_five_portable_rows() -> None:
