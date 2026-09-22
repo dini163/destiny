@@ -9,9 +9,11 @@ from functools import cache
 import pytest
 from lunar_python import Solar
 
+from app.content import CONTENT_VERSION
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import (
+    compute_liuri_matrix,
     liuri_days,
     month_base,
     resolve_liuri_month,
@@ -237,3 +239,142 @@ def test_a_day_ledger_reuses_the_year_rows_verbatim_and_appends_its_own() -> Non
         # 头几条就是年段那一批，无前缀，与月卡/年卡同一份字
         assert rules[1 : 1 + len(year_rows)] == year_rows
         assert sum(factor.delta for factor in row.score.factors) == row.score.value
+
+
+def test_the_summary_mirrors_the_transit_result_field_for_field() -> None:
+    """摘要九件不抽公共基类（spec §7.3 的取舍），漂移由这条字段级断言拦。"""
+    from app.schemas.bazi_liuri import BaziLiuriResult
+    from app.schemas.bazi_transit import BaziTransitResult
+
+    shared = [
+        "four_pillars", "pillars", "day_master", "day_master_element",
+        "favorable_elements", "unfavorable_elements", "true_solar_time", "tst_applied", "longitude",
+    ]
+    assert [
+        (name, BaziLiuriResult.model_fields[name].annotation) for name in shared
+    ] == [
+        (name, BaziTransitResult.model_fields[name].annotation) for name in shared
+    ]
+
+
+def test_the_matrix_echoes_the_reference_date_segment_by_default() -> None:
+    result = compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
+    assert (result.anchor_date, result.month_ganzhi, result.year) == ("2028-01-15", "癸丑", 2027)
+    assert (result.month_start_solar, result.month_end_solar) == ("2028-01-06", "2028-02-03")
+    assert (result.year_ganzhi, result.year_age) == ("丁未", 40)
+    assert (result.dayun_index, result.dayun_ganzhi) == (4, "戊午")
+    assert (result.month_index, result.month_in_chinese) == (11, "腊")
+    assert (result.month_score.value, result.month_score.tier) == (58.0, "平")
+    assert len(result.month_fired) == 13 and len(result.days) == 29
+    assert result.focused is None
+
+
+def test_a_cell_value_and_tier_come_from_its_own_ledger() -> None:
+    """格子上的那两个数取自那一段账本、四件命中取自日段命中，全部实测量（spec §2.5 表）。"""
+    result = compute_liuri_matrix(**_NATAL_KWARGS, anchor_date=date(2028, 1, 15), reference_date=date(2028, 1, 15))
+    cell = next(item for item in result.days if item.solar_date == "2028-01-25")
+    assert (cell.value, cell.tier) == (77.0, "顺")
+    assert [(hit.key, hit.label, hit.family, hit.delta) for hit in cell.day_hits] == [
+        ("ri.yongshen.gan_favourable", "运干入喜用（流日）", "yongshen", 10.0),
+        ("ri.yongshen.zhi_favourable", "运支主气入喜用（流日）", "yongshen", 8.0),
+        ("ri.dishi.prosperous", "日主临官帝旺（流日）", "dishi", 7.0),
+        ("ri.shensha.yangren", "羊刃（流日）", "shensha", -6.0),
+    ]
+
+
+def test_a_focused_day_and_its_matrix_cell_are_the_same_facts() -> None:
+    """§9.2 第 3 条：比的是**两次独立请求**，不是同一份内存里的两个视图。
+
+    一次不带 `focus_date`、一次带，于是这条断言同时钉住两件事：格子与明细同字，以及
+    "请求与否聚焦日"不改变任何一格的数字。
+    """
+    plain = compute_liuri_matrix(
+        **_NATAL_KWARGS, anchor_date=date(2028, 1, 15), reference_date=date(2028, 1, 15)
+    )
+    result = compute_liuri_matrix(
+        **_NATAL_KWARGS, anchor_date=date(2028, 1, 15), focus_date=date(2028, 1, 25),
+        reference_date=date(2028, 1, 15),
+    )
+    focused = result.focused
+    assert focused is not None
+    cell = next(item for item in plain.days if item.solar_date == "2028-01-25")
+    assert [(hit.key, hit.label, hit.family, hit.delta) for hit in cell.day_hits] == [
+        (fired.key, fired.label, fired.family, fired.delta)
+        for fired in focused.fired
+        if fired.key.startswith("ri.")
+    ]
+    assert (focused.value, focused.tier, focused.ganzhi, focused.lunar_day) == (
+        cell.value, cell.tier, cell.ganzhi, cell.lunar_day
+    )
+    assert focused.almanac == cell.almanac
+
+
+def test_the_almanac_is_passed_through_without_invention() -> None:
+    """宜忌逐字取自库；`馀事勿取` 是库自己写的，服务端不代填也不挪位置（决策 6）。
+
+    取的是段内最疏的一天（甲辰，宜只有两条），所以"库里写了几条就是几条"看得见。
+    """
+    result = compute_liuri_matrix(**_NATAL_KWARGS, anchor_date=date(2028, 1, 15), reference_date=date(2028, 1, 15))
+    by_date = {cell.solar_date: cell for cell in result.days}
+    assert by_date["2028-01-20"].almanac.yi == ["平治道涂", "馀事勿取"]
+    assert by_date["2028-01-20"].almanac.ji == [
+        "开光", "嫁娶", "开仓", "出货财", "造船", "安葬", "探病"
+    ]
+    assert len(by_date["2028-01-15"].almanac.yi) == 17
+    assert len(by_date["2028-01-15"].almanac.ji) == 5
+    for cell in result.days:
+        assert all(item and item.strip() for item in (*cell.almanac.yi, *cell.almanac.ji))
+        assert len(set(cell.almanac.yi)) == len(cell.almanac.yi)
+
+
+def test_the_provenance_carries_eleven_tables_and_the_library_version() -> None:
+    """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。"""
+    from importlib.metadata import version
+
+    result = compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
+    tables = {table.name: table for table in result.provenance.tables}
+    assert len(result.provenance.tables) == 11
+    assert tables["almanac_yiji"].version == version("lunar-python") == "1.4.8"
+    assert "外部历法库" in tables["almanac_yiji"].source
+    assert tables["bazi_transit_rules"].version == CONTENT_VERSION
+    assert result.provenance.engine == "lunar-python"
+
+
+def test_no_liuri_day_row_pollutes_the_natal_chart() -> None:
+    """污染红线（spec §2.7 沿用切片 2）：同进程内先快照、跑矩阵、再快照，两次逐字相等。"""
+    chart = compute_bazi_chart(reference_date=date(2028, 1, 15), **_NATAL_KWARGS)
+    before = chart.model_dump()
+    compute_liuri_matrix(
+        **_NATAL_KWARGS, anchor_date=date(2028, 1, 15), focus_date=date(2028, 1, 10),
+        reference_date=date(2028, 1, 15),
+    )
+    assert chart.model_dump() == before
+
+
+def test_a_conflicting_favorable_set_books_both_sides_rather_than_choosing() -> None:
+    """喜忌并列同一五行时两侧都进账：`+10` 与 `−10` 同屏、净额 0，不做静默取舍。
+
+    命 A 每日恰中两条 `yongshen` 是它喜忌铺满且不相交的巧合，不是一条不变式（spec §2.5
+    第 2 条）。所以本测不去数"恰两条"，只问干侧那两行是否都进了日段账本。
+    """
+    from dataclasses import replace
+
+    from app.engines.bazi_transit import hit_rows, scan_transit_pillar, transit_hit_keys
+
+    natal, _segment, _annual = _fixture(date(2028, 1, 15))
+    clashing = replace(natal, favourable=frozenset({"木"}), unfavourable=frozenset({"木"}))
+    scan = scan_transit_pillar(
+        clashing,
+        "甲子",
+        position="transit_day",
+        label="流日",
+        scope="ri",
+        dayun_ganzhi=None,
+    )
+    day_rows = [
+        (factor.rule, factor.delta) for factor, _ in hit_rows((), (), transit_hit_keys(scan.judgement))
+    ]
+    assert ("ri.yongshen.gan_favourable", 10.0) in day_rows
+    assert ("ri.yongshen.gan_unfavourable", -10.0) in day_rows
+    gan_only = [delta for rule, delta in day_rows if rule.endswith((".gan_favourable", ".gan_unfavourable"))]
+    assert sum(gan_only) == 0.0

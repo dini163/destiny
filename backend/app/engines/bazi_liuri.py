@@ -1,4 +1,4 @@
-"""流日（全月逐日）引擎：月段定位、段基准、逐日三段账本。
+"""流日（全月逐日）引擎：月段定位、段基准、逐日三段账本与整页总装。
 
 本模块**不重复**任何判定：命中过滤、账本装配、合成柱、月界全部跨模块取
 `bazi_transit` 的那一份（spec §5.4）。依赖方向单向 —— `bazi_liuri → bazi_transit`；
@@ -10,17 +10,29 @@
 """
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 from lunar_python import Solar
 
+from app.content import (
+    ALMANAC_CONTENT_SOURCES,
+    ALMANAC_CONTENT_VERSION,
+    CONTENT_SOURCES,
+    CONTENT_VERSION,
+    TRANSIT_CONTENT_SOURCES,
+)
+from app.content.bazi_shishen import ten_god_meaning
 from app.core.errors import TransitRangeError
+from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_transit import (
     AnnualLuck,
     TransitNatal,
     TransitScan,
+    annual_luck_by_year,
     hit_rows,
     jieqi_boundaries,
+    natal_projection,
     scan_transit_pillar,
     transit_fired,
     transit_hit_keys,
@@ -28,8 +40,18 @@ from app.engines.bazi_transit import (
     transit_narrative,
     year_scan,
 )
-from app.schemas.bazi_transit import TransitFired
+from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
+from app.schemas.bazi_liuri import (
+    AlmanacYiJi,
+    BaziLiuriResult,
+    TransitDayCell,
+    TransitDayDetail,
+    TransitDayHit,
+)
+from app.schemas.bazi_transit import TransitFired, TransitTenGod
+from app.schemas.common import CalendarType, Gender
 from app.schemas.scoring import ScoreValue
+from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
 
 @dataclass(frozen=True)
@@ -126,7 +148,7 @@ def month_base(natal: TransitNatal, annual: AnnualLuck, segment: _MonthSegment) 
 
 @dataclass(frozen=True)
 class _DayRow:
-    """一格的全部内部事实。schema 装配在 T5，本模块不依赖它。
+    """一格的全部内部事实：简表与聚焦卡都由 `_cell_fields` 从这一份读，不另算第二遍。
 
     `scan` 带着合成柱与三张已按 `extra0` 筛过的明细 —— 聚焦日卡要的就是这一份，
     简表格里则只取 `score` 的 `value`/`tier` 与 `fired` 的 `ri.` 四条（spec §2.5：
@@ -183,4 +205,147 @@ def _day_row(natal: TransitNatal, base: _MonthBase, day: date) -> _DayRow:
         narrative=transit_narrative(rows),
         yi=list(lunar.getDayYi()),
         ji=list(lunar.getDayJi()),
+    )
+
+
+# ---------------------------------------------------------------- 总装（spec §7.3 / §7.4）
+def _cell_fields(row: _DayRow) -> dict[str, object]:
+    """简表那六件，聚焦卡与格子共用一次构造 —— 同一天的两组事实不各算一遍。"""
+    return {
+        "solar_date": row.solar_date,
+        "weekday": row.weekday,
+        "lunar_day": row.lunar_day,
+        "ganzhi": row.ganzhi,
+        "value": row.score.value,
+        "tier": row.score.tier,
+        "day_hits": [
+            TransitDayHit(key=fired.key, label=fired.label, family=fired.family, delta=fired.delta)
+            for fired in row.fired
+            if fired.key.startswith("ri.")
+        ],
+        "almanac": AlmanacYiJi(yi=row.yi, ji=row.ji),
+    }
+
+
+def _day_detail(row: _DayRow) -> TransitDayDetail:
+    corpus = ten_god_meaning(row.scan.pillar.shishen_gan)
+    return TransitDayDetail(
+        **_cell_fields(row),
+        pillar=row.scan.pillar,
+        ten_god=TransitTenGod(god=corpus.ten_god, meaning=corpus.meaning, source=corpus.source),
+        score=row.score,
+        fired=row.fired,
+        narrative=row.narrative,
+        relations=row.scan.relations,
+        shensha=row.scan.shensha,
+        branch_groups=row.scan.branch_groups,
+    )
+
+
+def _focused_row(rows: list[_DayRow], focus_date: date | None, segment: _MonthSegment) -> _DayRow | None:
+    """聚焦日必须落在解析出的段内。判序即依赖序：段已经定完，才轮到它（spec §7.2）。"""
+    if focus_date is None:
+        return None
+    target = focus_date.isoformat()
+    for row in rows:
+        if row.solar_date == target:
+            return row
+    raise TransitRangeError(
+        "liuri_focus_out_of_month",
+        f"{target} 不在 {segment.start.isoformat()} ~ {segment.end.isoformat()} 这一段里。",
+        {
+            "focus_date": target,
+            "month_start_solar": segment.start.isoformat(),
+            "month_end_solar": segment.end.isoformat(),
+        },
+    )
+
+
+def compute_liuri_matrix(
+    *,
+    birth_date: date,
+    birth_time: time,
+    gender: Gender,
+    calendar: CalendarType = CalendarType.SOLAR,
+    longitude: float = STANDARD_MERIDIAN_CN,
+    apply_true_solar_time: bool = True,
+    anchor_date: date | None = None,
+    focus_date: date | None = None,
+    reference_date: date | None = None,
+    name: str | None = None,
+) -> BaziLiuriResult:
+    """从生辰与锚点日装配一整段节气月的逐日矩阵（spec §7.4）。
+
+    无 HTTP、无 I/O。排盘走两次同一个入口（`compute_bazi_chart` 出命局摘要与喜忌，
+    `resolve_natal_moment` 出 `EightChar` 供摊平流年），两次过同一个校正函数 —— 与
+    `compute_transit` 同一条纪律，不会出现"命盘用 23:30、矩阵用 23:26"的两个口径。
+
+    整页纯计算量 = 一次年扫描 + 一次月扫描 + 最多 32 次日扫描，都落在切片 2 每次请求
+    已经跑过十几遍的那套 `derive_*` 上；不做缓存（spec §7.4）。
+    """
+    reference = reference_date or date.today()
+    anchor = anchor_date or reference
+    chart = compute_bazi_chart(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        calendar=calendar,
+        longitude=longitude,
+        gender=gender,
+        apply_true_solar_time=apply_true_solar_time,
+        reference_date=reference,
+        name=name,
+    )
+    moment = resolve_natal_moment(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        calendar=calendar,
+        longitude=longitude,
+        apply_true_solar_time=apply_true_solar_time,
+    )
+    luck = annual_luck_by_year(moment.eight_char, gender)
+    segment = resolve_liuri_month(anchor, luck)
+    annual = luck[segment.owner_year]
+    natal = natal_projection(chart)
+    base = month_base(natal, annual, segment)
+    rows = liuri_days(natal, base, segment)
+    focused = _focused_row(rows, focus_date, segment)
+    return BaziLiuriResult(
+        four_pillars=chart.four_pillars,
+        pillars=list(chart.pillars),
+        day_master=chart.day_master,
+        day_master_element=chart.day_master_element,
+        favorable_elements=list(chart.analysis.favorable_elements),
+        unfavorable_elements=list(chart.analysis.unfavorable_elements),
+        true_solar_time=chart.true_solar_time,
+        tst_applied=chart.tst_applied,
+        longitude=chart.longitude,
+        anchor_date=anchor.isoformat(),
+        year=segment.owner_year,
+        year_ganzhi=annual.ganzhi,
+        year_age=annual.age,
+        dayun_index=annual.dayun_index,
+        dayun_ganzhi=annual.dayun_ganzhi,
+        month_index=segment.index,
+        month_in_chinese=segment.month_in_chinese,
+        month_ganzhi=segment.month_ganzhi,
+        month_start_solar=segment.start.isoformat(),
+        month_end_solar=segment.end.isoformat(),
+        month_score=base.score,
+        month_fired=base.fired,
+        days=[TransitDayCell(**_cell_fields(row)) for row in rows],
+        focused=None if focused is None else _day_detail(focused),
+        provenance=Provenance(
+            reference_date=reference.isoformat(),
+            engine="lunar-python",
+            tables=[
+                *(
+                    ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+                    for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
+                ),
+                *(
+                    ProvenanceTable(name=module, version=ALMANAC_CONTENT_VERSION, source=source)
+                    for module, source in ALMANAC_CONTENT_SOURCES
+                ),
+            ],
+        ),
     )

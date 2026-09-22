@@ -8,6 +8,8 @@ a version bump are one change, because responses echo the version per table and
 ``tests/test_bazi_schema.py`` fails when a table moves without it.
 """
 
+from importlib.metadata import version
+
 from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
@@ -46,3 +48,14 @@ TRANSIT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_changsheng", CHANG_SHENG_SOURCE),
     ("bazi_transit_rules", TRANSIT_RULE_SOURCE),
 )
+
+#: 历注宜忌一张表。单列的理由同 `TRANSIT_CONTENT_SOURCES`：矩阵页之外没有人引用它。
+ALMANAC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    (
+        "almanac_yiji",
+        "外部历法库 lunar-python（6tail/lunar-python）之通书宜忌，非本仓古籍语料，不参与任何计分",
+    ),
+)
+#: 历注的版本**不**取 `CONTENT_VERSION`：通书宜忌随库版本变，用本仓语料的滚动版本给
+#: 外部内容打版等于撒一个谎（spec §7.5）。
+ALMANAC_CONTENT_VERSION = version("lunar-python")
