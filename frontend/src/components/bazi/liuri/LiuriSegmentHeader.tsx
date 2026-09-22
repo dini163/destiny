@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Icon } from '../../ui/Icon';
 import { ResultCard } from '../../ui/ResultCard';
@@ -30,10 +31,13 @@ const SHIFT_ACTIONS: ReadonlyArray<{ direction: ShiftDirection; label: string }>
 export function LiuriSegmentHeader({
   result,
   busy,
+  transitHref,
   onShift,
 }: {
   result: BaziLiuriResult;
   busy: boolean;
+  /** 回该年岁运的上钻链接，由页面拼好交进来（本页组件一律自己不碰生辰，决定 10）。 */
+  transitHref?: string;
   onShift: (direction: ShiftDirection) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -44,6 +48,14 @@ export function LiuriSegmentHeader({
       icon="calendar"
       actions={
         <span className="flex items-center gap-2">
+          {transitHref ? (
+            <Link
+              to={transitHref}
+              className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
+            >
+              回岁运流年
+            </Link>
+          ) : null}
           {SHIFT_ACTIONS.map((action) => (
             <button
               key={action.direction}

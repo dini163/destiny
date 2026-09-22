@@ -19,22 +19,35 @@ export interface TransitLink {
   values: BirthInputValues;
   gender: Gender;
   applyTrueSolarTime: boolean;
+  /**
+   * 要聚焦的流年，取自流日页那一份 `result.year`（立春为界，故 2028-01-26 是 2027）。
+   *
+   * 只有上钻回岁运时才有值；下钻的三条链接不写这个键，`null` 即"进页按参考日开窗、
+   * 不聚焦任何一年"，与直接空手进页面完全同形。
+   */
+  year: number | null;
 }
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_PATTERN = /^\d{2}:\d{2}$/;
+/** 四位整数年，与 `schema` 那边 `start_year` 的取值面一致；区间由服务端再校一轮。 */
+const YEAR_PATTERN = /^\d{4}$/;
 
 /**
- * 拼出 `/bazi-transit?birth_date=…&…&tst=1`。
+ * 拼出 `/bazi-transit?birth_date=…&…&tst=1`，上钻时再带 `&year=2027`。
  *
  * 空值一律不写进串里（没选城市就没有 `city`），因此链接短且可读；缺省项由
  * {@link parseTransitLink} 补成与主命盘同一口径的默认值。
  */
 export function buildTransitHref(
   values: BirthInputValues,
-  options: { gender: Gender; applyTrueSolarTime: boolean },
+  options: { gender: Gender; applyTrueSolarTime: boolean; year?: number },
 ): string {
-  return `${ROUTES.baziTransit}?${birthParams(values, options).toString()}`;
+  const params = birthParams(values, options);
+  if (options.year !== undefined) {
+    params.set('year', String(options.year));
+  }
+  return `${ROUTES.baziTransit}?${params.toString()}`;
 }
 
 /**
@@ -89,6 +102,11 @@ export function parseTransitLink(params: URLSearchParams): TransitLink | null {
   const longitude = parseCoordinate(params.get('longitude'), 180);
   if (longitude === null) return null;
 
+  // `year` 与两个日期同一条纪律：给了就必须合形，不合形整条作废退回手填。半份来路不明
+  // 的年份最坏的情况是发出一条 `focus_year` 落在区间之外的请求，那记 422 会盖住全表。
+  const rawYear = params.get('year');
+  if (rawYear !== null && !YEAR_PATTERN.test(rawYear)) return null;
+
   const city = params.get('city');
   return {
     values: {
@@ -101,6 +119,7 @@ export function parseTransitLink(params: URLSearchParams): TransitLink | null {
     },
     gender: gender ?? 'male',
     applyTrueSolarTime: params.get('tst') !== '0',
+    year: rawYear === null ? null : Number(rawYear),
   };
 }
 

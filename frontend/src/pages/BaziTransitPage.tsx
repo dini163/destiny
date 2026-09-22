@@ -105,7 +105,7 @@ export function BaziTransitPage() {
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(
     link?.applyTrueSolarTime ?? true,
   );
-  const [startYear, setStartYear] = useState('');
+  const [startYear, setStartYear] = useState(link?.year ? String(link.year) : '');
   const [span, setSpan] = useState<'5' | '10'>('5');
   /** 点已展开的年份即收回详批卡：数据已在手上，收回不必再问一次服务端。 */
   const [collapsed, setCollapsed] = useState(false);
@@ -124,11 +124,19 @@ export function BaziTransitPage() {
     }
     autoSubmitted.current = true;
     setLastValues(link.values);
+    // 带上 `year` 的上钻链接要一次就落到那一年：区间以它为首年（+4 = 默认跨度 5 年减
+    // 一，与 `span` 的初值同一口径），否则服务端会按参考日开窗，那一年多半在窗外，
+    // 迎头就是一记 `transit_focus_out_of_range`。
     transit.mutate(
-      makeRequest(link.values, link.gender, link.applyTrueSolarTime, {
-        start_year: null,
-        end_year: null,
-      }, null),
+      makeRequest(
+        link.values,
+        link.gender,
+        link.applyTrueSolarTime,
+        link.year === null
+          ? { start_year: null, end_year: null }
+          : { start_year: link.year, end_year: link.year + 4 },
+        link.year,
+      ),
     );
     // 依赖只留 `link`：`transit.mutate` 是 react-query 给出的稳定引用，而这条链
     // 只允许在带合格查询串进入时放一次，跟着推演状态重跑就会反复发同一份请求。

@@ -15,7 +15,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
 import { shiftIso } from '../lib/isoDate';
-import { buildLiushiHref, parseLiuriLink } from '../lib/transitLink';
+import { buildLiushiHref, buildTransitHref, parseLiuriLink } from '../lib/transitLink';
 import type { BaziLiuriRequest } from '../types/baziLiuri';
 import type { Gender } from '../types/common';
 
@@ -207,7 +207,22 @@ export function BaziLiuriPage() {
         <>
           <TransitNatalBar natal={result} />
 
-          <LiuriSegmentHeader result={result} busy={liuri.isPending} onShift={handleShift} />
+          {/* 回岁运带上 `result.year`：那是立春为界的流年，与岁运页的 `focus_year` 同一
+              口径，落点正是这一年的年表；不带则岁运页按参考日开窗，多半不是在看这一段。 */}
+          <LiuriSegmentHeader
+            result={result}
+            busy={liuri.isPending}
+            transitHref={
+              lastRequest
+                ? buildTransitHref(lastRequest, {
+                    gender,
+                    applyTrueSolarTime,
+                    year: result.year,
+                  })
+                : undefined
+            }
+            onShift={handleShift}
+          />
 
           <ResultCard
             eyebrow="DAILY MATRIX"
