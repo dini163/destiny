@@ -102,10 +102,29 @@ def test_shensha_rows_are_the_priced_ten_and_no_neutral_one() -> None:
     } == priced, "中性神煞不许出现在账本里，吉凶则一条不能漏"
 
 
-def test_only_annual_families_are_gated_to_sui() -> None:
+def test_the_day_scope_shadows_the_month_scope_exactly() -> None:
+    """粒度取值只能来自受控词表，而"论月者必论日、只论年者两者不论"是本轮新钉的。
+
+    第三行是换轴后新增的、更严的一条：谁给某条偷偷只加 `"ri"`（想让某天单走一条规则），
+    当场红。
+    """
     for rule in TRANSIT_RULES.values():
-        assert set(rule.scopes) <= {"sui", "yue"}, rule.key
+        assert set(rule.scopes) <= {"sui", "yue", "ri"}, rule.key
         assert ("yue" in rule.scopes) is (rule.family not in _YEAR_ONLY), rule.key
+        assert ("ri" in rule.scopes) == ("yue" in rule.scopes), rule.key
+
+
+def test_the_ri_scope_covers_exactly_the_thirty_five_portable_rows() -> None:
+    """35 条岁、月、日通用，11 条（太岁 6 + 大运 5）只论年（spec §6.2）。"""
+    with_ri = [rule for rule in TRANSIT_RULES.values() if "ri" in rule.scopes]
+    assert len(with_ri) == 35
+    assert {rule.family for rule in with_ri} == {
+        "yongshen", "palace", "heyue", "ganzhi", "fuyin", "dishi", "shensha",
+    }
+    assert [rule.family for rule in TRANSIT_RULES.values() if "ri" not in rule.scopes] == [
+        "taisui", "taisui", "taisui", "taisui", "taisui", "taisui",
+        "dayun", "dayun", "dayun", "dayun", "dayun",
+    ]
 
 
 def test_readings_carry_a_single_clause_and_a_signature() -> None:
