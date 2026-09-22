@@ -17,7 +17,7 @@ export type PillarPosition = 'year' | 'month' | 'day' | 'hour';
  * recomputed against the day master) but belongs to no palace, so consumers must
  * not assume a four-pillar position.
  */
-export type TransitPillarPosition = 'transit_year' | 'transit_month';
+export type TransitPillarPosition = 'transit_year' | 'transit_month' | 'transit_day' | 'transit_hour';
 
 /** Day-master strength classification. */
 export type StrengthLevel = 'weak' | 'balanced' | 'strong';
