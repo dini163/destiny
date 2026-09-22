@@ -40,13 +40,13 @@ from app.engines.bazi_transit import (
     transit_ledger,
     transit_narrative,
 )
+from app.schemas.bazi_liuri import AlmanacYiJi
 from app.schemas.bazi_liushi import (
     BaziLiushiResult,
     TransitHourCell,
     TransitHourDetail,
     TransitHourHit,
 )
-from app.schemas.bazi_liuri import AlmanacYiJi
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
 from app.schemas.common import CalendarType, Gender
 from app.schemas.scoring import ScoreValue

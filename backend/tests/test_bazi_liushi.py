@@ -15,8 +15,8 @@ from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import compute_liuri_matrix
 from app.engines.bazi_liushi import HOUR_ZHI, compute_liushi_day, liushi_hour_moments
-from app.schemas.bazi_liushi import BaziLiushiResult
 from app.schemas.bazi_liuri import TransitDayDetail
+from app.schemas.bazi_liushi import BaziLiushiResult
 from app.schemas.common import CalendarType, Gender
 
 _BIRTH = (date(1988, 2, 15), time(23, 30))
