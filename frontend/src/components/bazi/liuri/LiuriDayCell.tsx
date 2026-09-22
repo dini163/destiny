@@ -1,15 +1,5 @@
 import type { TransitDayCell } from '../../../types/baziLiuri';
-
-/**
- * 档位色标。全仓此前没有任何 顺/平/滞 → class 的映射（岁运页把 `tier` 当纯文本渲染），
- * 所以这张表本轮新建。向背沿用账本里正负 delta 已有的两个色，不新增主题键：
- * 同一套色若别处也要用了，那时再提升成 token。
- */
-const TIER_CLASS: Record<string, string> = {
-  顺: 'text-wuxing-wood',
-  平: 'text-ink-muted',
-  滞: 'text-wuxing-fire',
-};
+import { tierClass } from './tier';
 
 /** 「馀事勿取」在库给的 `yi` 里时，它是"今日诸事不宜"的唯一信号 —— 排第一且永不被截掉。 */
 const FALL_BACK_YI = '馀事勿取';
@@ -64,10 +54,10 @@ export function LiuriDayCell({
         {isToday ? <span className="label-caps text-gold">今日</span> : null}
       </span>
       <span className="flex items-baseline gap-1.5">
-        <span className={`numeric text-lg ${TIER_CLASS[cell.tier] ?? 'text-ink'}`}>
+        <span className={`numeric text-lg ${tierClass(cell.tier)}`}>
           {Math.round(cell.value)}
         </span>
-        <span className={`label-caps ${TIER_CLASS[cell.tier] ?? 'text-ink'}`}>{cell.tier}</span>
+        <span className={`label-caps ${tierClass(cell.tier)}`}>{cell.tier}</span>
       </span>
       <YiJiLine prefix="宜" items={yi} total={cell.almanac.yi.length} />
       <YiJiLine prefix="忌" items={ji} total={cell.almanac.ji.length} />
