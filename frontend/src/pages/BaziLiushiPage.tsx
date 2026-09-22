@@ -1,0 +1,293 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
+import { LiushiDayHeader } from '../components/bazi/liushi/LiushiDayHeader';
+import { LiushiFocusCard } from '../components/bazi/liushi/LiushiFocusCard';
+import { LiushiHourLadder } from '../components/bazi/liushi/LiushiHourLadder';
+import { LiushiPeakNote } from '../components/bazi/liushi/LiushiPeakNote';
+import { LiushiQiWaveform } from '../components/bazi/liushi/LiushiQiWaveform';
+import type { ShiftDirection } from '../components/bazi/liuri/LiuriSegmentHeader';
+import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
+import { TransitNatalBar } from '../components/bazi/transit/TransitNatalBar';
+import { InputBar } from '../components/ui/InputBar';
+import type { BirthInputValues } from '../components/ui/InputBar';
+import { LabeledField } from '../components/ui/LabeledField';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
+import { ResultCard } from '../components/ui/ResultCard';
+import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { useBaziLiushi } from '../hooks/useBaziLiushi';
+import { shiftIso } from '../lib/isoDate';
+import { buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
+import type { BaziLiushiRequest, TransitHourCell } from '../types/baziLiushi';
+import type { Gender } from '../types/common';
+
+const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
+  { value: 'male', label: '乾造' },
+  { value: 'female', label: '坤造' },
+];
+
+/** 本页两个 422 码的 `context` 键名 → 中文标签；值一律取自 `error.context`，不补算。 */
+const CONTEXT_LABEL: Record<string, string> = {
+  requested: '所请',
+  supported: '可取时辰',
+  supported_from: '本命可推起',
+  supported_to: '本命可推终',
+};
+
+/**
+ * 峰值那一格的下标，同分取更早的一格（决策 8）。
+ *
+ * 用严格大于：`>=` 会让"两个时辰同为峰值"时标晚的那个，而十二支的读者默认从子起读，
+ * 标在后面的那格看起来像是页面挑错了。这一处不在后端算：契约里没有 `peak` 字段，
+ * 给一个纯呈现层的判断开一条新契约不值。
+ */
+function peakIndexOf(hours: TransitHourCell[]): number {
+  let best = 0;
+  for (let index = 1; index < hours.length; index += 1) {
+    if (hours[index].value > hours[best].value) {
+      best = index;
+    }
+  }
+  return best;
+}
+
+/** 拼一次流时请求：命盘入参照页口径，日与时辰由链接、格子点击或换日决定。 */
+function makeRequest(
+  values: BirthInputValues,
+  gender: Gender,
+  applyTrueSolarTime: boolean,
+  date: string | null,
+  hour: string | null,
+): BaziLiushiRequest {
+  return {
+    ...values,
+    gender,
+    apply_true_solar_time: applyTrueSolarTime,
+    solar_date: date,
+    focus_hour_zhi: hour,
+  };
+}
+
+/**
+ * 一日十二时辰页（PRD §6.1.3、spec 切片 4）。
+ *
+ * 一页 = 命局条 + 日头 + 真气波形 + 十二格梯次谱 + 峰值备忘 + 聚焦时辰详批 + 溯源。
+ * 页面上只有两件事是本页的意志：看哪一天、聚焦哪一支；两者留空即由服务端按参考日开窗，
+ * 本页不做第二次月界与时辰边界推算（决策 2/9）。十二格共用一根日柱，所以日头那三段只
+ * 出现一次（`day_score` / `day_fired`），每格多的只有 `shi.` 那一段。
+ *
+ * 入口在流日页的聚焦卡（`?…&date=同日&hour=辰`），因此本路由不在导航栏里 —— 它是流日
+ * 的下钻，无生辰即无意义（spec 决策 8 的延伸）。
+ */
+export function BaziLiushiPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const link = useMemo(() => parseLiushiLink(searchParams), [searchParams]);
+
+  const [gender, setGender] = useState<Gender>(link?.gender ?? 'male');
+  const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(link?.applyTrueSolarTime ?? true);
+  const [lastRequest, setLastRequest] = useState<BaziLiushiRequest | null>(null);
+
+  const liushi = useBaziLiushi();
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (!link || autoSubmitted) {
+      return;
+    }
+    setAutoSubmitted(true);
+    send(makeRequest(link.values, link.gender, link.applyTrueSolarTime, link.date, link.hour));
+    // 依赖只留 `link`：这条链只允许在带合格查询串进入时放一次，跟着推演状态重跑就会
+    // 反复发同一份请求（与流日页同一条纪律）。
+  }, [link, autoSubmitted]);
+
+  /**
+   * 发一次，并把自己那两键写回查询串（决策 12）。
+   *
+   * `replace: true`：换一格不该让"后退"变成把十二个时辰倒着走完。生辰半段原样交回
+   * `buildLiushiQuery`，所以表单里改了城市而没点查询时，URL 跟着请求一起走，不出现
+   * "地址是成都、画面上是北京"的错位。
+   */
+  function send(request: BaziLiushiRequest): void {
+    setLastRequest(request);
+    setSearchParams(
+      buildLiushiQuery(request, {
+        gender: request.gender,
+        applyTrueSolarTime: request.apply_true_solar_time ?? true,
+        date: request.solar_date ?? null,
+        hour: request.focus_hour_zhi ?? null,
+      }),
+      { replace: true },
+    );
+    liushi.mutate(request);
+  }
+
+  function handleSubmit(values: BirthInputValues): void {
+    send(
+      makeRequest(
+        values,
+        gender,
+        applyTrueSolarTime,
+        link?.date ?? null,
+        link?.hour ?? null,
+      ),
+    );
+  }
+
+  /** 点一格 = 换 `focus_hour_zhi` 整日重发；已是聚焦时辰则什么都不发。 */
+  function handleFocus(zhi: string): void {
+    const previous = lastRequest;
+    if (!previous || liushi.data?.focused?.zhi === zhi) {
+      return;
+    }
+    send({ ...previous, focus_hour_zhi: zhi });
+  }
+
+  /**
+   * 换日 = `solar_date` ±1 天再发，并且**保留** `focus_hour_zhi`。
+   *
+   * 与流日页的 `handleShift` 相反（那里一律清空 `focus_date`）：一支在任何一天都存在，
+   * 不会像聚焦日那样越界，清空反而让"换一天看同一时辰"变成两次点击（决策 10）。
+   * `0` 交回 `null`，即请服务端按参考日开窗 —— 与直接进这一页同一条路径。
+   */
+  function handleShift(direction: ShiftDirection): void {
+    const result = liushi.data;
+    const previous = lastRequest;
+    if (!result || !previous) {
+      return;
+    }
+    const date = direction === 0 ? null : shiftIso(result.solar_date, direction < 0 ? -1 : 1);
+    send({ ...previous, solar_date: date });
+  }
+
+  const showLinkNotice = link === null && [...searchParams.keys()].length > 0;
+  const result = liushi.data;
+  const peak = result ? peakIndexOf(result.hours) : 0;
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
+      <InputBar
+        title="流时十二辰 · 一日逐时"
+        badge="lunar-python 权威历算"
+        subtitle="在一个八字日内逐时辰结算加减：五鼠遁时柱、四段账本、日主临时支，点一格展开该时辰详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        showCalendar
+        initial={link?.values}
+        submitLabel={liushi.isPending ? '推演中…' : '开始推演'}
+        pending={liushi.isPending}
+        onSubmit={handleSubmit}
+      >
+        <LabeledField label="造向（性别）">
+          <SegmentedControl
+            ariaLabel="性别"
+            options={GENDER_OPTIONS}
+            value={gender}
+            onChange={(next) => setGender(next)}
+          />
+        </LabeledField>
+
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-variant">
+          <input
+            type="checkbox"
+            checked={applyTrueSolarTime}
+            onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
+            className="h-4 w-4 accent-[#d4af37]"
+          />
+          真太阳时校正（推荐）
+        </label>
+      </InputBar>
+
+      {showLinkNotice ? (
+        <p className="label-caps text-ink-muted">链接参数不完整，请手动填写后查询。</p>
+      ) : null}
+
+      {liushi.error ? (
+        <TransitErrorNote
+          error={liushi.error}
+          captions={CONTEXT_LABEL}
+          hint="换一天或改选十二支之一后重新推演。"
+        />
+      ) : null}
+
+      {liushi.isPending && !result ? (
+        <p className="label-caps text-ink-muted">正在按本命喜忌逐时辰结算…</p>
+      ) : null}
+
+      {result ? (
+        <>
+          <TransitNatalBar natal={result} />
+
+          <LiushiDayHeader result={result} busy={liushi.isPending} onShift={handleShift} />
+
+          <ResultCard
+            eyebrow="QI WAVEFORM"
+            title="一日真气"
+            icon="timeline"
+            actions={
+              <span className="label-caps text-ink-muted">
+                峰值 {result.hours[peak].ganzhi}·{Math.round(result.hours[peak].value)}
+              </span>
+            }
+          >
+            <LiushiQiWaveform
+              hours={result.hours}
+              baseline={result.day_score.value}
+              peakIndex={peak}
+            />
+          </ResultCard>
+
+          <ResultCard
+            eyebrow="HOUR LADDER"
+            title={`${result.day_ganzhi}日十二时辰`}
+            icon="clock"
+            actions={<span className="label-caps text-ink-muted">点一格看该时辰详批</span>}
+          >
+            <LiushiHourLadder
+              hours={result.hours}
+              peakIndex={peak}
+              focusZhi={result.focused?.zhi ?? null}
+              onSelect={handleFocus}
+            />
+          </ResultCard>
+
+          <ResultCard eyebrow="PEAK NOTE" title="峰值备忘录" icon="gauge">
+            <LiushiPeakNote cell={result.hours[peak]} dayValue={result.day_score.value} />
+          </ResultCard>
+
+          {result.focused ? (
+            <LiushiFocusCard detail={result.focused} />
+          ) : (
+            <p className="label-caps text-ink-muted">
+              未聚焦任何时辰 —— 点十二格里任意一格即出该时辰详批。
+            </p>
+          )}
+
+          <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
+            <ProvenancePanel
+              tables={result.provenance.tables}
+              meta={[
+                { label: '推演引擎', value: result.provenance.engine },
+                {
+                  label: '参考日',
+                  value: result.provenance.reference_date,
+                  title: '请求未指定聚焦日时取服务器当日',
+                },
+                { label: '八字日', value: result.solar_date },
+                {
+                  label: '本段起讫',
+                  value: `${result.month_start_solar} ~ ${result.month_end_solar}`,
+                },
+                { label: '真太阳时', value: result.true_solar_time ?? '未校正（标准时直排）' },
+                { label: '经度', value: `${result.longitude.toFixed(2)}°` },
+              ]}
+              notes={[
+                '逐时分数是岁运规则表在时段的加减账，不是吉凶断言；每一分都在账本里可核对（spec §6.2）。',
+                '十二格共用一根日柱，年/月/日三段只结算一次，每格多的只有 `shi.` 那一段（决策 1）。',
+                '时柱取五鼠遁、日界取 23:00 属次日；时辰划分按北京钟面整点，不做真太阳时校正（决策 2/6）。',
+                '通书宜忌是「日」粒度内容，只在页头一句带过，不下挂到时辰（决策 13）。',
+              ]}
+            />
+          </ResultCard>
+        </>
+      ) : null}
+    </div>
+  );
+}

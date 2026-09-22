@@ -2,7 +2,7 @@ import { Icon } from '../../ui/Icon';
 import type { ApiError } from '../../../api/client';
 
 /**
- * 域错误（岁运与流日共用的 `transit_*` / `liuri_*` 六个码）的页顶回显。
+ * 域错误（岁运、流日与流时共用的 `transit_*` / `liuri_*` / `liushi_*` 八个码）的页顶回显。
  *
  * 文案照后端原句（"2028-06-01 不在 2028-01-06 ~ 2028-02-03 这一段里"），数字与日期另取
  * `context` 排成可扫读的一行，让读者知道该把表单改成什么 —— 两处同源，不可能互相打架。
@@ -20,7 +20,10 @@ export function TransitErrorNote({
   /** 域错误时补的一句"那该怎么办"，各页按自己的控件写。 */
   hint?: string;
 }) {
-  const isDomain = error.code.startsWith('transit_') || error.code.startsWith('liuri_');
+  const isDomain =
+    error.code.startsWith('transit_') ||
+    error.code.startsWith('liuri_') ||
+    error.code.startsWith('liushi_');
   const facts = isDomain ? contextFacts(error.context, captions) : [];
 
   return (
@@ -48,7 +51,8 @@ export function TransitErrorNote({
  * `context` 里的数值与日期串 → 中文标签 + 原值。
  *
  * 岁运的六个键全是年份数字，流日的三个键全是 `YYYY-MM-DD`，两者都要摆出来才看得懂
- * 该改成什么；其余类型（如姓名学的候选字列表）留给文案自己说。
+ * 该改成什么；流时另有两个键，`supported` 是一整串十二支（`子丑寅卯辰巳午未申酉戌亥`），
+ * 与 `requested` 并排即说明该往哪个方向改。其余类型（如姓名学的候选字列表）留给文案自己说。
  */
 function contextFacts(
   context: Record<string, unknown> | undefined,

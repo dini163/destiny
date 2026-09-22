@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import { PillarCard } from '../PillarCard';
 import { RelationChips } from '../RelationChips';
 import { ShenShaList } from '../ShenShaList';
@@ -19,7 +21,7 @@ import type { TransitDayDetail } from '../../../types/baziLiuri';
  *
  * 历注与四书语料视觉上分开：它来自外部历法库，不参与上面那本账的任何一分。
  */
-export function LiuriFocusCard({ detail }: { detail: TransitDayDetail }) {
+export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; href?: string }) {
   return (
     <ResultCard
       eyebrow="FOCUSED DAY"
@@ -29,6 +31,14 @@ export function LiuriFocusCard({ detail }: { detail: TransitDayDetail }) {
         <span className="flex items-baseline gap-3">
           <span className="numeric text-xs text-ink-variant">{detail.solar_date}</span>
           <span className="text-xs text-ink-muted">{detail.lunar_day}</span>
+          {href ? (
+            <Link
+              to={href}
+              className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
+            >
+              看这一刻的十二时辰
+            </Link>
+          ) : null}
         </span>
       }
     >

@@ -3,14 +3,15 @@ import { ROUTES } from '../nav';
 import type { Gender } from '../types/common';
 
 /**
- * 岁运与流日这两条下钻链接。
+ * 岁运、流日与流时这三条下钻链接。
  *
- * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块与 `BaziTransitPage` 的月卡，拆串在
- * `BaziTransitPage` 与 `BaziLiuriPage` 挂载时，键名一旦漂移，症状是"点进去要手填"这种
- * 没人会立刻报牌的退化，所以它们必须同生同老。
+ * 两端并置一处：拼串在 `BaziNatalPage` 的大运区块、`BaziTransitPage` 的月卡与
+ * `BaziLiuriPage` 的聚焦卡，拆串在 `BaziTransitPage`、`BaziLiuriPage` 与 `BaziLiushiPage`
+ * 挂载时，键名一旦漂移，症状是"点进去要手填"这种没人会立刻报牌的退化，所以它们必须同生
+ * 同老。
  *
  * 走查询串而不是 `location.state`：`state` 刷新即丢，而推演的结论必须可分享、可回访
- * （spec §8）。`name` 不在其列 —— 称谓只是主命盘的回显，两个推演页既不收也不显示。
+ * （spec §8）。`name` 不在其列 —— 称谓只是主命盘的回显，三个推演页既不收也不显示。
  */
 
 /** 拆开的链接：一份可直接提交的命盘输入，加上岁运页的两项本地状态。 */
@@ -39,10 +40,10 @@ export function buildTransitHref(
 /**
  * 生辰 + 造向 + 校正开关 → 查询参数。
  *
- * 岁运与流日两条链接共用这一份，流日只在它上面再 `set` 自己的两个日期键 —— 少一次
+ * 岁运、流日与流时三条链接共用这一份，后两条只在它上面再 `set` 自己的键 —— 少一次
  * "复制粘贴字段清单"就少一处能漂移的地方。
  */
-function birthParams(
+export function birthParams(
   values: BirthInputValues,
   options: { gender: Gender; applyTrueSolarTime: boolean },
 ): URLSearchParams {
@@ -156,4 +157,80 @@ export function parseLiuriLink(params: URLSearchParams): LiuriLink | null {
     return null;
   }
   return { ...natal, anchor, focus };
+}
+
+const HOUR_BRANCH_PATTERN = /^[子丑寅卯辰巳午未申酉戌亥]$/;
+
+/** 流时页的两条本地状态：哪一天、聚焦哪一支。 */
+export interface LiushiLink extends TransitLink {
+  date: string | null;
+  hour: string | null;
+}
+
+/**
+ * 生辰 + 造向 + 校正 + 那两键 → `URLSearchParams`（不含路径）。
+ *
+ * 与 {@link buildLiushiHref} 分开是为了页面能把同一份参数写回查询串：`setSearchParams` 要
+ * 的是串而不是整链，两处各拼一遍字段清单就能各改一半。`date` / `hour` 空值不写进串，
+ * 于是"缺省落参考日"这条状态在 URL 上是不留痕的，与直接进页面完全同形。
+ */
+export function buildLiushiQuery(
+  values: BirthInputValues,
+  options: {
+    gender: Gender;
+    applyTrueSolarTime: boolean;
+    date: string | null;
+    hour: string | null;
+  },
+): string {
+  const params = birthParams(values, options);
+  if (options.date) {
+    params.set('date', options.date);
+  }
+  if (options.hour) {
+    params.set('hour', options.hour);
+  }
+  return params.toString();
+}
+
+/**
+ * 拼出 `/bazi-liushi?birth_date=…&…&date=2028-01-26&hour=辰`。
+ *
+ * 第一个参数收的是 `BirthInputValues`，而调用方手上通常是整份流日请求（多带 `gender` /
+ * `apply_true_solar_time` / `reference_date` / `name`）—— 直接交过去即可，多余字段无害，
+ * 因为 {@link birthParams} 只挑它认识的那七个键，调用点不必先 omit 一遍。
+ */
+export function buildLiushiHref(
+  values: BirthInputValues,
+  options: {
+    gender: Gender;
+    applyTrueSolarTime: boolean;
+    date: string | null;
+    hour: string | null;
+  },
+): string {
+  return `${ROUTES.baziLiushi}?${buildLiushiQuery(values, options)}`;
+}
+
+/**
+ * 解流时链接：生辰半段整块交给 {@link parseTransitLink}，再补那两键。
+ *
+ * 时辰只认十二支（`HOUR_BRANCHES` 那份白名单在这里是第二遍，但它拦的是"手改的链接"，
+ * 引擎那侧拦的是"发出来的请求"，两处各司其职）：`?hour=十三` 这种整条作废退回手填，
+ * 而不是把坏值交给服务端换一台机器码 —— 用户看到的会是两段毫不相干的话。
+ */
+export function parseLiushiLink(params: URLSearchParams): LiushiLink | null {
+  const natal = parseTransitLink(params);
+  if (!natal) {
+    return null;
+  }
+  const date = params.get('date');
+  const hour = params.get('hour');
+  if (date !== null && !DATE_PATTERN.test(date)) {
+    return null;
+  }
+  if (hour !== null && !HOUR_BRANCH_PATTERN.test(hour)) {
+    return null;
+  }
+  return { ...natal, date, hour };
 }

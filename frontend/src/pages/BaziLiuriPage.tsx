@@ -14,7 +14,8 @@ import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
-import { parseLiuriLink } from '../lib/transitLink';
+import { shiftIso } from '../lib/isoDate';
+import { buildLiushiHref, parseLiuriLink } from '../lib/transitLink';
 import type { BaziLiuriRequest } from '../types/baziLiuri';
 import type { Gender } from '../types/common';
 
@@ -57,18 +58,6 @@ function makeRequest(
 }
 
 /**
- * ISO 日期加减若干天，仍在 ISO 里。
- *
- * `T00:00:00Z` + `setUTCDate` 是必须的：按本地时区做加减会在夏令时切换那两天跳错一天，
- * 而跳错一天的症状是整段矩阵少一天或多一天，没人会把它当时区问题去查。
- */
-function shiftIso(iso: string, days: number): string {
-  const next = new Date(`${iso}T00:00:00Z`);
-  next.setUTCDate(next.getUTCDate() + days);
-  return next.toISOString().slice(0, 10);
-}
-
-/**
  * 全月流日矩阵页（PRD §6.1.2）。
  *
  * 一页 = 命局条 + 段头 + 逐日矩阵 + 聚焦日详批 + 溯源。页面上只有两个日期是本页的意志：
@@ -92,10 +81,10 @@ export function BaziLiuriPage() {
    * 最近一次提交的请求。点格与切段都只在它上面改一两个字段，其余（生辰、造向、锚日）
    * 原样交回 —— 这样「换一天看」不会顺带把用户没打算改的东西改掉。
    *
-   * 用 ref 而不是 state：href 不在本页拼（那是岁运页的事），这几个 handler 是唯一读它
-   * 的地方，渲染期不需要它参与。
+   * 用 state 而不是 ref：流日聚焦卡现在要在渲染期读它拼下钻链接（`buildLiushiHref`），
+   * 而 ref 不参与渲染 —— 用 ref 的症状是点了格子，下钻链接还停在上一份请求的生辰上。
    */
-  const lastRequest = useRef<BaziLiuriRequest | null>(null);
+  const [lastRequest, setLastRequest] = useState<BaziLiuriRequest | null>(null);
   const autoSubmitted = useRef(false);
 
   useEffect(() => {
@@ -110,7 +99,7 @@ export function BaziLiuriPage() {
 
   /** 发一次并记住发的是哪一份：段切换与下钻都要在它的基础上改字段。 */
   function send(request: BaziLiuriRequest): void {
-    lastRequest.current = request;
+    setLastRequest(request);
     liuri.mutate(request);
   }
 
@@ -133,7 +122,7 @@ export function BaziLiuriPage() {
    * 明细（决策 5）。已经是聚焦日则什么都不发 —— 点同一格不该让段头翻一次账。
    */
   function handleFocus(solarDate: string): void {
-    const previous = lastRequest.current;
+    const previous = lastRequest;
     if (!previous || liuri.data?.focused?.solar_date === solarDate) {
       return;
     }
@@ -149,7 +138,7 @@ export function BaziLiuriPage() {
    */
   function handleShift(direction: ShiftDirection): void {
     const result = liuri.data;
-    const previous = lastRequest.current;
+    const previous = lastRequest;
     if (!result || !previous) {
       return;
     }
@@ -235,7 +224,19 @@ export function BaziLiuriPage() {
           </ResultCard>
 
           {result.focused ? (
-            <LiuriFocusCard detail={result.focused} />
+            <LiuriFocusCard
+              detail={result.focused}
+              href={
+                lastRequest
+                  ? buildLiushiHref(lastRequest, {
+                      gender,
+                      applyTrueSolarTime,
+                      date: result.focused.solar_date,
+                      hour: null,
+                    })
+                  : undefined
+              }
+            />
           ) : (
             <p className="label-caps text-ink-muted">
               未聚焦任何一天 —— 点矩阵里任意一格即出当日详批。

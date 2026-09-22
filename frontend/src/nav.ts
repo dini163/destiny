@@ -22,6 +22,8 @@ export const ROUTES = {
   /** 全月流日矩阵（切片 3）。与 `baziTransit` 同一条理由不进导航：它是岁运页月卡的下钻，
    * 无生辰即无意义，不是一新一大体系（spec 决策 8）。 */
   baziLiuri: '/bazi-liuri',
+  // 岁运 → 流日 → 流时的下钻终点，不进 SECONDARY_NAV：无生辰即无意义。
+  baziLiushi: '/bazi-liushi',
   westernNatal: '/western-astrology',
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',
