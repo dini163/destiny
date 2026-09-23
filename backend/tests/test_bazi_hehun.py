@@ -49,10 +49,8 @@ from app.engines.bazi_hehun import (
     hehun_rows,
     hehun_tier,
     nayin_key,
-    nayin_phrase,
     nayin_relation,
     nayin_row,
-    nayin_side,
     nayin_view,
     pair_matrix,
     palace_keys,
@@ -708,7 +706,7 @@ def test_the_complement_figure_books_nothing_the_ledger_did_not() -> None:
         assert [(view.viewer, view.label) for view in figure.views] == [
             (view.viewer, view.label) for view in YONGSHEN_VIEWS
         ]
-        for view, yongshen_view in zip(figure.views, YONGSHEN_VIEWS):
+        for view, yongshen_view in zip(figure.views, YONGSHEN_VIEWS, strict=True):
             own = [row for row in rows if row.direction == yongshen_view.direction]
             assert sum(len(cell.elements) for cell in view.cells) == len(own)
             assert all(yongshen_view.label in row.label for row in own)
@@ -765,9 +763,16 @@ def test_the_five_nayin_relations_each_compose_their_own_sentence() -> None:
     乙亥 山头火我生 / 己巳 大林木比和 / 丙子 涧下水生我），所以这一段同时是
     `nayin_phrase` 的四分支与"不共用同一句"的证明。主语固定为乾（§6.2）。
     """
+    females = (
+        FEMALE_SAME,
+        FEMALE_COMPLEMENT,
+        FEMALE_AUSPICIOUS,
+        FEMALE_HOSTILE,
+        FEMALE_DAY_MERGE,
+    )
     assert [
-        (nayin_view(_pair_of(female)).relation, nayin_view(_pair_of(female)).reading)
-        for female in (FEMALE_SAME, FEMALE_COMPLEMENT, FEMALE_AUSPICIOUS, FEMALE_HOSTILE, FEMALE_DAY_MERGE)
+        (view.relation, view.reading)
+        for view in (nayin_view(_pair_of(female)) for female in females)
     ] == [
         (
             "我克",
@@ -819,6 +824,9 @@ def test_the_quadrant_table_is_the_only_source_of_both_views() -> None:
 
     `平` 不在表的横轴里，于是 `YONGSHEN_QUADRANT[(True, "平")]` 必然 KeyError：
     §7.1 那句"平既不入象限也不入账本"是数据结构本身给的，不是判断里写死的。
+    最后一条要和**总装配**对拍，不能与 `yongshen_rows` 对拍 —— 后者就是前者的投影，
+    两边比字面相等是同义反复。`hehun_rows` 走的是另一条路（五族按 `HEHUN_FAMILIES` 装配），
+    所以"事实表改序 / 总装另起一处互济族判定"都会让它变红，而这一断仍是真的。
     """
     assert [rule for rule, _n, _m, _t in YONGSHEN_QUADRANTS] == [
         "hh.yongshen.supply",
@@ -826,12 +834,14 @@ def test_the_quadrant_table_is_the_only_source_of_both_views() -> None:
         "hh.yongshen.clash",
         "hh.yongshen.harmless",
     ]
-    assert {rule: hehun_rule(rule).family for rule, *_ in YONGSHEN_QUADRANTS} == {rule: "yongshen" for rule, *_ in YONGSHEN_QUADRANTS}
+    families = {rule: hehun_rule(rule).family for rule, *_ in YONGSHEN_QUADRANTS}
+    assert families == dict.fromkeys(families, "yongshen")
     assert YONGSHEN_QUADRANT[(True, "旺")] == "hh.yongshen.supply"
     assert YONGSHEN_QUADRANT[(False, "弱")] == "hh.yongshen.harmless"
     assert (True, "平") not in YONGSHEN_QUADRANT
-    assert [fact.row.label for fact in yongshen_facts(_pair_of(FEMALE_COMPLEMENT))] == [
-        row.label for row in yongshen_rows(_pair_of(FEMALE_COMPLEMENT))
+    pair = _pair_of(FEMALE_COMPLEMENT)
+    assert [fact.row.label for fact in yongshen_facts(pair)] == [
+        row.label for row in hehun_rows(pair) if row.family == "yongshen"
     ]
 
 
