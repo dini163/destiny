@@ -36,7 +36,7 @@ class HehunProfile(BaseModel):
     #: 缺省不设经线（与 `BirthInput.longitude` 同形）：显式经度一旦有默认值就会在
     #: `profile_longitude` 里恒胜过城市，地理编码永不发生，认不出的城市也就无从报错
     #: （spec §9.1）。标准经线 120E 的兜底只在**关闭校正**时由 `profile_longitude` 给出。
-    longitude: float | None = None
+    longitude: float | None = Field(default=None, ge=-180, le=180)
     apply_true_solar_time: bool = True
     name: str | None = Field(default=None, max_length=40, description="称谓，仅回显，不进计算。")
 

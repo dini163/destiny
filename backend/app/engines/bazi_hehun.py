@@ -3,7 +3,8 @@
 历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做四件事：
 ① 把两造各排一次盘，并把错误归到是哪一造（§9.2）；② 以乾四柱为体、坤四柱为 `extra`
 扫一次跨造关系，按"恰好一侧是 extra"过滤（§2.1）；③ 按 §6.2 的归属规则把每个事实
-收进五族里的一族一条；④ 交 `build_ledger` 出一份自解释的总分。
+收进五族里的一族一条（五族随 Task 3、4 陆续落地，今日只有对称族那一族在账）；
+④ 交 `build_ledger` 出一份自解释的总分（Task 4 落地）。
 
 **跨造不算十神**（决策 2）：十神是命局内部的坐标（切片 0 §7.5 已把 `_god()` 对外来柱
 定为空串），把它伸到另一张盘上是本系统没有资格立的第五种命理学说。同理两造的喜忌一律
@@ -89,9 +90,11 @@ def compute_partner_charts(
 def _chart_for(profile: HehunProfile, gender: Gender, reference: date) -> BaziChart:
     """排一造的盘，出错时把"是哪一造"记进 `context` 再原样抛出。
 
-    code、message、status_code 一字不动：`TransitErrorNote` 于是自动说出是谁的生辰有问题
-    （§9.2），而既有的错误链不必为合婚开第二份。`partner` 是唯一新增的一项 context，
-    取 `Gender` 的值即是乾/坤的键名，不必再造一张映射表。
+    code、message、status_code 一字不动：既有的错误链不必为合婚开第二份，`context.partner`
+    随那份错误一同出去，归属在后端这一侧就已经定下了（§9.2）。把它说给读者还差前端一步 ——
+    `TransitErrorNote` 目前只在 `transit_*`/`liuri_*`/`liushi_*` 前缀族上渲染 `context`，
+    `invalid_birth_data` 落不进那道门，于是只回显 message（Task 11 接线）。`partner` 是唯一
+    新增的一项 context，取 `Gender` 的值即是乾/坤的键名，不必再造一张映射表。
     只拦 `DestinyError`：非域错误原样上抛，不塞归属，免得把一个 bug 伪装成"某造生辰有误"。
     """
     try:
