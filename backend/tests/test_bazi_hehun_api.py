@@ -4,7 +4,8 @@
 `{"error": {code, message, context}}`，轴的越界是 422；缺字段与 `axis_years` 自身越界过
 pydantic，带 `{"detail": [...]}`，也是 422；而一造生辰非法走的是 `/natal` 那条链上现成的
 `invalid_birth_data`，**状态码维持 400**（§9.2 明写"code、message、状态码一字不动"，
-`tests/golden/test_bazi_golden.py:146` 已把 400 钉在其它端点上）。形状不同而状态码有重合，
+`tests/golden/test_bazi_golden.py::test_bazi_natal_requires_location_when_tst_enabled`
+已把 400 钉在其它端点上）。形状不同而状态码有重合，
 所以每个用例都两头各断一次 —— 只看 status_code 的测试放得过任何一侧。
 
 合婚特有的一条是 `context.partner`：一造合法一造非法时整请求失败（§9.1），
@@ -124,7 +125,9 @@ def test_an_illegal_partner_is_named_and_no_half_chart_comes_back(client: TestCl
 
 def test_an_axis_before_the_later_birth_year_is_a_domain_422(client: TestClient) -> None:
     """轴起早于坤的出生年：机器码 + 五项 context，前端据此把轴挪回去（§8 的 CONTEXT_LABEL）。"""
-    error = _error(_post(client, axis_start_year=1989))
+    response = _post(client, axis_start_year=1989)
+    error = _error(response)
+    assert response.status_code == 422
     assert error["code"] == "hehun_axis_out_of_range"
     assert error["context"] == {
         "requested_from": 1989,
@@ -136,14 +139,18 @@ def test_an_axis_before_the_later_birth_year_is_a_domain_422(client: TestClient)
 
 
 def test_an_axis_past_the_shared_end_is_the_same_code(client: TestClient) -> None:
-    error = _error(_post(client, axis_start_year=2080, axis_years=5))
+    response = _post(client, axis_start_year=2080, axis_years=5)
+    error = _error(response)
+    assert response.status_code == 422
     assert error["code"] == "hehun_axis_out_of_range"
     assert (error["context"]["requested_to"], error["context"]["supported_to"]) == (2084, 2082)
 
 
 def test_an_axis_longer_than_the_cap_is_a_pydantic_422_not_a_domain_422(client: TestClient) -> None:
     """§9.3 的两类 422 分界：轴长自身越界是入参错误，拿不到也不该拿到机器码。"""
-    body = _post(client, axis_years=31).json()
+    response = _post(client, axis_years=31)
+    body = response.json()
+    assert response.status_code == 422
     assert "error" not in body
     assert {item["loc"][-1] for item in body["detail"]} == {"axis_years"}
 
@@ -155,6 +162,7 @@ def test_a_missing_partner_field_is_a_validation_error(client: TestClient) -> No
         json={"male": _MALE, "female": {k: v for k, v in _FEMALE.items() if k != "birth_time"}},
     )
     body = response.json()
+    assert response.status_code == 422
     assert "error" not in body
     assert {tuple(item["loc"]) for item in body["detail"]} == {("body", "female", "birth_time")}
 
