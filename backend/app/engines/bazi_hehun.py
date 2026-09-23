@@ -1,11 +1,12 @@
 """八字合婚引擎（spec §2、§6）：两造同屏，关系第一次要跨两张盘算。
 
-历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做五件事：
+历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做六件事：
 ① 把两造各排一次盘，并把错误归到是哪一造（§9.2）；② 以乾四柱为体、坤四柱为 `extra`
 扫一次跨造关系，按"恰好一侧是 extra"过滤（§2.1）；③ 按 §6.2 的归属规则把每个事实
 收进五族里的一族一条（对称、成局、互济、年命、婚姻宫五族全在账）；
 ④ 交 `build_ledger` 出一份自解释的总分。
 ⑤ 铺 §7.3 的同频演进轴：轴上的分值不在此重算，走的是岁运那一条装配路径。
+⑥ 装配整页并守轴界（§9.3）：两造档案、四张衍生结构与一轴一次给全，越界的轴以域错误出去。
 
 **跨造不算十神**（决策 2）：十神是命局内部的坐标（切片 0 §7.5 已把 `_god()` 对外来柱
 定为空串），把它伸到另一张盘上是本系统没有资格立的第五种命理学说。同理两造的喜忌一律
@@ -60,6 +61,7 @@ from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_hehun import (
     AxisSync,
     BaziHehunResult,
+    ComplementAxis,
     HehunAxis,
     HehunAxisRow,
     HehunAxisSegment,
@@ -462,7 +464,7 @@ def palace_rows(pair: HehunChartPair) -> list[HehunRow]:
     return [_to_row(key, "mutual") for key in palace_keys(pair)]
 
 
-def _to_row(rule_key: str, direction: str, suffix: str = "") -> HehunRow:
+def _to_row(rule_key: str, direction: HehunDirection, suffix: str = "") -> HehunRow:
     """账本的一行未折入前的形。短名带后缀：同一个键在一份账本里可以出现三次
     （乾月×坤年、乾日×坤年、乾时×坤时），不带格位就读不出那一行是谁加的分 ——
     与岁运 `hit_rows` 的（流月）后缀是同一条纪律（`bazi_transit.py:436`）。
@@ -532,7 +534,11 @@ def pair_matrix(pair: HehunChartPair) -> list[HehunCell]:
 #: 四象限的表：(账本键, 单字格名, 纵轴, 横轴)。序即 §7.1 那张表的阅读序，
 #: 也是响应里 `cells` 的恒定长度与顺序。`平` 不在横轴里 ——
 #: §7.1 那句"平既不落象限也不入账本"就是这么落进数据结构的。
-YONGSHEN_QUADRANTS: tuple[tuple[str, str, str, str], ...] = (
+#: 横轴那一路直接钉在 `ComplementAxis` 上（旺|弱，无 平）；纵轴那一路仍写 `str`：
+#: 它的取值就是 `HehunComplementCell.mine` 那枚内联 Literal（favorable|unfavorable），
+#: 仓里没有别名可引，为一张表再造一个别名反而多一处要跟着改的地方。运行时门槛在
+#: pydantic 的 `cells` 上，这里只是把表的形状说给读代码的人。
+YONGSHEN_QUADRANTS: tuple[tuple[str, str, str, ComplementAxis], ...] = (
     ("hh.yongshen.supply", "补", "favorable", "旺"),
     ("hh.yongshen.shortfall", "阙", "favorable", "弱"),
     ("hh.yongshen.clash", "冲", "unfavorable", "旺"),

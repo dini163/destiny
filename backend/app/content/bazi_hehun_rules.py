@@ -6,7 +6,7 @@
 那一格的三级归属（§6.2）。本表不碰历法，也不把命盘再算一遍（契约模型在 `app/schemas`、
 命中逻辑在 `app/engines`），所以它不需要第二处真值来源。
 
-族序即账本序：`HEHUN_FAMILIES` 的顺序就是 `engines/bazi_hehun.hehun_rows()`（Task 4 落地）
+族序即账本序：`HEHUN_FAMILIES` 的顺序就是 `engines/bazi_hehun.hehun_rows()`
 拼账本的顺序，两处同序是为了让"这一行属于哪一族"在 ledger 里读得出来，而不是靠键名前缀现推
 —— 这条许诺由 `tests/content/test_bazi_hehun_rules.py` 的族序测钉住。
 
