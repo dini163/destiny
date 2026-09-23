@@ -350,7 +350,10 @@ def test_a_pillar_level_fact_seals_the_whole_palace_cell() -> None:
     assert len(hits) == 11
     assert len(relation_rows(pair)) == 8
     assert not any(row.label.endswith("（乾日×坤日）") for row in relation_rows(pair))
-    assert any(row.label.endswith("（乾日×坤月）") for row in relation_rows(pair))
+    # 格位逐字断言：(乾日, 坤月) 那一格里照记账的确实且仅有 乾日 子 × 坤月 卯 的一条无礼之刑。
+    assert [
+        row.label for row in relation_rows(pair) if row.label.endswith("（乾日×坤月）")
+    ] == ["无礼之刑（乾日×坤月）"]
 
 
 def test_a_branch_clash_in_the_palace_leaves_the_relation_family_clean() -> None:
