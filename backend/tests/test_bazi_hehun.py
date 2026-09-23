@@ -826,7 +826,10 @@ def test_the_quadrant_table_is_the_only_source_of_both_views() -> None:
     §7.1 那句"平既不入象限也不入账本"是数据结构本身给的，不是判断里写死的。
     最后一条要和**总装配**对拍，不能与 `yongshen_rows` 对拍 —— 后者就是前者的投影，
     两边比字面相等是同义反复。`hehun_rows` 走的是另一条路（五族按 `HEHUN_FAMILIES` 装配），
-    所以"事实表改序 / 总装另起一处互济族判定"都会让它变红，而这一断仍是真的。
+    所以"总装改序 / 总装另起一处互济族判定"都会让它变红，而这一断仍是真的。反过来，
+    `yongshen_facts` 内部改序杀不掉它 —— 投影 `yongshen_rows` 走的是同一张事实表，两边一起变；
+    那一层的顺序本就没有唯一的正确排法，多出来的象限/元素归属由
+    `test_the_complement_figure_books_nothing_the_ledger_did_not` 收住。
     """
     assert [rule for rule, _n, _m, _t in YONGSHEN_QUADRANTS] == [
         "hh.yongshen.supply",
