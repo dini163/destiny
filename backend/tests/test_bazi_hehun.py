@@ -26,7 +26,6 @@ from app.engines.bazi_hehun import (
     PALACE_STEM_MERGE,
     PILLAR_NAME,
     POSITION_ORDER,
-    YONGSHEN_QUADRANT,
     GroupMember,
     HehunChartPair,
     compute_partner_charts,
@@ -527,7 +526,7 @@ def test_every_measured_pair_lands_where_the_design_said() -> None:
 
 
 def test_the_ledger_is_self_explaining_and_starts_with_the_base() -> None:
-    """§10.5 末条 + §6.3 第 3 条：`value == Σ factors[].delta`，每行的出处都是模型参数。
+    """§10.5 末条 + §6.3 第 3 条：`value == Σ factors[].delta`，每一行的出处都带模型参数那一句。
 
     九枚命例里最低 0.0、最高 94.0，都在 [0, 100] 之内，所以没有一枚会多出
     `score.clamped` 那一行 —— 上一测的 `len(factors) - 1 == 行数` 已经把这条钉住了。
@@ -538,10 +537,10 @@ def test_the_ledger_is_self_explaining_and_starts_with_the_base() -> None:
     assert ledger.factors[0].label == "基准分"
     assert ledger.factors[0].delta == HEHUN_BASE
     assert ledger.value == pytest.approx(sum(factor.delta for factor in ledger.factors))
-    # 控制方裁定点（原字面量 `{HEHUN_RULE_SOURCE}` 与既有契约冲突）：基准行的 source 恒为
-    # `MODEL_PARAM_SOURCE` 原句 —— `build_ledger` 硬编码如此（spec §6.3 第 3 条点名 `HEHUN_BASE`
-    # 的出处就是那一句，岁运 golden 测 `test_bazi_transit_golden.py:195` 钉的是同一行为）。
-    assert {factor.source for factor in ledger.factors} == {HEHUN_RULE_SOURCE, MODEL_PARAM_SOURCE}
+    # 基准行的 source 是 `build_ledger` 打的 `MODEL_PARAM_SOURCE` 原句（§6.3 第 3 条点名 `HEHUN_BASE`
+    # 的出处就是那一句；岁运 golden 测 `test_bazi_transit_golden.py:195` 钉的是同一行为），贡献行才写合婚自己的口径。
+    assert {factor.source for factor in ledger.factors[1:]} == {HEHUN_RULE_SOURCE}
+    assert ledger.factors[0].source == MODEL_PARAM_SOURCE
     assert MODEL_PARAM_SOURCE in HEHUN_RULE_SOURCE
 
 
