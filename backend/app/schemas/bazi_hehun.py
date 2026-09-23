@@ -98,6 +98,10 @@ class HehunFired(BaseModel):
 #: §7.2 的 5×5 通行关系，主语固定为乾（"我"= 乾）。
 NayinRelation = Literal["生我", "我生", "我克", "克我", "比和"]
 
+#: 互补图横轴。这里不用 `Vigor`（旺|弱|平）：§7.1 的"平既不落象限也不入账本"要写进类型，
+#: 否则契约承认一个引擎永远给不出的取值，前端就得为它写一条走不到的分支。
+ComplementAxis = Literal["旺", "弱"]
+
 
 class HehunComplementElement(BaseModel):
     """象限里的一个五行：只带名字与比值；规则与分值在同级的那一格上。"""
@@ -118,7 +122,7 @@ class HehunComplementCell(BaseModel):
     )
     name: str = Field(description="单字格名：补 | 阙 | 冲 | 安。")
     mine: Literal["favorable", "unfavorable"] = Field(description="纵轴：这一行对**观看方**是喜是忌。")
-    theirs: Vigor = Field(description="横轴：**对方**盘里这一行的旺弱。恒为 旺|弱 —— 表里没有 平 这一格。")
+    theirs: ComplementAxis = Field(description="横轴：**对方**盘里这一行的旺弱。恒为 旺|弱 —— 表里没有 平 这一格。")
     delta: float = Field(description="该格单价，与 `rule` 那条账本行同一个数。")
     elements: list[HehunComplementElement] = Field(
         description="落在本格的五行，按观看方喜忌集自身的序；空格是空列表（§10.6）。"
@@ -130,13 +134,25 @@ class HehunComplementView(BaseModel):
 
     viewer: PartnerSide = Field(description="视角主语：male = 乾视坤。")
     label: str = Field(description="「乾视坤」短名，与账本行 `label` 里的那一处字同一来源。")
-    cells: list[HehunComplementCell] = Field(description="恒 4 格，序即 §7.1 表：补 阙 冲 安。")
+    cells: list[HehunComplementCell] = Field(
+        min_length=4,
+        max_length=4,
+        description="恒 4 格，序即 §7.1 表：补 阙 冲 安。",
+    )
 
 
 class HehunComplement(BaseModel):
-    """五行互补（§7.1）：四象限 × 两视角，与互济族账本同一次遍历。"""
+    """五行互补（§7.1）：四象限 × 两视角，与互济族账本出自**同一次判定**。
 
-    views: list[HehunComplementView] = Field(description="恒 2 视角：乾视坤、坤视乾（§6.2 的有向族）。")
+    措辞要说准：账本与图不是同一次*遍历*（账本取事实表的 `.row`，图按 (视角, 象限) 分桶，
+    各自还要走一遍），是同一批 `YongshenFact` 的两个投影 —— 一次判定，两处读数。
+    """
+
+    views: list[HehunComplementView] = Field(
+        min_length=2,
+        max_length=2,
+        description="恒 2 视角：乾视坤、坤视乾（§6.2 的有向族）。",
+    )
 
 
 class HehunNayinSide(BaseModel):

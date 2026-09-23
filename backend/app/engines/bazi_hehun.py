@@ -45,10 +45,12 @@ from app.schemas.bazi_hehun import (
     HehunComplementCell,
     HehunComplementElement,
     HehunComplementView,
+    HehunDirection,
     HehunFired,
     HehunNayin,
     HehunNayinSide,
     HehunProfile,
+    NayinRelation,
     PartnerSide,
     Vigor,
 )
@@ -355,7 +357,7 @@ def _nayin_elements(pair: HehunChartPair) -> tuple[str, str]:
     )
 
 
-def nayin_relation(pair: HehunChartPair) -> str:
+def nayin_relation(pair: HehunChartPair) -> NayinRelation:
     """两造年命纳音的五行关系，**主语固定为乾**（§6.2）。
 
     五行之间的关系只有 比和/生我/我生/我克/克我 五种，前四条判完剩下的那一条必然是
@@ -521,7 +523,7 @@ class YongshenView:
     """
 
     viewer: PartnerSide
-    direction: str
+    direction: HehunDirection
     label: str
 
 
@@ -544,7 +546,6 @@ class YongshenFact:
 
     row: HehunRow
     element: str
-    vigor: Vigor
     ratio: float
 
 
@@ -562,6 +563,19 @@ def element_ratios(chart: BaziChart) -> dict[str, float]:
     return {element: round(score / mean, 4) for element, score in scores.items()}
 
 
+def _vigor_from_ratios(ratios: dict[str, float]) -> dict[str, Vigor]:
+    """比值 → 旺/弱/平 标签。§2.6 的档位只在这一处比。
+
+    单独一处是因为互补图那一边**两个都要**：判象限用标签、给图带读数。少了这一步，
+    调用方只能 `element_vigor(other)` 与 `element_ratios(other)` 各来一遍 —— 同一把尺
+    量两遍，两遍的中间值还各不相同。
+    """
+    return {
+        element: "旺" if ratio >= STRONG_RATIO else "弱" if ratio <= WEAK_RATIO else "平"
+        for element, ratio in ratios.items()
+    }
+
+
 def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
     """该造五行的旺/弱/平标签（§2.6）。
 
@@ -572,20 +586,21 @@ def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
     跨盘比原始分值没有意义，两造的总量本来就接近（§2.6）。
     均值恒为正（四柱八个小干与藏干必有权重），所以这里不设除零分支。
     """
-    return {
-        element: "旺" if ratio >= STRONG_RATIO else "弱" if ratio <= WEAK_RATIO else "平"
-        for element, ratio in element_ratios(chart).items()
-    }
+    return _vigor_from_ratios(element_ratios(chart))
 
 
-def _one_view_facts(me: BaziChart, other: BaziChart, direction: str, where: str) -> list[YongshenFact]:
+def _one_view_facts(
+    me: BaziChart, other: BaziChart, direction: HehunDirection, where: str
+) -> list[YongshenFact]:
     """一个视角的四象限：先喜用（补/阙）后忌神（冲/安），组内按该造喜忌集的序。
 
     `where` 是短名里的"乾视坤/坤视乾" —— 两个视角的行同键同 delta，
     不带这一处就分不出是谁的喜用在说话（§6.1：一条账本行的身份是 (族, 视角, 五行)）。
+    比值只量一次：标签与读数都从同一个 `ratios` 出来（`vigor` 因此不上事实表 ——
+    它已经在 `row.rule` 与 `row.label` 里了，再存一份就是第四处真相）。
     """
-    theirs = element_vigor(other)
     ratios = element_ratios(other)
+    theirs = _vigor_from_ratios(ratios)
     facts: list[YongshenFact] = []
     for favorable, elements in (
         (True, me.analysis.favorable_elements),
@@ -599,7 +614,6 @@ def _one_view_facts(me: BaziChart, other: BaziChart, direction: str, where: str)
                     YongshenFact(
                         row=_to_row(rule_key, direction, f"（{where}·{element}{vigor}）"),
                         element=element,
-                        vigor=vigor,
                         ratio=ratios[element],
                     )
                 )
@@ -619,6 +633,7 @@ def yongshen_facts(pair: HehunChartPair) -> list[YongshenFact]:
 
 
 def yongshen_rows(pair: HehunChartPair) -> list[HehunRow]:
+    """互济族的账本行：事实表在 `row` 那一列上的投影（§6.1）。Task 4 的签名不变。"""
     return [fact.row for fact in yongshen_facts(pair)]
 
 
@@ -658,7 +673,7 @@ def complement(pair: HehunChartPair) -> HehunComplement:
 
 
 # ---------------------------------------------------------------- 年命纳音（spec §7.2）
-def nayin_phrase(mine: str, theirs: str, relation: str) -> str:
+def nayin_phrase(mine: str, theirs: str, relation: NayinRelation) -> str:
     """三字生克句：`生我` → 水生木、`比和` → 木与木同气。
 
     句式而非表：五行只有五对生克，写成一张 5×5 表就是四处要维护的字符串。
