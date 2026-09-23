@@ -77,6 +77,7 @@ from app.schemas.bazi_hehun import (
     NayinRelation,
     PartnerSide,
     Vigor,
+    YiJiKind,
 )
 from app.schemas.common import Gender
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
@@ -999,7 +1000,7 @@ def _only(kept: list[str], other: list[str]) -> list[str]:
     return [element for element in kept if element not in other]
 
 
-def _yiji_group(kind: str, elements: list[str]) -> HehunYiJiGroup:
+def _yiji_group(kind: YiJiKind, elements: list[str]) -> HehunYiJiGroup:
     return HehunYiJiGroup(
         kind=kind,
         items=[

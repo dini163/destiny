@@ -237,12 +237,16 @@ class HehunYiJiItem(BaseModel):
 class HehunYiJiGroup(BaseModel):
     kind: YiJiKind
     items: list[HehunYiJiItem] = Field(
-        description="该组的五行，按本组主语的喜忌集自身的序；空组是空列表（§10.6）。"
+        description="该组的五行：交集组按乾造的序，独集组按该造自己的序；空组是空列表（§10.6）。"
     )
 
 
 class HehunYiJi(BaseModel):
     """宜忌（§7.4）：唯一输入是两造本命盘的喜用与忌神。"""
 
-    groups: list[HehunYiJiGroup] = Field(description="恒 6 组，序即 §7.4 的阅读序。")
+    groups: list[HehunYiJiGroup] = Field(
+        min_length=6,
+        max_length=6,
+        description="恒 6 组，序即 §7.4 的阅读序（同宜→乾独宜→坤独宜→同忌→乾独忌→坤独忌）。",
+    )
     declaration: str = Field(description="逐字取自 `HEHUN_YIJI_DECLARATION`，前端不补算也不改写。")
