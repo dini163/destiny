@@ -1,10 +1,11 @@
 """八字合婚引擎（spec §2、§6）：两造同屏，关系第一次要跨两张盘算。
 
-历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做四件事：
+历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做五件事：
 ① 把两造各排一次盘，并把错误归到是哪一造（§9.2）；② 以乾四柱为体、坤四柱为 `extra`
 扫一次跨造关系，按"恰好一侧是 extra"过滤（§2.1）；③ 按 §6.2 的归属规则把每个事实
 收进五族里的一族一条（对称、成局、互济、年命、婚姻宫五族全在账）；
 ④ 交 `build_ledger` 出一份自解释的总分。
+⑤ 铺 §7.3 的同频演进轴：轴上的分值不在此重算，走的是岁运那一条装配路径。
 
 **跨造不算十神**（决策 2）：十神是命局内部的坐标（切片 0 §7.5 已把 `_god()` 对外来柱
 定为空串），把它伸到另一张盘上是本系统没有资格立的第五种命理学说。同理两造的喜忌一律
@@ -17,6 +18,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
+from typing import NamedTuple
 
 from app.content.bazi_hehun_rules import (
     HEHUN_BASE,
@@ -901,6 +903,15 @@ def _dayun_label(who: str, step: DayunStep) -> str:
     return f"{who}·第 {step.index} 运 {step.ganzhi}（{step.start_age}—{step.end_age} 岁）"
 
 
+class _SegmentDraft(NamedTuple):
+    """`axis_segments` 走轴时的累加器：一段还没走完时的那四个值。"""
+
+    key: tuple[int, int]
+    start_year: int
+    end_year: int
+    label: str
+
+
 def axis_segments(
     pair: HehunChartPair,
     male_luck: LuckTable,
@@ -915,20 +926,22 @@ def axis_segments(
     再去切区间 —— 前者与轴行同源于一次摊平，"这一段的名字"与"这一段里每一行的运"
     因此不可能不一致；后者还要在窗口边界上判一次谁先谁后，多一处可错的地方。
     """
-    segments: list[list[object]] = []
+    drafts: list[_SegmentDraft] = []
     for year in range(start_year, start_year + years):
         male_step = _dayun_step(pair.male, male_luck, year)
         female_step = _dayun_step(pair.female, female_luck, year)
         key = (male_step.index, female_step.index)
-        if segments and segments[-1][0] == key:
-            segments[-1][2] = year
+        if drafts and drafts[-1].key == key:
+            drafts[-1] = drafts[-1]._replace(end_year=year)
             continue
-        segments.append(
-            [key, year, year, f"{_dayun_label('乾', male_step)}／{_dayun_label('坤', female_step)}"]
+        drafts.append(
+            _SegmentDraft(
+                key, year, year, f"{_dayun_label('乾', male_step)}／{_dayun_label('坤', female_step)}"
+            )
         )
     return [
-        HehunAxisSegment(start_year=int(start), end_year=int(end), label=str(label))
-        for _key, start, end, label in segments
+        HehunAxisSegment(start_year=draft.start_year, end_year=draft.end_year, label=draft.label)
+        for draft in drafts
     ]
 
 
