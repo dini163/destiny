@@ -175,3 +175,47 @@ class HehunNayin(BaseModel):
     rule: str = Field(description="`hh.nayin.*`，与账本里那一行同键。")
     delta: float
     reading: str = Field(description="§7.2 的固定句式，末尾必带 `HEHUN_NAYIN_NOTE`。")
+
+
+#: §7.3 的同频三档。
+AxisSync = Literal["同频", "半同步", "背离"]
+
+
+class HehunAxisSide(BaseModel):
+    """一造在某一年的分数与档位 —— 与岁运年表同一条装配路径，不另算（§10.5）。"""
+
+    value: float = Field(description="该年岁运分，`transit_ledger` 的 `value`，0–100。")
+    tier: str = Field(description="岁运四档：顺 | 平 | 滞。与合婚总分的四档是两套词汇（§6.4）。")
+    dayun: str | None = Field(description="该年所从出的大运干支；起运前为 None（页面标「童限」）。")
+    dayun_start_age: int = Field(description="那一步大运的起龄（虚岁）。童限段给的是童限那一段的起龄。")
+
+
+class HehunAxisRow(BaseModel):
+    """轴的一年：两造各自的分数 + 它们之差。简表不带判语（§5.2，继承切片 3）。"""
+
+    year: int = Field(description="公历年，与岁运同一口径（立春为界取该年干支）。")
+    ganzhi: str = Field(description="流年干支；两造的 `LiuNian` 表对同一年给同一个字。")
+    male: HehunAxisSide
+    female: HehunAxisSide
+    gap: float = Field(ge=0, description="|乾分 - 坤分|。")
+    sync: AxisSync
+
+
+class HehunAxisSegment(BaseModel):
+    """一段大运边界切出来的区间（设计稿的时间轴卡片，§7.3）。"""
+
+    start_year: int
+    end_year: int
+    label: str = Field(
+        description="只写事实本身：「乾·第 4 运 戊午（37—46 岁）／坤·第 4 运 戊寅（34—43 岁）」，"
+        "起运前那一段标「童限」。不另立家族称谓表 —— 轴的段就是大运段。"
+    )
+
+
+class HehunAxis(BaseModel):
+    """同频演进轴（§7.3）：轻量流年表，一轴一次算，不给任何一格展开明细。"""
+
+    start_year: int
+    end_year: int
+    rows: list[HehunAxisRow]
+    segments: list[HehunAxisSegment] = Field(description="段的并集恰好覆盖 `rows`，序与轴同向（Task 6 不变式）。")

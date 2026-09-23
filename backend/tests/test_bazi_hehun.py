@@ -16,6 +16,8 @@ from app.content.bazi_hehun_rules import (
     HEHUN_PALACE_KEYS,
     HEHUN_RULES,
     HEHUN_RULE_SOURCE,
+    HEHUN_SYNC_CLOSE,
+    HEHUN_SYNC_WIDE,
     hehun_rule,
 )
 from app.content.bazi_nayin import nayin_meaning
@@ -33,7 +35,11 @@ from app.engines.bazi_hehun import (
     YONGSHEN_QUADRANTS,
     YONGSHEN_VIEWS,
     GroupMember,
+    HehunAxisWindow,
     HehunChartPair,
+    axis_segments,
+    axis_sync,
+    axis_window,
     complement,
     compute_partner_charts,
     cross_groups,
@@ -44,6 +50,7 @@ from app.engines.bazi_hehun import (
     group_is_new_between_charts,
     group_rows,
     group_spans_both_charts,
+    hehun_axis,
     hehun_fired,
     hehun_ledger,
     hehun_rows,
@@ -55,12 +62,14 @@ from app.engines.bazi_hehun import (
     pair_matrix,
     palace_keys,
     palace_rows,
+    partner_annual_luck,
     relation_rows,
     scanned_groups,
     yongshen_facts,
     yongshen_rows,
 )
 from app.engines.bazi_rules import derive_relations
+from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_hehun import HehunProfile
 from app.schemas.common import Gender
@@ -866,3 +875,186 @@ def test_the_family_order_is_pinned_on_a_fixture_whose_group_slot_is_not_empty()
         "palace",
     ]
     assert list(dict.fromkeys(row.family for row in rows)) == list(HEHUN_FAMILIES)
+
+
+# 轴吃的是**档案**（经线与历法各造一份决定），不是盘：与 §5.1 的入参同一形状。
+MALE_PROFILE = _profile(1988, 2, 15, 23, 30, "成都")
+SAME_PROFILE = _profile(1990, 6, 15, 10, 0, "北京")
+COMPLEMENT_PROFILE = _profile(1985, 7, 22, 14, 30, "上海")
+AUSPICIOUS_PROFILE = _profile(1995, 9, 18, 18, 0, "北京")
+
+
+def _axis(start: int, years: int, chart: BaziChart, profile: HehunProfile):
+    return hehun_axis(
+        _pair_of(chart),
+        partner_annual_luck(MALE_PROFILE, Gender.MALE),
+        partner_annual_luck(profile, Gender.FEMALE),
+        start_year=start,
+        years=years,
+    )
+
+
+def test_an_axis_row_is_the_same_year_as_the_transit_table() -> None:
+    """§10.5 同尺：轴上乾造那五格的分与档，与 `/bazi/liuyue` 同年表逐格相等。
+
+    这一测**不重算**，而是回头调岁运引擎自己那份装配 —— "同一年在两个端点上分数不同"
+    是本切片最贵的一种错，因为它会让用户在岁运页看到 61 分、在合婚轴上看到 58 分。
+    """
+    transit = compute_transit(
+        birth_date=date(1988, 2, 15),
+        birth_time=time(23, 30),
+        gender=Gender.MALE,
+        longitude=resolve_longitude("成都", None),
+        start_year=2024,
+        end_year=2028,
+        reference_date=date(2026, 9, 22),
+    )
+    axis = _axis(2024, 5, FEMALE_SAME, SAME_PROFILE)
+    assert [(row.year, row.male.value, row.male.tier) for row in axis.rows] == [
+        (year.year, year.score.value, year.score.tier) for year in transit.years
+    ]
+
+
+def test_the_axis_is_one_row_per_year_with_a_gap_and_no_reading() -> None:
+    """§7.3 的轴行形状：干支、两造各一分一档一运、差、档 —— 九枚实测值逐字对拍。
+
+    流年干支两造的表必须给同一个字（`LiuNian` 以立春为界，与命盘无关），
+    所以这里同时断两造的表一致，而不是只取乾那一份就算完。
+    轴行不带 `reading`（"简表不带判语"，§5.2 继承切片 3）。
+    """
+    axis = _axis(2024, 5, FEMALE_SAME, SAME_PROFILE)
+    assert (axis.start_year, axis.end_year) == (2024, 2028)
+    assert [row.ganzhi for row in axis.rows] == ["甲辰", "乙巳", "丙午", "丁未", "戊申"]
+    male_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE)
+    female_luck = partner_annual_luck(SAME_PROFILE, Gender.FEMALE)
+    assert [(male_luck[y].ganzhi, female_luck[y].ganzhi) for y in range(2024, 2029)] == [
+        ("甲辰", "甲辰"),
+        ("乙巳", "乙巳"),
+        ("丙午", "丙午"),
+        ("丁未", "丁未"),
+        ("戊申", "戊申"),
+    ]
+    assert [
+        (
+            row.year,
+            row.male.value,
+            row.male.tier,
+            row.female.value,
+            row.female.tier,
+            row.gap,
+            row.sync,
+        )
+        for row in axis.rows
+    ] == [
+        (2024, 33.0, "滞", 42.0, "滞", 9.0, "半同步"),
+        (2025, 27.0, "滞", 0.0, "滞", 27.0, "背离"),
+        (2026, 29.0, "滞", 32.0, "滞", 3.0, "同频"),
+        (2027, 61.0, "平", 50.0, "平", 11.0, "半同步"),
+        (2028, 56.0, "平", 66.0, "顺", 10.0, "半同步"),
+    ]
+    assert [(row.male.dayun, row.male.dayun_start_age) for row in axis.rows] == [
+        ("戊午", 37)
+    ] * 5
+    assert [(row.female.dayun, row.female.dayun_start_age) for row in axis.rows] == [
+        ("戊寅", 34)
+    ] * 5
+    assert all("reading" not in row.model_dump() for row in axis.rows)
+
+
+def test_the_three_sync_bands_are_cut_at_eight_and_twenty() -> None:
+    """§7.3 的三档分界：gap ≤8 同频、≤20 半同步、>20 背离（边界压线值各一枚）。
+
+    1993 年那一格是真命例（乾 54.0 平 vs 坤 62.0 平，gap 恰为 8.0），
+    所以 `<=` 与 `<` 之差在这里不是假设，是页面上已经存在的一行。
+    """
+    assert (HEHUN_SYNC_CLOSE, HEHUN_SYNC_WIDE) == (8.0, 20.0)
+    assert axis_sync(8.0) == "同频"
+    assert axis_sync(8.1) == "半同步"
+    assert axis_sync(20.0) == "半同步"
+    assert axis_sync(20.1) == "背离"
+    child = _axis(1990, 5, FEMALE_SAME, SAME_PROFILE)
+    assert [row.gap for row in child.rows] == [7.0, 7.0, 10.0, 8.0, 19.0]
+    assert [row.sync for row in child.rows] == ["同频", "同频", "半同步", "同频", "半同步"]
+
+
+def test_a_child_limit_year_names_no_luck_pillar() -> None:
+    """起运前那一年没有运可论：`dayun` 为 None，分与档照给（§7.3）。
+
+    乾 1990—1993 四年在童限段（`DayunStep` index 0，起 1 岁），坤只有 1990—1992 三年 ——
+    两造的童限长度本来就不同，所以这一段同时是"轴不因一方无运而少给一年"的证据。
+    """
+    child = _axis(1990, 5, FEMALE_SAME, SAME_PROFILE)
+    assert [row.male.dayun for row in child.rows] == [None, None, None, None, "乙卯"]
+    assert [row.female.dayun for row in child.rows] == [None, None, None, "辛巳", "辛巳"]
+    assert [row.male.dayun_start_age for row in child.rows] == [1, 1, 1, 1, 7]
+    assert [(row.year, row.ganzhi) for row in child.rows][:3] == [
+        (1990, "庚午"),
+        (1991, "辛未"),
+        (1992, "壬申"),
+    ]
+
+
+def test_segments_split_where_either_side_changes_pillar() -> None:
+    """§7.3 段边界：两造换运之年并起来切轴，21 年轴切出五段，标签只写事实本身。
+
+    标签里的岁数区间是 `DayunStep.start_age—end_age`（虚岁，库给什么写什么），
+    破折号用「—」与 `bazi_transit` 的年份区间同一个字。`第 N 运` 的 N 即 `DayunStep.index`，
+    0 段不成句、改标「童限」（见上一测的 1990—1993 段）。
+    """
+    pair = _pair_of(FEMALE_SAME)
+    male_luck, female_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE), partner_annual_luck(
+        SAME_PROFILE, Gender.FEMALE
+    )
+    spans = axis_segments(pair, male_luck, female_luck, start_year=2024, years=21)
+    assert [(s.start_year, s.end_year, s.label) for s in spans] == [
+        (2024, 2032, "乾·第 4 运 戊午（37—46 岁）／坤·第 4 运 戊寅（34—43 岁）"),
+        (2033, 2033, "乾·第 4 运 戊午（37—46 岁）／坤·第 5 运 丁丑（44—53 岁）"),
+        (2034, 2042, "乾·第 5 运 己未（47—56 岁）／坤·第 5 运 丁丑（44—53 岁）"),
+        (2043, 2043, "乾·第 5 运 己未（47—56 岁）／坤·第 6 运 丙子（54—63 岁）"),
+        (2044, 2044, "乾·第 6 运 庚申（57—66 岁）／坤·第 6 运 丙子（54—63 岁）"),
+    ]
+    child = axis_segments(pair, male_luck, female_luck, start_year=1990, years=5)
+    assert [s.label for s in child] == [
+        "乾·童限（1—6 岁）／坤·童限（1—3 岁）",
+        "乾·童限（1—6 岁）／坤·第 1 运 辛巳（4—13 岁）",
+        "乾·第 1 运 乙卯（7—16 岁）／坤·第 1 运 辛巳（4—13 岁）",
+    ]
+
+
+def test_segments_cover_the_axis_exactly_once() -> None:
+    """段是轴的一个划分：首段起于轴首、末段终于轴末、相邻段首尾相接、总长等于年数。
+
+    短轴（2024—2028）只有一段，那正是设计稿"一整条时间轴一张卡"的退化情形；
+    不验这一条的话，"边界在窗口外"这一类错位要到浏览器走查才看得见。
+    """
+    pair = _pair_of(FEMALE_SAME)
+    male_luck, female_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE), partner_annual_luck(
+        SAME_PROFILE, Gender.FEMALE
+    )
+    for start, years in ((2024, 5), (2024, 21), (1990, 5)):
+        spans = axis_segments(pair, male_luck, female_luck, start_year=start, years=years)
+        assert (spans[0].start_year, spans[-1].end_year) == (start, start + years - 1)
+        assert sum(span.end_year - span.start_year + 1 for span in spans) == years
+        assert all(a.end_year + 1 == b.start_year for a, b in zip(spans, spans[1:], strict=False))
+    assert [
+        s.label for s in axis_segments(pair, male_luck, female_luck, start_year=2024, years=5)
+    ] == ["乾·第 4 运 戊午（37—46 岁）／坤·第 4 运 戊寅（34—43 岁）"]
+
+
+def test_the_window_is_the_overlap_of_two_luck_spans() -> None:
+    """可推窗：起于各造自己摊出来的第一年，止于两造共同的末年（§9.3 的输入）。
+
+    `min(luck)` 就是出生年（乾 1988 / 坤 1990、1985、1995），这不是假设而是实测：
+    库把起运前的童年段也排在 `getDaYun()` 第 0 项里，摊平之后首年即出生年。
+    终点取**较小**的那个末年 —— 轴不能画进任何一方已经没有盘的地方。
+    """
+    male_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE)
+    for profile, female_from, supported_to in (
+        (SAME_PROFILE, 1990, 2082),
+        (COMPLEMENT_PROFILE, 1985, 2080),
+        (AUSPICIOUS_PROFILE, 1995, 2083),
+    ):
+        window = axis_window(male_luck, partner_annual_luck(profile, Gender.FEMALE))
+        assert window == HehunAxisWindow(
+            male_from=1988, female_from=female_from, supported_to=supported_to
+        )

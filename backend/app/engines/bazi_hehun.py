@@ -25,6 +25,8 @@ from app.content.bazi_hehun_rules import (
     HEHUN_NAYIN_NOTE,
     HEHUN_RELATION_KEYS,
     HEHUN_RULE_SOURCE,
+    HEHUN_SYNC_CLOSE,
+    HEHUN_SYNC_WIDE,
     HEHUN_TOP_CUT,
     STRONG_RATIO,
     WEAK_RATIO,
@@ -35,10 +37,25 @@ from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, GENERATES
 from app.core.errors import DestinyError
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_rules import POSITIONS, derive_branch_groups, derive_relations, is_fanyin
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT, element_weight_scores
-from app.schemas.bazi import BaziChart, BaziPillar
+from app.engines.bazi_transit import (
+    AnnualLuck,
+    annual_luck_by_year,
+    hit_rows,
+    natal_projection,
+    transit_hit_keys,
+    transit_ledger,
+    year_scan,
+)
+from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_hehun import (
+    AxisSync,
+    HehunAxis,
+    HehunAxisRow,
+    HehunAxisSegment,
+    HehunAxisSide,
     HehunCell,
     HehunCellHit,
     HehunComplement,
@@ -793,3 +810,162 @@ def hehun_fired(rows: Sequence[HehunRow]) -> list[HehunFired]:
         )
         for row in rows
     ]
+
+
+# ---------------------------------------------------------------- 轻量轴（spec §7.3）
+#: 一造的大运全表：`公历年 -> 流年`。键的最小值即该造可推的第一年（实测等于出生年）。
+LuckTable = dict[int, AnnualLuck]
+
+
+@dataclass(frozen=True)
+class HehunAxisWindow:
+    """两造摊出来的可推年界：轴只能画在两个人都有盘的这一段上（§9.3 的输入）。"""
+
+    male_from: int
+    female_from: int
+    supported_to: int
+
+
+def partner_annual_luck(profile: HehunProfile, gender: Gender) -> LuckTable:
+    """一造的流年表：与岁运页同一个入口、同一个经线决定。
+
+    这一步必须再走一次 `resolve_natal_moment`：`compute_bazi_chart` 交出的是命局，
+    流年与大运序号只能从 `getYun()` 摊出来。两次排盘过的是同一个校正函数与同一个
+    `profile_longitude()`，所以不会出现"命盘用 23:30、轴用 23:26"的两个口径 ——
+    校正逻辑只有一份的理由在 `bazi_moment` 的模块 docstring 里，此处同理。
+    """
+    moment = resolve_natal_moment(
+        birth_date=profile.birth_date,
+        birth_time=profile.birth_time,
+        calendar=profile.calendar,
+        longitude=profile_longitude(profile),
+        apply_true_solar_time=profile.apply_true_solar_time,
+    )
+    return annual_luck_by_year(moment.eight_char, gender)
+
+
+def axis_window(male_luck: LuckTable, female_luck: LuckTable) -> HehunAxisWindow:
+    """可推窗：两造各自的起点各记一次（错误要说清是谁没出生），终点取共同的末年。"""
+    return HehunAxisWindow(
+        male_from=min(male_luck),
+        female_from=min(female_luck),
+        supported_to=min(max(male_luck), max(female_luck)),
+    )
+
+
+def _dayun_step(chart: BaziChart, luck: LuckTable, year: int) -> DayunStep:
+    """这一年所从出的那一步大运：`AnnualLuck.dayun_index` 与 `DayunStep.index` 同一来源。
+
+    这是恒等映射而不是近似匹配 —— 两个字段都出自 `getYun().getDaYun()` 的那一次摊平，
+    所以命盘页上的"今年在哪步运里"与轴上的同一件事不会分家。
+    """
+    index = luck[year].dayun_index
+    return next(step for step in chart.dayun if step.index == index)
+
+
+def axis_side(chart: BaziChart, luck: LuckTable, year: int) -> HehunAxisSide:
+    """一造在一年的分与档 —— 与 `bazi_transit._transit_year` 同一条装配路径（§10.5）。
+
+    分值不在合婚层重算：`hit_rows(year_keys, [])` + `transit_ledger` 就是岁运年表里那两行，
+    所以"同一年在 `/bazi/liuyue` 与合婚轴上分数不同"必然错得出来（Task 6 的测正是回头
+    调 `compute_transit` 对拍）。`dayun_ganzhi` 为空即童限（`DayunStep` 既有约定），
+    此时 `dayun` 给 None —— "无运可论"与"运干为空字符串"两件事里，前者才是事实。
+    """
+    info = luck[year]
+    scan = year_scan(natal_projection(chart), info)
+    ledger = transit_ledger(hit_rows(transit_hit_keys(scan.judgement), []))
+    return HehunAxisSide(
+        value=ledger.value,
+        tier=ledger.tier,
+        dayun=info.dayun_ganzhi,
+        dayun_start_age=_dayun_step(chart, luck, year).start_age,
+    )
+
+
+def axis_sync(gap: float) -> AxisSync:
+    """三档同频：≤8 同频、≤20 半同步、>20 背离。边界压线归上一档（实测 8.0 即同频）。"""
+    if gap <= HEHUN_SYNC_CLOSE:
+        return "同频"
+    return "半同步" if gap <= HEHUN_SYNC_WIDE else "背离"
+
+
+def _dayun_label(who: str, step: DayunStep) -> str:
+    """一步大运的名字：「乾·第 4 运 戊午（37—46 岁）」，起运前那一段是「乾·童限（1—6 岁）」。
+
+    `第 N 运` 的 N 直接用 `DayunStep.index`，不做 +1 偏移：index 0 是童限、它不成句，
+    所以剩下的数正好是页面上"第几步运"的那个数。岁数区间用「—」，与 `bazi_transit`
+    里年份区间的破折号同一个字（"覆盖 1988—2083 年"）。
+    """
+    if not step.ganzhi:
+        return f"{who}·童限（{step.start_age}—{step.end_age} 岁）"
+    return f"{who}·第 {step.index} 运 {step.ganzhi}（{step.start_age}—{step.end_age} 岁）"
+
+
+def axis_segments(
+    pair: HehunChartPair,
+    male_luck: LuckTable,
+    female_luck: LuckTable,
+    *,
+    start_year: int,
+    years: int,
+) -> list[HehunAxisSegment]:
+    """两造换运之年切段（§7.3）：轴的段就是大运段，主语已写在标签里。
+
+    按 `AnnualLuck.dayun_index` 顺轴走一遍，而不是把两造 `DayunStep.start_year` 的并集
+    再去切区间 —— 前者与轴行同源于一次摊平，"这一段的名字"与"这一段里每一行的运"
+    因此不可能不一致；后者还要在窗口边界上判一次谁先谁后，多一处可错的地方。
+    """
+    segments: list[list[object]] = []
+    for year in range(start_year, start_year + years):
+        male_step = _dayun_step(pair.male, male_luck, year)
+        female_step = _dayun_step(pair.female, female_luck, year)
+        key = (male_step.index, female_step.index)
+        if segments and segments[-1][0] == key:
+            segments[-1][2] = year
+            continue
+        segments.append(
+            [key, year, year, f"{_dayun_label('乾', male_step)}／{_dayun_label('坤', female_step)}"]
+        )
+    return [
+        HehunAxisSegment(start_year=int(start), end_year=int(end), label=str(label))
+        for _key, start, end, label in segments
+    ]
+
+
+def hehun_axis(
+    pair: HehunChartPair,
+    male_luck: LuckTable,
+    female_luck: LuckTable,
+    *,
+    start_year: int,
+    years: int,
+) -> HehunAxis:
+    """一整条同频轴（§7.3）：逐年两造各扫一次流年，差即同步度。
+
+    耗时与岁运页同量级（§2.5 实测：一年一秒都不多，30 年一次请求装得下），
+    所以不设第二次的分页请求。轴不做任何一格的明细展开（决策 9）——
+    明细在岁运页已经有一份，前端给两造各自的下钻链接。
+
+    一行一年、先算两侧再组行：`gap` 用的是那两分本身，不是把两造的扫描再走一遍。
+    """
+    rows: list[HehunAxisRow] = []
+    for year in range(start_year, start_year + years):
+        male = axis_side(pair.male, male_luck, year)
+        female = axis_side(pair.female, female_luck, year)
+        gap = round(abs(male.value - female.value), 2)
+        rows.append(
+            HehunAxisRow(
+                year=year,
+                ganzhi=male_luck[year].ganzhi,
+                male=male,
+                female=female,
+                gap=gap,
+                sync=axis_sync(gap),
+            )
+        )
+    return HehunAxis(
+        start_year=start_year,
+        end_year=start_year + years - 1,
+        rows=rows,
+        segments=axis_segments(pair, male_luck, female_luck, start_year=start_year, years=years),
+    )
