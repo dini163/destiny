@@ -57,7 +57,11 @@ class BaziHehunRequest(BaseModel):
 
 
 class HehunCellHit(BaseModel):
-    """矩阵一格里扫到的一条跨造事实。"""
+    """矩阵一格里扫到的一条跨造事实。
+
+    矩阵是呈现层：(乾日, 坤日) 那一格里被婚姻宫族收编的关系照样显示在这里，
+    只是不再进账本（§6.2 的归属规则），所以 `rule` 只作标识、不代表那一行真的加了分。
+    """
 
     kind: str = Field(description="关系中文名，与 `RELATION_TABLES` 的 kind 同词。")
     male_character: str = Field(description="乾那一根的干、支或整柱（伏吟/反吟论整柱）。")
