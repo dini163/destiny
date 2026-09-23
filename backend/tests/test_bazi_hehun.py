@@ -9,10 +9,12 @@ from datetime import date, time
 
 import pytest
 
+from app.content import CONTENT_VERSION
 from app.content.bazi_hehun_rules import (
     ELEMENT_ATTRIBUTIONS,
     HEHUN_BASE,
     HEHUN_FAMILIES,
+    HEHUN_MODEL_SOURCE,
     HEHUN_NAYIN_NOTE,
     HEHUN_PALACE_KEYS,
     HEHUN_RULES,
@@ -23,7 +25,7 @@ from app.content.bazi_hehun_rules import (
     hehun_rule,
 )
 from app.content.bazi_nayin import nayin_meaning
-from app.core.errors import InvalidBirthDataError
+from app.core.errors import InvalidBirthDataError, TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import (
     PALACE_BRANCH_CLASH,
@@ -37,12 +39,14 @@ from app.engines.bazi_hehun import (
     YONGSHEN_QUADRANTS,
     YONGSHEN_VIEWS,
     GroupMember,
+    HehunAxisRange,
     HehunAxisWindow,
     HehunChartPair,
     axis_segments,
     axis_sync,
     axis_window,
     complement,
+    compute_hehun,
     compute_partner_charts,
     cross_groups,
     cross_relations,
@@ -65,7 +69,9 @@ from app.engines.bazi_hehun import (
     palace_keys,
     palace_rows,
     partner_annual_luck,
+    partner_profile,
     relation_rows,
+    resolve_hehun_axis_range,
     scanned_groups,
     yi_ji,
     yongshen_facts,
@@ -74,7 +80,7 @@ from app.engines.bazi_hehun import (
 from app.engines.bazi_rules import derive_relations
 from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart
-from app.schemas.bazi_hehun import HehunAxis, HehunProfile
+from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult, HehunAxis, HehunProfile
 from app.schemas.common import Gender
 from app.schemas.scoring import MODEL_PARAM_SOURCE
 from app.solar.geo import resolve_longitude
@@ -1172,3 +1178,180 @@ def test_one_element_can_be_one_sides_taboo_and_the_others_favor() -> None:
         "乾独忌": [],
         "坤独忌": [],
     }
+
+
+def test_the_axis_default_starts_at_the_later_birth_year_or_today_whichever_is_later() -> None:
+    """§9.3 末条：缺省轴起点 = `max(较晚出生年, reference_date 所在年)`（实测两值两形）。
+
+    2026 年参考 → 取参考年（两人都已出生）；1989 年参考 → 取坤的出生年 1990，
+    因为那一年乾 1 岁、坤还没出生，轴若从 1989 起就有一格没有盘。
+    """
+    window = axis_window(
+        partner_annual_luck(MALE_PROFILE, Gender.MALE),
+        partner_annual_luck(SAME_PROFILE, Gender.FEMALE),
+    )
+    assert window == HehunAxisWindow(male_from=1988, female_from=1990, supported_to=2082)
+    assert resolve_hehun_axis_range(
+        start_year=None, years=21, reference_year=2026, window=window
+    ) == HehunAxisRange(start_year=2026, end_year=2046)
+    assert resolve_hehun_axis_range(
+        start_year=None, years=5, reference_year=1989, window=window
+    ) == HehunAxisRange(start_year=1990, end_year=1994)
+
+
+def test_an_axis_before_the_later_birth_year_is_a_domain_error() -> None:
+    """§9.3 触发一：轴起早于较晚一造的出生年。五项 context 齐给，前端一句提示改得动表单。
+
+    `requested_to` 是补齐轴长之后的末年（1989 + 21 - 1），不是请求里的数 ——
+    用户填的是起点与长度，页面要说的是"你这段轴实际会画到哪儿"。
+    """
+    with pytest.raises(TransitRangeError) as raised:
+        compute_hehun(
+            male=MALE_PROFILE,
+            female=SAME_PROFILE,
+            reference_date=date(2026, 9, 22),
+            axis_start_year=1989,
+            axis_years=21,
+        )
+    error = raised.value
+    assert (error.code, error.status_code) == ("hehun_axis_out_of_range", 422)
+    assert error.context == {
+        "requested_from": 1989,
+        "requested_to": 2009,
+        "male_available_from": 1988,
+        "female_available_from": 1990,
+        "supported_to": 2082,
+    }
+
+
+def test_an_axis_past_the_shared_end_uses_the_same_code_but_says_another_thing() -> None:
+    """§9.3 触发二：轴末超出两造共同可推的末年。同码、同五项 context，但 message 说另一头。
+
+    两造末年不同（乾 2083 / 坤 2082），所以 2080+5-1=2084 只越了坤那一头 ——
+    越界的是共同末年而不是谁的末年，`supported_to` 给的就是这一个数。
+    """
+    with pytest.raises(TransitRangeError) as raised:
+        compute_hehun(
+            male=MALE_PROFILE,
+            female=SAME_PROFILE,
+            reference_date=date(2026, 9, 22),
+            axis_start_year=2080,
+            axis_years=5,
+        )
+    assert raised.value.code == "hehun_axis_out_of_range"
+    assert raised.value.context["supported_to"] == 2082
+    assert raised.value.context["requested_to"] == 2084
+    assert "2082" in raised.value.message
+
+
+def test_a_partner_profile_is_a_summary_not_a_second_natal_chart() -> None:
+    """§5.2：精简档案 = 四柱（干支/本柱十神/纳音）+ 生肖 + 日主 + 喜忌 + 五行分布 + 大运步表。
+
+    神煞、格局、六维详批、藏干账本**一概不在**这里 —— 双人页不重演一个人的本命盘，
+    也不给同一份结论造第二个呈现口径。键名因此可以整表断言：这份档案的形状是契约，
+    不是实现细节，多一个字段就是多一处要前端确认的口径。
+    """
+    partner = partner_profile(MALE, "male")
+    assert set(partner.model_dump()) == {
+        "side",
+        "name",
+        "four_pillars",
+        "zodiac",
+        "day_master",
+        "day_master_element",
+        "favorable_elements",
+        "unfavorable_elements",
+        "elements",
+        "pillars",
+        "dayun",
+        "true_solar_time",
+        "tst_applied",
+    }
+    assert (partner.four_pillars, partner.zodiac, partner.day_master) == ("戊辰 甲寅 庚子 丁亥", "龙", "庚")
+    assert partner.day_master_element == "金"
+    assert (partner.favorable_elements, partner.unfavorable_elements) == (
+        ["土", "金"],
+        ["木", "水", "火"],
+    )
+    assert [(p.position, p.ganzhi, p.shishen_gan, p.nayin) for p in partner.pillars] == [
+        ("year", "戊辰", "偏印", "大林木"),
+        ("month", "甲寅", "偏财", "大溪水"),
+        ("day", "庚子", "日主", "壁上土"),
+        ("hour", "丁亥", "正官", "屋上土"),
+    ]
+    assert [(e.element, e.score) for e in partner.elements] == [
+        ("木", 2.2),
+        ("火", 1.3),
+        ("土", 1.7),
+        ("金", 1.0),
+        ("水", 1.7),
+    ]
+    assert len(partner.dayun) == len(MALE.dayun) == 10 and partner.dayun[4].ganzhi == "戊午"
+    assert (partner.tst_applied, partner.true_solar_time) == (True, "1988-02-15 22:12")
+
+
+def test_the_result_is_the_ten_sections_the_contract_promised() -> None:
+    """§5.2 的十个段一段不缺，且互相自洽：矩阵 16 格、fired 与账本同长、轴长等于请求年数。"""
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE, reference_date=date(2026, 9, 22), axis_years=5
+    )
+    assert set(result.model_dump()) == {
+        "male",
+        "female",
+        "score",
+        "matrix",
+        "fired",
+        "complement",
+        "nayin",
+        "axis",
+        "yi_ji",
+        "provenance",
+    }
+    assert (result.male.side, result.female.side) == ("male", "female")
+    assert (result.female.four_pillars, result.female.zodiac) == ("庚午 壬午 辛亥 癸巳", "马")
+    assert len(result.matrix) == 16 and len(result.fired) == len(result.score.factors) - 1
+    assert (result.score.value, result.score.tier) == (0.0, "欠和宜慎")
+    assert (result.axis.start_year, result.axis.end_year, len(result.axis.rows)) == (2026, 2030, 5)
+    assert result.nayin.relation == "我克"
+    assert result.model_validate_json(result.model_dump_json()).model_dump() == result.model_dump()
+
+
+def test_the_provenance_lists_only_the_tables_this_page_reads() -> None:
+    """溯源纪律：一张表也没引的不能列，引了十张的不能只列三张。
+
+    与 `NAME_CONTENT_SOURCES` 同一条理由（`content/__init__.py:37`）：把 `bazi_dimensions`
+    （六维详批）列进来就是让合婚声称引了它没引的书 —— 本页既没呈现也没用它计分。
+    反过来 `bazi_wangshuai` / `bazi_geju` / `bazi_tiaohou` 看着像"本命盘的事"，
+    其实两造的喜忌集正是由它们合并出来的（互补图与宜忌的唯一输入），一张都删不得。
+    """
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE, reference_date=date(2026, 9, 22), axis_years=1
+    )
+    provenance = result.provenance
+    assert [table.name for table in provenance.tables] == [
+        "bazi_shishen",
+        "bazi_nayin",
+        "bazi_wangshuai",
+        "bazi_geju",
+        "bazi_tiaohou",
+        "bazi_shensha",
+        "bazi_relations",
+        "bazi_changsheng",
+        "bazi_transit_rules",
+        "bazi_hehun_rules",
+    ]
+    assert {table.version for table in provenance.tables} == {CONTENT_VERSION}
+    assert (provenance.reference_date, provenance.engine) == ("2026-09-22", "lunar-python")
+    assert provenance.rule_count == len(HEHUN_RULES) == 29
+    assert provenance.method == HEHUN_MODEL_SOURCE
+
+
+def test_the_axis_length_default_has_exactly_one_home() -> None:
+    """21 这个数只在契约上出现一次：引擎的 `axis_years` 没有缺省，路由必须显式给。
+
+    两处各写一份迟早分家（前端读的是契约）。这一测是那条纪律的可执行版本：
+    少给 `axis_years` 就是 `TypeError`，而不是"悄悄用了引擎里那份缺省"。
+    """
+    with pytest.raises(TypeError):
+        compute_hehun(male=MALE_PROFILE, female=SAME_PROFILE)  # type: ignore[call-arg]
+    assert BaziHehunRequest(male=MALE_PROFILE, female=SAME_PROFILE).axis_years == 21

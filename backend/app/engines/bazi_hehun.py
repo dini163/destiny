@@ -20,13 +20,16 @@ from dataclasses import dataclass
 from datetime import date
 from typing import NamedTuple
 
+from app.content import CONTENT_VERSION, HEHUN_CONTENT_SOURCES
 from app.content.bazi_hehun_rules import (
     ELEMENT_ATTRIBUTIONS,
     HEHUN_BASE,
     HEHUN_GROUP_KEYS,
+    HEHUN_MODEL_SOURCE,
     HEHUN_NAYIN_KEYS,
     HEHUN_NAYIN_NOTE,
     HEHUN_RELATION_KEYS,
+    HEHUN_RULES,
     HEHUN_RULE_SOURCE,
     HEHUN_SYNC_CLOSE,
     HEHUN_SYNC_WIDE,
@@ -39,7 +42,7 @@ from app.content.bazi_hehun_rules import (
 from app.content.bazi_nayin import nayin_meaning
 from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, GENERATES
-from app.core.errors import DestinyError
+from app.core.errors import DestinyError, TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_rules import POSITIONS, derive_branch_groups, derive_relations, is_fanyin
@@ -56,6 +59,7 @@ from app.engines.bazi_transit import (
 from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_hehun import (
     AxisSync,
+    BaziHehunResult,
     HehunAxis,
     HehunAxisRow,
     HehunAxisSegment,
@@ -70,7 +74,10 @@ from app.schemas.bazi_hehun import (
     HehunFired,
     HehunNayin,
     HehunNayinSide,
+    HehunPartner,
+    HehunPartnerPillar,
     HehunProfile,
+    HehunProvenance,
     HehunYiJi,
     HehunYiJiGroup,
     HehunYiJiItem,
@@ -79,7 +86,7 @@ from app.schemas.bazi_hehun import (
     Vigor,
     YiJiKind,
 )
-from app.schemas.common import Gender
+from app.schemas.common import Gender, ProvenanceTable
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
@@ -1035,4 +1042,153 @@ def yi_ji(pair: HehunChartPair) -> HehunYiJi:
             _yiji_group("坤独忌", _only(theirs.unfavorable_elements, mine.unfavorable_elements)),
         ],
         declaration=HEHUN_YIJI_DECLARATION,
+    )
+
+
+# ---------------------------------------------------------------- 轴界校验（spec §9.3）
+@dataclass(frozen=True)
+class HehunAxisRange:
+    """补齐缺省之后的轴区间。"""
+
+    start_year: int
+    end_year: int
+
+
+def resolve_hehun_axis_range(
+    *, start_year: int | None, years: int, reference_year: int, window: HehunAxisWindow
+) -> HehunAxisRange:
+    """缺省轴起点 = `max(较晚出生年, 参考年)`，然后两道界（§9.3）。
+
+    两道界同一个机器码、同一组五项 `context`：前端要渲染的是同一句"把轴挪回两个人都在
+    的年份里"，把起点与终点分成两个码只会让页面多两张脸。但两句 message 不同 ——
+    用户得知道自己越的是哪一头。
+
+    `axis_years` 自身越界（<1 / >30）走不到这里：那是 pydantic 的 `ge/le` 给的
+    另一类 422，与岁运页一样分两类，不混为一谈（§9.3）。
+    """
+    later_birth = max(window.male_from, window.female_from)
+    span_start = start_year if start_year is not None else max(later_birth, reference_year)
+    span_end = span_start + years - 1
+    envelope: dict[str, object] = {
+        "requested_from": span_start,
+        "requested_to": span_end,
+        "male_available_from": window.male_from,
+        "female_available_from": window.female_from,
+        "supported_to": window.supported_to,
+    }
+    if span_start < later_birth:
+        raise TransitRangeError(
+            "hehun_axis_out_of_range",
+            f"轴起 {span_start} 年早于较晚一造的 {later_birth} 年，那一年有一方尚无命盘可推。",
+            envelope,
+        )
+    if span_end > window.supported_to:
+        raise TransitRangeError(
+            "hehun_axis_out_of_range",
+            f"轴末 {span_end} 年超出两造共同可推的 {window.supported_to} 年。",
+            envelope,
+        )
+    return HehunAxisRange(start_year=span_start, end_year=span_end)
+
+
+# ---------------------------------------------------------------- 档案与溯源（spec §5.2）
+def partner_profile(chart: BaziChart, side: PartnerSide) -> HehunPartner:
+    """一造的双人页档案：本命盘那份详批留在这里，本页只带对位要看的那几件。
+
+    `side` 由调用方给而不是从盘里读：`BaziChart` 不带性别字段（乾/坤是合婚请求的键位，
+    §5.1），把它塞进命盘契约为了一页双人页动不到。
+    """
+    return HehunPartner(
+        side=side,
+        name=chart.name,
+        four_pillars=chart.four_pillars,
+        zodiac=chart.zodiac,
+        day_master=chart.day_master,
+        day_master_element=chart.day_master_element,
+        favorable_elements=list(chart.analysis.favorable_elements),
+        unfavorable_elements=list(chart.analysis.unfavorable_elements),
+        elements=list(chart.wuxing),
+        pillars=[
+            HehunPartnerPillar(
+                position=pillar.position,
+                label=pillar.label,
+                ganzhi=pillar.ganzhi,
+                shishen_gan=pillar.shishen_gan,
+                nayin=pillar.nayin,
+            )
+            for pillar in chart.pillars
+        ],
+        dayun=list(chart.dayun),
+        true_solar_time=chart.true_solar_time,
+        tst_applied=chart.tst_applied,
+    )
+
+
+def hehun_provenance(reference: date, pair: HehunChartPair) -> HehunProvenance:
+    """溯源：版本、参考日、规则条数、十张表与方法声明。
+
+    `rule_count` 回显的是**表里有多少条**，不是**这一对命中了多少条** —— 后者页面上
+    直接数得出来（`fired`），前者才是"这套说法一共 29 条、每条都可核对"那句话的凭据。
+    """
+    return HehunProvenance(
+        reference_date=reference.isoformat(),
+        engine=pair.male.engine,
+        rule_count=len(HEHUN_RULES),
+        tables=[
+            ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+            for module, source in HEHUN_CONTENT_SOURCES
+        ],
+        method=HEHUN_MODEL_SOURCE,
+    )
+
+
+# ---------------------------------------------------------------- 总装（spec §5、§11 任务 8）
+def compute_hehun(
+    *,
+    male: HehunProfile,
+    female: HehunProfile,
+    reference_date: date | None,
+    axis_years: int,
+    axis_start_year: int | None = None,
+) -> BaziHehunResult:
+    """双人合盘一次装配：两造排盘 → 五族账本 → 四张衍生结构 → 一轴。
+
+    无 HTTP、无 I/O；随调用时刻变化的只有 `reference_date`（缺省由路由给），
+    它同时决定当前运档与缺省轴起点，并经 `provenance.reference_date` 回显。
+
+    `axis_years` 与 `reference_date` 都**不设引擎缺省**：21 这个数只在契约上出现一次
+    （`BaziHehunRequest.axis_years`），两处各写一份迟早分家，而前端读的是契约。
+    `axis_start_year` 是三者里唯一给缺省的：`None` 不是"没填"而是一个真取值 ——
+    它要的是 §9.3 那条 `max(较晚出生年, 参考年)`，那个数只有这里算得出。
+    轴的两道界在排完盘才知道（窗口来自两造各自的 `getYun()`），所以它是域错误而不是
+    入参错误（§9.3）；两造的生辰错误由 `_chart_for` 归到 `partner` 那一项上（§9.2）。
+    """
+    reference = reference_date or date.today()
+    pair = compute_partner_charts(male, female, reference)
+    male_luck = partner_annual_luck(male, Gender.MALE)
+    female_luck = partner_annual_luck(female, Gender.FEMALE)
+    span = resolve_hehun_axis_range(
+        start_year=axis_start_year,
+        years=axis_years,
+        reference_year=reference.year,
+        window=axis_window(male_luck, female_luck),
+    )
+    rows = hehun_rows(pair)
+    return BaziHehunResult(
+        male=partner_profile(pair.male, "male"),
+        female=partner_profile(pair.female, "female"),
+        score=hehun_ledger(rows),
+        matrix=pair_matrix(pair),
+        fired=hehun_fired(rows),
+        complement=complement(pair),
+        nayin=nayin_view(pair),
+        axis=hehun_axis(
+            pair,
+            male_luck,
+            female_luck,
+            start_year=span.start_year,
+            years=span.end_year - span.start_year + 1,
+        ),
+        yi_ji=yi_ji(pair),
+        provenance=hehun_provenance(reference, pair),
     )

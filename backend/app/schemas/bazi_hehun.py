@@ -17,7 +17,9 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import CalendarType
+from app.schemas.bazi import DayunStep, WuxingScore
+from app.schemas.common import CalendarType, ProvenanceTable
+from app.schemas.scoring import ScoreValue
 
 #: 乾/坤。键位即性别（spec §5.1），所以 `HehunProfile` 里没有 `gender` 字段。
 PartnerSide = Literal["male", "female"]
@@ -250,3 +252,62 @@ class HehunYiJi(BaseModel):
         description="恒 6 组，序即 §7.4 的阅读序（同宜→乾独宜→坤独宜→同忌→乾独忌→坤独忌）。",
     )
     declaration: str = Field(description="逐字取自 `HEHUN_YIJI_DECLARATION`，前端不补算也不改写。")
+
+
+class HehunPartnerPillar(BaseModel):
+    """双人页上的一柱：只到"这一柱是谁"为止，藏干与地势是本命盘的事。"""
+
+    position: str = Field(description="year | month | day | hour，与矩阵柱位同一套词。")
+    label: str = Field(description="中文名：年柱 | 月柱 | 日柱 | 时柱。")
+    ganzhi: str
+    shishen_gan: str = Field(description="该柱天干对**本造**日主的十神；日柱本身为「日主」。")
+    nayin: str = Field(description="本柱纳音名（《三命通会》，逐字取自命盘，不在这里重述）。")
+
+
+class HehunPartner(BaseModel):
+    """一造的精简档案（§5.2）。刻意不是 `/natal` 的副本。
+
+    神煞、格局、六维详批、藏干账本一概不给：那些是一个人本命盘的事，双人页不重演。
+    `elements` 复用命盘的 `WuxingScore`（因此带 `count`）、`dayun` 复用 `DayunStep`
+    （因此带 `xun` / `xun_kong` / `is_current`）—— 这是比 §5.2 点名字段多出的两处，
+    取的是"复用现成口径优于再造一个两字段副本"，计划已记为有意偏离。
+    """
+
+    side: PartnerSide = Field(description="乾/坤键位，即请求里的那一项；性别不在档案里重复一份。")
+    name: str | None = Field(default=None, description="称谓，逐字回显请求，不参与计算。")
+    four_pillars: str = Field(description="空格连写的四柱，如 戊辰 甲寅 庚子 丁亥。")
+    zodiac: str = Field(description="生肖（按立春）。")
+    day_master: str
+    day_master_element: str
+    favorable_elements: list[str] = Field(description="喜用神，逐字取该造本命盘（决策 3：合婚不重判）。")
+    unfavorable_elements: list[str] = Field(description="忌神，同上。")
+    elements: list[WuxingScore] = Field(description="五行分布，木火土金水序。")
+    pillars: list[HehunPartnerPillar]
+    dayun: list[DayunStep] = Field(description="该造的大运步表（含 index 0 的童限段）。")
+    true_solar_time: str | None = Field(description="该造起柱所用的真太阳时；关闭校正时为 None。")
+    tst_applied: bool = Field(description="该造是否做了真太阳时校正 —— 各造一份，不共用（§5.1）。")
+
+
+class HehunProvenance(BaseModel):
+    """合婚页自带的溯源：版本、口径、规则条数与方法声明。"""
+
+    reference_date: str = Field(description="判定当前大运与缺省轴起点的截止日（ISO）。")
+    engine: str = Field(description="四柱来源引擎，恒为 lunar-python。")
+    rule_count: int = Field(description="合婚规则表的条数（29）：页面上「每条命中都可核对」这一句的数目。")
+    tables: list[ProvenanceTable] = Field(description="本页真正读到的表，来自 `HEHUN_CONTENT_SOURCES`。")
+    method: str = Field(description="方法声明：四档命名、旺弱尺与三条自造判语的出处口径。")
+
+
+class BaziHehunResult(BaseModel):
+    """合婚一页的全部（§5.2）：一次请求给全，段与段之间互相自洽。"""
+
+    male: HehunPartner
+    female: HehunPartner
+    score: ScoreValue = Field(description="契合度总分与 29 条族账本（`Σ factors[].delta == value`）。")
+    matrix: list[HehunCell] = Field(description="恒 16 格，乾序年→月→日→时 × 坤序年→月→日→时。")
+    fired: list[HehunFired] = Field(description="账本贡献行的镜像，逐行带 direction。")
+    complement: HehunComplement
+    nayin: HehunNayin
+    axis: HehunAxis
+    yi_ji: HehunYiJi
+    provenance: HehunProvenance

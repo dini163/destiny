@@ -11,6 +11,7 @@ a version bump are one change, because responses echo the version per table and
 from importlib.metadata import version
 
 from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
+from app.content.bazi_hehun_rules import HEHUN_RULE_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
@@ -59,3 +60,24 @@ ALMANAC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: 历注的版本**不**取 `CONTENT_VERSION`：通书宜忌随库版本变，用本仓语料的滚动版本给
 #: 外部内容打版等于撒一个谎（spec §7.5）。
 ALMANAC_CONTENT_VERSION = version("lunar-python")
+
+#: `CONTENT_SOURCES` 的按名索引。合婚与后续任何"只引其中几页"的端点都用它取，
+#: 免得把书名逐字抄第二遍 —— 抄一份错一处，书名也就分了家。
+NATAL_SOURCE_BY_MODULE: dict[str, str] = dict(CONTENT_SOURCES)
+
+#: 合婚一页真正读到的十张表。单列的理由同 `NAME_CONTENT_SOURCES`：`bazi_dimensions`
+#: （六维详批）在本页既没参与计算也没有呈现，列进来等于让合婚声称引了它没引的书；
+#: 而 `bazi_wangshuai` / `bazi_geju` / `bazi_tiaohou` 三张看着像"本命盘的事"，
+#: 其实两造的喜忌集正是由它们合并出来的（互补图与宜忌的唯一输入），一张都删不得。
+#: 岁运那两张由轻量轴读：轴行一分一档与 `/bazi/liuyue` 的年表同一把尺（合婚 spec §10.5）。
+HEHUN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("bazi_shishen", NATAL_SOURCE_BY_MODULE["bazi_shishen"]),
+    ("bazi_nayin", NATAL_SOURCE_BY_MODULE["bazi_nayin"]),
+    ("bazi_wangshuai", NATAL_SOURCE_BY_MODULE["bazi_wangshuai"]),
+    ("bazi_geju", NATAL_SOURCE_BY_MODULE["bazi_geju"]),
+    ("bazi_tiaohou", NATAL_SOURCE_BY_MODULE["bazi_tiaohou"]),
+    ("bazi_shensha", NATAL_SOURCE_BY_MODULE["bazi_shensha"]),
+    ("bazi_relations", NATAL_SOURCE_BY_MODULE["bazi_relations"]),
+    *TRANSIT_CONTENT_SOURCES,
+    ("bazi_hehun_rules", HEHUN_RULE_SOURCE),
+)
