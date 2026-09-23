@@ -3,10 +3,12 @@
 条件是别处已经推出来的事实：`derive_relations` 的跨造 12 种关系（§2.1 的过滤）、
 `derive_branch_groups` 的三合/半合/三会（§2.3 的两道判据）、`element_weight_scores`
 对两造喜忌集的旺弱比值（§2.6）、两造年柱纳音的五行生克（§7.2）、以及 (乾日, 坤日)
-那一格的三级归属（§6.2）。本表不碰历法也不碰 pydantic，所以它不需要第二处真值来源。
+那一格的三级归属（§6.2）。本表不碰历法，也不把命盘再算一遍（契约模型在 `app/schemas`、
+命中逻辑在 `app/engines`），所以它不需要第二处真值来源。
 
-族序即账本序：`HEHUN_FAMILIES` 的顺序就是 `engines/bazi_hehun.hehun_rows()` 拼账本的
-顺序，两处同序是为了让"这一行属于哪一族"在 ledger 里读得出来，而不是靠键名前缀现推。
+族序即账本序：`HEHUN_FAMILIES` 的顺序就是 `engines/bazi_hehun.hehun_rows()`（Task 4 落地）
+拼账本的顺序，两处同序是为了让"这一行属于哪一族"在 ledger 里读得出来，而不是靠键名前缀现推
+—— 这条许诺由 `tests/content/test_bazi_hehun_rules.py` 的族序测钉住。
 
 出处三句（spec §6.3，逐条落在下面的 `_borrowed` / `_own` 两个构造器里）：
 ① 对称族与成局族的判语**前半句逐字**是 `RELATION_TABLES[kind].reading`，`source` 逐字同取；
@@ -34,7 +36,7 @@ WEAK_RATIO = 0.75
 #: 声称古籍给过分数。
 HEHUN_MODEL_SOURCE = "本系统命名与演绎（不引具体卷次）"
 
-#: 书级出处，随 `provenance.tables` 回显（`app/content/__init__.py::HEHUN_CONTENT_SOURCES`）。
+#: 书级出处，随 `provenance.tables` 回显（`app/content/__init__.py::HEHUN_CONTENT_SOURCES`，Task 8 接线）。
 HEHUN_RULE_SOURCE = (
     "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；"
     "婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · " + MODEL_PARAM_SOURCE
@@ -49,7 +51,7 @@ class HehunRule(BaseModel):
     key: str = Field(description="机器可读规则键，同时是 ScoreFactor.rule；前缀即族名。")
     label: str = Field(description="账本行短名，如 两造干合、我喜彼旺、日干五合。")
     family: str = Field(description="五族之一，必须与键的第二段一致。")
-    delta: float = Field(description="分值增减 ±3…±10，本系统模型参数（古籍只给喜忌序，从不给数）。")
+    delta: float = Field(description="分值增减，本系统模型参数（古籍只给喜忌序，从不给数）；幅度按族给定，见 spec §6.1。")
     reading: str = Field(description="单句判语；借古籍的那半句逐字，自造的那半句自署本系统。")
     source: str = Field(description="判语的出处。逐字引书者给书名，自造者给 HEHUN_MODEL_SOURCE。")
 
@@ -153,7 +155,7 @@ _RULE_LIST: tuple[HehunRule, ...] = (
     ),
     _own(
         "hh.yongshen.harmless", "我忌彼弱", 3.0,
-        "我忌神之五行，于彼造之盘衰弱的地，是名为安：所畏者不起，虽同气而不相害",
+        "我忌神之五行，于彼造之盘衰弱无力，是名为安：所畏者不起，虽同气而不相害",
     ),
     # --- nayin：两造年命纳音五行，主语固定为乾 ---
     _own(
