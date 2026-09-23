@@ -3,10 +3,12 @@
 from fastapi import APIRouter
 
 from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi_hehun import compute_hehun
 from app.engines.bazi_liuri import compute_liuri_matrix
 from app.engines.bazi_liushi import compute_liushi_day
 from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart, BaziNatalRequest
+from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult
 from app.schemas.bazi_liuri import BaziLiuriRequest, BaziLiuriResult
 from app.schemas.bazi_liushi import BaziLiushiRequest, BaziLiushiResult
 from app.schemas.bazi_transit import BaziTransitRequest, BaziTransitResult
@@ -130,4 +132,26 @@ async def bazi_liushi_day(request: BaziLiushiRequest) -> BaziLiushiResult:
         focus_hour_zhi=request.focus_hour_zhi,
         reference_date=request.reference_date,
         name=request.name,
+    )
+
+
+@router.post(
+    "/hehun",
+    response_model=BaziHehunResult,
+    summary="Compare two BaZi charts for marriage compatibility",
+)
+async def bazi_hehun(request: BaziHehunRequest) -> BaziHehunResult:
+    """双人合盘：一次请求给全一页（总分、16 格矩阵、互补图、纳音、同频轴、宜忌）。
+
+    这里薄到只剩转参数：两造各自的经线由引擎按 profile 决定（`profile_longitude`），
+    不复用本文件的 `_chart_longitude` —— 那一个读的是单造请求上的那一份校正开关，
+    而合婚的 `apply_true_solar_time` 是各造一份的（spec §5.1）。
+    参考日也原样传下去：它的缺省只在引擎里解析一次，并经 `provenance.reference_date` 回显。
+    """
+    return compute_hehun(
+        male=request.male,
+        female=request.female,
+        reference_date=request.reference_date,
+        axis_start_year=request.axis_start_year,
+        axis_years=request.axis_years,
     )
