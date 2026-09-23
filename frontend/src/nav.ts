@@ -24,6 +24,9 @@ export const ROUTES = {
   baziLiuri: '/bazi-liuri',
   // 岁运 → 流日 → 流时的下钻终点，不进 SECONDARY_NAV：无生辰即无意义。
   baziLiushi: '/bazi-liushi',
+  /** 双人合盘（切片 5）。与岁运/流日/流时不同，它进 `SECONDARY_NAV`：合婚不挂在任何
+   * 单造命盘之下，是一档独立的体系入口，`以此造合婚` 只是它的一个可选起点（决策 10）。 */
+  baziHehun: '/bazi-hehun',
   westernNatal: '/western-astrology',
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',
