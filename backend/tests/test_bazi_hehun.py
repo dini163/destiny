@@ -9,7 +9,13 @@ from datetime import date, time
 
 import pytest
 
-from app.content.bazi_hehun_rules import HEHUN_PALACE_KEYS
+from app.content.bazi_hehun_rules import (
+    HEHUN_BASE,
+    HEHUN_FAMILIES,
+    HEHUN_PALACE_KEYS,
+    HEHUN_RULES,
+    HEHUN_RULE_SOURCE,
+)
 from app.core.errors import InvalidBirthDataError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import (
@@ -20,16 +26,22 @@ from app.engines.bazi_hehun import (
     PALACE_STEM_MERGE,
     PILLAR_NAME,
     POSITION_ORDER,
+    YONGSHEN_QUADRANT,
     GroupMember,
     HehunChartPair,
     compute_partner_charts,
     cross_groups,
     cross_relations,
+    element_vigor,
     group_bonds_both_day_pillars,
     group_is_a_palace_fact,
     group_is_new_between_charts,
     group_rows,
     group_spans_both_charts,
+    hehun_fired,
+    hehun_ledger,
+    hehun_rows,
+    hehun_tier,
     nayin_key,
     nayin_relation,
     nayin_row,
@@ -38,11 +50,13 @@ from app.engines.bazi_hehun import (
     palace_rows,
     relation_rows,
     scanned_groups,
+    yongshen_rows,
 )
 from app.engines.bazi_rules import derive_relations
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_hehun import HehunProfile
 from app.schemas.common import Gender
+from app.schemas.scoring import MODEL_PARAM_SOURCE
 from app.solar.geo import resolve_longitude
 
 
@@ -478,3 +492,186 @@ def test_a_pillar_level_seal_never_vanishes_a_group_row() -> None:
         ("hh.group.three_harmony", "跨造三合（水）", 8.0),
         ("hh.group.three_meeting", "跨造三会（水）", 6.0),
     ]
+
+
+# §2.9 的七枚构造命例与 §2.7 的两对走查命例都在这一张表里：(名, 坤造, 行数, 总分, 档位)
+# 行数是账本**贡献行**的条数（不含 `build_ledger` 那条基准行）；九枚全都不触 0/100 截断。
+# Task 3 追加的第八枚 `FEMALE_DAY_FUYIN_GROUP` 不在表内：它是 §6.2 成局族交接的判据例
+# （§10.4 最后一条），断的是"柱级封口不吞成局族的行"，不是某一档可达。
+MEASURED_LEDGERS: list[tuple[str, BaziChart, int, float, str]] = [
+    ("全吉对", FEMALE_AUSPICIOUS, 19, 94.0, "天作之合"),
+    ("干支双收对", FEMALE_DAY_MERGE, 13, 74.0, "相得益彰"),
+    ("婚姻宫由三合撑起对", FEMALE_GROUP_MERGE, 16, 71.0, "相得益彰"),
+    ("日干冲无宫可对对", FEMALE_STEM_CLASH, 11, 64.0, "中和可处"),
+    ("互补对", FEMALE_COMPLEMENT, 17, 38.0, "欠和宜慎"),
+    ("欠和对", FEMALE_HOSTILE, 20, 37.0, "欠和宜慎"),
+    ("日支战对", FEMALE_DAY_CLASH, 20, 14.0, "欠和宜慎"),
+    ("日柱反吟对", FEMALE_DAY_REVERSE, 17, 9.0, "欠和宜慎"),
+    ("同频对", FEMALE_SAME, 20, 0.0, "欠和宜慎"),
+]
+
+
+def test_every_measured_pair_lands_where_the_design_said() -> None:
+    """§10.5 可达性：四档各有实测命例，且**不触截断**。
+
+    行数与总分一起断言，是因为只断总分看不出"少记一行被另一行补回来了"这种巧合。
+    「中和可处」那一枚停在 64.0 —— 离 65 那道界只有一分，正是把 `>=` 断在错的一侧时
+    会立刻变红的那一类数（§10.5 只强制要求 ≥80 与 <45 两端可达，中间两档是本轮加严）。
+    """
+    for name, female, rows, total, tier in MEASURED_LEDGERS:
+        ledger = hehun_ledger(hehun_rows(_pair_of(female)))
+        assert (name, len(ledger.factors) - 1, ledger.value, ledger.tier) == (name, rows, total, tier)
+
+
+def test_the_ledger_is_self_explaining_and_starts_with_the_base() -> None:
+    """§10.5 末条 + §6.3 第 3 条：`value == Σ factors[].delta`，每行的出处都是模型参数。
+
+    九枚命例里最低 0.0、最高 94.0，都在 [0, 100] 之内，所以没有一枚会多出
+    `score.clamped` 那一行 —— 上一测的 `len(factors) - 1 == 行数` 已经把这条钉住了。
+    """
+    rows = hehun_rows(_pair_of(FEMALE_DAY_CLASH))
+    ledger = hehun_ledger(rows)
+    assert ledger.factors[0].rule == "hehun.base"
+    assert ledger.factors[0].label == "基准分"
+    assert ledger.factors[0].delta == HEHUN_BASE
+    assert ledger.value == pytest.approx(sum(factor.delta for factor in ledger.factors))
+    # 控制方裁定点（原字面量 `{HEHUN_RULE_SOURCE}` 与既有契约冲突）：基准行的 source 恒为
+    # `MODEL_PARAM_SOURCE` 原句 —— `build_ledger` 硬编码如此（spec §6.3 第 3 条点名 `HEHUN_BASE`
+    # 的出处就是那一句，岁运 golden 测 `test_bazi_transit_golden.py:195` 钉的是同一行为）。
+    assert {factor.source for factor in ledger.factors} == {HEHUN_RULE_SOURCE, MODEL_PARAM_SOURCE}
+    assert MODEL_PARAM_SOURCE in HEHUN_RULE_SOURCE
+
+
+def test_the_day_merge_ledger_reads_family_by_family() -> None:
+    """整份账本逐字对拍（13 行 74.0），族序即 `HEHUN_FAMILIES`：对称→成局→互济→年命→婚姻宫。
+
+    这枚命例是五族里四族的同屏样本（成局族为空，两道判据都滤尽了），
+    也是"一格出两行字级"的那一枚：干级 +10、支级 +8，格内那两条命中在对称族里消失。
+    """
+    assert [
+        (row.family, row.rule, row.direction, row.label, row.delta)
+        for row in hehun_rows(_pair_of(FEMALE_DAY_MERGE))
+    ] == [
+        ("relation", "hh.relation.branch_break", "mutual", "两造支破（乾年×坤日）", -3.0),
+        ("relation", "hh.relation.stem_merge", "mutual", "两造干合（乾年×坤时）", 8.0),
+        ("relation", "hh.relation.stem_merge", "mutual", "两造干合（乾月×坤月）", 8.0),
+        ("relation", "hh.relation.branch_merge", "mutual", "两造支合（乾月×坤月）", 8.0),
+        ("relation", "hh.relation.branch_harm", "mutual", "两造支害（乾日×坤时）", -5.0),
+        ("relation", "hh.relation.self_punishment", "mutual", "两造自刑（乾时×坤月）", -4.0),
+        ("relation", "hh.relation.stem_clash", "mutual", "两造干冲（乾时×坤时）", -6.0),
+        ("yongshen", "hh.yongshen.supply", "male_to_female", "我喜彼旺（乾视坤·土旺）", 6.0),
+        ("yongshen", "hh.yongshen.shortfall", "male_to_female", "我喜彼弱（乾视坤·金弱）", -5.0),
+        ("yongshen", "hh.yongshen.clash", "male_to_female", "我忌彼旺（乾视坤·水旺）", -7.0),
+        ("nayin", "hh.nayin.sheng_wo", "mutual", "生我（乾木·坤水）", 6.0),
+        ("palace", "hh.palace.stem_merge", "mutual", "日干五合", 10.0),
+        ("palace", "hh.palace.branch_merge", "mutual", "日支相合", 8.0),
+    ]
+
+
+def test_the_vigor_ruler_is_set_against_the_chart_s_own_mean() -> None:
+    """§2.6：尺是**该造自己的五行均值**，不是原始分值，也不是对方的盘。
+
+    乾 实测比值 木1.3924 火0.8228 土1.0759 金0.6329 水1.0759 —— 离 1.25/0.75 两道界
+    都有距离，所以五个标签都断得出口（取四位前后是同一个读数，§2.6）。
+    """
+    assert element_vigor(MALE) == {"木": "旺", "火": "平", "土": "平", "金": "弱", "水": "平"}
+
+
+def test_the_four_quadrants_and_both_views_all_book_in_one_pair() -> None:
+    """§10.4：同频对恰好把补/阙/冲/安四格与两个视角一次给全（实测六行）。
+
+    「安」= 乾视坤·木弱（坤 木比值 0.1948，离两道界都远）。§10.4 原本担心只有这一枚
+    非走查命例给得出安格，实测在四位读数下走查那对也给得出一条（§2.6、§2.7），两对互为备份。
+    """
+    assert [
+        (row.rule, row.direction, row.label, row.delta) for row in yongshen_rows(_pair_of(FEMALE_SAME))
+    ] == [
+        ("hh.yongshen.shortfall", "male_to_female", "我喜彼弱（乾视坤·土弱）", -5.0),
+        ("hh.yongshen.supply", "male_to_female", "我喜彼旺（乾视坤·金旺）", 6.0),
+        ("hh.yongshen.harmless", "male_to_female", "我忌彼弱（乾视坤·木弱）", 3.0),
+        ("hh.yongshen.clash", "male_to_female", "我忌彼旺（乾视坤·水旺）", -7.0),
+        ("hh.yongshen.shortfall", "female_to_male", "我喜彼弱（坤视乾·金弱）", -5.0),
+        ("hh.yongshen.clash", "female_to_male", "我忌彼旺（坤视乾·木旺）", -7.0),
+    ]
+
+
+def test_the_same_element_books_two_rows_that_say_two_different_things() -> None:
+    """§6.2 的双向裁定：同一个「金」在两个视角上方向相反，两行说的是两种气，不是双计。
+
+    乾 喜金而 坤 金旺（比值 1.4935 → 补），坤 喜金而 乾 金弱（0.6329 → 阙）；
+    两条不同的补救路径，各记一行。
+    """
+    rows = [row for row in yongshen_rows(_pair_of(FEMALE_SAME)) if "金" in row.label]
+    assert [(row.direction, row.label, row.delta) for row in rows] == [
+        ("male_to_female", "我喜彼旺（乾视坤·金旺）", 6.0),
+        ("female_to_male", "我喜彼弱（坤视乾·金弱）", -5.0),
+    ]
+
+
+def test_an_element_in_the_flat_zone_books_nothing() -> None:
+    """§7.1 诚实性约束的因：落在"平"区的五行既不入象限也不入账本。
+
+    互补对里 乾忌火 而 坤 火比值 1.0625（离 1.25 与 0.75 两道界都有距离）—— 乾忌三条
+    候选里唯一落空的就是它，木 0.75 与 水 1.4375 都各自成了象限（§2.6 的四位读数）。
+    """
+    rows = yongshen_rows(_pair_of(FEMALE_COMPLEMENT))
+    assert not [row for row in rows if "火" in row.label]
+    assert [row.label for row in rows] == [
+        "我喜彼旺（乾视坤·土旺）",
+        "我喜彼弱（乾视坤·金弱）",
+        "我忌彼弱（乾视坤·木弱）",
+        "我忌彼旺（乾视坤·水旺）",
+        "我喜彼弱（坤视乾·金弱）",
+        "我忌彼旺（坤视乾·木旺）",
+    ]
+
+
+def test_a_chart_without_a_list_of_its_own_books_only_one_view() -> None:
+    """一造的喜忌集为空时那一向就是零行（§5.2 的 `null` 只出现在结构性之处）。
+
+    坤 1989-04-04 的 `favorable_elements` 与 `unfavorable_elements` 实测都是空表
+    （§2.9 命例之一），所以整对只有 乾视坤 的四行 —— 四行都在，只是反过来的那一向没有。
+    """
+    rows = yongshen_rows(_pair_of(FEMALE_DAY_REVERSE))
+    assert {row.direction for row in rows} == {"male_to_female"}
+    assert [(row.label, row.delta) for row in rows] == [
+        ("我喜彼弱（乾视坤·金弱）", -5.0),
+        ("我忌彼旺（乾视坤·木旺）", -7.0),
+        ("我忌彼弱（乾视坤·水弱）", 3.0),
+        ("我忌彼旺（乾视坤·火旺）", -7.0),
+    ]
+
+
+def test_the_four_bands_are_cut_where_the_design_said() -> None:
+    """§6.4：四档是本系统命名；中间两道分界直接引 `bazi_strength` 的两条常量。
+
+    80 是本轮唯一新增的分界（决策 5）。边界取"压线值 + 一角钱"两两一对，
+    断的是 `>=` 而不是 `>`，档位是整数分的函数，与 §2.6 那条比值纪律无关。
+    """
+    assert hehun_tier(80.0) == "天作之合"
+    assert hehun_tier(79.9) == "相得益彰"
+    assert hehun_tier(65.0) == "相得益彰"
+    assert hehun_tier(64.9) == "中和可处"
+    assert hehun_tier(45.0) == "中和可处"
+    assert hehun_tier(44.9) == "欠和宜慎"
+
+
+def test_every_ledger_row_has_a_mirrored_fired_entry() -> None:
+    """§10.6 第二条：账本与判语不分家 —— 一行账配一句判语，逐行对齐。
+
+    镜像的断法是按序逐条对，不是按 `rule` 集合对：同一个键可以在一份账本里出现三次
+    （三条六冲），集合会把这个巧合抹平，而读者在页面上是按行读的。
+    """
+    rows = hehun_rows(_pair_of(FEMALE_SAME))
+    fired = hehun_fired(rows)
+    assert len(fired) == len(rows)
+    for row, entry in zip(rows, fired, strict=True):
+        assert (entry.rule, entry.label, entry.family, entry.direction, entry.delta) == (
+            row.rule,
+            row.label,
+            row.family,
+            row.direction,
+            row.delta,
+        )
+        assert entry.reading == HEHUN_RULES[row.rule].reading
+    assert {entry.family for entry in fired} <= set(HEHUN_FAMILIES)

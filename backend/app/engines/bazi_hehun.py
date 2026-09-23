@@ -3,8 +3,8 @@
 历法、排盘、关系表、合局表、纳音表、账本、流年扫描全是现成件，本模块只做四件事：
 ① 把两造各排一次盘，并把错误归到是哪一造（§9.2）；② 以乾四柱为体、坤四柱为 `extra`
 扫一次跨造关系，按"恰好一侧是 extra"过滤（§2.1）；③ 按 §6.2 的归属规则把每个事实
-收进五族里的一族一条（对称、成局、年命、婚姻宫四族今日在账，互济族那一族随 Task 4 落地）；
-④ 交 `build_ledger` 出一份自解释的总分（Task 4 落地）。
+收进五族里的一族一条（对称、成局、互济、年命、婚姻宫五族全在账）；
+④ 交 `build_ledger` 出一份自解释的总分。
 
 **跨造不算十神**（决策 2）：十神是命局内部的坐标（切片 0 §7.5 已把 `_god()` 对外来柱
 定为空串），把它伸到另一张盘上是本系统没有资格立的第五种命理学说。同理两造的喜忌一律
@@ -19,9 +19,14 @@ from dataclasses import dataclass
 from datetime import date
 
 from app.content.bazi_hehun_rules import (
+    HEHUN_BASE,
     HEHUN_GROUP_KEYS,
     HEHUN_NAYIN_KEYS,
     HEHUN_RELATION_KEYS,
+    HEHUN_RULE_SOURCE,
+    HEHUN_TOP_CUT,
+    STRONG_RATIO,
+    WEAK_RATIO,
     hehun_rule,
 )
 from app.content.bazi_nayin import nayin_meaning
@@ -30,9 +35,11 @@ from app.content.wuxing import CONTROLS, GENERATES
 from app.core.errors import DestinyError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_rules import POSITIONS, derive_branch_groups, derive_relations, is_fanyin
+from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT, element_weight_scores
 from app.schemas.bazi import BaziChart, BaziPillar
-from app.schemas.bazi_hehun import HehunCell, HehunCellHit, HehunProfile
+from app.schemas.bazi_hehun import HehunCell, HehunCellHit, HehunFired, HehunProfile, Vigor
 from app.schemas.common import Gender
+from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -469,4 +476,140 @@ def pair_matrix(pair: HehunChartPair) -> list[HehunCell]:
         )
         for male in POSITION_ORDER
         for female in POSITION_ORDER
+    ]
+
+
+# ---------------------------------------------------------------- 互济族（spec §2.6、§7.1）
+
+#: 四象限的键：(该行是不是我的喜用, 彼造这一行的旺弱)。`平` 不在表内 —— 于是 `.get()`
+#: 拿不到键就是"平"，既不入象限也不入账本（§7.1 的诚实性约束在数据结构这一层成立）。
+#: 元组第一项用 bool 而不是"喜"/"忌"两个字，是因为调用方手里本来就是
+#: `analysis.favorable_elements` 与 `unfavorable_elements` 这两个列表，谁真谁假一目了然。
+YONGSHEN_QUADRANT: dict[tuple[bool, Vigor], str] = {
+    (True, "旺"): "hh.yongshen.supply",
+    (True, "弱"): "hh.yongshen.shortfall",
+    (False, "旺"): "hh.yongshen.clash",
+    (False, "弱"): "hh.yongshen.harmless",
+}
+
+
+def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
+    """该造五行的旺/弱/平标签（§2.6）。
+
+    站里给得出的是**量**（`element_weight_scores`：四干各 1.0 加藏干本中余 0.6/0.3/0.1），
+    没有任何一处给过"某行旺不旺"的标签，所以这一把尺本轮由本系统立，且只立在这一处：
+    基准是**该造自己的五行均值**，比值 ≥1.25 为旺、≤0.75 为弱、其余为平。
+    拿盘内均值当基准是因为"在这个人的盘里这一行算不算多"本来就是盘内比较 ——
+    跨盘比原始分值没有意义，两造的总量本来就接近（§2.6）。
+    比值先取四位再比大小：权重是浮点累加，`1.2 / 1.6` 给的是 `0.7500000000000001`，
+    不取整就会让一条数学上正好压界的比值判成"平"，而压界在 §2.6 里属于弱。
+    均值恒为正（四柱八个小干与藏干必有权重），所以这里不设除零分支。
+    """
+    scores = element_weight_scores(chart.pillars)
+    mean = sum(scores.values()) / len(scores)
+    vigor: dict[str, Vigor] = {}
+    for element, score in scores.items():
+        ratio = round(score / mean, 4)
+        vigor[element] = "旺" if ratio >= STRONG_RATIO else "弱" if ratio <= WEAK_RATIO else "平"
+    return vigor
+
+
+def _one_view_rows(me: BaziChart, other: BaziChart, direction: str, where: str) -> list[HehunRow]:
+    """一个视角的四象限：先喜用（补/阙）后忌神（冲/安），组内按该造喜忌集的序。
+
+    `where` 是短名里的"乾视坤/坤视乾" —— 两个视角的行同键同 delta，
+    不带这一处就分不出是谁的喜用在说话（§6.1 一条账本行的身份是 (族, 视角, 五行)）。
+    """
+    theirs = element_vigor(other)
+    rows: list[HehunRow] = []
+    for favorable, elements in (
+        (True, me.analysis.favorable_elements),
+        (False, me.analysis.unfavorable_elements),
+    ):
+        for element in elements:
+            vigor = theirs[element]
+            rule_key = YONGSHEN_QUADRANT.get((favorable, vigor))
+            if rule_key:
+                rows.append(_to_row(rule_key, direction, f"（{where}·{element}{vigor}）"))
+    return rows
+
+
+def yongshen_rows(pair: HehunChartPair) -> list[HehunRow]:
+    """互济族：两向各一组（§6.2）。
+
+    这是五族里唯一天生有向的一族 —— 事实的主语是谁的喜用在先，
+    「乾忌火而坤火旺」与「坤忌木而乾木旺」是两件不同的事、两条不同的补救路径。
+    两造的喜忌一律直接取各自本命盘，合婚不重判（决策 3）。
+    """
+    return [
+        *_one_view_rows(pair.male, pair.female, "male_to_female", "乾视坤"),
+        *_one_view_rows(pair.female, pair.male, "female_to_male", "坤视乾"),
+    ]
+
+
+# ---------------------------------------------------------------- 总账本（spec §6.1、§6.4）
+def hehun_rows(pair: HehunChartPair) -> list[HehunRow]:
+    """五族装配成一份账本的行，序即 `HEHUN_FAMILIES`：对称→成局→互济→年命→婚姻宫。
+
+    婚姻宫族排在最后不是凑顺序：它是唯一会**改写前面几族**的一族（§6.2 的封口），
+    放在末尾读起来正是"前面记下的一切，到这一格按宫位归属重新收一次"。
+    """
+    return [
+        *relation_rows(pair),
+        *group_rows(pair),
+        *yongshen_rows(pair),
+        nayin_row(pair),
+        *palace_rows(pair),
+    ]
+
+
+def hehun_tier(value: float) -> str:
+    """四档（§6.4）。中间两道分界直接引旺衰那两条常量，只在上面加一条 80（决策 5）。
+
+    最低档刻意不叫"待化解"：本轮不做任何化解物品与风水手段（§4.2），
+    给一个暗示"有解法"的档位名就是在替页面上不存在的内容打广告。
+    注意同一份响应里有两套档位词汇 —— 轴行里两造各自的档是岁运的 顺/平/滞（`_tier()`），
+    两套不合并（它们回答的是"你们合不合"与"这一年他顺不顺"两个问题）。
+    """
+    if value >= HEHUN_TOP_CUT:
+        return "天作之合"
+    if value >= STRONG_CUT:
+        return "相得益彰"
+    return "中和可处" if value >= WEAK_CUT else "欠和宜慎"
+
+
+def hehun_ledger(rows: Sequence[HehunRow]) -> ScoreValue:
+    """行 → 自解释总分；截断由 `build_ledger` 记成它自己的一行（与 `transit_ledger` 同形）。
+
+    档位取**截断后**的值：§6.4 说的是"页面显示的那个数落在哪一档"，
+    让 `value == 99` 与 `value == 100` 分属两档是一个可读性 bug，不是精度问题。
+    """
+    raw_total = HEHUN_BASE + sum(row.delta for row in rows)
+    return build_ledger(
+        base=HEHUN_BASE,
+        tier=hehun_tier(min(100.0, max(0.0, raw_total))),
+        contributions=[
+            ScoreFactor(rule=row.rule, label=row.label, delta=row.delta, source=HEHUN_RULE_SOURCE)
+            for row in rows
+        ],
+        base_rule="hehun.base",
+    )
+
+
+def hehun_fired(rows: Sequence[HehunRow]) -> list[HehunFired]:
+    """账本行的人类可读镜像：键、短名、族、视角、分值逐字取自那一行，判语取自规则表。
+
+    `fired` 与 `score.factors` 按序一一对齐（§10.6 的"账本与判语不分家"），
+    所以前端可以按行渲染，不必拿 `rule` 去两处之间做 join。
+    """
+    return [
+        HehunFired(
+            rule=row.rule,
+            label=row.label,
+            family=row.family,
+            direction=row.direction,
+            delta=row.delta,
+            reading=hehun_rule(row.rule).reading,
+        )
+        for row in rows
     ]

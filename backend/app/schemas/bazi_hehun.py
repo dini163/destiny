@@ -23,6 +23,8 @@ from app.schemas.common import CalendarType
 PartnerSide = Literal["male", "female"]
 #: 一条账本行的视角。互济族天生两向，其余四族无向（spec §6.2）。
 HehunDirection = Literal["male_to_female", "female_to_male", "mutual"]
+#: §2.6 的三档旺弱。**"平"既不落旺也不落弱**：它既不入互补图的四象限，也不进互济族的账。
+Vigor = Literal["旺", "弱", "平"]
 
 
 class HehunProfile(BaseModel):
