@@ -1028,13 +1028,16 @@ def test_segments_cover_the_axis_exactly_once() -> None:
     不验这一条的话，"边界在窗口外"这一类错位要到浏览器走查才看得见。
 
     上面那三条是顺轴走一遍的构造性质，回归了也测不出来；守得住 §7.3 的是最后那一条 ——
-    段首年恰等于两造 `DayunStep.start_year` 落在窗内的并集（去重、升序）。
+    段首年恰等于两造 `DayunStep.start_year` 落在窗内的并集（去重、升序）。并集里再并入窗口
+    起年不是遮丑：轴可以从一步大运的中间开始（Task 9 让用户自选 `axis_start`），那时首段就是
+    那一步的尾巴 —— 后两个窗口（2025—2028、2026—2034）正是这一形，其窗口起年落在两造任何
+    `start_year` 之外，不并它这条等式在中途起轴上就配不上"恰等于"。
     """
     pair = _pair_of(FEMALE_SAME)
     male_luck, female_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE), partner_annual_luck(
         SAME_PROFILE, Gender.FEMALE
     )
-    for start, years in ((2024, 5), (2024, 21), (1990, 5)):
+    for start, years in ((2024, 5), (2024, 21), (1990, 5), (2025, 4), (2026, 9)):
         spans = axis_segments(pair, male_luck, female_luck, start_year=start, years=years)
         assert (spans[0].start_year, spans[-1].end_year) == (start, start + years - 1)
         assert sum(span.end_year - span.start_year + 1 for span in spans) == years
@@ -1046,6 +1049,7 @@ def test_segments_cover_the_axis_exactly_once() -> None:
                 for step in chart.dayun
                 if start <= step.start_year <= start + years - 1
             }
+            | {start}
         )
         assert [span.start_year for span in spans] == boundaries
     assert [
