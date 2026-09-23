@@ -1,7 +1,7 @@
 """合婚引擎（spec §10.1–10.6）。
 
 夹具一律**用真实生辰走 `compute_bazi_chart`**：全仓 0 处手搓 `BaziPillar` 列表
-（§2.7），本轮不破例。§2.7 的两对走查命例与 §2.9 的七枚构造命例在此一次立齐，
+（§2.7），本轮不破例。§2.7 的两对走查命例与 §2.9 的七枚构造命例、§6.2 的交接命例在此一次立齐，
 后面每个任务都只往这个文件追加测。
 """
 
@@ -68,7 +68,7 @@ FEMALE_SAME = _chart(1990, 6, 15, 10, 0, "北京", Gender.FEMALE)
 # 互补对 坤：乙丑 癸未 壬戌 丁未，喜水金忌土火木 —— 浏览器走查用这一对
 FEMALE_COMPLEMENT = _chart(1985, 7, 22, 14, 30, "上海", Gender.FEMALE)
 
-# §2.9 构造命例：婚姻宫四族与四档可达性，全部按生辰实测（全仓 0 处手搓 BaziPillar）
+# §2.9 构造命例与 §6.2 交接例：婚姻宫四族、四档可达性、成局族交接，全部按生辰实测（全仓 0 处手搓 BaziPillar）
 # 全吉对：乾自带的辰子半合水因"坤 那颗子只是同字重复"被 §2.3 第二道判据滤掉 → 成局族空
 FEMALE_AUSPICIOUS = _chart(1995, 9, 18, 18, 0, "北京", Gender.FEMALE)   # 乙亥 乙酉 壬子 己酉
 # 欠和对：乾有辰子、坤来申辰 → 半合升级为三合，kind 变了 → 入账（§2.3 反向对照）
@@ -77,12 +77,15 @@ FEMALE_HOSTILE = _chart(1989, 8, 18, 10, 0, "成都", Gender.FEMALE)      # 己�
 FEMALE_DAY_CLASH = _chart(1989, 3, 11, 10, 0, "成都", Gender.FEMALE)    # 己巳 丁卯 庚午 庚辰
 # 柱级封口：庚子 × 甲午 = 干冲 + 支冲 = 反吟，该格三条命中全封
 FEMALE_DAY_REVERSE = _chart(1989, 4, 4, 7, 0, "成都", Gender.FEMALE)    # 己巳 丁卯 甲午 丁卯
-# 干级 + 支级各出一条：日干庚乙五合、日管子丑六合 → 账本 13 行 74.0
+# 干级 + 支级各出一条：日干庚乙五合、日管子丑六合 → 总账本 13 行 74.0（Task 4 装配完整账本后的数）
 FEMALE_DAY_MERGE = _chart(1996, 11, 24, 14, 30, "成都", Gender.FEMALE)  # 丙子 己亥 乙丑 癸未
 # 支级的第三条路：申子辰三合跨两造日支，格内**没有**任何一条六合关系 → branch_merge 全由成局族撑起
 FEMALE_GROUP_MERGE = _chart(1992, 2, 2, 20, 0, "成都", Gender.FEMALE)   # 辛未 辛丑 戊申 辛酉
 # 格内只有日干相冲：婚姻宫族不立"日干冲"那一键，所以这一格空手，那条命中留在对称族
 FEMALE_STEM_CLASH = _chart(1997, 2, 1, 15, 0, "成都", Gender.FEMALE)    # 丙子 辛丑 甲戌 辛未
+# §6.2 与成局族的交接：日柱伏吟（乾 庚子 × 坤 庚子）把归属收在柱级一条上，而申子辰三合
+# 跨住两造日支 —— 那一格没有支级行可收编，成局族这一行必须照记（+8 不该两头都不入账）
+FEMALE_DAY_FUYIN_GROUP = _chart(1985, 8, 29, 3, 30, "成都", Gender.FEMALE)  # 乙丑 甲申 庚子 丁丑
 
 
 def _pair_of(female: BaziChart) -> HehunChartPair:
@@ -209,9 +212,12 @@ def test_a_group_needs_a_member_from_each_chart_to_be_a_fact_between_them() -> N
     前者两侧不齐 → 滤，后者 → 入账。
     """
     pair = _pair_of(FEMALE_SAME)
-    assert [(g.kind, g.element) for g in scanned_groups(pair)] == [("半合", "水"), ("半合", "火")]
-    two_sided = [g for g in scanned_groups(pair) if group_spans_both_charts(g)]
-    assert [(g.kind, g.element, g.members) for g in two_sided] == [
+    scanned = scanned_groups(pair)
+    assert [(g.kind, g.element) for g in scanned] == [("半合", "水"), ("半合", "火")]
+    # 判据的真假各钉一次：期望若是 `group_spans_both_charts` 现算出来的，谓词写反时两边一起反，
+    # 这一条测就恒真（§2.3 明说第一道判据"单独设测"，测的正是它自己）。
+    assert [group_spans_both_charts(g) for g in scanned] == [False, True]
+    assert [(g.kind, g.element, g.members) for g in cross_groups(pair)] == [
         (
             "半合",
             "火",
@@ -222,7 +228,6 @@ def test_a_group_needs_a_member_from_each_chart_to_be_a_fact_between_them() -> N
             ),
         )
     ]
-    assert cross_groups(pair) == two_sided
 
 
 def test_a_group_that_only_repeats_one_charts_own_group_is_not_a_new_fact() -> None:
@@ -452,3 +457,24 @@ def test_the_names_the_ledger_suffixes_use_are_the_ones_the_charts_carry() -> No
         PALACE_BRANCH_HARMONY,
         PALACE_PILLAR_REVERSE,
     } == set(HEHUN_PALACE_KEYS)
+
+
+def test_a_pillar_level_seal_never_vanishes_a_group_row() -> None:
+    """§6.2 与成局族的交接：成局族那一行要**有人接了**才交得出去。
+
+    `FEMALE_DAY_FUYIN_GROUP`（乾 庚子 × 坤 庚子）实测：日柱伏吟 → 归属直接收在柱级那一条，
+    支级根本不出现；而 乾 辰子 + 坤 申子 拼成的申子辰三合跨住两造日支，`group_is_a_palace_fact`
+    为真。若 `group_rows` 只看这一条就丢行，这 +8 于是两头都不记 —— 而 §6.2 说的是
+    "一条事实只记一次"，从不是"一次都不记"。（三会水 不在 `PALACE_GROUP_KINDS` 里：
+    §6.1 的 `branch_merge` 只收六合/三合/半合。）
+    """
+    pair = _pair_of(FEMALE_DAY_FUYIN_GROUP)
+    assert [g.kind for g in cross_groups(pair) if group_is_a_palace_fact(g)] == ["三合"]
+    assert palace_keys(pair) == [PALACE_PILLAR_REVERSE]
+    assert [(r.rule, r.label, r.delta) for r in palace_rows(pair)] == [
+        ("hh.palace.pillar_reverse", "日柱伏反吟", -8.0)
+    ]
+    assert [(r.rule, r.label, r.delta) for r in group_rows(pair)] == [
+        ("hh.group.three_harmony", "跨造三合（水）", 8.0),
+        ("hh.group.three_meeting", "跨造三会（水）", 6.0),
+    ]

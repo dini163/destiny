@@ -307,12 +307,31 @@ def group_is_a_palace_fact(group: CrossGroup) -> bool:
 
 
 def group_rows(pair: HehunChartPair) -> list[HehunRow]:
-    """成局族：跨造局每局一行；撑婚姻宫支级的那局不在这里出账（§6.2 一条事实一行账）。"""
+    """成局族：跨造局每局一行；被婚姻宫**收走**的那局不在这里出账（§6.2 与成局族的交接）。
+
+    收走的判据是两道，缺一不可：`group_is_a_palace_fact` 说出"这一局撑的是婚姻宫支级"，
+    `PALACE_BRANCH_MERGE in palace_keys(pair)` 说出"婚姻宫确实记了它"。柱级成立时后者为假
+    （`palace_keys` 直接 `return` 在 `pillar_reverse` 上），此时丢掉前者就是让那局的分值
+    两头不记 —— "只记一次"不等于"一次都不记"。
+    """
+    sealed_by_palace = PALACE_BRANCH_MERGE in palace_keys(pair)
     return [
         _to_row(group.rule, "mutual", f"（{group.element}）")
         for group in cross_groups(pair)
-        if not group_is_a_palace_fact(group)
+        if not (sealed_by_palace and group_is_a_palace_fact(group))
     ]
+
+
+def _nayin_elements(pair: HehunChartPair) -> tuple[str, str]:
+    """两造年命的五行（乾, 坤）。
+
+    纳音五行取自 `nayin_meaning()`：`BaziPillar` 上只有纳音**名**（`nayin` 字段），没有
+    五行字段，所以两边各现查一次。关系与短名后缀都要读这一对，故只查在这一处。
+    """
+    return (
+        nayin_meaning(_pillar(pair.male, "year").ganzhi).element,
+        nayin_meaning(_pillar(pair.female, "year").ganzhi).element,
+    )
 
 
 def nayin_relation(pair: HehunChartPair) -> str:
@@ -321,11 +340,8 @@ def nayin_relation(pair: HehunChartPair) -> str:
     五行之间的关系只有 比和/生我/我生/我克/克我 五种，前四条判完剩下的那一条必然是
     克我（`CONTROLS[theirs] == mine`），所以不必再判一次 —— 五个分支穷尽。
     乾火坤木 → 木生火 → 生我，绝不同时再记一行我生。
-    纳音五行取自 `nayin_meaning()`：`BaziPillar` 上只有纳音**名**（`nayin` 字段），
-    没有五行字段，所以两造的年命都要现查一次。
     """
-    mine = nayin_meaning(_pillar(pair.male, "year").ganzhi).element
-    theirs = nayin_meaning(_pillar(pair.female, "year").ganzhi).element
+    mine, theirs = _nayin_elements(pair)
     if mine == theirs:
         return "比和"
     if GENERATES[theirs] == mine:
@@ -343,12 +359,8 @@ def nayin_key(pair: HehunChartPair) -> str:
 
 def nayin_row(pair: HehunChartPair) -> HehunRow:
     """年命族恒一行（§6.1）：短名带两造纳音五行的那半句，读得出"从谁看谁"。"""
-    return _to_row(
-        nayin_key(pair),
-        "mutual",
-        f"（乾{nayin_meaning(_pillar(pair.male, 'year').ganzhi).element}"
-        f"·坤{nayin_meaning(_pillar(pair.female, 'year').ganzhi).element}）",
-    )
+    mine, theirs = _nayin_elements(pair)
+    return _to_row(nayin_key(pair), "mutual", f"（乾{mine}·坤{theirs}）")
 
 
 def _day_cell_kinds(pair: HehunChartPair, hits: Sequence[CrossHit]) -> frozenset[str]:
@@ -368,6 +380,8 @@ def palace_keys(pair: HehunChartPair) -> list[str]:
     五合（婚姻宫族不立日干冲），支级三条分支互斥：合 > 战 > 比和。
     干级与支级不互斥，所以一格可以同时出 `stem_merge` 与 `branch_merge` 两行 ——
     那是两回事（心意的合与居处的合），不是把一格记了两次。
+    柱级那一支的 `return` 另有一层意思：**它没有收下任何支级事实**，所以成局族那一边
+    的交接（`group_rows` 只看 `PALACE_BRANCH_MERGE` 是否真在这里出现）于是不成立。
     """
     male_day = _pillar(pair.male, "day")
     female_day = _pillar(pair.female, "day")

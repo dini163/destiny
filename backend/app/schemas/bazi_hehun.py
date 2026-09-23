@@ -66,7 +66,7 @@ class HehunCellHit(BaseModel):
     kind: str = Field(description="关系中文名，与 `RELATION_TABLES` 的 kind 同词。")
     male_character: str = Field(description="乾那一根的干、支或整柱（伏吟/反吟论整柱）。")
     female_character: str = Field(description="坤那一根的干、支或整柱。")
-    rule: str = Field(description="该 kind 的账本键；矩阵是呈现层，键只作标识。")
+    rule: str = Field(description="该 kind 的账本键。")
     direction: HehunDirection = Field(
         default="mutual",
         description="矩阵格一律 mutual —— 列出该字段是为了与 `HehunFired` 同一个渲染器，"
