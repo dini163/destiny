@@ -10,6 +10,7 @@ from datetime import date, time
 import pytest
 
 from app.content.bazi_hehun_rules import (
+    ELEMENT_ATTRIBUTIONS,
     HEHUN_BASE,
     HEHUN_FAMILIES,
     HEHUN_NAYIN_NOTE,
@@ -18,6 +19,7 @@ from app.content.bazi_hehun_rules import (
     HEHUN_RULE_SOURCE,
     HEHUN_SYNC_CLOSE,
     HEHUN_SYNC_WIDE,
+    HEHUN_YIJI_DECLARATION,
     hehun_rule,
 )
 from app.content.bazi_nayin import nayin_meaning
@@ -65,6 +67,7 @@ from app.engines.bazi_hehun import (
     partner_annual_luck,
     relation_rows,
     scanned_groups,
+    yi_ji,
     yongshen_facts,
     yongshen_rows,
 )
@@ -1074,3 +1077,98 @@ def test_the_window_is_the_overlap_of_two_luck_spans() -> None:
         assert window == HehunAxisWindow(
             male_from=1988, female_from=female_from, supported_to=supported_to
         )
+
+
+def test_the_six_groups_are_always_six_in_the_reading_order() -> None:
+    """§7.4 的阅读序：同宜→乾独宜→坤独宜→同忌→乾独忌→坤独忌，恒六组。
+
+    空组照样给（`items: []`）—— 设计稿的宜忌板是六格版面，缺格与"无"是两件事（§10.6）。
+    """
+    groups = yi_ji(_pair_of(FEMALE_SAME)).groups
+    assert [group.kind for group in groups] == ["同宜", "乾独宜", "坤独宜", "同忌", "乾独忌", "坤独忌"]
+    assert [group.items for group in groups][1] == []
+    assert all(len(group.items) == 0 or all(i.element for i in group.items) for group in groups)
+
+
+def test_the_complementary_pair_splits_the_five_elements_as_measured() -> None:
+    """互补对（坤 喜水金 / 忌土火木）的六组，逐字对拍。
+
+    乾 喜土金、忌木水火，所以交集只有金；水既是坤之喜又是乾之忌，
+    土既是乾之喜又是坤之忌 —— 这正是"互补"两个字在数据上的形状。
+    """
+    assert [
+        (group.kind, [item.element for item in group.items])
+        for group in yi_ji(_pair_of(FEMALE_COMPLEMENT)).groups
+    ] == [
+        ("同宜", ["金"]),
+        ("乾独宜", ["土"]),
+        ("坤独宜", ["水"]),
+        ("同忌", ["木", "火"]),
+        ("乾独忌", ["水"]),
+        ("坤独忌", ["土"]),
+    ]
+
+
+def test_a_partner_without_useful_god_lists_only_the_other_side() -> None:
+    """坤（1996-11-24）实测喜忌集两空：三组空、乾侧三组满。
+
+    这不是假设出来的边界，是 §2.9 已经命中的那一枚构造命例。喜忌在盘内本来就允许为空
+    （`/natal` 的既有事实），宜忌板因此必须能把"空"画出来而不是整块消失。
+    """
+    assert [
+        (group.kind, [item.element for item in group.items])
+        for group in yi_ji(_pair_of(FEMALE_DAY_MERGE)).groups
+    ] == [
+        ("同宜", []),
+        ("乾独宜", ["土", "金"]),
+        ("坤独宜", []),
+        ("同忌", []),
+        ("乾独忌", ["木", "水", "火"]),
+        ("坤独忌", []),
+    ]
+
+
+def test_the_attributions_are_the_common_table_and_the_declaration_is_verbatim() -> None:
+    """§7.4 的两条硬约束：通说配属取自一张表，声明句逐字回显（前端不补算也不改写）。"""
+    assert ELEMENT_ATTRIBUTIONS == {
+        "木": ("东", "青", "春"),
+        "火": ("南", "赤", "夏"),
+        "土": ("中", "黄", "四季"),
+        "金": ("西", "白", "秋"),
+        "水": ("北", "黑", "冬"),
+    }
+    figure = yi_ji(_pair_of(FEMALE_COMPLEMENT))
+    assert figure.declaration == HEHUN_YIJI_DECLARATION
+    assert HEHUN_YIJI_DECLARATION == (
+        "宜忌取自两造用神法（喜用五行的通说配属），非玄空坐向，不含住宅方位与化解物品。"
+    )
+    assert [(i.element, i.direction, i.color, i.season) for i in figure.groups[0].items] == [
+        ("金", "西", "白", "秋")
+    ]
+    assert all(i.element in ELEMENT_ATTRIBUTIONS for g in figure.groups for i in g.items)
+
+
+def test_one_element_can_be_one_sides_taboo_and_the_others_favor() -> None:
+    """「水」在互补对里同时出现在坤独宜与乾独忌 —— 宜忌板不是同一句话讲两遍。
+
+    这一条顺带钉住一个实现陷阱：六组必须由**各自的**喜忌集算，
+    不能图省事用一张"共用差集表"。同频对里两造喜忌同集，六个组就有三个空着，
+    那同样是实测（同宜 土金、同忌 木水火，三个独集全空）。
+    """
+    groups = {
+        group.kind: [item.element for item in group.items]
+        for group in yi_ji(_pair_of(FEMALE_COMPLEMENT)).groups
+    }
+    assert groups["坤独宜"] == ["水"] and groups["乾独忌"] == ["水"]
+    same = {
+        group.kind: [item.element for item in group.items]
+        for group in yi_ji(_pair_of(FEMALE_SAME)).groups
+    }
+    assert same == {
+        "同宜": ["土", "金"],
+        "乾独宜": [],
+        "坤独宜": [],
+        "同忌": ["木", "水", "火"],
+        "乾独忌": [],
+        "坤独忌": [],
+    }

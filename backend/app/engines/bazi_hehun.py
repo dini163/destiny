@@ -21,6 +21,7 @@ from datetime import date
 from typing import NamedTuple
 
 from app.content.bazi_hehun_rules import (
+    ELEMENT_ATTRIBUTIONS,
     HEHUN_BASE,
     HEHUN_GROUP_KEYS,
     HEHUN_NAYIN_KEYS,
@@ -30,6 +31,7 @@ from app.content.bazi_hehun_rules import (
     HEHUN_SYNC_CLOSE,
     HEHUN_SYNC_WIDE,
     HEHUN_TOP_CUT,
+    HEHUN_YIJI_DECLARATION,
     STRONG_RATIO,
     WEAK_RATIO,
     hehun_rule,
@@ -69,6 +71,9 @@ from app.schemas.bazi_hehun import (
     HehunNayin,
     HehunNayinSide,
     HehunProfile,
+    HehunYiJi,
+    HehunYiJiGroup,
+    HehunYiJiItem,
     NayinRelation,
     PartnerSide,
     Vigor,
@@ -981,4 +986,52 @@ def hehun_axis(
         end_year=start_year + years - 1,
         rows=rows,
         segments=axis_segments(pair, male_luck, female_luck, start_year=start_year, years=years),
+    )
+
+
+# ---------------------------------------------------------------- 宜忌（spec §7.4）
+def _shared(kept: list[str], other: list[str]) -> list[str]:
+    """交集按 `kept` 侧的序给出 —— 喜忌集在盘内有自己的次序，页面按它读，不重排成五行序。"""
+    return [element for element in kept if element in other]
+
+
+def _only(kept: list[str], other: list[str]) -> list[str]:
+    return [element for element in kept if element not in other]
+
+
+def _yiji_group(kind: str, elements: list[str]) -> HehunYiJiGroup:
+    return HehunYiJiGroup(
+        kind=kind,
+        items=[
+            HehunYiJiItem(
+                element=element,
+                direction=ELEMENT_ATTRIBUTIONS[element][0],
+                color=ELEMENT_ATTRIBUTIONS[element][1],
+                season=ELEMENT_ATTRIBUTIONS[element][2],
+            )
+            for element in elements
+        ],
+    )
+
+
+def yi_ji(pair: HehunChartPair) -> HehunYiJi:
+    """两造喜用的交并与差，配成六组宜忌（§7.4）。
+
+    唯一输入是各自本命盘的 `favorable_elements` / `unfavorable_elements` —— 合婚不重判
+    喜忌（决策 3），也不引通书宜忌、不引玄空坐向（决策 8、§4.2）。所以这里没有任何
+    "今日宜忌"式的时间维度：这一板回答的是"这两个人一起时，哪一行是双方都想要的"。
+    一方喜忌为空时对应的三组就是空表，本函数不为此开分支（实测坤 1996-11-24 即此形）。
+    """
+    mine = pair.male.analysis
+    theirs = pair.female.analysis
+    return HehunYiJi(
+        groups=[
+            _yiji_group("同宜", _shared(mine.favorable_elements, theirs.favorable_elements)),
+            _yiji_group("乾独宜", _only(mine.favorable_elements, theirs.favorable_elements)),
+            _yiji_group("坤独宜", _only(theirs.favorable_elements, mine.favorable_elements)),
+            _yiji_group("同忌", _shared(mine.unfavorable_elements, theirs.unfavorable_elements)),
+            _yiji_group("乾独忌", _only(mine.unfavorable_elements, theirs.unfavorable_elements)),
+            _yiji_group("坤独忌", _only(theirs.unfavorable_elements, mine.unfavorable_elements)),
+        ],
+        declaration=HEHUN_YIJI_DECLARATION,
     )

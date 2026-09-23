@@ -219,3 +219,30 @@ class HehunAxis(BaseModel):
     end_year: int
     rows: list[HehunAxisRow]
     segments: list[HehunAxisSegment] = Field(description="段的并集恰好覆盖 `rows`，序与轴同向（Task 6 不变式）。")
+
+
+#: §7.4 的六个组名。交集在前、独集在后，宜先忌后 —— 页面按这个序读。
+YiJiKind = Literal["同宜", "乾独宜", "坤独宜", "同忌", "乾独忌", "坤独忌"]
+
+
+class HehunYiJiItem(BaseModel):
+    """一个五行的通说配属。"""
+
+    element: str
+    direction: str = Field(description="方位（木东 火南 土中 金西 水北）。")
+    color: str = Field(description="色（青 赤 黄 白 黑）。")
+    season: str = Field(description="季节（春 夏 四季 秋 冬）。")
+
+
+class HehunYiJiGroup(BaseModel):
+    kind: YiJiKind
+    items: list[HehunYiJiItem] = Field(
+        description="该组的五行，按本组主语的喜忌集自身的序；空组是空列表（§10.6）。"
+    )
+
+
+class HehunYiJi(BaseModel):
+    """宜忌（§7.4）：唯一输入是两造本命盘的喜用与忌神。"""
+
+    groups: list[HehunYiJiGroup] = Field(description="恒 6 组，序即 §7.4 的阅读序。")
+    declaration: str = Field(description="逐字取自 `HEHUN_YIJI_DECLARATION`，前端不补算也不改写。")
