@@ -49,6 +49,7 @@ from app.schemas.bazi_hehun import (
     HehunNayin,
     HehunNayinSide,
     HehunProfile,
+    PartnerSide,
     Vigor,
 )
 from app.schemas.common import Gender
@@ -512,6 +513,27 @@ YONGSHEN_QUADRANT: dict[tuple[bool, Vigor], str] = {
 
 
 @dataclass(frozen=True)
+class YongshenView:
+    """一个视角的身份三件套，三件写在一处。
+
+    `viewer` 是响应里的字段、`direction` 是账本行的字段、`label` 同时进账本短名与图。
+    分成三处写就是三份真相：账上写「乾视坤」而图上写「坤视乾」这种事，只有同源才防得住。
+    """
+
+    viewer: PartnerSide
+    direction: str
+    label: str
+
+
+#: 互济族的两个视角（§6.2：五族里唯一天生有向的一族）。互补图按 `direction` **等值**分桶，
+#: 不靠前缀猜 —— `HehunDirection` 是三个值的闭集（另有 `mutual`），等值才读得出"就是那一向"。
+YONGSHEN_VIEWS: tuple[YongshenView, ...] = (
+    YongshenView(viewer="male", direction="male_to_female", label="乾视坤"),
+    YongshenView(viewer="female", direction="female_to_male", label="坤视乾"),
+)
+
+
+@dataclass(frozen=True)
 class YongshenFact:
     """互济族的一次命中：账本行 + 它在互补图里的坐标。
 
@@ -589,9 +611,10 @@ def yongshen_facts(pair: HehunChartPair) -> list[YongshenFact]:
 
     这是账本与互补图共同的唯一来源。两造的喜忌一律直接取各自本命盘，合婚不重判（决策 3）。
     """
+    male_view, female_view = YONGSHEN_VIEWS
     return [
-        *_one_view_facts(pair.male, pair.female, "male_to_female", "乾视坤"),
-        *_one_view_facts(pair.female, pair.male, "female_to_male", "坤视乾"),
+        *_one_view_facts(pair.male, pair.female, male_view.direction, male_view.label),
+        *_one_view_facts(pair.female, pair.male, female_view.direction, female_view.label),
     ]
 
 
@@ -603,15 +626,16 @@ def complement(pair: HehunChartPair) -> HehunComplement:
     """五行互补图（§7.1）：把同一批事实按 (视角, 象限) 分桶，一格不漏也不增。
 
     分桶靠 `row.rule` 与 `row.direction` 这两个已有字段，不看 element 也不看 vigor ——
-    图的结构是账本的投影，不是第二次判定。空格的 `elements` 为空列表（§10.6），
-    前端才敢把"无"渲染出来。
+    图的结构是账本的投影，不是第二次判定。视角与 direction 之间是**等值**关系（表里那一个值），
+    不靠前缀相似：`HehunDirection` 另有 `mutual`，等值才读得出"就是那一向"。
+    空格的 `elements` 为空列表（§10.6），前端才敢把"无"渲染出来。
     """
     facts = yongshen_facts(pair)
     return HehunComplement(
         views=[
             HehunComplementView(
-                viewer=viewer,
-                label=label,
+                viewer=view.viewer,
+                label=view.label,
                 cells=[
                     HehunComplementCell(
                         rule=rule,
@@ -622,13 +646,13 @@ def complement(pair: HehunChartPair) -> HehunComplement:
                         elements=[
                             HehunComplementElement(element=fact.element, ratio=fact.ratio)
                             for fact in facts
-                            if fact.row.direction.startswith(viewer) and fact.row.rule == rule
+                            if fact.row.direction == view.direction and fact.row.rule == rule
                         ],
                     )
                     for rule, name, mine, theirs in YONGSHEN_QUADRANTS
                 ],
             )
-            for viewer, label in (("male", "乾视坤"), ("female", "坤视乾"))
+            for view in YONGSHEN_VIEWS
         ]
     )
 

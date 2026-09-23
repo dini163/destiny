@@ -31,6 +31,7 @@ from app.engines.bazi_hehun import (
     POSITION_ORDER,
     YONGSHEN_QUADRANT,
     YONGSHEN_QUADRANTS,
+    YONGSHEN_VIEWS,
     GroupMember,
     HehunChartPair,
     complement,
@@ -692,17 +693,26 @@ def test_every_ledger_row_has_a_mirrored_fired_entry() -> None:
 def test_the_complement_figure_books_nothing_the_ledger_did_not() -> None:
     """§7.1 诚实性约束 / §10.6 互补条：图上的每一个五行都在账上有同名的一行。
 
-    正反两个方向一起断：`len(cells) == len(rows)` 钉住"打过分的行一个都不少"，
-    `cell.rule in booked`（只对**非空**格）钉住"没打过的分画不出来"。
+    正反两个方向、**逐视角**一起断：`该视角四格的元素数 == 该 direction 的行数` 钉住
+    "打过分的行一个都不少、也没有串到对方的视角里去"（全局求和做不到这一点 ——
+    两格互换内容时总数照旧）；`cell.rule in booked`（只对**非空**格）钉住"没打过的分画不出来"。
     空格不参与第二条 —— 一造没有那条喜忌集时那一格本就没有账。
+    最后一断钉的是"图上写的视角短名与账本短名里那一处是同一个字"：两处若走岔，
+    用户在「乾视坤」那张图上读到的就不是账上标着乾视坤的那几行。
     """
     for female in (FEMALE_SAME, FEMALE_COMPLEMENT, FEMALE_DAY_MERGE, FEMALE_DAY_REVERSE):
         pair = _pair_of(female)
         figure = complement(pair)
         rows = yongshen_rows(pair)
         booked = {factor.rule for factor in hehun_ledger(hehun_rows(pair)).factors}
+        assert [(view.viewer, view.label) for view in figure.views] == [
+            (view.viewer, view.label) for view in YONGSHEN_VIEWS
+        ]
+        for view, yongshen_view in zip(figure.views, YONGSHEN_VIEWS):
+            own = [row for row in rows if row.direction == yongshen_view.direction]
+            assert sum(len(cell.elements) for cell in view.cells) == len(own)
+            assert all(yongshen_view.label in row.label for row in own)
         cells = [cell for view in figure.views for cell in view.cells if cell.elements]
-        assert sum(len(cell.elements) for cell in cells) == len(rows)
         assert {cell.rule for cell in cells} <= booked
 
 
