@@ -71,7 +71,7 @@ from app.engines.bazi_hehun import (
 from app.engines.bazi_rules import derive_relations
 from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart
-from app.schemas.bazi_hehun import HehunProfile
+from app.schemas.bazi_hehun import HehunAxis, HehunProfile
 from app.schemas.common import Gender
 from app.schemas.scoring import MODEL_PARAM_SOURCE
 from app.solar.geo import resolve_longitude
@@ -884,7 +884,7 @@ COMPLEMENT_PROFILE = _profile(1985, 7, 22, 14, 30, "上海")
 AUSPICIOUS_PROFILE = _profile(1995, 9, 18, 18, 0, "北京")
 
 
-def _axis(start: int, years: int, chart: BaziChart, profile: HehunProfile):
+def _axis(start: int, years: int, chart: BaziChart, profile: HehunProfile) -> HehunAxis:
     return hehun_axis(
         _pair_of(chart),
         partner_annual_luck(MALE_PROFILE, Gender.MALE),
@@ -1026,6 +1026,9 @@ def test_segments_cover_the_axis_exactly_once() -> None:
 
     短轴（2024—2028）只有一段，那正是设计稿"一整条时间轴一张卡"的退化情形；
     不验这一条的话，"边界在窗口外"这一类错位要到浏览器走查才看得见。
+
+    上面那三条是顺轴走一遍的构造性质，回归了也测不出来；守得住 §7.3 的是最后那一条 ——
+    段首年恰等于两造 `DayunStep.start_year` 落在窗内的并集（去重、升序）。
     """
     pair = _pair_of(FEMALE_SAME)
     male_luck, female_luck = partner_annual_luck(MALE_PROFILE, Gender.MALE), partner_annual_luck(
@@ -1036,6 +1039,15 @@ def test_segments_cover_the_axis_exactly_once() -> None:
         assert (spans[0].start_year, spans[-1].end_year) == (start, start + years - 1)
         assert sum(span.end_year - span.start_year + 1 for span in spans) == years
         assert all(a.end_year + 1 == b.start_year for a, b in zip(spans, spans[1:], strict=False))
+        boundaries = sorted(
+            {
+                step.start_year
+                for chart in (pair.male, pair.female)
+                for step in chart.dayun
+                if start <= step.start_year <= start + years - 1
+            }
+        )
+        assert [span.start_year for span in spans] == boundaries
     assert [
         s.label for s in axis_segments(pair, male_luck, female_luck, start_year=2024, years=5)
     ] == ["乾·第 4 运 戊午（37—46 岁）／坤·第 4 运 戊寅（34—43 岁）"]
