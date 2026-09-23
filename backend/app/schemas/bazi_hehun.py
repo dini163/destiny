@@ -93,3 +93,69 @@ class HehunFired(BaseModel):
     direction: HehunDirection = Field(description="互济族带视角，其余四族 mutual（spec §6.2）。")
     delta: float = Field(description="本行分值，与账本里那一条同一个数。")
     reading: str = Field(description="单句判语；借古籍的那半句与自造的那半句同在一句里。")
+
+
+#: §7.2 的 5×5 通行关系，主语固定为乾（"我"= 乾）。
+NayinRelation = Literal["生我", "我生", "我克", "克我", "比和"]
+
+
+class HehunComplementElement(BaseModel):
+    """象限里的一个五行：只带名字与比值；规则与分值在同级的那一格上。"""
+
+    element: str
+    ratio: float = Field(
+        description="该造此行的加权量对其自身五行均值的比值（§2.6 的尺，四位小数）。"
+        "带它出来是为了让「这一行为什么算旺」当场可核，不必回命盘页重算。"
+    )
+
+
+class HehunComplementCell(BaseModel):
+    """四象限的一格（§7.1）：纵轴是观看方的喜/忌，横轴是对方该行的旺/弱。"""
+
+    rule: str = Field(
+        description="该格的账本键。`elements` 里每一个五行都在 `score.factors` 里有一行同名账 —— "
+        "§7.1 的诚实性约束，Task 5 由同一张事实表保证。"
+    )
+    name: str = Field(description="单字格名：补 | 阙 | 冲 | 安。")
+    mine: Literal["favorable", "unfavorable"] = Field(description="纵轴：这一行对**观看方**是喜是忌。")
+    theirs: Vigor = Field(description="横轴：**对方**盘里这一行的旺弱。恒为 旺|弱 —— 表里没有 平 这一格。")
+    delta: float = Field(description="该格单价，与 `rule` 那条账本行同一个数。")
+    elements: list[HehunComplementElement] = Field(
+        description="落在本格的五行，按观看方喜忌集自身的序；空格是空列表（§10.6）。"
+    )
+
+
+class HehunComplementView(BaseModel):
+    """一个视角的四象限。"""
+
+    viewer: PartnerSide = Field(description="视角主语：male = 乾视坤。")
+    label: str = Field(description="「乾视坤」短名，与账本行 `label` 里的那一处字同一来源。")
+    cells: list[HehunComplementCell] = Field(description="恒 4 格，序即 §7.1 表：补 阙 冲 安。")
+
+
+class HehunComplement(BaseModel):
+    """五行互补（§7.1）：四象限 × 两视角，与互济族账本同一次遍历。"""
+
+    views: list[HehunComplementView] = Field(description="恒 2 视角：乾视坤、坤视乾（§6.2 的有向族）。")
+
+
+class HehunNayinSide(BaseModel):
+    """一造的年命纳音：名、五行、取象原文逐字取自 `NayinCorpus`。"""
+
+    ganzhi: str = Field(description="年柱干支，如 戊辰。")
+    nayin: str = Field(description="纳音全称，如 大林木。")
+    element: str = Field(description="纳音五行 —— 生克论的是这个，不是日主五行。")
+    imagery: str = Field(description="《三命通会》取象原文首句，逐字转录，引擎不改写。")
+    source: str
+
+
+class HehunNayin(BaseModel):
+    """年命纳音（§7.2）：一对纳音只出一个关系、只入一行账，主语固定为乾。"""
+
+    male: HehunNayinSide
+    female: HehunNayinSide
+    relation: NayinRelation
+    phrase: str = Field(description="三字生克句：水生木 / 木克土 / 木与木同气。")
+    rule: str = Field(description="`hh.nayin.*`，与账本里那一行同键。")
+    delta: float
+    reading: str = Field(description="§7.2 的固定句式，末尾必带 `HEHUN_NAYIN_NOTE`。")

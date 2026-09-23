@@ -12,10 +12,13 @@ import pytest
 from app.content.bazi_hehun_rules import (
     HEHUN_BASE,
     HEHUN_FAMILIES,
+    HEHUN_NAYIN_NOTE,
     HEHUN_PALACE_KEYS,
     HEHUN_RULES,
     HEHUN_RULE_SOURCE,
+    hehun_rule,
 )
+from app.content.bazi_nayin import nayin_meaning
 from app.core.errors import InvalidBirthDataError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import (
@@ -26,8 +29,11 @@ from app.engines.bazi_hehun import (
     PALACE_STEM_MERGE,
     PILLAR_NAME,
     POSITION_ORDER,
+    YONGSHEN_QUADRANT,
+    YONGSHEN_QUADRANTS,
     GroupMember,
     HehunChartPair,
+    complement,
     compute_partner_charts,
     cross_groups,
     cross_relations,
@@ -42,13 +48,17 @@ from app.engines.bazi_hehun import (
     hehun_rows,
     hehun_tier,
     nayin_key,
+    nayin_phrase,
     nayin_relation,
     nayin_row,
+    nayin_side,
+    nayin_view,
     pair_matrix,
     palace_keys,
     palace_rows,
     relation_rows,
     scanned_groups,
+    yongshen_facts,
     yongshen_rows,
 )
 from app.engines.bazi_rules import derive_relations
@@ -677,3 +687,159 @@ def test_every_ledger_row_has_a_mirrored_fired_entry() -> None:
         )
         assert entry.reading == HEHUN_RULES[row.rule].reading
     assert {entry.family for entry in fired} <= set(HEHUN_FAMILIES)
+
+
+def test_the_complement_figure_books_nothing_the_ledger_did_not() -> None:
+    """§7.1 诚实性约束 / §10.6 互补条：图上的每一个五行都在账上有同名的一行。
+
+    正反两个方向一起断：`len(cells) == len(rows)` 钉住"打过分的行一个都不少"，
+    `cell.rule in booked`（只对**非空**格）钉住"没打过的分画不出来"。
+    空格不参与第二条 —— 一造没有那条喜忌集时那一格本就没有账。
+    """
+    for female in (FEMALE_SAME, FEMALE_COMPLEMENT, FEMALE_DAY_MERGE, FEMALE_DAY_REVERSE):
+        pair = _pair_of(female)
+        figure = complement(pair)
+        rows = yongshen_rows(pair)
+        booked = {factor.rule for factor in hehun_ledger(hehun_rows(pair)).factors}
+        cells = [cell for view in figure.views for cell in view.cells if cell.elements]
+        assert sum(len(cell.elements) for cell in cells) == len(rows)
+        assert {cell.rule for cell in cells} <= booked
+
+
+def test_the_figure_always_has_two_views_of_four_quadrants() -> None:
+    """§10.6 呈现完整性：2 视角 × 4 象限恒在，空格是 `elements: []` 而不是缺格。
+
+    互补对特意挑进来：它的四格里 乾视坤 那一张是满的（土补 / 金阙 / 水冲 / 木安），
+    坤视乾 那一张的「补」与「安」两格是空的（乾的土、水、火三行在"平"区，§2.6 的四位读数）——
+    同一次走查里两种状态都看得见，页面上空格要渲染成"无"，所以契约里它们必须存在。
+    """
+    figure = complement(_pair_of(FEMALE_COMPLEMENT))
+    assert [(v.viewer, v.label) for v in figure.views] == [("male", "乾视坤"), ("female", "坤视乾")]
+    for view in figure.views:
+        assert [(c.name, c.mine, c.theirs, c.delta) for c in view.cells] == [
+            ("补", "favorable", "旺", 6.0),
+            ("阙", "favorable", "弱", -5.0),
+            ("冲", "unfavorable", "旺", -7.0),
+            ("安", "unfavorable", "弱", 3.0),
+        ]
+    assert [[len(c.elements) for c in view.cells] for view in figure.views] == [
+        [1, 1, 1, 1],
+        [0, 1, 1, 0],
+    ]
+
+
+def test_the_measured_quadrant_contents_are_the_rulers_own_readings() -> None:
+    """同频对的八格里落账者，逐字来自 §2.6 那把尺（比值取四位）。
+
+    乾视坤：坤 土 0.4545 → 阙、坤 金 1.4935 → 补、坤 木 0.1948 → 安、坤 水 1.6883 → 冲；
+    坤视乾：乾 金 0.6329 → 阙、乾 木 1.3924 → 冲。格内的序是**观看方**喜忌集的序。
+    """
+    figure = complement(_pair_of(FEMALE_SAME))
+    assert [
+        (cell.name, [(e.element, e.ratio) for e in cell.elements]) for cell in figure.views[0].cells
+    ] == [
+        ("补", [("金", 1.4935)]),
+        ("阙", [("土", 0.4545)]),
+        ("冲", [("水", 1.6883)]),
+        ("安", [("木", 0.1948)]),
+    ]
+    assert [
+        (cell.name, [(e.element, e.ratio) for e in cell.elements]) for cell in figure.views[1].cells
+    ] == [("补", []), ("阙", [("金", 0.6329)]), ("冲", [("木", 1.3924)]), ("安", [])]
+
+
+def test_the_five_nayin_relations_each_compose_their_own_sentence() -> None:
+    """§7.2 的固定句式：｛乾年命、坤年命｝，｛三字生克句｝为｛关系｝；｛该键自己的断语｝＋尾注。
+
+    五枚命例的坤造年柱恰好覆盖五个关系（庚午 路旁土我克 / 乙丑 海中金克我 /
+    乙亥 山头火我生 / 己巳 大林木比和 / 丙子 涧下水生我），所以这一段同时是
+    `nayin_phrase` 的四分支与"不共用同一句"的证明。主语固定为乾（§6.2）。
+    """
+    assert [
+        (nayin_view(_pair_of(female)).relation, nayin_view(_pair_of(female)).reading)
+        for female in (FEMALE_SAME, FEMALE_COMPLEMENT, FEMALE_AUSPICIOUS, FEMALE_HOSTILE, FEMALE_DAY_MERGE)
+    ] == [
+        (
+            "我克",
+            "乾年命大林木、坤年命路旁土，木克土为我克；我去克彼，我居其长，凡事宜主不宜客。"
+            + HEHUN_NAYIN_NOTE,
+        ),
+        (
+            "克我",
+            "乾年命大林木、坤年命海中金，金克木为克我；彼来克我，我居其短，凡事宜和不宜争。"
+            + HEHUN_NAYIN_NOTE,
+        ),
+        (
+            "我生",
+            "乾年命大林木、坤年命山头火，木生火为我生；我去生彼，泄我之气，凡事宜守不宜耗。"
+            + HEHUN_NAYIN_NOTE,
+        ),
+        (
+            "比和",
+            "乾年命大林木、坤年命大林木，木与木同气为比和；两家同气，其情相安，无高低之辨。"
+            + HEHUN_NAYIN_NOTE,
+        ),
+        (
+            "生我",
+            "乾年命大林木、坤年命涧下水，水生木为生我；彼之来生我，其气长养，凡事宜受、宜进、宜生。"
+            + HEHUN_NAYIN_NOTE,
+        ),
+    ]
+
+
+def test_the_imagery_text_is_the_corpus_verbatim_not_a_rephrasing() -> None:
+    """§7.2 末条：`imagery` 与 `source` 逐字取自 `NayinCorpus`，本页不重述《三命通会》。
+
+    比对现成语料而不是抄一遍长句 —— 与 `tests/test_bazi_schema.py` 里
+    `test_ten_god_readings_are_corpus_lookup_not_invention` 同一手法：抄进断言的原文
+    会在语料订正那天变成一条假的红线。
+    """
+    view = nayin_view(_pair_of(FEMALE_SAME))
+    assert (view.male.ganzhi, view.male.nayin, view.male.element) == ("戊辰", "大林木", "木")
+    assert (view.female.ganzhi, view.female.nayin, view.female.element) == ("庚午", "路旁土", "土")
+    for side, ganzhi in ((view.male, "戊辰"), (view.female, "庚午")):
+        corpus = nayin_meaning(ganzhi)
+        assert (side.imagery, side.source) == (corpus.imagery, corpus.source)
+    assert (view.rule, view.delta) == ("hh.nayin.wo_ke", 2.0)
+    assert view.phrase == "木克土"
+
+
+def test_the_quadrant_table_is_the_only_source_of_both_views() -> None:
+    """四象限表一处定义同时供给账本键与图的格名 —— 改一处不会漏另一处。
+
+    `平` 不在表的横轴里，于是 `YONGSHEN_QUADRANT[(True, "平")]` 必然 KeyError：
+    §7.1 那句"平既不入象限也不入账本"是数据结构本身给的，不是判断里写死的。
+    """
+    assert [rule for rule, _n, _m, _t in YONGSHEN_QUADRANTS] == [
+        "hh.yongshen.supply",
+        "hh.yongshen.shortfall",
+        "hh.yongshen.clash",
+        "hh.yongshen.harmless",
+    ]
+    assert {rule: hehun_rule(rule).family for rule, *_ in YONGSHEN_QUADRANTS} == {rule: "yongshen" for rule, *_ in YONGSHEN_QUADRANTS}
+    assert YONGSHEN_QUADRANT[(True, "旺")] == "hh.yongshen.supply"
+    assert YONGSHEN_QUADRANT[(False, "弱")] == "hh.yongshen.harmless"
+    assert (True, "平") not in YONGSHEN_QUADRANT
+    assert [fact.row.label for fact in yongshen_facts(_pair_of(FEMALE_COMPLEMENT))] == [
+        row.label for row in yongshen_rows(_pair_of(FEMALE_COMPLEMENT))
+    ]
+
+
+def test_the_family_order_is_pinned_on_a_fixture_whose_group_slot_is_not_empty() -> None:
+    """Task 4 评审留下的那个空槽位盲区：装配序要钉在**成局族非空**的那一枚上。
+
+    `hehun_rows` 的 docstring 许诺"序即 `HEHUN_FAMILIES`"，而 Task 4 的逐字样本
+    （`FEMALE_DAY_MERGE`，13 行）成局族恰是空的 —— 于是把 `*group_rows(pair)` 在 relation
+    与 palace 之间任意挪位，那一测照样绿。这一枚有两行成局账，挪位即红。
+    条数与相邻关系用字面量钉（16 行 = 10+2+2+1+1），族序与常量的相等关系另断一条：
+    前者防装配序被动，后者防 `HEHUN_FAMILIES` 自己改序。
+    """
+    rows = hehun_rows(_pair_of(FEMALE_DAY_FUYIN_GROUP))
+    assert [row.family for row in rows] == [
+        *["relation"] * 10,
+        *["group"] * 2,
+        *["yongshen"] * 2,
+        "nayin",
+        "palace",
+    ]
+    assert list(dict.fromkeys(row.family for row in rows)) == list(HEHUN_FAMILIES)

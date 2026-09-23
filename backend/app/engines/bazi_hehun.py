@@ -22,6 +22,7 @@ from app.content.bazi_hehun_rules import (
     HEHUN_BASE,
     HEHUN_GROUP_KEYS,
     HEHUN_NAYIN_KEYS,
+    HEHUN_NAYIN_NOTE,
     HEHUN_RELATION_KEYS,
     HEHUN_RULE_SOURCE,
     HEHUN_TOP_CUT,
@@ -37,7 +38,19 @@ from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_rules import POSITIONS, derive_branch_groups, derive_relations, is_fanyin
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT, element_weight_scores
 from app.schemas.bazi import BaziChart, BaziPillar
-from app.schemas.bazi_hehun import HehunCell, HehunCellHit, HehunFired, HehunProfile, Vigor
+from app.schemas.bazi_hehun import (
+    HehunCell,
+    HehunCellHit,
+    HehunComplement,
+    HehunComplementCell,
+    HehunComplementElement,
+    HehunComplementView,
+    HehunFired,
+    HehunNayin,
+    HehunNayinSide,
+    HehunProfile,
+    Vigor,
+)
 from app.schemas.common import Gender
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.geo import resolve_longitude
@@ -481,16 +494,50 @@ def pair_matrix(pair: HehunChartPair) -> list[HehunCell]:
 
 # ---------------------------------------------------------------- 互济族（spec §2.6、§7.1）
 
-#: 四象限的键：(该行是不是我的喜用, 彼造这一行的旺弱)。`平` 不在表内 —— 于是 `.get()`
-#: 拿不到键就是"平"，既不入象限也不入账本（§7.1 的诚实性约束在数据结构这一层成立）。
-#: 元组第一项用 bool 而不是"喜"/"忌"两个字，是因为调用方手里本来就是
-#: `analysis.favorable_elements` 与 `unfavorable_elements` 这两个列表，谁真谁假一目了然。
+#: 四象限的表：(账本键, 单字格名, 纵轴, 横轴)。序即 §7.1 那张表的阅读序，
+#: 也是响应里 `cells` 的恒定长度与顺序。`平` 不在横轴里 ——
+#: §7.1 那句"平既不落象限也不入账本"就是这么落进数据结构的。
+YONGSHEN_QUADRANTS: tuple[tuple[str, str, str, str], ...] = (
+    ("hh.yongshen.supply", "补", "favorable", "旺"),
+    ("hh.yongshen.shortfall", "阙", "favorable", "弱"),
+    ("hh.yongshen.clash", "冲", "unfavorable", "旺"),
+    ("hh.yongshen.harmless", "安", "unfavorable", "弱"),
+)
+
+#: (该行是不是我的喜用, 彼造这一行的旺弱) → 账本键。由上面那张表倒推，
+#: 于是"加一格象限"与"加一条账本键"在代码里是同一处改动，不可能只改一半。
 YONGSHEN_QUADRANT: dict[tuple[bool, Vigor], str] = {
-    (True, "旺"): "hh.yongshen.supply",
-    (True, "弱"): "hh.yongshen.shortfall",
-    (False, "旺"): "hh.yongshen.clash",
-    (False, "弱"): "hh.yongshen.harmless",
+    (mine == "favorable", theirs): rule for rule, _name, mine, theirs in YONGSHEN_QUADRANTS
 }
+
+
+@dataclass(frozen=True)
+class YongshenFact:
+    """互济族的一次命中：账本行 + 它在互补图里的坐标。
+
+    图与账本同源（§7.1）：同一个对象既出那一行账，也出图上的那一格，
+    两处不可能一个有分、一个有格。`ratio` 直接引 `element_ratios` 的四位读数：图上写的
+    数与判档用的数是同一个数，所以看图永远推得出账。
+    """
+
+    row: HehunRow
+    element: str
+    vigor: Vigor
+    ratio: float
+
+
+def element_ratios(chart: BaziChart) -> dict[str, float]:
+    """该造五行各自对其自身五行均值的比值，取四位 —— §2.6 那把尺的读数，还没贴标签。
+
+    单独一处是因为互补图要把比值本身给出去（"这一行为什么算旺"得当场可核），而图与
+    标签必须出自同一个数：让图去重算一遍，两边迟早分家。取四位同时是为了让边界不落在
+    浮点尾差上：权重是累加出来的，`1.2 / 1.6` 给的是 `0.7500000000000001`，不取整就会
+    把一条数学上正好压界（§2.6 归"弱"）的比值判成"平"。页面上看到的数与被判定的数，
+    从此是同一个数。
+    """
+    scores = element_weight_scores(chart.pillars)
+    mean = sum(scores.values()) / len(scores)
+    return {element: round(score / mean, 4) for element, score in scores.items()}
 
 
 def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
@@ -501,27 +548,23 @@ def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
     基准是**该造自己的五行均值**，比值 ≥1.25 为旺、≤0.75 为弱、其余为平。
     拿盘内均值当基准是因为"在这个人的盘里这一行算不算多"本来就是盘内比较 ——
     跨盘比原始分值没有意义，两造的总量本来就接近（§2.6）。
-    比值先取四位再比大小：权重是浮点累加，`1.2 / 1.6` 给的是 `0.7500000000000001`，
-    不取整就会让一条数学上正好压界的比值判成"平"，而压界在 §2.6 里属于弱。
     均值恒为正（四柱八个小干与藏干必有权重），所以这里不设除零分支。
     """
-    scores = element_weight_scores(chart.pillars)
-    mean = sum(scores.values()) / len(scores)
-    vigor: dict[str, Vigor] = {}
-    for element, score in scores.items():
-        ratio = round(score / mean, 4)
-        vigor[element] = "旺" if ratio >= STRONG_RATIO else "弱" if ratio <= WEAK_RATIO else "平"
-    return vigor
+    return {
+        element: "旺" if ratio >= STRONG_RATIO else "弱" if ratio <= WEAK_RATIO else "平"
+        for element, ratio in element_ratios(chart).items()
+    }
 
 
-def _one_view_rows(me: BaziChart, other: BaziChart, direction: str, where: str) -> list[HehunRow]:
+def _one_view_facts(me: BaziChart, other: BaziChart, direction: str, where: str) -> list[YongshenFact]:
     """一个视角的四象限：先喜用（补/阙）后忌神（冲/安），组内按该造喜忌集的序。
 
     `where` 是短名里的"乾视坤/坤视乾" —— 两个视角的行同键同 delta，
-    不带这一处就分不出是谁的喜用在说话（§6.1 一条账本行的身份是 (族, 视角, 五行)）。
+    不带这一处就分不出是谁的喜用在说话（§6.1：一条账本行的身份是 (族, 视角, 五行)）。
     """
     theirs = element_vigor(other)
-    rows: list[HehunRow] = []
+    ratios = element_ratios(other)
+    facts: list[YongshenFact] = []
     for favorable, elements in (
         (True, me.analysis.favorable_elements),
         (False, me.analysis.unfavorable_elements),
@@ -530,21 +573,119 @@ def _one_view_rows(me: BaziChart, other: BaziChart, direction: str, where: str) 
             vigor = theirs[element]
             rule_key = YONGSHEN_QUADRANT.get((favorable, vigor))
             if rule_key:
-                rows.append(_to_row(rule_key, direction, f"（{where}·{element}{vigor}）"))
-    return rows
+                facts.append(
+                    YongshenFact(
+                        row=_to_row(rule_key, direction, f"（{where}·{element}{vigor}）"),
+                        element=element,
+                        vigor=vigor,
+                        ratio=ratios[element],
+                    )
+                )
+    return facts
+
+
+def yongshen_facts(pair: HehunChartPair) -> list[YongshenFact]:
+    """互济族的全部事实：两向各一组（§6.2，五族里唯一天生有向的一族）。
+
+    这是账本与互补图共同的唯一来源。两造的喜忌一律直接取各自本命盘，合婚不重判（决策 3）。
+    """
+    return [
+        *_one_view_facts(pair.male, pair.female, "male_to_female", "乾视坤"),
+        *_one_view_facts(pair.female, pair.male, "female_to_male", "坤视乾"),
+    ]
 
 
 def yongshen_rows(pair: HehunChartPair) -> list[HehunRow]:
-    """互济族：两向各一组（§6.2）。
+    return [fact.row for fact in yongshen_facts(pair)]
 
-    这是五族里唯一天生有向的一族 —— 事实的主语是谁的喜用在先，
-    「乾忌火而坤火旺」与「坤忌木而乾木旺」是两件不同的事、两条不同的补救路径。
-    两造的喜忌一律直接取各自本命盘，合婚不重判（决策 3）。
+
+def complement(pair: HehunChartPair) -> HehunComplement:
+    """五行互补图（§7.1）：把同一批事实按 (视角, 象限) 分桶，一格不漏也不增。
+
+    分桶靠 `row.rule` 与 `row.direction` 这两个已有字段，不看 element 也不看 vigor ——
+    图的结构是账本的投影，不是第二次判定。空格的 `elements` 为空列表（§10.6），
+    前端才敢把"无"渲染出来。
     """
-    return [
-        *_one_view_rows(pair.male, pair.female, "male_to_female", "乾视坤"),
-        *_one_view_rows(pair.female, pair.male, "female_to_male", "坤视乾"),
-    ]
+    facts = yongshen_facts(pair)
+    return HehunComplement(
+        views=[
+            HehunComplementView(
+                viewer=viewer,
+                label=label,
+                cells=[
+                    HehunComplementCell(
+                        rule=rule,
+                        name=name,
+                        mine=mine,  # pydantic 的 Literal 校验挡得住：表里只有这两个值
+                        theirs=theirs,
+                        delta=hehun_rule(rule).delta,
+                        elements=[
+                            HehunComplementElement(element=fact.element, ratio=fact.ratio)
+                            for fact in facts
+                            if fact.row.direction.startswith(viewer) and fact.row.rule == rule
+                        ],
+                    )
+                    for rule, name, mine, theirs in YONGSHEN_QUADRANTS
+                ],
+            )
+            for viewer, label in (("male", "乾视坤"), ("female", "坤视乾"))
+        ]
+    )
+
+
+# ---------------------------------------------------------------- 年命纳音（spec §7.2）
+def nayin_phrase(mine: str, theirs: str, relation: str) -> str:
+    """三字生克句：`生我` → 水生木、`比和` → 木与木同气。
+
+    句式而非表：五行只有五对生克，写成一张 5×5 表就是四处要维护的字符串。
+    主语固定为乾（`mine` 即乾的年命五行，§6.2），所以 `生我` 的"生者"是彼造。
+    """
+    if relation == "比和":
+        return f"{mine}与{mine}同气"
+    if relation == "生我":
+        return f"{theirs}生{mine}"
+    if relation == "我生":
+        return f"{mine}生{theirs}"
+    if relation == "我克":
+        return f"{mine}克{theirs}"
+    return f"{theirs}克{mine}"
+
+
+def nayin_side(chart: BaziChart) -> HehunNayinSide:
+    """一造的年命纳音。取象原文与书名一律从 `NayinCorpus` 直取，本模块一个字都不写。"""
+    corpus = nayin_meaning(_pillar(chart, "year").ganzhi)
+    return HehunNayinSide(
+        ganzhi=_pillar(chart, "year").ganzhi,
+        nayin=corpus.nayin,
+        element=corpus.element,
+        imagery=corpus.imagery,
+        source=corpus.source,
+    )
+
+
+def nayin_view(pair: HehunChartPair) -> HehunNayin:
+    """纳音段：两造年命 + 一句判语，键与分值逐字取自年命族那一行账。
+
+    判语按 §7.2 的固定句式装配（不是引擎自己组句子，是把三处现成件按同一顺序拼起来：
+    纳音名、生克句、该键在规则表里的 `reading`），末尾的尾注与规则表的 source 同一口径。
+    设计稿"乾坤双人档案"那一栏要的意象原文也由本段给出（Task 11 的档案组件读这里）。
+    """
+    male, female = nayin_side(pair.male), nayin_side(pair.female)
+    relation = nayin_relation(pair)
+    row = nayin_row(pair)
+    phrase = nayin_phrase(male.element, female.element, relation)
+    return HehunNayin(
+        male=male,
+        female=female,
+        relation=relation,
+        phrase=phrase,
+        rule=row.rule,
+        delta=row.delta,
+        reading=(
+            f"乾年命{male.nayin}、坤年命{female.nayin}，{phrase}为{relation}；"
+            f"{hehun_rule(row.rule).reading}。{HEHUN_NAYIN_NOTE}"
+        ),
+    )
 
 
 # ---------------------------------------------------------------- 总账本（spec §6.1、§6.4）

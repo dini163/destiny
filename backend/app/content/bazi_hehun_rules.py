@@ -36,6 +36,11 @@ WEAK_RATIO = 0.75
 #: 声称古籍给过分数。
 HEHUN_MODEL_SOURCE = "本系统命名与演绎（不引具体卷次）"
 
+#: 纳音判语尾注（spec §7.2）。纳音的**名与象**逐字有出处（《三命通会·卷一》，
+#: `content/bazi_nayin.py`），但"两家年命纳音论生克"这一步是本系统的演绎 ——
+#: 古籍合婚没有这张 5×5 表。设计稿里的"抑扬"二字不装古书，故句尾必须带着这一句。
+HEHUN_NAYIN_NOTE = "本系统依五行生克义理演绎，非古籍合婚原文。"
+
 #: 书级出处，随 `provenance.tables` 回显（`app/content/__init__.py::HEHUN_CONTENT_SOURCES`，Task 8 接线）。
 HEHUN_RULE_SOURCE = (
     "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；"
