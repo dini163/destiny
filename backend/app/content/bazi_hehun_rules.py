@@ -62,7 +62,7 @@ ELEMENT_ATTRIBUTIONS: dict[str, tuple[str, str, str]] = {
 #: 由响应给出而不是前端写死，出处口径才与 `provenance` 同一处。
 HEHUN_YIJI_DECLARATION = "宜忌取自两造用神法（喜用五行的通说配属），非玄空坐向，不含住宅方位与化解物品。"
 
-#: 书级出处，随 `provenance.tables` 回显（`app/content/__init__.py::HEHUN_CONTENT_SOURCES`，Task 8 接线）。
+#: 书级出处，随 `provenance.tables` 回显（`app/content/__init__.py::HEHUN_CONTENT_SOURCES`）。
 HEHUN_RULE_SOURCE = (
     "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；"
     "婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · " + MODEL_PARAM_SOURCE

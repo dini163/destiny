@@ -6,7 +6,7 @@
 收进五族里的一族一条（对称、成局、互济、年命、婚姻宫五族全在账）；
 ④ 交 `build_ledger` 出一份自解释的总分。
 ⑤ 铺 §7.3 的同频演进轴：轴上的分值不在此重算，走的是岁运那一条装配路径。
-⑥ 装配整页并守轴界（§9.3）：两造档案、四张衍生结构与一轴一次给全，越界的轴以域错误出去。
+⑥ 装配整页并守轴界（§9.3）：两造档案、四张衍生结构、一轴与一份溯源一次给全，越界的轴以域错误出去。
 
 **跨造不算十神**（决策 2）：十神是命局内部的坐标（切片 0 §7.5 已把 `_god()` 对外来柱
 定为空串），把它伸到另一张盘上是本系统没有资格立的第五种命理学说。同理两造的喜忌一律
@@ -159,7 +159,7 @@ class HehunRow:
     rule: str
     label: str
     family: str
-    direction: str
+    direction: HehunDirection
     delta: float
 
 
@@ -623,6 +623,9 @@ def element_vigor(chart: BaziChart) -> dict[str, Vigor]:
     拿盘内均值当基准是因为"在这个人的盘里这一行算不算多"本来就是盘内比较 ——
     跨盘比原始分值没有意义，两造的总量本来就接近（§2.6）。
     均值恒为正（四柱八个小干与藏干必有权重），所以这里不设除零分支。
+
+    它不参与本页装配：互补图那一边同时要比值与档位，改调这里就会把比值量两遍。
+    留着是作为 §2.6 那把尺的公开入口，档位口径由 `tests/test_bazi_hehun.py` 钉住。
     """
     return _vigor_from_ratios(element_ratios(chart))
 
@@ -1153,19 +1156,19 @@ def compute_hehun(
     *,
     male: HehunProfile,
     female: HehunProfile,
-    reference_date: date | None,
     axis_years: int,
+    reference_date: date | None = None,
     axis_start_year: int | None = None,
 ) -> BaziHehunResult:
     """双人合盘一次装配：两造排盘 → 五族账本 → 四张衍生结构 → 一轴。
 
-    无 HTTP、无 I/O；随调用时刻变化的只有 `reference_date`（缺省由路由给），
-    它同时决定当前运档与缺省轴起点，并经 `provenance.reference_date` 回显。
+    无 HTTP、无 I/O；随调用时刻变化的只有 `reference_date`（缺省取当日，与 `compute_transit`
+    同形），它同时决定当前运档与缺省轴起点，并经 `provenance.reference_date` 回显。
 
-    `axis_years` 与 `reference_date` 都**不设引擎缺省**：21 这个数只在契约上出现一次
+    `axis_years` 是这里唯一不设引擎缺省的字段：21 这个数只在契约上出现一次
     （`BaziHehunRequest.axis_years`），两处各写一份迟早分家，而前端读的是契约。
-    `axis_start_year` 是三者里唯一给缺省的：`None` 不是"没填"而是一个真取值 ——
-    它要的是 §9.3 那条 `max(较晚出生年, 参考年)`，那个数只有这里算得出。
+    另两个 `None` 都是真取值而不是占位：`reference_date` 要的是"以今日为截止"，
+    `axis_start_year` 要的是 §9.3 那条 `max(较晚出生年, 参考年)` —— 后者只有排完盘才算得出。
     轴的两道界在排完盘才知道（窗口来自两造各自的 `getYun()`），所以它是域错误而不是
     入参错误（§9.3）；两造的生辰错误由 `_chart_for` 归到 `partner` 那一项上（§9.2）。
     """

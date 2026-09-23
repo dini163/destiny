@@ -291,7 +291,7 @@ class HehunPartner(BaseModel):
 class HehunProvenance(BaseModel):
     """合婚页自带的溯源：版本、口径、规则条数与方法声明。"""
 
-    reference_date: str = Field(description="判定当前大运与缺省轴起点的截止日（ISO）。")
+    reference_date: str = Field(description="判定当前大运与缺省轴起点的截止日（ISO）；未传时为服务器当日。")
     engine: str = Field(description="四柱来源引擎，恒为 lunar-python。")
     rule_count: int = Field(description="合婚规则表的条数（29）：页面上「每条命中都可核对」这一句的数目。")
     tables: list[ProvenanceTable] = Field(description="本页真正读到的表，来自 `HEHUN_CONTENT_SOURCES`。")

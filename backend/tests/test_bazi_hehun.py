@@ -1351,7 +1351,9 @@ def test_the_axis_length_default_has_exactly_one_home() -> None:
 
     两处各写一份迟早分家（前端读的是契约）。这一测是那条纪律的可执行版本：
     少给 `axis_years` 就是 `TypeError`，而不是"悄悄用了引擎里那份缺省"。
+    要带 `match` 是因为不指定缺的是哪一项时这条测就退了色 —— 少给 `male` 同样抛
+    `TypeError`，那证明的是"参数没给全"而不是"轴长没有缺省"。
     """
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="axis_years"):
         compute_hehun(male=MALE_PROFILE, female=SAME_PROFILE)  # type: ignore[call-arg]
     assert BaziHehunRequest(male=MALE_PROFILE, female=SAME_PROFILE).axis_years == 21
