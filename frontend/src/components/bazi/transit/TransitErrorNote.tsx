@@ -5,8 +5,8 @@ import type { ApiError } from '../../../api/client';
 const VALUE_LABEL: Record<string, string> = { male: '乾造', female: '坤造' };
 
 /**
- * 域错误（岁运、流日、流时与合婚共用的 `transit_*` / `liuri_*` / `liushi_*` / `hehun_*`
- * 九个码，外加带 `context.partner` 的 `invalid_birth_data`）的页顶回显。
+ * 域错误（岁运、流日、流时、合婚与数字命理共用的 `transit_*` / `liuri_*` / `liushi_*` /
+ * `hehun_*` / `numerology_*` 十个码，外加带 `context.partner` 的 `invalid_birth_data`）的页顶回显。
  *
  * 文案照后端原句（"2028-06-01 不在 2028-01-06 ~ 2028-02-03 这一段里"），数字与日期另取
  * `context` 排成可扫读的一行，让读者知道该把表单改成什么 —— 两处同源，不可能互相打架。
@@ -29,6 +29,9 @@ export function TransitErrorNote({
     error.code.startsWith('liuri_') ||
     error.code.startsWith('liushi_') ||
     error.code.startsWith('hehun_') ||
+    // 数字理只有一个域码（`numerology_no_latin_letters`）：纯中文名过得了 pydantic 的长度
+    // 校验，坏的是「毕达哥拉斯映射只定义在 A–Z 上」这条只有引擎知道的前提。
+    error.code.startsWith('numerology_') ||
     // 合婚独有：`invalid_birth_data` 不是前缀族，但 §9.2 往它的 `context` 里塞了
     // `partner`。那一格不列出来，页面就只说"这一造排不出来"而说不出是哪一造。
     error.context?.partner !== undefined;

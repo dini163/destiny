@@ -9,6 +9,7 @@ import { BaziNatalPage } from './pages/BaziNatalPage';
 import { BaziTransitPage } from './pages/BaziTransitPage';
 import { NamePage } from './pages/NamePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { NumerologyPage } from './pages/NumerologyPage';
 import { PortalPage } from './pages/PortalPage';
 import { TarotPage } from './pages/TarotPage';
 import { WesternNatalPage } from './pages/WesternNatalPage';
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
       { path: segment(ROUTES.tarot), element: <TarotPage /> },
       { path: segment(ROUTES.zhouyi), element: <ZhouyiPage /> },
       { path: segment(ROUTES.nameMetric), element: <NamePage /> },
+      { path: segment(ROUTES.numerologyMatrix), element: <NumerologyPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

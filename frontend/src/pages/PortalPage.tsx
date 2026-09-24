@@ -29,9 +29,10 @@ const FILTER_OPTIONS: ReadonlyArray<{ value: SystemFilter; label: string }> = [
  *
  * Section 1 pairs an atmospheric gateway headline with the live astronomical time
  * broadcast (`DailyTimePanel`, fed by the real meta true-solar-time + health
- * endpoints). Section 2 is the 16-system entry matrix: the five live systems are
- * real links, the eleven Phase-2 systems carry an honest build status; a category
- * filter narrows the grid.
+ * endpoints). Section 2 is the 16-system entry matrix: the live systems are real
+ * links, the Phase-2 ones carry an honest build status; a category filter narrows
+ * the grid. Neither count is written down here — `LIVE_SYSTEM_COUNT` derives them
+ * from the catalogue, so wiring a new system cannot leave this note lying.
  *
  * The mockup's fabricated 今日天象 pillars (岁次干支 / 月相 / 行星落座 / 黄历宜忌)
  * and its 命盘收藏 / 历史记录 vault are intentionally omitted — those engines and

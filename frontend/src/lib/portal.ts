@@ -3,7 +3,7 @@
  *
  * This is curated *navigational* content (which systems exist, what each one is,
  * which are live now), not computed results, so it honours the no-mock rule: the
- * five live systems point at real routes from `nav.ts` (the single source of truth
+ * six live systems point at real routes from `nav.ts` (the single source of truth
  * for paths), and every other system is declared Phase-2 with `route: null` and an
  * honest build status. Blurbs describe each discipline factually; no chart value,
  * reading or almanac verdict is invented here.
@@ -46,16 +46,17 @@ export interface PortalSystem {
   icon: IconName;
 }
 
-/** A system is navigable exactly when it has a real route (the five live ones). */
+/** A system is navigable exactly when it has a real route (the six live ones). */
 export function isLive(system: PortalSystem): boolean {
   return system.route !== null;
 }
 
 /**
- * The full 16-system roadmap. Five of them are live and carry a real route: the
- * four Phase-1 MVP systems lead the list (八字 / 周易 / 西洋本命 / 塔罗), and
- * 姓名学 sits at its catalogue position inside the 华夏术数 block. The remaining
- * eleven are Phase-2 and carry an honest status instead of a link.
+ * The full 16-system roadmap. Six of them are live and carry a real route: the
+ * four Phase-1 MVP systems lead the list (八字 / 周易 / 西洋本命 / 塔罗), while
+ * 姓名学 and 数字命理 each sit at their catalogue position inside the 华夏术数 and
+ * 西洋秘学 blocks. The remaining ten are Phase-2 and carry an honest status
+ * instead of a link.
  */
 export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
   {
@@ -195,11 +196,11 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     nameZh: '毕达哥拉斯灵数',
     nameEn: 'NUMEROLOGY',
     category: 'western',
-    blurb: '生命道路数、表现数与灵魂渴求数，以数字震动频率洞察天赋潜能与流年周期。',
-    highlights: ['九宫九星数阵'],
-    cta: '',
-    route: null,
-    status: '架构中',
+    blurb: '生命灵数、表达数与灵魂冲动数，以数字震动频率洞察天赋潜能与流年周期。',
+    highlights: ['双九宫矩阵'],
+    cta: '推演灵数',
+    route: ROUTES.numerologyMatrix,
+    status: null,
     icon: 'gauge',
   },
   {

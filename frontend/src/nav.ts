@@ -3,7 +3,7 @@
  *
  * Mirrors the multi-civilization nav in the design mockups: a primary bar of the
  * Phase-1 destinations plus a secondary, categorized bar spanning the full
- * 16-system roadmap. Only the five Phase-1 routes plus 姓名学 are navigable;
+ * 16-system roadmap. Only the five Phase-1 routes plus 姓名学 and 数字命理 are navigable;
  * every other system is declared here with `to: null` so the "全域" nav is
  * complete now and a later phase merely points a slug at a real route — no shell
  * re-architecture.
@@ -31,6 +31,10 @@ export const ROUTES = {
   tarot: '/tarot-oracle',
   zhouyi: '/zhouyi-divination',
   nameMetric: '/name-metric',
+  /** 毕达哥拉斯数字命理（切片 6）。列在「西洋秘学」而不是它原先待的「吠陀与北欧」：
+   * `lib/portal.ts` 早已把它归为 `category: 'western'`，设计稿的次级导航也把它印在
+   * 「西洋秘学」下 —— 三者里两处说 western，而毕达哥拉斯数理本就不是吠陀或北欧体系。 */
+  numerologyMatrix: '/numerology-matrix',
 } as const;
 
 /** A single navigation entry. `to === null` marks a roadmap system not yet built. */
@@ -81,6 +85,7 @@ export const SECONDARY_NAV: NavGroup[] = [
       { slug: 'tarot-oracle', label: '经典塔罗', to: ROUTES.tarot },
       { slug: 'lenormand-cards', label: '雷诺曼', to: null },
       { slug: 'kabbalah-tree', label: '卡巴拉', to: null },
+      { slug: 'numerology-matrix', label: '毕氏灵数', to: ROUTES.numerologyMatrix },
     ],
   },
   {
@@ -88,7 +93,6 @@ export const SECONDARY_NAV: NavGroup[] = [
     items: [
       { slug: 'vedic-astrology', label: '吠陀乔蒂什', to: null },
       { slug: 'norse-runes', label: '北欧卢恩', to: null },
-      { slug: 'numerology-matrix', label: '毕氏灵数', to: null },
     ],
   },
 ];
