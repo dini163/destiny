@@ -276,7 +276,10 @@ class NumerologyChart(BaseModel):
     input: NumerologyInput
     letters: list[LetterValue]
     core: list[CoreNumber] = Field(description="固定序：生命灵数 → 表达 → 灵魂冲动 → 人格面具 → 生日 → 成熟。")
-    karmic_debts: list[KarmicDebt] = Field(default_factory=list)
+    # 不给缺省：业力债是从生命灵数的相加行里查出来的，缺省成 `[]` 会让「引擎忘了递」
+    # 与「确实一笔债都没有」在响应里长得一模一样 —— 那是无声的假清白。空就是空列表，
+    # 但必须由引擎显式递出（同合婚切片「空格子是 `[]` 不是可选」那条规矩）。
+    karmic_debts: list[KarmicDebt] = Field(description="生命灵数账本里查出的业力债；无债时为空列表。")
     pinnacles: list[Pinnacle]
     challenges: list[Challenge]
     personal_cycles: PersonalCycles
