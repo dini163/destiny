@@ -50,7 +50,7 @@ export function ScoreLedger({ score, label }: ScoreLedgerProps) {
           <caption className="sr-only">{`${label}的赋分账本`}</caption>
           <tbody>
             {score.factors.map((factor, index) => (
-              <tr key={factor.rule} className="border-t border-rim">
+              <tr key={`${factor.rule}#${index}`} className="border-t border-rim">
                 <th scope="row" className="py-1.5 pr-2 text-left font-normal text-ink-variant">
                   {factor.label}
                 </th>

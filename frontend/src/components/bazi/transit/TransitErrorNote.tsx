@@ -1,8 +1,12 @@
 import { Icon } from '../../ui/Icon';
 import type { ApiError } from '../../../api/client';
 
+/** `context` 里那些"取值本身也是机器词"的键：合婚的 `partner` 是唯一的例子。 */
+const VALUE_LABEL: Record<string, string> = { male: '乾造', female: '坤造' };
+
 /**
- * 域错误（岁运、流日与流时共用的 `transit_*` / `liuri_*` / `liushi_*` 八个码）的页顶回显。
+ * 域错误（岁运、流日、流时与合婚共用的 `transit_*` / `liuri_*` / `liushi_*` / `hehun_*`
+ * 九个码，外加带 `context.partner` 的 `invalid_birth_data`）的页顶回显。
  *
  * 文案照后端原句（"2028-06-01 不在 2028-01-06 ~ 2028-02-03 这一段里"），数字与日期另取
  * `context` 排成可扫读的一行，让读者知道该把表单改成什么 —— 两处同源，不可能互相打架。
@@ -23,7 +27,11 @@ export function TransitErrorNote({
   const isDomain =
     error.code.startsWith('transit_') ||
     error.code.startsWith('liuri_') ||
-    error.code.startsWith('liushi_');
+    error.code.startsWith('liushi_') ||
+    error.code.startsWith('hehun_') ||
+    // 合婚独有：`invalid_birth_data` 不是前缀族，但 §9.2 往它的 `context` 里塞了
+    // `partner`。那一格不列出来，页面就只说"这一造排不出来"而说不出是哪一造。
+    error.context?.partner !== undefined;
   const facts = isDomain ? contextFacts(error.context, captions) : [];
 
   return (
@@ -63,7 +71,7 @@ function contextFacts(
     if (typeof value === 'number') {
       facts.push({ label: captions[key] ?? key, value: String(value) });
     } else if (typeof value === 'string' && value !== '') {
-      facts.push({ label: captions[key] ?? key, value });
+      facts.push({ label: captions[key] ?? key, value: VALUE_LABEL[value] ?? value });
     }
   }
   return facts;

@@ -189,9 +189,9 @@ def _chart_for(profile: HehunProfile, gender: Gender, reference: date) -> BaziCh
     """排一造的盘，出错时把"是哪一造"记进 `context` 再原样抛出。
 
     code、message、status_code 一字不动：既有的错误链不必为合婚开第二份，`context.partner`
-    随那份错误一同出去，归属在后端这一侧就已经定下了（§9.2）。把它说给读者还差前端一步 ——
-    `TransitErrorNote` 目前只在 `transit_*`/`liuri_*`/`liushi_*` 前缀族上渲染 `context`，
-    `invalid_birth_data` 落不进那道门，于是只回显 message（Task 11 接线）。`partner` 是唯一
+    随那份错误一同出去，归属在后端这一侧就已经定下了（§9.2）。把它说给读者还差前端一步，而
+    本步前两处的改动补的正是那一步：`TransitErrorNote` 现在既认 `hehun_*` 前缀族，也认带
+    `context.partner` 的 `invalid_birth_data`，于是哪一造要改在页顶就说得出口。`partner` 是唯一
     新增的一项 context，取 `Gender` 的值即是乾/坤的键名，不必再造一张映射表。
     只拦 `DestinyError`：非域错误原样上抛，不塞归属，免得把一个 bug 伪装成"某造生辰有误"。
     """

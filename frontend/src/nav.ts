@@ -69,6 +69,7 @@ export const SECONDARY_NAV: NavGroup[] = [
       { slug: 'qimen-dunjia', label: '奇门遁甲', to: null },
       { slug: 'zhouyi-divination', label: '文王六爻', to: ROUTES.zhouyi },
       { slug: 'plum-blossom', label: '梅花易数', to: null },
+      { slug: 'bazi-hehun', label: '八字合婚', to: ROUTES.baziHehun },
       { slug: 'name-metric', label: '五格姓名学', to: ROUTES.nameMetric },
     ],
   },

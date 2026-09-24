@@ -21,7 +21,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { pillarSlotLabel } from '../lib/pillars';
-import { buildTransitHref } from '../lib/transitLink';
+import { buildHehunPrefillHref, buildTransitHref } from '../lib/transitLink';
 import { useBaziNatal } from '../hooks/useBaziNatal';
 import type {
   BaziChart,
@@ -52,6 +52,8 @@ export function BaziNatalPage() {
   const [name, setName] = useState('');
   /** 这一造的岁运链接，随每次排盘同步；未排过时为 null，入口也随之消失。 */
   const [transitHref, setTransitHref] = useState<string | null>(null);
+  /** 这一造的合婚预填链接，同样随每次排盘同步；未排过时为 null，入口随之消失。 */
+  const [hehunHref, setHehunHref] = useState<string | null>(null);
   const bazi = useBaziNatal();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -62,6 +64,13 @@ export function BaziNatalPage() {
       name: name.trim() || null,
     };
     setTransitHref(buildTransitHref(values, { gender, applyTrueSolarTime }));
+    setHehunHref(
+      buildHehunPrefillHref(values, {
+        side: gender,
+        applyTrueSolarTime,
+        name: name.trim() || null,
+      }),
+    );
     bazi.mutate(request);
   }
 
@@ -115,7 +124,9 @@ export function BaziNatalPage() {
         <p className="label-caps text-ink-muted">正在依据真太阳时排定四柱…</p>
       ) : null}
 
-      {bazi.data ? <BaziResults chart={bazi.data} transitHref={transitHref} /> : null}
+      {bazi.data ? (
+        <BaziResults chart={bazi.data} transitHref={transitHref} hehunHref={hehunHref} />
+      ) : null}
     </div>
   );
 }
@@ -138,10 +149,15 @@ interface SectionSpec {
  * not fill is absent from the nav as well as the page — an anchor that jumps to
  * nothing would be a broken promise (spec §8.2 规则 2、3).
  *
- * `transitHref` rides along into the 大运 block only: 岁运 is the next step of the
- * same question the luck pillars ask, and it needs this chart's birth data to run.
+ * `transitHref` and `hehunHref` ride along into the 大运 block only: 岁运 is the next step
+ * of the same question the luck pillars ask, while 合婚 is this chart's next step on the
+ * 「跟谁」question — both need this chart's birth data to run.
  */
-function sectionsFor(chart: BaziChart, transitHref: string | null): SectionSpec[] {
+function sectionsFor(
+  chart: BaziChart,
+  transitHref: string | null,
+  hehunHref: string | null,
+): SectionSpec[] {
   const ledger = chart.hidden_stem_ledger ?? [];
   const relations = chart.relations ?? [];
   const branchGroups = chart.branch_groups ?? [];
@@ -251,6 +267,12 @@ function sectionsFor(chart: BaziChart, transitHref: string | null): SectionSpec[
               推演此造岁运流年
             </Link>
           ) : null}
+          {hehunHref ? (
+            <Link to={hehunHref} className="btn-ghost self-start">
+              <Icon name="compass" size={16} />
+              以此造合婚
+            </Link>
+          ) : null}
           {chart.dayun_current ? <CurrentDayun detail={chart.dayun_current} /> : null}
         </div>
       ),
@@ -300,11 +322,13 @@ function sectionsFor(chart: BaziChart, transitHref: string | null): SectionSpec[
 function BaziResults({
   chart,
   transitHref,
+  hehunHref,
 }: {
   chart: BaziChart;
   transitHref: string | null;
+  hehunHref: string | null;
 }) {
-  const sections = sectionsFor(chart, transitHref);
+  const sections = sectionsFor(chart, transitHref, hehunHref);
 
   return (
     <>
