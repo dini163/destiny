@@ -10,7 +10,7 @@ import { HehunScoreRing } from '../components/bazi/hehun/HehunScoreRing';
 import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
 import { ResultCard } from '../components/ui/ResultCard';
 import { buildHehunQuery, parseHehunLink } from '../lib/transitLink';
-import type { HehunSideLink, HehunSides } from '../lib/transitLink';
+import type { HehunSideLink } from '../lib/transitLink';
 import { useBaziHehun } from '../hooks/useBaziHehun';
 import type { BaziHehunRequest, HehunProfile } from '../types/baziHehun';
 
@@ -70,8 +70,8 @@ function makeRequest(sides: CompleteSides, axis: AxisState): BaziHehunRequest {
  * 与流日/流时同一条入口纪律：链接带全**两半**才自动提交，只带一半（`以此造合婚` 的落点）
  * 即预填而不提交，也不报"链接不完整"。本页自己写查询串，所以那份自动提交由 `send` 里
  * 同步落下的 ref 闸门把住。流时 T9 那一课：`StrictMode` 跑两遍 + 自写回串重跑 effect，
- * 症状是一次进入发两份请求 —— 合婚这一份实测轴长 21 时 1.73 秒 / 23.9 KB，拉到 30 年
- * 也只多两 KB（贵的是两造排盘，不是那几行轴）。
+ * 症状是一次进入发两份请求 —— 合婚这一份实测约 3.5 秒 / 27 KB（轴长 21；拉到 30 年 29 KB），
+ * 贵的是两造排盘，不是那几行轴。
  */
 export function BaziHehunPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -97,8 +97,7 @@ export function BaziHehunPage() {
     autoSubmitted.current = true;
     const request = makeRequest(sides, axis);
     setLastRequest(request);
-    const written: HehunSides = sides;
-    setSearchParams(buildHehunQuery(written, { axisStartYear: axis.startYear, axisYears: axis.years }), {
+    setSearchParams(buildHehunQuery(sides, { axisStartYear: axis.startYear, axisYears: axis.years }), {
       replace: true,
     });
     hehun.mutate(request);

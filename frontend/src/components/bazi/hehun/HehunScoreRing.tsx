@@ -5,7 +5,7 @@ import type { ScoreValue } from '../../../types/scoring';
  * 合婚四档的唯一色标（spec §6.4）。
  *
  * 一张表管两件事：环的那道弧用 `stroke`（SVG 属性只吃颜色值，Tailwind 类名进不去），
- * 档名与分数文字用 `text`。两处同源，于是"什么颜色配什么档"不可能各改一半。
+ * 档名用 `text`、中心分数与弧同源用 `stroke`。两处一表，于是"什么颜色配什么档"不可能各改一半。
  * 颜色取自 `tailwind.config.ts` 的既有 token（wood/gold/ink-muted/fire），不新调一支色。
  */
 export const HEHUN_TIER_LOOK: Record<string, { stroke: string; text: string }> = {

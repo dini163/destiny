@@ -137,7 +137,7 @@ function NayinBlock({ nayin }: { nayin: HehunNayin }) {
         <span className="text-ink">{nayin.phrase}</span>
         <span className="label-caps text-ink-muted">{nayin.relation}</span>
         <span className={`numeric ${nayin.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>
-          {nayin.delta < 0 ? `-${nayin.delta.toFixed(1)}` : `+${nayin.delta.toFixed(1)}`}
+          {nayin.delta < 0 ? `-${Math.abs(nayin.delta).toFixed(1)}` : `+${nayin.delta.toFixed(1)}`}
         </span>
       </div>
       <p className="text-xs leading-relaxed text-ink-muted">{nayin.reading}</p>

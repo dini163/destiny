@@ -153,7 +153,7 @@ interface DualBirthConsoleProps {
  * 为的是读者从主命盘页过来时不必重学一遍表单；不同的是校正开关在每一列上 ——
  * `apply_true_solar_time` 各造一份（§5.1），主盘那一个开关管不到别人的盘。
  *
- * 状态在本件里，初值由 `initial` 落一次（`useState` 的惰性初值）：挂载之后这一列就归
+ * 状态在本件里，初值由 `initial` 落一次（`useState` 的初值只在挂载时取一次）：挂载之后这一列就归
  * 用户编辑，链接再变（`send` 自己写回的那两键）都不该把已填的字段抹回去。
  */
 export function DualBirthConsole({ initial, pending, onSubmit }: DualBirthConsoleProps) {
