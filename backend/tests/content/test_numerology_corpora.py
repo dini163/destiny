@@ -14,6 +14,7 @@ import pytest
 
 from app.content.numerology_cycles import (
     CHALLENGE_DURATION,
+    CHALLENGE_DURATIONS,
     CHALLENGE_MEANINGS,
     CYCLES_SOURCE,
     PERSONAL_YEAR_MEANINGS,
@@ -26,7 +27,12 @@ from app.content.numerology_loshu import (
     MISSING_NUMBER_MEANINGS,
     PLANES,
 )
-from app.content.numerology_meanings import CORE_MEANINGS, KARMIC_LESSONS, MEANINGS_SOURCE
+from app.content.numerology_meanings import (
+    CORE_MEANINGS,
+    KARMIC_DEBT_MEANINGS,
+    KARMIC_LESSONS,
+    MEANINGS_SOURCE,
+)
 from app.content.numerology_pythagorean import (
     KARMIC_DEBT_NUMBERS,
     LETTER_VALUES,
@@ -37,9 +43,10 @@ from app.content.numerology_pythagorean import (
     letter_value,
 )
 
-#: 值是纯字符串的四张表；出处由模块级 `*_SOURCE` 承担，故只验非空。
+#: 值是纯字符串的六张表；出处由模块级 `*_SOURCE` 承担，故只验非空。
 PLAIN_TABLES: tuple[tuple[str, dict[int, str]], ...] = (
     ("KARMIC_LESSONS", KARMIC_LESSONS),
+    ("KARMIC_DEBT_MEANINGS", KARMIC_DEBT_MEANINGS),
     ("PINNACLE_MEANINGS", PINNACLE_MEANINGS),
     ("CHALLENGE_MEANINGS", CHALLENGE_MEANINGS),
     ("PERSONAL_YEAR_MEANINGS", PERSONAL_YEAR_MEANINGS),
@@ -83,6 +90,16 @@ def test_master_and_karmic_debt_sets_are_disjoint_and_exact() -> None:
     assert not (MASTER_NUMBERS & KARMIC_DEBT_NUMBERS)
 
 
+def test_karmic_debt_meanings_cover_exactly_the_debt_numbers() -> None:
+    """双向锁死：释义表不多一键（死数据）、不少一键（运行时 `KeyError`）。
+
+    主数与业力债是两个不相交的集合，所以一个数不可能既是主数又带业力债释义 ——
+    上面那条 disjoint 断言与这一条合起来把「13 算不算主数」这类模糊永久排除。
+    """
+    assert set(KARMIC_DEBT_MEANINGS) == set(KARMIC_DEBT_NUMBERS)
+    assert not (set(KARMIC_DEBT_MEANINGS) & set(CORE_MEANINGS))
+
+
 def test_letter_value_is_case_insensitive_and_rejects_non_letters() -> None:
     assert letter_value("a") == letter_value("A") == 1
     assert letter_value("z") == 8
@@ -122,11 +139,46 @@ def test_challenge_domain_is_exactly_what_the_formula_can_produce() -> None:
     assert {abs(a - b) for a in reachable for b in reachable} == reachable
 
 
-def test_personal_year_domain_excludes_33_because_the_sum_cannot_reach_it() -> None:
-    """流年 = 月 + 日 + reduce(年)，三个加数各 ≤9，原始和最大 27，故 33 不可达。"""
-    assert set(PERSONAL_YEAR_MEANINGS) == set(range(1, 10)) | {11, 22}
-    assert 9 + 9 + 9 < 33, "若这条不再成立，流年上界就得重算，表里也要补 33"
+def _reduce_keeping_masters(total: int) -> int:
+    """测试自带的约简神谕：故意独立于引擎重写一次，否则这条测只是在测它自己。"""
+    while total >= 10 and total not in MASTER_NUMBERS:
+        total = sum(int(char) for char in str(total))
+    return total
+
+
+def test_personal_year_domain_is_exactly_what_the_chained_sum_can_reach() -> None:
+    """键域由算式反推，不靠记忆：加数各自保留主数（决策 3），相加后也保留主数。
+
+    于是每个加数 ∈ `{1..9, 11, 22, 33}`，落点也只可能是这一批 —— 33 真凑得出来
+    （`9 + 2 + 22`、`11 + 11 + 11`）。初稿写的是 `{1..9,11,22}`，理由「三个加数各 ≤9」
+    与决策 3 直接冲突，故按决策 3 补齐（偏差记在 spec §5.3）。少一个键就是一次
+    生产上的 `KeyError`，而它只在罕见的生日 + 罕见的基准年凑到一起时才爆。
+    流月/流日只有两个加数，值域更窄，故一并锁在这条里。
+    """
+    addends = set(range(1, 10)) | set(MASTER_NUMBERS)
+    reachable = {
+        _reduce_keeping_masters(a + b + c) for a in addends for b in addends for c in addends
+    }
+    assert reachable == addends
+    assert set(PERSONAL_YEAR_MEANINGS) == reachable
+    two_addends = {_reduce_keeping_masters(a + b) for a in addends for b in addends}
+    assert two_addends <= reachable, "流月/流日共用这张表，值域必须被它盖住"
     assert set(PERSONAL_YEAR_MEANINGS) <= set(CORE_MEANINGS)
+
+
+def test_challenge_durations_are_the_source_intervals_split_per_challenge() -> None:
+    """四个挑战各自回显来源的定性时段；值必须是 `CHALLENGE_DURATION` 原文的片段。
+
+    片段式锁法而不是只验非空：「另编一个确切年份」是这张表唯一可能的坏法，
+    而它看上去完全像一条真结论。片段必须是原文子串，编不进去。
+    """
+    assert set(CHALLENGE_DURATIONS) == {"first", "second", "main", "fourth"}
+    for key, text in CHALLENGE_DURATIONS.items():
+        assert text.strip(), f"{key} 的时段文本是空的"
+        assert text in CHALLENGE_DURATION, f"{key} 的时段必须是规则原文的片段"
+    assert "贯穿一生" in CHALLENGE_DURATIONS["main"]
+    for key in ("first", "second", "fourth"):
+        assert "约" in CHALLENGE_DURATIONS[key], f"{key} 是区间而不是确年，得带「约」"
 
 
 def test_loshu_missing_meanings_domain_is_one_to_nine() -> None:
