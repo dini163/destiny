@@ -81,6 +81,22 @@ class TransitRangeError(DestinyError):
         self.code = code
 
 
+class NumerologyInputError(DestinyError):
+    """数字命理入参里没有一个可计算的拉丁字母（数字命理 spec §7）。
+
+    机器码只有一个：`numerology_no_latin_letters`。纯中文名过得了 pydantic 的长度校验
+    —— 它确实非空、确实不超长；坏的是「毕达哥拉斯 1–9 映射定义在拉丁字母表上」这条
+    前提，而这条前提只有引擎知道。故给 422 域错误而不是 400 校验错误，分工同
+    `NameInputError` 的 `not_han`：长度归 pydantic，字符集归引擎。
+
+    这里不静默返回一份全零命盘：那样一来「输错了」与「算出来了」在响应上完全同形，
+    用户永远不会发现要改用拼音。
+    """
+
+    code = "numerology_no_latin_letters"
+    status_code = 422
+
+
 def register_error_handlers(app: FastAPI) -> None:
     """Map :class:`DestinyError` subclasses to a consistent JSON error envelope."""
 

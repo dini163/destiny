@@ -17,6 +17,10 @@ from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.name_numerology import NUMEROLOGY_SOURCE
 from app.content.name_sancai import SANCAI_SOURCE
+from app.content.numerology_cycles import CYCLES_SOURCE
+from app.content.numerology_loshu import LOSHU_SOURCE
+from app.content.numerology_meanings import MEANINGS_SOURCE
+from app.content.numerology_pythagorean import PYTHAGOREAN_SOURCE
 from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 CONTENT_VERSION = "2026.09"
@@ -80,4 +84,15 @@ HEHUN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_relations", NATAL_SOURCE_BY_MODULE["bazi_relations"]),
     *TRANSIT_CONTENT_SOURCES,
     ("bazi_hehun_rules", HEHUN_RULE_SOURCE),
+)
+
+#: 数字命理一页真正读到的四张表。单列的理由同 `NAME_CONTENT_SOURCES`：混进
+#: `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。四张不多不少，其中
+#: `numerology_loshu` 属印度数理传统而非毕达哥拉斯体系，它的出处字符串自己说清了
+#: 这一点（数字命理 spec §11 残余风险 3）—— 两张九宫共用一个端点，但各署各的名。
+NUMEROLOGY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("numerology_pythagorean", PYTHAGOREAN_SOURCE),
+    ("numerology_meanings", MEANINGS_SOURCE),
+    ("numerology_cycles", CYCLES_SOURCE),
+    ("numerology_loshu", LOSHU_SOURCE),
 )
