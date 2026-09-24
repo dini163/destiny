@@ -74,6 +74,21 @@ class LetterValue(BaseModel):
     is_vowel: bool = Field(description="按本次 `y_as_vowel` 判定；决定它进元音和还是辅音和。")
 
 
+class LetterMapGroup(BaseModel):
+    """字母映射表的一列：一个数字，与归它管的那几个字母。
+
+    下发这一列、而不是让前端把 A–Z 再抄一遍，是决策 2 的直接延伸：那张表在语料里
+    **逐个写死**，并由 `LETTER_VALUES` ↔ `VALUE_GROUPS` 双向锁死；前端另抄一份就等于凭空
+    多出第三处真相，而三处一旦漂移，页面会印出一张与同一份响应里的 `letters` 自相矛盾的表
+    ——读者无从判断哪个才对。
+    """
+
+    value: int = Field(ge=1, le=9, description="这一列的数字。")
+    letters: list[str] = Field(
+        description="归这一列的大写字母。26 = 9 + 9 + 8，故 9 那列只有 I、R 两个字母。"
+    )
+
+
 class CoreNumber(BaseModel):
     """一个核心数，连同它的释义与完整约简账本。
 
@@ -275,6 +290,9 @@ class NumerologyChart(BaseModel):
 
     input: NumerologyInput
     letters: list[LetterValue]
+    letter_map: list[LetterMapGroup] = Field(
+        description="毕达哥拉斯字母映射表的九列（1→A,J,S …），供前端直接渲染。"
+    )
     core: list[CoreNumber] = Field(description="固定序：生命灵数 → 表达 → 灵魂冲动 → 人格面具 → 生日 → 成熟。")
     # 不给缺省：业力债是从生命灵数的相加行里查出来的，缺省成 `[]` 会让「引擎忘了递」
     # 与「确实一笔债都没有」在响应里长得一模一样 —— 那是无声的假清白。空就是空列表，

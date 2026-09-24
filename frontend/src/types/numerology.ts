@@ -83,6 +83,21 @@ export interface LetterValue {
   is_vowel: boolean;
 }
 
+/**
+ * 字母映射表的一列：一个数字，与归它管的那几个字母。
+ *
+ * 这张表由后端下发而不是在前端写死，理由与整个契约同源：A–Z 的映射是**权威内容**而非
+ * 展示措辞，前端另抄一份就等于凭空多出第三处真相（后端已有 `LETTER_VALUES` 与
+ * `VALUE_GROUPS` 两处，由语料测双向锁死），而三处一旦漂移，页面会印出一张与同一份响应里
+ * `letters` 自相矛盾的表。故 `LetterMapTable` 只渲染它，不携带任何字母常量。
+ */
+export interface LetterMapGroup {
+  /** 这一列的数字，1–9。 */
+  value: number;
+  /** 归这一列的大写字母。26 = 9 + 9 + 8，故 9 那列只有 I、R 两个。 */
+  letters: string[];
+}
+
 /** 一个核心数，连同释义与完整约简账本。 */
 export interface CoreNumber {
   key: CoreNumberKey;
@@ -283,6 +298,8 @@ export interface NumerologyProvenance {
 export interface NumerologyChart {
   input: NumerologyInput;
   letters: LetterValue[];
+  /** 九列映射表，与 `letters` 同源（spec §5.1）。 */
+  letter_map: LetterMapGroup[];
   /** 固定序：生命灵数 → 表达 → 灵魂冲动 → 人格面具 → 生日 → 成熟。 */
   core: CoreNumber[];
   /** 生命灵数账本里查出的业力债；无债时为空列表（不给缺省，由后端显式递出）。 */

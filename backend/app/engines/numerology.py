@@ -42,6 +42,7 @@ from app.content.numerology_pythagorean import (
     LETTER_VALUES,
     MASTER_NUMBERS,
     PYTHAGOREAN_SOURCE,
+    VALUE_GROUPS,
     VOWELS,
     letter_value,
 )
@@ -53,6 +54,7 @@ from app.schemas.numerology import (
     DigitMeaning,
     GridCell,
     KarmicDebt,
+    LetterMapGroup,
     LetterValue,
     LoshuGrid,
     LoshuPlane,
@@ -807,6 +809,12 @@ def compute_chart(
             letter_total=letters.letter_total,
         ),
         letters=list(letters.letters),
+        # 映射表本身也下发（spec §5.1：`VALUE_GROUPS` 就是为前端那张九列表而存在的）。
+        # 照搬语料里的倒排，不在此处由 `LETTER_VALUES` 重算 —— 两份表已由语料测双向锁死，
+        # 在这里再推一次只会把「哪份才是真相」重新变成一个问题。
+        letter_map=[
+            LetterMapGroup(value=value, letters=list(group)) for value, group in VALUE_GROUPS
+        ],
         core=list(result.core),
         karmic_debts=list(result.karmic_debts),
         pinnacles=list(pinnacles(birth_date, reference_date=reference)),

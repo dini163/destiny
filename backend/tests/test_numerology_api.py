@@ -60,6 +60,7 @@ def test_the_chart_comes_back_whole_and_in_the_documented_order(
     assert set(body) == {
         "input",
         "letters",
+        "letter_map",
         "core",
         "karmic_debts",
         "pinnacles",
@@ -103,6 +104,31 @@ def test_the_reference_date_defaults_to_today(client: TestClient) -> None:
     """缺省取今天（决策 11，与八字诸页同一个习惯）；golden 测试靠显式传参固定。"""
     echoed = _post(client, reference_date=None).json()["input"]
     assert echoed["reference_date"] == date.today().isoformat()
+
+
+def test_the_letter_map_is_the_same_table_the_name_letters_were_read_from(
+    client: TestClient,
+) -> None:
+    """映射表九列下发（spec §5.1），且与同一份响应里的逐字值**对得上**。
+
+    这一条是前端不另抄一份 A–Z 的前提：表只在后端有一份，页面才能把它与逐字透视条
+    摆在一屏而不担心两处自相矛盾。故这里不只数九列，还拿姓名里每个字母反查它所在列的
+    数字 —— 两份数据在同一份 JSON 里互证，漂移了就同时炸。
+
+    不断言具体哪几个字母归哪列：那是语料测（`LETTER_VALUES` ↔ `VALUE_GROUPS` 双向锁）
+    的活，在此重列一遍只会多一份可漂移的副本。只锁形状：26 个字母一个不多一个不少，
+    九列值为 1..9，以及 26 = 9 + 9 + 8 带来的那一列只有两个字母。
+    """
+    body = _post(client).json()
+    columns = body["letter_map"]
+    assert [column["value"] for column in columns] == list(range(1, 10))
+    spelled = [char for column in columns for char in column["letters"]]
+    assert sorted(spelled) == [chr(code) for code in range(ord("A"), ord("Z") + 1)]
+    assert len(columns[-1]["letters"]) == 2
+    value_of = {char: column["value"] for column in columns for char in column["letters"]}
+    assert [value_of[item["char"]] for item in body["letters"]] == [
+        item["value"] for item in body["letters"]
+    ]
 
 
 def test_both_grids_come_back_separately_with_their_own_missing_lists(
