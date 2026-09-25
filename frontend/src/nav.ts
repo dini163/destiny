@@ -3,8 +3,8 @@
  *
  * Mirrors the multi-civilization nav in the design mockups: a primary bar of the
  * Phase-1 destinations plus a secondary, categorized bar spanning the full
- * 16-system roadmap. Only the five Phase-1 routes plus 姓名学 and 数字命理 are navigable;
- * every other system is declared here with `to: null` so the "全域" nav is
+ * 16-system roadmap. Only the five Phase-1 routes plus 姓名学、数字命理 and 北欧卢恩 are
+ * navigable; every other system is declared here with `to: null` so the "全域" nav is
  * complete now and a later phase merely points a slug at a real route — no shell
  * re-architecture.
  *
@@ -35,6 +35,9 @@ export const ROUTES = {
    * `lib/portal.ts` 早已把它归为 `category: 'western'`，设计稿的次级导航也把它印在
    * 「西洋秘学」下 —— 三者里两处说 western，而毕达哥拉斯数理本就不是吠陀或北欧体系。 */
   numerologyMatrix: '/numerology-matrix',
+  /** 北欧卢恩（切片 7）。归在「吠陀与北欧」：该组本就有这一格（与吠陀乔蒂什同组），
+   * 故不必为它新开一个只有一个成员的组 —— 设计稿把它放在「北欧符文与吠陀」下，同一个意思。 */
+  norseRunes: '/norse-runes',
 } as const;
 
 /** A single navigation entry. `to === null` marks a roadmap system not yet built. */
@@ -92,7 +95,7 @@ export const SECONDARY_NAV: NavGroup[] = [
     title: '吠陀与北欧',
     items: [
       { slug: 'vedic-astrology', label: '吠陀乔蒂什', to: null },
-      { slug: 'norse-runes', label: '北欧卢恩', to: null },
+      { slug: 'norse-runes', label: '北欧卢恩', to: ROUTES.norseRunes },
     ],
   },
 ];

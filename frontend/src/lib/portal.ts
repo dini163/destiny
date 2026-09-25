@@ -3,7 +3,7 @@
  *
  * This is curated *navigational* content (which systems exist, what each one is,
  * which are live now), not computed results, so it honours the no-mock rule: the
- * six live systems point at real routes from `nav.ts` (the single source of truth
+ * seven live systems point at real routes from `nav.ts` (the single source of truth
  * for paths), and every other system is declared Phase-2 with `route: null` and an
  * honest build status. Blurbs describe each discipline factually; no chart value,
  * reading or almanac verdict is invented here.
@@ -46,17 +46,17 @@ export interface PortalSystem {
   icon: IconName;
 }
 
-/** A system is navigable exactly when it has a real route (the six live ones). */
+/** A system is navigable exactly when it has a real route (the seven live ones). */
 export function isLive(system: PortalSystem): boolean {
   return system.route !== null;
 }
 
 /**
- * The full 16-system roadmap. Six of them are live and carry a real route: the
+ * The full 16-system roadmap. Seven of them are live and carry a real route: the
  * four Phase-1 MVP systems lead the list (八字 / 周易 / 西洋本命 / 塔罗), while
- * 姓名学 and 数字命理 each sit at their catalogue position inside the 华夏术数 and
- * 西洋秘学 blocks. The remaining ten are Phase-2 and carry an honest status
- * instead of a link.
+ * 姓名学、数字命理 and 北欧卢恩 each sit at their catalogue position inside the
+ * 华夏术数、西洋秘学 and 吠陀与北欧 blocks. The remaining nine are Phase-2 and
+ * carry an honest status instead of a link.
  */
 export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
   {
@@ -244,11 +244,11 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     nameZh: '北欧卢恩符文',
     nameEn: 'ELDER FUTHARK',
     category: 'vedicNorse',
-    blurb: '古老弗萨克 24 字符石，融合奥丁智慧诗篇与命运三女神（Norns）纺线织网。',
-    highlights: ['乌尔德泉水阵'],
-    cta: '',
-    route: null,
-    status: '研发中',
+    blurb: '24 枚古老弗萨克字符石，序位据 Kylver 石碑；单枚启示、诺伦三女神运命之阵与卢恩十字，另可启用现代增补的空白符。',
+    highlights: ['三种牌阵', '全典检索'],
+    cta: '掷符铸石',
+    route: ROUTES.norseRunes,
+    status: null,
     icon: 'seal',
   },
 ];
