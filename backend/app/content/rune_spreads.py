@@ -199,8 +199,9 @@ SPREADS: dict[str, Spread] = {
 #: 牌阵 id 的规范顺序，供 schema 的字面量与前端下拉框共用同一份真相。
 SPREAD_IDS: tuple[str, ...] = ("single", "three", "five")
 
-#: 未指定牌阵时用这一种：单枚最轻，也最不容易把一次铸石过度解读成一整套命运判词。
-DEFAULT_SPREAD_ID = "single"
+#: 未指定牌阵时用这一种：`RuneCastRequest.spread_id` 的默认值，前端控制台的初始态同取三石阵。
+#: 三枚是默认的一档 —— 单枚只够一句启示，五枚要读者先懂十字五位，三枚居中。
+DEFAULT_SPREAD_ID = "three"
 
 
 def get_spread(spread_id: str) -> Spread | None:

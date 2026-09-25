@@ -21,6 +21,7 @@ honestly (决策 19) instead of the mockup's invented "quantum chaos" claim.
 
 from pydantic import BaseModel, Field
 
+from app.content.rune_spreads import DEFAULT_SPREAD_ID
 from app.schemas.common import ProvenanceTable
 
 #: 徽标只印方法标识（决策 18）。设计稿的 `#RUNES-FUTHARK-2026-N09` 里那串流水号
@@ -47,7 +48,7 @@ class RuneCastRequest(BaseModel):
     有任何「时机」字段的原因（决策 10）。
     """
 
-    spread_id: str = Field(default="three", description="single | three | five.")
+    spread_id: str = Field(default=DEFAULT_SPREAD_ID, description="single | three | five.")
     include_wyrd: bool = Field(
         default=False,
         description="Whether the blank stone (a modern addition) joins the 24-rune deck.",
@@ -142,8 +143,9 @@ class ShadowNote(BaseModel):
 class CodexRune(BaseModel):
     """全典抽屉里的一枚符文 —— 参考资料，不是本次结果。
 
-    比 `DrawnRune` 多三样：`codepoint` 与 `unicode_name`（出处卡要印「Unicode 码位锚点」，
-    §8 —— 字形对错不靠肉眼，读者可以自己拿这两个字段核），以及正逆**两面都带齐**
+    比 `DrawnRune` 多三样：`codepoint` 与 `unicode_name`（全典抽屉的宽表逐枚印「码位」与
+    「Unicode 官方名」，即 §8 说的「Unicode 码位锚点」—— 字形对错不靠肉眼，读者可以自己拿
+    这两个字段核；它为何落在抽屉而非出处卡，见 spec §11 偏差 U），以及正逆**两面都带齐**
     （抽屉是查阅用的，只带一面就没法当参考）。
     """
 
