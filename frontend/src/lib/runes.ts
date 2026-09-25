@@ -12,7 +12,34 @@
  * （函数个数刻意不写进这段话：多一个函数就少一句真话 —— 数字命理 T7 的教训。）
  */
 
-import type { CodexRune, DrawnRune, RuneCodex, RuneIdentity } from '../types/runes';
+import type {
+  CodexRune,
+  DrawnRune,
+  RuneCodex,
+  RuneIdentity,
+  RuneOrientation,
+} from '../types/runes';
+
+/** 朝向的中文标签与配色。 */
+export interface RuneOrientationMeta {
+  label: string;
+  /** 走 inline `style` 而不是 Tailwind 工具类：颜色由数据决定，扫不到也无需扫到。 */
+  color: string;
+}
+
+/**
+ * 朝向 → 标签与配色。
+ *
+ * 两个色值与 `lib/tarot.ts` 的 `orientationMeta` 逐字相同（正位青、逆位绯）：两个神谕页
+ * 摆在同一间观测台里，同一个概念换一种颜色就是让读者重学一遍。但**不 import 它** ——
+ * 理由同后端 `content/rune_spreads.py` 刻意不 import `tarot_deck`：跨系统引用会把
+ * 「塔罗改个名」升级成卢恩的破坏性变更，而两个颜色字面量不值得换这个耦合。
+ */
+export function orientationMeta(orientation: RuneOrientation): RuneOrientationMeta {
+  return orientation === 'reversed'
+    ? { label: '逆位', color: '#F43F5E' }
+    : { label: '正位', color: '#2DD4BF' };
+}
 
 /**
  * 这一枚该不该把字形转 180°。

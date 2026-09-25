@@ -190,6 +190,11 @@ export interface RuneProvenance {
   method: string;
   naming_note: string;
   wyrd_note: string;
+  /**
+   * 两处真实凭据（Kylver 石碑与 Codex Regius），以及设计稿那两条假声明为何不印。
+   * 这一段同时承担「说了什么」与「刻意没说什么」，后者同样是事实。
+   */
+  manuscript_note: string;
 }
 
 /** 一次铸石的入参。 */

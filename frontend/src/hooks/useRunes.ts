@@ -20,10 +20,12 @@ import { useLastSuccessMutation } from './useLastSuccessMutation';
  * 领起句 —— 也就是说任何一项都会换掉整批石。在途那一下读者该看见的，是上一批石还在
  * 屏上，而不是白板。
  *
- * 失败时同样需要它。这个端点两条 422 路径里，页面上真够得着的是 `question` 超过 120 字
- * （回 pydantic 的 `detail`）；未知牌阵那条（回统一的 `unsupported_method`）得绕过三选
- * 控件才踩得到。但两条的改正动作一样：改输入、再掷 —— 而改正时参照物最好还在眼前，
- * 这正是纯中文名吃 `numerology_no_latin_letters` 时留住上一份盘的同一条道理。
+ * 失败时同样需要它，而且这一版页面上**够不着任何一条 422**：`RuneConsole` 给所问输入框上了
+ * `maxLength={120}`，对齐后端 `question` 的 `max_length`，超长那条提交不出去（HTML 的 `maxLength`
+ * 数的是 UTF-16 码元，pydantic 数的是码点，前者对 astral 字符更严，故不会漏放）；未知牌阵那条
+ * 要绕过三选控件才踩得到，而三选只给三个字面值。于是真会走进 `error` 的是传输与服务器故障
+ * （后端没起、5xx、断网）—— 那种时候留住上一次成功最要紧：读者不该因为一次网络抖动，就丢掉
+ * 手里那份已经掷出来、本来好好的结果。
  */
 export function useRunes() {
   return useLastSuccessMutation<RuneCastResponse, ApiError, RuneCastRequest>(fetchRuneCast);
