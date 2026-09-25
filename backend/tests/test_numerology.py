@@ -21,9 +21,10 @@ from app.content.numerology_cycles import (
     CHALLENGE_MEANINGS,
     PERSONAL_CYCLE_MEANINGS,
     PINNACLE_MEANINGS,
+    cycles_source,
 )
-from app.content.numerology_loshu import LOSHU_SQUARE, PLANES
-from app.content.numerology_meanings import CORE_MEANINGS, KARMIC_LESSONS
+from app.content.numerology_loshu import LOSHU_SQUARE, PLANES, loshu_source
+from app.content.numerology_meanings import CORE_MEANINGS, KARMIC_LESSONS, meanings_source
 from app.content.numerology_pythagorean import (
     KARMIC_DEBT_NUMBERS,
     LETTER_VALUES,
@@ -875,3 +876,32 @@ def test_the_whole_chart_is_deterministic() -> None:
     second = compute_chart(full_name="Anna", birth_date=BIRTH)
     assert first == second
     assert first.input.reference_date == date.today()
+
+
+def test_entry_level_sources_are_composed_by_the_content_helpers() -> None:
+    """六处条目级出处都由语料 helper 拼；helper 保证条目名落在限定语之前。
+
+    语料测锁的是 helper 自己，锁不住引擎有没有用它：把某一处改回
+    `f"{CYCLES_SOURCE}·顶峰1"`，语料测照样全绿，而那一处的角标又变回一句光秃秃的书名
+    （前端 `SourceNote` 只印第一个「（」之前的半句）—— 顶峰卡上并列的两条引用随即
+    长得一模一样，读者分不出哪条引哪条。故这里按**产物**逐处核对，而不是只信 helper。
+    """
+    chart = compute_chart(full_name="LU QINGXUAN", birth_date=BIRTH, reference_date=REFERENCE)
+    pinnacle = chart.pinnacles[0]
+    challenge = chart.challenges[0]
+    year = chart.personal_cycles.year
+    lesson = chart.name_grid.karmic_lessons[0]
+    missing = chart.loshu_grid.missing[0]
+    assert pinnacle.source == cycles_source(f"顶峰{pinnacle.value}")
+    assert challenge.source == cycles_source(f"挑战{challenge.value}")
+    assert year.source == cycles_source(f"个人周期{year.value}")
+    assert lesson.source == meanings_source(f"业力课{lesson.digit}")
+    assert missing.source == loshu_source(f"缺数{missing.digit}")
+
+    # 第六处是业力债。主角那盘没有（相加行是 15），故换 Decoz 的原例 1998-10-15 → 16。
+    debt = compute_chart(full_name="Anna", birth_date=date(1998, 10, 15)).karmic_debts[0]
+    assert debt.source == meanings_source(f"业力债{debt.number}")
+
+    # 六处的角标（第一个「（」之前）都必须把条目名留在里面，否则前端印出来全是书名。
+    for item in (pinnacle, challenge, year, lesson, missing, debt):
+        assert "·" in item.source.split("（")[0], item.source

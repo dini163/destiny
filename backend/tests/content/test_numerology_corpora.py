@@ -20,18 +20,21 @@ from app.content.numerology_cycles import (
     PERSONAL_CYCLE_MEANINGS,
     PINNACLE_AGE_RULE,
     PINNACLE_MEANINGS,
+    cycles_source,
 )
 from app.content.numerology_loshu import (
     LOSHU_SOURCE,
     LOSHU_SQUARE,
     MISSING_NUMBER_MEANINGS,
     PLANES,
+    loshu_source,
 )
 from app.content.numerology_meanings import (
     CORE_MEANINGS,
     KARMIC_DEBT_MEANINGS,
     KARMIC_LESSONS,
     MEANINGS_SOURCE,
+    meanings_source,
 )
 from app.content.numerology_pythagorean import (
     KARMIC_DEBT_NUMBERS,
@@ -306,3 +309,24 @@ def test_cycle_rule_texts_are_qualitative_and_never_claim_exact_years() -> None:
     assert "36" in PINNACLE_AGE_RULE and "终身" in PINNACLE_AGE_RULE
     assert "区间而非确年" in CHALLENGE_DURATION
     assert "30–35" in CHALLENGE_DURATION and "45–50" in CHALLENGE_DURATION
+
+
+def test_entry_sources_keep_the_entry_inside_the_visible_chip() -> None:
+    """条目名必须排在限定语之前：前端角标只印第一个「（」之前的那半句。
+
+    `f"{CYCLES_SOURCE}·顶峰1"` 与 `cycles_source("顶峰1")` 语义一模一样，tooltip 里也
+    照样看得见条目名 —— 坏法只在前端那一刀上：角标被限定语截断，于是顶峰卡上并列的
+    「顶峰1」与「挑战0」印成两个一模一样的角标，洛书那八个平面也共用一句书名。
+    语义没丢，丢的是页面上看得见的可分辨性，而它看上去完全不像个 bug。
+    """
+    for make, entries in (
+        (meanings_source, ("数6", "业力债13", "业力课4")),
+        (cycles_source, ("顶峰1", "挑战0", "个人周期11")),
+        (loshu_source, ("Will", "缺数3", "缺数7")),
+    ):
+        chips = [make(entry).split("（")[0] for entry in entries]
+        for entry, chip in zip(entries, chips, strict=True):
+            assert entry in chip, f"{entry} 被限定语挤出了角标"
+        assert len(set(chips)) == len(chips), f"角标撞车，读者分不出哪条引哪条：{chips}"
+        # 拼条目名不许把「自认非古籍」那半句弄丢 —— 它是这四张表的诚实底线。
+        assert all("非古籍" in make(entry) for entry in entries)

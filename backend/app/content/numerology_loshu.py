@@ -18,7 +18,21 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 #: 书级出处：自认是通行整理稿，且自认不属毕达哥拉斯体系。
-LOSHU_SOURCE = "洛书九宫与八平面箭矢（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+#:
+#: 拆成「名 + 限定语」两半，理由同 `numerology_meanings.MEANINGS_SOURCE`：前端角标只印
+#: 第一个「（」之前的那半句。八个平面过去共用一句书名，条目名全被切掉；而这一张卡上
+#: 恰恰是八条并列的引用，分不出哪条引哪个平面，可核对性就没了。
+LOSHU_SOURCE_NAME = "洛书九宫与八平面箭矢"
+LOSHU_SOURCE_QUALIFIER = "印度数理通行整理稿，非古籍、非毕达哥拉斯体系"
+
+#: 整串出处，逐字等于拆分前那一串：语料测（含「非毕达哥拉斯」那条）按整串核。
+LOSHU_SOURCE = f"{LOSHU_SOURCE_NAME}（{LOSHU_SOURCE_QUALIFIER}）"
+
+
+def loshu_source(entry: str) -> str:
+    """带条目名的出处，如 `洛书九宫与八平面箭矢·Will（印度数理通行整理稿…）`。"""
+    return f"{LOSHU_SOURCE_NAME}·{entry}（{LOSHU_SOURCE_QUALIFIER}）"
+
 
 #: 洛书幻方。每格数字只出现一次，八条线各自和为 15。
 LOSHU_SQUARE: tuple[tuple[int, int, int], ...] = (
@@ -55,7 +69,7 @@ def _plane(
         cells=cells,
         present_text=present_text,
         missing_text=missing_text,
-        source=f"{LOSHU_SOURCE}·{name_en}",
+        source=loshu_source(name_en),
     )
 
 

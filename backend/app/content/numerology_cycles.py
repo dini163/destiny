@@ -16,9 +16,21 @@ P4=M+Y；四挑战 C1=|M−D| / C2=|D−Y| / C3=|C1−C2| / C4=|M−Y|）；释�
 from __future__ import annotations
 
 #: 书级出处：算式署 Decoz，释义自认是摘要整理。
-CYCLES_SOURCE = (
-    "西方毕达哥拉斯数理周期算法与释义（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
-)
+#:
+#: 拆成「名 + 限定语」两半，理由同 `numerology_meanings.MEANINGS_SOURCE`：前端角标只印
+#: 第一个「（」之前的那半句，条目名缀在末尾会被切掉 —— 顶峰卡与挑战卡于是印出
+#: 两个一模一样的角标，而它们引的本是两条。
+CYCLES_SOURCE_NAME = "西方毕达哥拉斯数理周期算法与释义"
+CYCLES_SOURCE_QUALIFIER = "Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文"
+
+#: 整串出处，逐字等于拆分前那一串：语料测与响应里的四张表都按整串核，不能改字。
+CYCLES_SOURCE = f"{CYCLES_SOURCE_NAME}（{CYCLES_SOURCE_QUALIFIER}）"
+
+
+def cycles_source(entry: str) -> str:
+    """带条目名的出处，如 `…周期算法与释义·顶峰1（Hans Decoz 通行整理…）`。"""
+    return f"{CYCLES_SOURCE_NAME}·{entry}（{CYCLES_SOURCE_QUALIFIER}）"
+
 
 #: 顶峰释义。键域 `{1..9, 11, 22, 33}` —— 顶峰**可以是主数且不约简**
 #: （Decoz 的算例里 P1、P2 都是 11），故主数三条必须在表内。

@@ -25,17 +25,23 @@ from app.content.numerology_cycles import (
     CHALLENGE_DURATION,
     CHALLENGE_DURATIONS,
     CHALLENGE_MEANINGS,
-    CYCLES_SOURCE,
     PERSONAL_CYCLE_MEANINGS,
     PINNACLE_AGE_RULE,
     PINNACLE_MEANINGS,
+    cycles_source,
 )
-from app.content.numerology_loshu import LOSHU_SOURCE, LOSHU_SQUARE, MISSING_NUMBER_MEANINGS, PLANES
+from app.content.numerology_loshu import (
+    LOSHU_SOURCE,
+    LOSHU_SQUARE,
+    MISSING_NUMBER_MEANINGS,
+    PLANES,
+    loshu_source,
+)
 from app.content.numerology_meanings import (
     CORE_MEANINGS,
     KARMIC_DEBT_MEANINGS,
     KARMIC_LESSONS,
-    MEANINGS_SOURCE,
+    meanings_source,
 )
 from app.content.numerology_pythagorean import (
     KARMIC_DEBT_NUMBERS,
@@ -344,7 +350,7 @@ def life_path(birth_date: date) -> tuple[CoreNumber, tuple[KarmicDebt, ...]]:
             label=step.label,
             expression=step.expression,
             meaning=KARMIC_DEBT_MEANINGS[step.total],
-            source=f"{MEANINGS_SOURCE}·业力债{step.total}",
+            source=meanings_source(f"业力债{step.total}"),
         )
         for step in summed.steps
         if step.karmic_debt
@@ -523,7 +529,7 @@ def pinnacles(birth_date: date, *, reference_date: date | None = None) -> tuple[
             end_age=segments[index][1],
             is_current=index == current,
             meaning=PINNACLE_MEANINGS[reduced.value],
-            source=f"{CYCLES_SOURCE}·顶峰{reduced.value}",
+            source=cycles_source(f"顶峰{reduced.value}"),
         )
         for index, (key, reduced) in enumerate(
             zip(PINNACLE_KEYS, reduced_values, strict=True)
@@ -583,7 +589,7 @@ def challenges(birth_date: date) -> tuple[Challenge, ...]:
             expression=expressions[key],
             duration=CHALLENGE_DURATIONS[key],
             meaning=CHALLENGE_MEANINGS[values[key]],
-            source=f"{CYCLES_SOURCE}·挑战{values[key]}",
+            source=cycles_source(f"挑战{values[key]}"),
         )
         for index, key in enumerate(CHALLENGE_KEYS)
     )
@@ -615,7 +621,7 @@ def _personal_cycle(key: str, period: str, addends: Sequence[Reduced]) -> Person
         is_master=summed.value in MASTER_NUMBERS,
         meaning=PERSONAL_CYCLE_MEANINGS[summed.value],
         steps=[*(step for item in addends for step in item.steps), *summed.steps],
-        source=f"{CYCLES_SOURCE}·个人周期{summed.value}",
+        source=cycles_source(f"个人周期{summed.value}"),
     )
 
 
@@ -691,7 +697,7 @@ def name_grid(letters: NameLetters) -> NumberGrid:
             DigitMeaning(
                 digit=cell.digit,
                 meaning=KARMIC_LESSONS[cell.digit],
-                source=f"{MEANINGS_SOURCE}·业力课{cell.digit}",
+                source=meanings_source(f"业力课{cell.digit}"),
             )
             for cell in cells
             if cell.count == 0
@@ -744,7 +750,7 @@ def loshu_grid(birth_date: date) -> LoshuGrid:
             DigitMeaning(
                 digit=cell.digit,
                 meaning=MISSING_NUMBER_MEANINGS[cell.digit],
-                source=f"{LOSHU_SOURCE}·缺数{cell.digit}",
+                source=loshu_source(f"缺数{cell.digit}"),
             )
             for cell in cells
             if cell.count == 0

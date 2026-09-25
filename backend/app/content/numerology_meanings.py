@@ -21,7 +21,22 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 #: 书级出处：摘要整理，非古籍，亦非逐字引文。
-MEANINGS_SOURCE = "西方毕达哥拉斯数理核心数释义（通行传统摘要整理，非古籍、非逐字引文）"
+#:
+#: 拆成「名 + 限定语」两半，为的是让**条目名排在限定语之前**（见 `meanings_source`）：
+#: 前端 `SourceNote` 的角标只印第一个「（」之前的那半句，全文留在 tooltip 里。条目名
+#: 若缀在整串末尾，就会被那半句切掉 —— 同一张卡上两条不同的引用于是印成两个一模一样
+#: 的角标（顶峰卡并列「顶峰1」与「挑战0」，洛书缺数那五条同理），读者分不出哪条引的
+#: 是哪条。语义没丢，丢的是**页面上看得见的可分辨性**。
+MEANINGS_SOURCE_NAME = "西方毕达哥拉斯数理核心数释义"
+MEANINGS_SOURCE_QUALIFIER = "通行传统摘要整理，非古籍、非逐字引文"
+
+#: 整串出处，逐字等于拆分前那一串：语料测与响应里的四张表都按整串核，不能改字。
+MEANINGS_SOURCE = f"{MEANINGS_SOURCE_NAME}（{MEANINGS_SOURCE_QUALIFIER}）"
+
+
+def meanings_source(entry: str) -> str:
+    """带条目名的出处，如 `西方毕达哥拉斯数理核心数释义·数6（通行传统摘要整理…）`。"""
+    return f"{MEANINGS_SOURCE_NAME}·{entry}（{MEANINGS_SOURCE_QUALIFIER}）"
 
 
 @dataclass(frozen=True)
@@ -57,7 +72,7 @@ def _core(
         challenge=challenge,
         root=number if root is None else root,
         master_title=master_title,
-        source=f"{MEANINGS_SOURCE}·数{number}",
+        source=meanings_source(f"数{number}"),
     )
 
 
