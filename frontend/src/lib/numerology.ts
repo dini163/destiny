@@ -7,9 +7,10 @@
  * 一处显示 11、一处显示 2，读者无从判断哪个才对（这正是后端 `Challenge` 不带 `steps`
  * 的同一条理由）。
  *
- * 所以下面四个函数做的全是**选**与**摆**：从后端已经算好的数组里挑出当前那一段、
- * 把 1..9 升序的九宫按后端下发的洛书摆法排成三行、把主数拆成大小两号字、把年龄轴
- * 拼成一句人话。没有一个函数会改变任何数值。
+ * 所以下面这些函数做的全是**选**、**摆**与**排版**：从后端已经算好的数组里挑出当前
+ * 那一段、把 1..9 升序的九宫按后端下发的洛书摆法排成三行、把主数拆成大小两号字、
+ * 把年龄轴拼成一句人话、把看不见的字符换成看得见的写法。没有一个函数会改变任何
+ * 数值。（函数个数刻意不写进这段话：多一个函数就少一句真话。）
  */
 
 import type { GridCell, PersonalCycle, PersonalCycles, Pinnacle } from '../types/numerology';
@@ -88,4 +89,35 @@ export function pinnacleAgeLabel(pinnacle: Pinnacle): string {
  */
 export function yearRounds(cycles: PersonalCycles): readonly PersonalCycle[] {
   return [cycles.previous_year, cycles.year, cycles.next_year];
+}
+
+/** 看不见的那些字符：分隔符（空格、不换行空格、全角空格）、格式符（零宽空格、
+ * BOM、零宽连接符）与控制符（制表、换行）。用 Unicode 分类而不是枚举字面量：
+ * 枚举永远漏下一个，而漏掉的那个正好也是看不见的 —— 它不会报错，只会静静地
+ * 把括号里留白。 */
+const NO_GLYPH = /^[\p{Z}\p{Cf}\p{Cc}]$/u;
+
+/**
+ * 被跳过字符的**可见**写法。
+ *
+ * 后端如实报出参与不了计算的字符（决策 8），可「如实报」不等于「报得出来」：主角
+ * `LU QINGXUAN` 被跳过的正是名字中间那个空格，直接印就是「（去重后： ）」——
+ * 括号里一片空白，看上去像渲染坏了。而这一格恰恰是最该被看见的：它是「为何字母数
+ * 比字符数少」的唯一凭据，印成空白就等于把凭据收了回去。故看不见的字符一律改印
+ * 码位（读者能自己核），其余原样印出。
+ */
+export function skippedCharLabel(char: string): string {
+  if (!NO_GLYPH.test(char)) return char;
+  const code = char.codePointAt(0)?.toString(16).toUpperCase().padStart(4, '0');
+  return code === undefined ? '空白字符' : `空白 U+${code}`;
+}
+
+/**
+ * 一整串被跳过字符的写法，用「、」分隔。
+ *
+ * 分隔符不能是空格：`[' '].join(' ')` 印出来还是一个空格，正是 `skippedCharLabel`
+ * 要治的那个病；两个字符时 `['-', ' '].join(' ')` 更是分不清谁是谁。
+ */
+export function skippedCharsLabel(chars: readonly string[]): string {
+  return chars.map(skippedCharLabel).join('、');
 }

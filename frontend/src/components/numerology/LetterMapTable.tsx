@@ -1,3 +1,4 @@
+import { skippedCharsLabel } from '../../lib/numerology';
 import type { LetterMapGroup, LetterValue, NumerologyInput } from '../../types/numerology';
 
 interface LetterMapTableProps {
@@ -19,7 +20,9 @@ interface LetterMapTableProps {
  *
  * 逐字透视条**不还原被跳过的字符位置**：后端给的是去重后的字符清单（决策 8：如实报数，
  * 不偷偷当 0），不是逐位标记，所以设计稿那种在词间插一个 `•` 的画法在这里画不出来 ——
- * 要画就得猜空格在第几位。宁可少一个装饰，也不印一个猜出来的位置。
+ * 要画就得猜空格在第几位。宁可少一个装饰，也不印一个猜出来的位置。清单里的空白字符
+ * 由 `skippedCharsLabel` 换成看得见的写法（码位）：直接印空格会得到一对空括号，
+ * 而那一格正是「为何字母数比字符数少」的唯一凭据。
  *
  * 宽表纪律（Global Constraints）：外层 `overflow-x-auto`、内层 `min-w-[40rem]`，
  * 九列在窄屏上横向滚动而不是挤成不可读的一条，与 `HehunPairMatrix` 同一套做法。
@@ -64,7 +67,7 @@ export function LetterMapTable({ columns, letters, input }: LetterMapTableProps)
           <span className="numeric text-xs text-ink-variant">
             共 {input.letter_count} 个字母计入
             {input.skipped_count > 0
-              ? ` · 跳过 ${input.skipped_count} 个非字母字符（${input.skipped_chars.join(' ')}）`
+              ? ` · 跳过 ${input.skipped_count} 个非字母字符（${skippedCharsLabel(input.skipped_chars)}）`
               : ' · 无跳过字符'}
           </span>
         </div>

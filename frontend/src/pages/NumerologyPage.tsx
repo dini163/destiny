@@ -12,6 +12,7 @@ import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SourceNote } from '../components/ui/SourceNote';
 import { useNumerology } from '../hooks/useNumerology';
+import { skippedCharsLabel } from '../lib/numerology';
 import type { KarmicDebt, NumerologyChart } from '../types/numerology';
 
 /**
@@ -283,7 +284,7 @@ function ChartSummary({ chart }: { chart: NumerologyChart }) {
           <Icon name="alert" size={16} className="mt-0.5 shrink-0" />
           <span>
             有 {input.skipped_count} 个字符不参与计算（去重后：
-            <span className="numeric">{input.skipped_chars.join(' ')}</span>
+            <span className="numeric">{skippedCharsLabel(input.skipped_chars)}</span>
             ）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如实报出、不折算成 0（决策 8）。
           </span>
         </p>
