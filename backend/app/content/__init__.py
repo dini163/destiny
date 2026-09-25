@@ -21,6 +21,8 @@ from app.content.numerology_cycles import CYCLES_SOURCE
 from app.content.numerology_loshu import LOSHU_SOURCE
 from app.content.numerology_meanings import MEANINGS_SOURCE
 from app.content.numerology_pythagorean import PYTHAGOREAN_SOURCE
+from app.content.rune_futhark import RUNES_SOURCE
+from app.content.rune_spreads import SPREADS_SOURCE
 from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 CONTENT_VERSION = "2026.09"
@@ -95,4 +97,15 @@ NUMEROLOGY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("numerology_meanings", MEANINGS_SOURCE),
     ("numerology_cycles", CYCLES_SOURCE),
     ("numerology_loshu", LOSHU_SOURCE),
+)
+
+#: 卢恩一页真正读到的两张表。单列的理由同 `NAME_CONTENT_SOURCES`：混进
+#: `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。两张不多不少：一张管
+#: 24+1 枚符文本体（序位、字形、释义），一张管三种牌阵的位次。它们分开署名而不是
+#: 合成一张，是因为两者的凭据不同：前者的字形可以拿 `unicodedata.name()` 逐字核（客观、
+#: 可单测），后者的位次只是现代通行约定（主观、不可核）—— 合表会把后者的确定性
+#: 抬高到前者的水平（卢恩 spec 决策 24）。版本仍取共用的 `CONTENT_VERSION`，同数字命理。
+RUNE_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("rune_futhark", RUNES_SOURCE),
+    ("rune_spreads", SPREADS_SOURCE),
 )
