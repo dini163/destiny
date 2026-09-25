@@ -17,7 +17,7 @@ from app.content.numerology_cycles import (
     CHALLENGE_DURATIONS,
     CHALLENGE_MEANINGS,
     CYCLES_SOURCE,
-    PERSONAL_YEAR_MEANINGS,
+    PERSONAL_CYCLE_MEANINGS,
     PINNACLE_AGE_RULE,
     PINNACLE_MEANINGS,
 )
@@ -49,7 +49,7 @@ PLAIN_TABLES: tuple[tuple[str, dict[int, str]], ...] = (
     ("KARMIC_DEBT_MEANINGS", KARMIC_DEBT_MEANINGS),
     ("PINNACLE_MEANINGS", PINNACLE_MEANINGS),
     ("CHALLENGE_MEANINGS", CHALLENGE_MEANINGS),
-    ("PERSONAL_YEAR_MEANINGS", PERSONAL_YEAR_MEANINGS),
+    ("PERSONAL_CYCLE_MEANINGS", PERSONAL_CYCLE_MEANINGS),
     ("MISSING_NUMBER_MEANINGS", MISSING_NUMBER_MEANINGS),
 )
 
@@ -146,7 +146,7 @@ def _reduce_keeping_masters(total: int) -> int:
     return total
 
 
-def test_personal_year_domain_is_exactly_what_the_chained_sum_can_reach() -> None:
+def test_personal_cycle_domain_is_exactly_what_the_chained_sum_can_reach() -> None:
     """键域由算式反推，不靠记忆：加数各自保留主数（决策 3），相加后也保留主数。
 
     于是每个加数 ∈ `{1..9, 11, 22, 33}`，落点也只可能是这一批 —— 33 真凑得出来
@@ -160,10 +160,28 @@ def test_personal_year_domain_is_exactly_what_the_chained_sum_can_reach() -> Non
         _reduce_keeping_masters(a + b + c) for a in addends for b in addends for c in addends
     }
     assert reachable == addends
-    assert set(PERSONAL_YEAR_MEANINGS) == reachable
+    assert set(PERSONAL_CYCLE_MEANINGS) == reachable
     two_addends = {_reduce_keeping_masters(a + b) for a in addends for b in addends}
     assert two_addends <= reachable, "流月/流日共用这张表，值域必须被它盖住"
-    assert set(PERSONAL_YEAR_MEANINGS) <= set(CORE_MEANINGS)
+    assert set(PERSONAL_CYCLE_MEANINGS) <= set(CORE_MEANINGS)
+
+
+#: 年尺度的字眼。这张表被流年/流月/流日三处共用，故其中任何一个都是错的：
+#: 印到流月卡上，「新周期第一年…决定后八年」就成了「这个月决定后八年」。
+#: 尺度只能由卡片自己的 `label` 提供（个人流年 / 个人流月 / 个人流日），
+#: 不能藏在释义正文里 —— 正文里的尺度词看上去完全像一句真结论，而它只在
+#: 三种尺度中的一种上为真。
+YEAR_SCALE_WORDS = ("之年", "第一年", "九年", "明年", "今年", "本年", "去年", "前几年", "后八年")
+
+
+def test_personal_cycle_meanings_hold_at_every_scale() -> None:
+    """共用表的每条释义必须在年/月/日三种尺度上同时为真（按字眼拦，不靠读）。"""
+    for number, text in PERSONAL_CYCLE_MEANINGS.items():
+        for word in YEAR_SCALE_WORDS:
+            assert word not in text, (
+                f"{number} 的释义带年尺度字眼「{word}」：流月/流日也在用这张表，"
+                "印过去就是假话；尺度该由 label 说，不该写进正文"
+            )
 
 
 def test_challenge_durations_are_the_source_intervals_split_per_challenge() -> None:

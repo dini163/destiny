@@ -19,7 +19,7 @@ from app.content.numerology_cycles import (
     CHALLENGE_DURATION,
     CHALLENGE_DURATIONS,
     CHALLENGE_MEANINGS,
-    PERSONAL_YEAR_MEANINGS,
+    PERSONAL_CYCLE_MEANINGS,
     PINNACLE_MEANINGS,
 )
 from app.content.numerology_loshu import LOSHU_SQUARE, PLANES
@@ -629,7 +629,7 @@ def test_the_personal_year_keeps_the_master_the_mockup_flattened() -> None:
     assert (year.value, year.root, year.is_master) == (11, 2, True)
     assert year.steps[-1].label == "相加"
     assert year.steps[-1].expression == "5+5+1"
-    assert year.meaning == PERSONAL_YEAR_MEANINGS[11]
+    assert year.meaning == PERSONAL_CYCLE_MEANINGS[11]
 
 
 def test_the_month_and_day_chain_off_the_previous_root() -> None:
@@ -641,24 +641,28 @@ def test_the_month_and_day_chain_off_the_previous_root() -> None:
     assert cycles.month.steps[0].total == cycles.year.value
     assert cycles.month.steps[0].reduced == cycles.year.root
     assert cycles.day.steps[0].total == cycles.month.value
+    # 出处后缀必须写共用那张表的名字，不能写「流年」：流月卡上引「流年 11」是句假话，
+    # 而它看上去完全像一条真出处 —— 同 `CHALLENGE_DURATIONS` 那条片段式锁法的用意。
+    for item in (cycles.month, cycles.day):
+        assert "个人周期" in item.source and "流年" not in item.source
 
 
 def test_a_personal_year_can_reach_thirty_three() -> None:
     """33 真凑得出来，而且凑它的日期是活人会问的：`9+2+22` 与 `11+11+11` 两条路都通。
 
     加数各自约简后保留主数（决策 3），故每个加数 ∈ `{1..9,11,22,33}`。本测试是
-    `PERSONAL_YEAR_MEANINGS` 补上 33 那一项的凭据 —— 语料初稿写「三个加数各 ≤9」，
+    `PERSONAL_CYCLE_MEANINGS` 补上 33 那一项的凭据 —— 语料初稿写「三个加数各 ≤9」，
     与决策 3 直接冲突；没有 33 这一项，1970-09-02 出生的人问 1993 年就会 `KeyError`
     成 500，而它只在罕见的生日 + 罕见的基准年凑到一起时才爆。
     """
     via_twenty_two = personal_cycles(date(1970, 9, 2), reference_date=date(1993, 5, 1)).year
     assert via_twenty_two.steps[-1].expression == "9+2+22"
     assert (via_twenty_two.value, via_twenty_two.root) == (33, 6)
-    assert via_twenty_two.meaning == PERSONAL_YEAR_MEANINGS[33]
+    assert via_twenty_two.meaning == PERSONAL_CYCLE_MEANINGS[33]
     via_eleven = personal_cycles(date(1990, 11, 29), reference_date=date(2027, 3, 1)).year
     assert via_eleven.steps[-1].expression == "11+11+11"
     assert (via_eleven.value, via_eleven.root, via_eleven.is_master) == (33, 6, True)
-    assert via_eleven.meaning == PERSONAL_YEAR_MEANINGS[33]
+    assert via_eleven.meaning == PERSONAL_CYCLE_MEANINGS[33]
 
 
 @pytest.mark.parametrize(
@@ -667,7 +671,7 @@ def test_a_personal_year_can_reach_thirty_three() -> None:
 def test_every_personal_cycle_ledger_adds_up(reference: date) -> None:
     """账本自洽：每一行要么原样要么真等于各位相加，且相加行 == 各基底约简后的值之和。"""
     for item in _all_cycles(personal_cycles(BIRTH, reference_date=reference)):
-        assert item.value in PERSONAL_YEAR_MEANINGS
+        assert item.value in PERSONAL_CYCLE_MEANINGS
         assert item.root == reduce_number(item.value, keep_master=False).value
         assert item.is_master == (item.value in MASTER_NUMBERS)
         assert item.label and item.period and item.meaning and item.source
@@ -692,7 +696,7 @@ def test_every_personal_cycle_ledger_adds_up(reference: date) -> None:
 @pytest.mark.parametrize("birth", MANY_BIRTHS)
 def test_personal_cycles_close_over_the_meaning_table(birth: date) -> None:
     for item in _all_cycles(personal_cycles(birth, reference_date=REFERENCE)):
-        assert item.value in PERSONAL_YEAR_MEANINGS
+        assert item.value in PERSONAL_CYCLE_MEANINGS
         assert 1 <= item.root <= 9
 
 

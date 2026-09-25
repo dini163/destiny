@@ -26,7 +26,7 @@ from app.content.numerology_cycles import (
     CHALLENGE_DURATIONS,
     CHALLENGE_MEANINGS,
     CYCLES_SOURCE,
-    PERSONAL_YEAR_MEANINGS,
+    PERSONAL_CYCLE_MEANINGS,
     PINNACLE_AGE_RULE,
     PINNACLE_MEANINGS,
 )
@@ -596,8 +596,10 @@ def _personal_cycle(key: str, period: str, addends: Sequence[Reduced]) -> Person
     """一个个人周期：基底各自约简（保留主数），相加行也保留主数（决策 11）。
 
     相加行的算式印**各基底约简后的值**（`5+5+1`），与生命灵数相加行同一个理由：读者要能
-    对上上一行（spec §6.1 补记）。释义三处共用 `PERSONAL_YEAR_MEANINGS`：流月/流日只有
-    两个加数，值域是流年的子集，故一张表就盖得住（由语料单测按算式反推锁死）。
+    对上上一行（spec §6.1 补记）。释义三处共用 `PERSONAL_CYCLE_MEANINGS`：流月/流日只有
+    两个加数，值域是流年的子集，故一张表就盖得住（由语料单测按算式反推锁死）。那张表的
+    每条释义都是**尺度中立**的，尺度由本函数填的 `label` 提供 —— 出处后缀也跟着写
+    「个人周期」而不是「流年」：它引的就是那张共用表，写成流年在流月卡上就是假话。
     """
     summed = reduce_number(
         sum(item.value for item in addends),
@@ -611,9 +613,9 @@ def _personal_cycle(key: str, period: str, addends: Sequence[Reduced]) -> Person
         value=summed.value,
         root=summed.root,
         is_master=summed.value in MASTER_NUMBERS,
-        meaning=PERSONAL_YEAR_MEANINGS[summed.value],
+        meaning=PERSONAL_CYCLE_MEANINGS[summed.value],
         steps=[*(step for item in addends for step in item.steps), *summed.steps],
-        source=f"{CYCLES_SOURCE}·流年{summed.value}",
+        source=f"{CYCLES_SOURCE}·个人周期{summed.value}",
     )
 
 
