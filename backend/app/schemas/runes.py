@@ -214,6 +214,10 @@ class RuneProvenance(BaseModel):
     )
     naming_note: str = Field(description="Says the aett names are modern and vary between sources.")
     wyrd_note: str = Field(description="Says the blank stone is a 1980s addition, not ancient.")
+    manuscript_note: str = Field(
+        description="The two real credentials behind this page (the Kylver stone for the order, "
+        "Codex Regius for the myth), plus which mockup claims were dropped for want of evidence."
+    )
 
 
 class RuneCastResponse(BaseModel):

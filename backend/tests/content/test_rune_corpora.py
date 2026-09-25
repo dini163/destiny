@@ -34,6 +34,7 @@ from app.content.rune_futhark import (
     DECK_24,
     DECK_25,
     FUTHARK,
+    MANUSCRIPT_NOTE,
     REVERSIBLE_NOTE,
     RUNES_SOURCE,
     RUNES_SOURCE_NAME,
@@ -101,7 +102,7 @@ def corpus_strings() -> list[tuple[str, str]]:
                     for i, item in enumerate(value)
                     if isinstance(item, str)
                 )
-    for name in ("REVERSIBLE_NOTE", "WYRD_NOTE", "AETT_NAMING_NOTE"):
+    for name in ("REVERSIBLE_NOTE", "WYRD_NOTE", "AETT_NAMING_NOTE", "MANUSCRIPT_NOTE"):
         out.append((name, globals()[name]))
     for label, mapping in (
         ("AETT_NAMES", AETT_NAMES),
@@ -399,6 +400,24 @@ def test_corpus_contains_no_percentages_or_fabricated_tables() -> None:
     for label, text in corpus_strings():
         for token in FORBIDDEN_TOKENS:
             assert token not in text, f"{label} 含 {token!r}"
+
+
+def test_manuscript_note_keeps_the_real_sources_and_drops_the_fake_claims() -> None:
+    """spec §11 偏差 L：两个真实出处名保留，不存在的校准声明与假哈希删掉。
+
+    设计稿那行页脚里「CODEX REGIUS」与「KYLVER STONE」是引对了的，而
+    「EPIGRAPHICAL CALIBRATION VERIFIED」是不存在的校准流程、`HASH: 0x9AF8...` 是假哈希。
+    故本条两头都锁：真名必须在场，而「无实据故不印」这句取舍也必须说出来 ——
+    沉默地不印，读者无从知道这里做过取舍，也无从知道设计稿本来声称过什么。
+    """
+    assert "Kylver" in MANUSCRIPT_NOTE
+    assert "Codex Regius" in MANUSCRIPT_NOTE
+    assert "GKS 2365 4to" in MANUSCRIPT_NOTE
+    assert "不印" in MANUSCRIPT_NOTE
+    # 假声明连当反例原样引用也不行：这一段会被逐字印到页面上。
+    assert "VERIFIED" not in MANUSCRIPT_NOTE
+    assert "HASH" not in MANUSCRIPT_NOTE
+    assert "0x9AF8" not in MANUSCRIPT_NOTE
 
 
 def test_corpus_uses_no_curly_quotes() -> None:

@@ -38,6 +38,7 @@ from app.content.rune_futhark import (
     AETT_TYR,
     DECK_24,
     DECK_25,
+    MANUSCRIPT_NOTE,
     REVERSIBLE_NOTE,
     WYRD,
     WYRD_NOTE,
@@ -384,6 +385,7 @@ def _provenance(deck_size: int) -> RuneProvenance:
         method=METHOD,
         naming_note=AETT_NAMING_NOTE,
         wyrd_note=WYRD_NOTE,
+        manuscript_note=MANUSCRIPT_NOTE,
     )
 
 
