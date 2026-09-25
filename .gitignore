@@ -169,3 +169,11 @@ backend/coverage/
 .eslintcache
 *.tsbuildinfo
 .vite/
+
+# --- Browser-walkthrough screenshots ---------------------------------------
+# Verification evidence captured while walking a slice through the browser.
+# Kept on disk -- the plan's walkthrough record cites these files by name --
+# but never tracked. Deliberately narrow and root-anchored: the header note
+# above keeps design/*.png TRACKED, so no broad image pattern belongs here.
+/.verify-*.png
+/.refix-*.png
