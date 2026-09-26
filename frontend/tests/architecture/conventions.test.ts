@@ -233,20 +233,36 @@ describe('不变式 6：单文件体量棘轮（wc -l 口径）', () => {
 
 describe('不变式 7：重发保果 —— hooks/useLastSuccessMutation adoption 不回落', () => {
   // 项目红线（memory `feedback-retained-result-on-refetch`）：可重发的推演页必须让
-  // 上一次成功结果留在屏上，载体就是这个 hook。现测（2026-09-26）：25 个 hook 文件里
-  // 7 个采用（`grep -rl useLastSuccessMutation hooks | grep -v useLastSuccessMutation.ts | wc -l`），
-  // 另外 12 个直调 useMutation 的 hook 未采用（其页面同样可重发）——缺口记在
-  // ledger F-A2-6。机制只有一个（评审 Important 3）：ADOPTED_BY 是名单身份，丢掉任一个即红；
-  // 「总数不低于 7」是名单的直接推论，不另设断言——旧那行在名单断言通过后永不可能失败。
-  // 「只准增不准减」的语义就住在名单里：新采用者要进名单，名单条目只能加长。
+  // 上一次成功结果留在屏上，载体就是这个 hook。
+  //
+  // 2026-09-26（Task 5 走查）把缺口补平了：原先 7 采用 / 12 个直调 `useMutation`
+  // （ledger F-A2-6，紫微页同页重发抹空白即其表现，F-A1-2），12 个已逐个改为
+  // `useLastSuccessMutation`，名单随之从 7 项扩到 19 项。一次性抽签三页（tarot /
+  // lenormand / zhouyi）跟着采用，依的是 `useRunes` 已立的裁定：留住的是**上一次显示的
+  // 结果**，不是重放上一次的抽牌——下一次仍是后端 `secrets` 的新洗牌。
+  //
+  // 机制两条，各挡一种退化：① 名单（下面）——已采用者偷偷改回去即红；② 裸
+  // `useMutation` 禁令（最后一条 it）——新增 hook 绕过这个模式即红，基线 0 是硬门。
   const ADOPTED_BY = [
     'useBaziHehun',
     'useBaziLiuri',
     'useBaziLiushi',
+    'useBaziNatal',
     'useBaziTransit',
+    'useGematria',
+    'useLenormand',
+    'useMeihua',
+    'useNameAnalysis',
     'useNumerology',
+    'useQimen',
     'useRunes',
     'useSynastry',
+    'useTarotSpread',
+    'useTransit',
+    'useVedic',
+    'useWesternNatal',
+    'useZhouyiCast',
+    'useZiwei',
   ];
   const SELF = 'useLastSuccessMutation';
 
@@ -257,5 +273,16 @@ describe('不变式 7：重发保果 —— hooks/useLastSuccessMutation adoptio
       .map((f) => f.replace(/\.ts$/, ''));
     const dropped = ADOPTED_BY.filter((n) => !adopters.includes(n));
     expect(dropped, `丢掉重发保果模式的 hook: ${dropped.join(', ')}`).toEqual([]);
+  });
+
+  it('除包装器外没有 hook 再直调 useMutation', () => {
+    // 注意判定形状：`useLastSuccessMutation` 字面上**包含** `useMutation`，所以按子串
+    // grep 会全绿假阴；只有 import 语句本身能区分「直调」与「走包装」。
+    const DIRECT = /import\s*\{[^}]*\buseMutation\b[^}]*\}\s*from\s*'@tanstack\/react-query'/;
+    const offenders = readdirSync(resolve(SRC, 'hooks'))
+      .filter((f) => f.endsWith('.ts') && f !== `${SELF}.ts`)
+      .filter((f) => DIRECT.test(readFileSync(resolve(SRC, 'hooks', f), 'utf8')))
+      .map((f) => f.replace(/\.ts$/, ''));
+    expect(offenders, `绕过重发保果模式的 hook: ${offenders.join(', ')}`).toEqual([]);
   });
 });
