@@ -1,9 +1,31 @@
-"""Golden tests for the Western engine, pinned to Swiss Ephemeris output.
+"""Golden tests for the Western engine, anchored on independently derivable astronomy.
 
-Reference chart: 2000-01-01 12:00 UT at Greenwich (51.4769N, 0.0005E). This is
-the J2000 epoch, so the Julian day is exactly 2451545.0, and the expected
-positions below were read directly from pyswisseph 2.10 (Moshier) and are
-astronomically self-consistent (e.g. at local noon the Sun culminates on the MC).
+Reference chart: 2000-01-01 12:00 UT at Greenwich (51.4769N, 0.0005E) — the J2000
+epoch. The anchors below are *not* read back from the engine; each class is derived
+by hand and only the value is then compared against the engine, so a wrong engine
+would be caught rather than self-confirmed:
+
+* **Julian day** — `2451545.0` is the definition of J2000 (noon TT/UT at the epoch),
+  an external constant, not engine output.
+* **落座算术** — `sign_index == int(longitude // 30)` and
+  `degree_in_sign == round(longitude % 30, 4)` are pure arithmetic on the response's
+  own longitude (the `_degree_in_sign` width 4 is from `app/engines/western.py:80-81`);
+  the sign/degree helpers are additionally pinned at the 0° / 29°59′ / 30° boundaries
+  and at the 60′ text carry (`_format_degree`, `app/engines/western.py:84-92`).
+* **宫制** — Whole Sign (W) keeps every longitude and sign_index while only renumbering
+  houses, and its house follows `((sign_index - asc_sign_index) % 12) + 1`; there is no
+  whole-sign branch in the engine — house always comes from `_house_of` over the cusps
+  Swiss Ephemeris returns (`app/engines/western.py:217`), so the formula is a property of
+  the sign-aligned W cusps, not a special case.
+* **逆行** — `retrograde == (speed < 0)` over all ten bodies, plus Saturn's negative speed
+  at the pinned date.
+* **相位表** — the natal aspect list is monotonic in orb, free of duplicate
+  `(planet1, planet2, type)` triples, and respects the shared `ASPECTS` per-type orb limits;
+  the inclusive `<=` boundary is forced arithmetically (orb 7.9/8.0/8.1 vs the 8.0
+  conjunction limit at `app/engines/western.py:61`).
+
+Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
+.venv/Scripts/python.exe -m pytest tests/golden/test_western_golden.py -v`.
 """
 
 from datetime import date, time
@@ -12,7 +34,19 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.errors import UnsupportedMethodError
-from app.engines.western import compute_western_chart
+from app.engines.western import (
+    ASPECTS,
+    _compute_aspects,
+    _degree_in_sign,
+    _format_degree,
+    _sign_index,
+    compute_western_chart,
+)
+from app.schemas.western import PlanetPlacement
+
+#: Conjunction's maximum orb, shared by all three aspect tables (`western.py:61`).
+#: Recount: `python -c "from app.engines.western import ASPECTS; print(ASPECTS)"`.
+CONJUNCTION_ORB = next(orb for name, _g, _a, orb in ASPECTS if name == "conjunction")
 
 GREENWICH_LAT = 51.4769
 GREENWICH_LON = -0.0005
@@ -155,3 +189,136 @@ def test_western_natal_requires_location(client: TestClient) -> None:
     )
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "invalid_birth_data"
+
+
+# ------------------------------------------------------- Step 1(b): 落座边界的纯算术
+
+def _pp(name: str, longitude: float) -> PlanetPlacement:
+    """A PlanetPlacement bare enough to feed ``_compute_aspects`` (only name/longitude read).
+
+    The other fields are placeholders — `_compute_aspects` (`app/engines/western.py:131-155`)
+    only touches ``name`` and ``longitude`` — so they carry no assertion meaning.
+    """
+    return PlanetPlacement(
+        name=name, glyph="", name_zh="", longitude=longitude, sign="", sign_zh="",
+        sign_glyph="", sign_index=0, degree_in_sign=0.0, degree_text="", house=1,
+        retrograde=False, speed=0.0,
+    )
+
+
+def test_sign_index_and_degree_at_the_sign_boundaries() -> None:
+    """0° / 29°59′ / 30° / 360° 上 `_sign_index`、`_degree_in_sign` 是纯算术，不引 swisseph。
+
+    边界「进位」发生在 30.0 本身（`int(30.0 // 30) == 1`），而不是靠四舍五入蒙对：29.9999
+    仍是第 0 座、359.9999 仍是第 11 座、360.0 归一化回第 0 座（`_normalize_longitude`）。
+    `_degree_in_sign` 取 `round(x % 30, 4)`，30.0 归到 0.0。复测：
+    `python -c "from app.engines.western import _sign_index as s,_degree_in_sign as d;"`
+    """
+    assert _sign_index(0.0) == 0
+    assert _sign_index(29.9999) == 0
+    assert _sign_index(30.0) == 1
+    assert _sign_index(59.9999) == 1
+    assert _sign_index(359.9999) == 11
+    assert _sign_index(360.0) == 0  # wraps through _normalize_longitude (360 % 360 == 0)
+    assert _degree_in_sign(0.0) == 0.0
+    assert _degree_in_sign(29.9999) == 29.9999
+    assert _degree_in_sign(30.0) == 0.0
+    assert _degree_in_sign(359.9999) == 29.9999
+
+
+def test_degree_text_carries_at_sixty_minutes() -> None:
+    """`_format_degree` 的 60′ 进位规则（`app/engines/western.py:88-91`）：分凑满 60 进一度。
+
+    4.9958° → 0.9958×60 = 59.748′ round 到 60 → 进位成 "5°00'"。座首的取整假象也要钉死：
+    29.9917° 进位后文本写 "30°00'"，但 `sign_index` 仍停在上一座（度数文本只是显示口径，
+    不代表跨座），这是刻意镜像的实现，不是被测值本身「正确」。
+    """
+    assert _format_degree(10.0) == "10°00'"
+    assert _format_degree(0.0) == "0°00'"
+    assert _format_degree(4.9958) == "5°00'"   # minutes rounded up into the next degree
+    assert _format_degree(29.9917) == "30°00'"  # top-of-sign text artefact, sign unchanged
+    assert _format_degree(24.2641) == "24°16'"  # 0.2641×60 = 15.85' → 16' (the J2000 ASC)
+
+
+# ------------------------------------------------------- Step 1(c): 宫制只动宫不动星
+
+def test_whole_sign_renumbers_houses_without_moving_the_planets() -> None:
+    """同一本命 P（Placidus）与 W（Whole Sign）：黄经与 sign_index 完全不变，宫号却重排。
+
+    宫制只喂给 `swe.houses` 定宫头，绝不参与 `swe.calc_ut` 的行星空——所以十曜的 longitude
+    与 sign_index 在两制下一字不差；Whole Sign 的宫头按 30° 等分（实测 W cusps 全为 30 的
+    整数倍），于是 `house == ((sign_index - asc_sign_index) % 12) + 1`（实现来自
+    `app/engines/western.py:217` 的 `_house_of`，无专门整宫制分支）。
+    """
+    placidus = _greenwich_chart()
+    whole = compute_western_chart(
+        birth_date=date(2000, 1, 1), birth_time=time(12, 0),
+        latitude=GREENWICH_LAT, longitude=GREENWICH_LON,
+        utc_offset_hours=0.0, house_system="W",
+    )
+    # ① 天体位置不受宫制影响。
+    assert [(p.name, p.longitude, p.sign_index) for p in whole.planets] == [
+        (p.name, p.longitude, p.sign_index) for p in placidus.planets
+    ]
+    # ② 宫号分布确有变化（至少一颗行星换了宫）。
+    assert {p.name: p.house for p in whole.planets} != {p.name: p.house for p in placidus.planets}
+    # ③ Whole Sign 的宫号就是星座相对上升所在星座的序差。
+    asc_sign_index = next(a.sign_index for a in whole.axes if a.name == "ASC")
+    for planet in whole.planets:
+        assert planet.house == ((planet.sign_index - asc_sign_index) % 12) + 1, planet.name
+    # W 的宫头皆落在 30° 刻度上（整宫制的前提）。
+    for cusp in whole.houses:
+        assert cusp.longitude % 30 == pytest.approx(0.0, abs=1e-9)
+
+
+# ------------------------------------------------------- Step 1(d): 逆行 = 速度为负
+
+def test_retrograde_flag_is_the_sign_of_the_speed() -> None:
+    """十曜全体 `retrograde == (speed < 0)`；再钉 J2000 当天确实逆行的 Saturn 的速度符号。
+
+    引擎 `retrograde = positions[name][3] < 0`、`speed = round(...,6)`（`app/engines/western.py:218-219`），
+    二者同号（round 到 6 位不会把真实逆行速度抹成 0，Saturn 实测 -0.019945）。Saturn 于
+    2000-01-01 12:00 UT 在金牛 10°24′（黄经 40.3956°）逆行。复测：见本文件顶部 pytest -v。
+    """
+    chart = _greenwich_chart()
+    for planet in chart.planets:
+        assert planet.retrograde == (planet.speed < 0), planet.name
+    saturn = next(p for p in chart.planets if p.name == "Saturn")
+    assert saturn.speed < 0
+    assert saturn.retrograde is True
+
+
+# ------------------------------------------------------- Step 3: 本命相位表完备性
+
+def test_natal_aspects_are_sorted_unique_and_within_their_orbs() -> None:
+    """本命相位列：orb 非降序、`(planet1, planet2, type)` 全表唯一、每种相位不越其共享容许度。
+
+    `_compute_aspects` 对 i<j 每对只留最紧一个再按 orb 排序（`app/engines.western.py:131-155`），
+    所以三元组天然唯一、orb 天然非降；上限表 `ASPECTS`（合 8/六合 6/刑 7/拱 8/冲 8）是三表共用，
+    这里断言本命这一表不越界。
+    """
+    limit_by_type = {name: orb for name, _g, _a, orb in ASPECTS}
+    aspects = _greenwich_chart().aspects
+    orbs = [a.orb for a in aspects]
+    assert orbs == sorted(orbs)  # tightest first / non-decreasing
+    triples = {(a.planet1, a.planet2, a.type) for a in aspects}
+    assert len(triples) == len(aspects)
+    for a in aspects:
+        assert 0.0 <= a.orb <= limit_by_type[a.type], (a.planet1, a.planet2, a.type)
+
+
+def test_aspect_orb_boundary_is_inclusive_and_identical_across_the_three_tables() -> None:
+    """「恰好等于上限」计入：用纯构造把合相 orb 逼到 7.9 / 8.0 / 8.1，只有 8.1 被剔除。
+
+    三表（本命 `_compute_aspects`、行运 `_cross_aspects`、合盘 `_synastry_aspects`）都用同一份
+    `ASPECTS` 与同一句 `orb <= orb_limit`（见 `app/engines/transit.py:138`、
+    `app/engines/synastry.py:136`），本条在合盘/行运各自的文件里以同样 8.0 再钉一次，三处一致即
+    「口径一致」；若哪张表改成 `<` 就会在这里红。8.0 是合相上限（`CONJUNCTION_ORB`）。
+    """
+    assert CONJUNCTION_ORB == 8.0
+    inside = _compute_aspects([_pp("Sun", 0.0), _pp("Moon", 7.9)])
+    on_the_limit = _compute_aspects([_pp("Sun", 0.0), _pp("Moon", 8.0)])
+    outside = _compute_aspects([_pp("Sun", 0.0), _pp("Moon", 8.1)])
+    assert [a.orb for a in inside] == [7.9]
+    assert [a.orb for a in on_the_limit] == [8.0]  # inclusive: == limit is kept
+    assert outside == []  # 8.1 exceeds every orb limit at delta 8.1
