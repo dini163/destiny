@@ -91,8 +91,11 @@ PUBLISHED_NAKSHATRAS: tuple[str, ...] = (
     "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
 )
 
-#: 星历数据文件缺失时 swe 仍会算，但必须如实回报它实际用了哪一副星历。
-_MOON_BODIES: tuple[tuple[str, int], ...] = (
+#: 引擎逐曜调 `swe.calc_ut` 的那八颗，名单抄自 `app/engines/vedic.py:69-77` 的 `_GRAHA_BODY`：
+#: 太阳、太阴与火水木金土五颗肉眼可见行星，加上罗睺（`MEAN_NODE`，平交点）。计都是它的对宫
+#: （`vedic.py:94` 的 +180°），引擎不单独算，所以是八曜而非九曜。两条对拍测共用这份名单：
+#: 「恒星黄经 = 热带 − 岁差」与「两副星历同瞬时」。
+_SWE_COMPUTED_GRAHAS: tuple[tuple[str, int], ...] = (
     ("Sun", swe.SUN), ("Moon", swe.MOON), ("Mars", swe.MARS), ("Mercury", swe.MERCURY),
     ("Jupiter", swe.JUPITER), ("Venus", swe.VENUS), ("Saturn", swe.SATURN),
     ("Rahu", swe.MEAN_NODE),
@@ -384,7 +387,7 @@ def test_sidereal_longitudes_are_tropical_minus_ayanamsa() -> None:
     chart = _chart()
     ayanamsa = swe.get_ayanamsa_ut(JD_J2000)
     assert ayanamsa == pytest.approx(LAHIRI_AT_J2000, abs=1e-4)
-    for name, body in _MOON_BODIES:
+    for name, body in _SWE_COMPUTED_GRAHAS:
         tropical = swe.calc_ut(JD_J2000, body, swe.FLG_SPEED)[0][0]
         predicted = (tropical - ayanamsa) % 360.0
         actual = next(p.longitude for p in chart.planets if p.name == name)
@@ -469,7 +472,10 @@ def test_the_ephemeris_flag_branch_is_a_pure_bit_choice(monkeypatch) -> None:
 
 
 def test_a_swieph_request_without_data_files_is_silently_answered_by_moshier() -> None:
-    """PRD §4.1/§6 六处（62、142、216、270、281、415 行）声称「瑞士历表 DE431」；本地实测：一副都不在。
+    """星历数据文件缺失时 swe 照样算，但必须如实回报它实际用了哪一副星历——本测就是那道回报。
+
+    PRD §4.1/§6 六处（62、142、216、270、281、415 行）声称「瑞士历表 DE431」；本地实测：
+    一副都不在。
 
     现测（2026-09-27）：
     * 仓库与虚拟环境里没有任何星历数据文件——
@@ -498,10 +504,10 @@ def test_a_swieph_request_without_data_files_is_silently_answered_by_moshier() -
     # 这个数字是 F-A1-9 的证据（也是本测 docstring 末那条复测命令的断言化），值得真算。
     worst_arcsec = max(
         abs(swe.calc_ut(JD_J2000, body, swieph)[0][0] - swe.calc_ut(JD_J2000, body, moshier)[0][0])
-        * 3600.0 for _, body in _MOON_BODIES
+        * 3600.0 for _, body in _SWE_COMPUTED_GRAHAS
     )
     assert worst_arcsec == 0.0  # 两法逐位相同；配好 DE 件后这条转红是故意的哨兵
-    for name, body in _MOON_BODIES:
+    for name, body in _SWE_COMPUTED_GRAHAS:
         claimed, ret_swieph = swe.calc_ut(JD_J2000, body, swieph)
         actual, ret_mos = swe.calc_ut(JD_J2000, body, moshier)
         assert claimed == actual, name  # 逐位相同：拿不到 DE431 的任何差别
@@ -729,6 +735,11 @@ def test_exact_boundary_multiples_of_the_span_fall_one_mansion_early() -> None:
 
 
 # ---------------------------------------------------------------- 端点（留在 golden 的两条）
+# 仓里的口径（AGENTS 第 9 条）是「端点测住 `tests/test_*_api.py`，golden 直调 `compute_*`」，
+# 这两条是刻意留下的例外：它们钉的是**本文件手推出来的那张盘**经 HTTP 递出去仍是同一张
+# （白羊、120 年这些取值都来自上面的锚），搬去 api 那侧就得把 `_chart()` 的岁差/命度锚重算
+# 一遍——那边一律不 import 引擎。契约面（键集、位宽、错误分工、时移来源）不在此处，见
+# `tests/test_vedic_api.py`。
 
 
 def test_vedic_natal_endpoint(client: TestClient) -> None:

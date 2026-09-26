@@ -315,7 +315,10 @@ def test_every_graha_stays_inside_the_declared_ranges(client: TestClient) -> Non
         assert planet["retrograde"] == (planet["speed"] < 0), planet["name"]
         assert planet["nakshatra"] and planet["nakshatra_zh"] and planet["nakshatra_devanagari"]
         assert planet["nakshatra_lord"] in NAVAGRAHA_EN
-        assert 0.0 <= planet["degree_in_sign"] < 30.0, planet["name"]  # 星座内度数，非小数
+        # 半开区间而不是 `<= 30`：`degree_in_sign` 是 `_normalize_longitude(lon) % 30` 再 round
+        # 的余数（`app/engines/western.py:80-81`），30 这一端结构上取不到；写成闭区间就是允许
+        # 一个引擎永远给不出的值，也就不再是「域」的契约而是废话的契约。
+        assert 0.0 <= planet["degree_in_sign"] < 30.0, planet["name"]
         assert re.fullmatch(r"\d{1,2}°\d{2}'", planet["degree_text"]), planet["degree_text"]
 
 
@@ -351,17 +354,19 @@ def test_an_omitted_utc_offset_is_replaced_by_the_longitude_zone(client: TestCli
     """不给偏移时按经度折时区，并如实标 `longitude_approximation`。
 
     东经 116.4074 → round(116.4074/15) = 8 小时；西经 52.0 → round(−3.4667) = −3 小时。
+    第二支取的是赤道上的西经 52°（北大西洋东侧），只是一个经度样本点、不对应任何城市，
+    变量名照此自陈；原来叫 `denver` 是误称——丹佛在西经 105° 一带，折出来是 −7 小时。
     这条分支是真值差：折出来的区时与实测时区可差数小时，命度随之漂移。
     """
     beijing = _body(client, longitude=116.4074, latitude=39.9042, utc_offset_hours=None)
     assert beijing["utc_offset_source"] == "longitude_approximation"
     assert beijing["utc_offset_hours"] == 8.0
     assert beijing["utc_datetime"] == "2000-01-01 04:00"
-    denver = _body(client, longitude=-52.0, latitude=0.0, utc_offset_hours=None)
-    assert denver["utc_offset_source"] == "longitude_approximation"
-    assert denver["utc_offset_hours"] == -3.0
+    west_atlantic = _body(client, longitude=-52.0, latitude=0.0, utc_offset_hours=None)
+    assert west_atlantic["utc_offset_source"] == "longitude_approximation"
+    assert west_atlantic["utc_offset_hours"] == -3.0
     # 前端把该字段声明成两个字面量的联合，后端类型是裸 str：名单在此钉死。
-    assert {beijing["utc_offset_source"], "explicit"} == FRONTEND_OFFSET_SOURCES
+    assert {west_atlantic["utc_offset_source"], "explicit"} == FRONTEND_OFFSET_SOURCES
 
 
 def test_the_two_offset_routes_disagree_about_the_same_clock_reading(client: TestClient) -> None:
@@ -416,6 +421,17 @@ def test_a_target_date_before_birth_leaves_no_current_period(client: TestClient)
 
 
 def test_the_missing_target_date_defaults_to_the_servers_today(client: TestClient) -> None:
+    """缺省 `target_date` 时取**服务器自己那天**（`app/api/v1/vedic.py:31` 的
+    `request.target_date or date.today()`），钉的就是这条契约。
+
+    本测拿客户端的 `date.today()` 去比响应：两端读的是同一台机器的同一个钟，所以今天绿、
+    明天仍然绿。但这份耦合是实打实的**跨日竞态**——服务端与测试进程一旦分属两台机器或两个
+    时区（UTC 与本地日界不同步）、或 CI 时钟偏移，它和
+    `test_a_target_date_before_birth_leaves_no_current_period`（那条靠固定日期才稳）就会红。
+    不冻结日期是刻意的：冻结得往生产代码里加时钟注入点，本轮一行 `app/**` 都不动。
+    这条不适用于给了 `target_date` 的载荷：其余各测各自指定日期，出生前那条尤其要断的正是
+    「无当前段」，与默认值无关。
+    """
     body = _body(client, target_date=None)
     today = date.today().isoformat()
     assert body["vimshottari"]["current"] is not None
