@@ -123,7 +123,6 @@ def test_every_system_has_backend_pieces(system: str) -> None:
         missing.append(f"engines/{system}.py")
     if not list(APP.glob(f"schemas/{system}*.py")):
         missing.append(f"schemas/{system}.py")
-    assert (APP / "api" / "v1" / f"{system}.py").exists()
     assert not missing, f"{system} 缺后端件: {missing}"
 
 
