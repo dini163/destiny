@@ -4,7 +4,7 @@
 B ``2024-01-10 08:30``（小寒中元 阳遁八局，甲寅旬，手推值使与值符同宫）、
 C ``2024-09-06 14:30``（处暑中元 **阴遁**四局，逆布逆退）、
 D ``2024-12-22 12:30``（冬至下元 阳遁四局，旬首甲戌遁己落**中五** → 值符天禽、值使寄坤二取
-死门，且时辰在旬中第八位）。
+死门，且时辰壬午在甲戌旬第九位 —— 与 A 的「甲子旬第六位」同为 1 基数法，旬首算第一）。
 
 以下每一格断言都是**手推**所得（算式就地写在测试里），依据《烟波钓叟歌》起局歌诀 + 时家奇门
 通行安盘：拆补法定局（节气定阴阳遁与局数组、日干支符头定上中下元）→ 阳顺阴逆布戊己庚辛壬癸
@@ -132,6 +132,12 @@ def _chart(cast: datetime = CAST):
     return compute_qimen_chart(cast_time=cast, question=None)
 
 
+def _anchor(letter: str) -> Anchor:
+    """按 id 前缀取锚。跨锚对照的测不许按位置取 —— ``ANCHORS`` 重排会让那条测静默换含义，
+    而它的 docstring 讲的还是「A 与 D」。"""
+    return next(anchor for anchor in ANCHORS if anchor.id.startswith(f"{letter}-"))
+
+
 def _day_ganzhi_by_julian_day(d: date) -> str:
     """日干支，只依赖儒略日：干支序 = (JDN + 49) mod 60，0 = 甲子。
 
@@ -209,8 +215,8 @@ def test_dipan_matches_the_hand_laid_plate(anchor: Anchor) -> None:
 
 def test_dipan_is_a_function_of_the_ju_number_only() -> None:
     """A 与 D 同为阳遁四局（节气不同、时辰不同），地盘必须逐宫相同——盘不因时辰而移。"""
-    first = {p.number: p.dipan_gan for p in _chart(ANCHORS[0].cast).palaces}
-    last = {p.number: p.dipan_gan for p in _chart(ANCHORS[3].cast).palaces}
+    first = {p.number: p.dipan_gan for p in _chart(_anchor("A").cast).palaces}
+    last = {p.number: p.dipan_gan for p in _chart(_anchor("D").cast).palaces}
     assert first == last
     assert first[4] == "戊" and first[5] == "己"
 

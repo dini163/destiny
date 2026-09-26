@@ -1,6 +1,6 @@
 """梅花语料表自身的不变式（Task 6 Step 3 · 轴 1 深包 B）。
 
-`tests/golden/test_meihua_golden.py` 钉的是十六张手推锚卦的**推导结果**（起卦数、本/互/变、
+`tests/golden/test_meihua_golden.py` 钉的是十五张手推锚卦的**推导结果**（起卦数、本/互/变、
 体用定位、卦气、账本），本模块钉的是推导所依据的**表体**：先天八卦数、64 卦的上卦×下卦全覆盖、
 八卦万物类象、体用生克五关系、旺相休囚死判定表、月支季节名。表上被改动一格，引擎照样算得完，
 断语照样成段，只有对照古法才发现得了——所以对照必须写在这里。
@@ -8,7 +8,7 @@
 与既有测试的分工：64 卦的**文王序计数、卦画与上下卦一致、八宫与文王序同集、卦辞齐**这四条
 住在 `tests/golden/test_zhouyi_golden.py`（那是六爻系统的表门，不重述）。本模块只补梅花这一侧
 真正独有的三件事：**先天卦数**（起卦算术的定义域）、**上卦×下卦 8×8 积集齐**（`HEXAGRAM_BY_TRIGRAMS`
-那条索引若缺一格，某一组上下卦的盘会在 `_hexagram()` 里 KeyError，而那一格恰好不在十六张锚卦里）、
+那条索引若缺一格，某一组上下卦的盘会在 `_hexagram()` 里 KeyError，而那一格恰好不在十五张锚卦里）、
 **体用五行与卦气的 5×5 全组合**（引擎只按两行查表，表缺一格就有一类盘没有结论）。
 
 **一处语料诚实性缺口（记入本轮报告，不在测试里替它背书）**：`app/content/meihua.py` 的
@@ -111,7 +111,7 @@ def test_every_upper_lower_trigram_pair_has_exactly_one_hexagram() -> None:
     """64 卦全覆盖：`HEXAGRAM_BY_TRIGRAMS` 的键集正是 8×8 的笛卡尔积，一格不多一格不少。
 
     梅花本/互/变三卦都靠这张索引落卦。少一格不会让引擎在锚卦上出错——只有落在
-    那一组的盘才 KeyError，而那一组恰好可能不在十六张锚卦里。
+    那一组的盘才 KeyError，而那一组恰好可能不在十五张锚卦里。
     """
     keys = {t.key for t in TRIGRAMS}
     assert set(HEXAGRAM_BY_TRIGRAMS) == {(lower, upper) for lower in keys for upper in keys}

@@ -106,8 +106,28 @@ def _lunar_jieqi_names() -> set[str]:
 
     `getJieQiTable()` 的键里除中文名外还有若干拼音键，故取「非 ASCII 键」那一份。
     """
-    table = Solar.fromYmdHms(2024, 5, 15, 10, 30, 0).getLunar().getJieQiTable()
-    return {name for name in table if not name.isascii()}
+    return set(_lunar_jieqi_order())
+
+
+def _lunar_jieqi_order(*, year: int = 2024) -> tuple[str, ...]:
+    """lunar-python 节气表的**时间序**：自冬至起、经小寒……至大雪，24 名一圈。
+
+    表的键序按 Solar 时间排列，起于上一年冬至，所以取非 ASCII 键的插入序即为节气年序。
+    下面两条断言把「插入序 = 年序」这个前提钉住：它一旦被库改成别的顺序，本文件由它派生的
+    阴阳遁分工（`test_the_two_dun_together_cover_all_twenty_four_jieqi`）会立刻失真。
+    """
+    table = Solar.fromYmdHms(year, 5, 15, 10, 30, 0).getLunar().getJieQiTable()
+    order = tuple(name for name in table if not name.isascii())
+    assert len(order) == 24, order
+    assert order[0] == "冬至" and order[1] == "小寒", order[:2]
+    assert order[12] == "夏至" and order[-1] == "大雪", (order[12], order[-1])
+    return order
+
+
+#: 阳遁十二节气 = 年序前半（冬至→芒种），阴遁 = 后半（夏至→大雪）。从权威库的序派生，
+#: 不在测试里重抄一遍表 —— 重抄的那份错了也不会红。
+YANG_JU_TERMS = frozenset(_lunar_jieqi_order()[:12])
+YIN_JU_TERMS = frozenset(_lunar_jieqi_order()[12:])
 
 
 def test_jiazi_table_is_the_sixty_stem_branch_pairs() -> None:
@@ -122,7 +142,7 @@ def test_jiazi_table_is_the_sixty_stem_branch_pairs() -> None:
 def test_ju_tables_are_word_for_word_the_yanbo_diaosou_song() -> None:
     """阳遁/阴遁局数表与《烟波钓叟歌》歌诀逐字相符，且两个节气表互不相交。
 
-    表里 36 个数字（12 节气 × 三元 × 两遁）任何一个被改动都不会让引擎报错——它照样按
+    表里 72 个数字（两遁各 12 节气 × 三元）任何一个被改动都不会让引擎报错——它照样按
     `triple[yuan]` 取到一个 1-9 的局数，照样排出满盘，只是那张盘的局从头到尾是错的。
     """
     assert YANG_JU == YANG_JU_SONG
@@ -131,15 +151,35 @@ def test_ju_tables_are_word_for_word_the_yanbo_diaosou_song() -> None:
 
 
 def test_the_two_dun_together_cover_all_twenty_four_jieqi() -> None:
-    """阴阳遁各 12 节气、合起来恰是 lunar-python 的 24 节气名，一格不缺不多。
+    """阴阳遁各 12 节气、逐名点到，合起来恰是 lunar-python 的 24 节气名，一格不缺不多。
 
     这条同时是 `engines/qimen.py:91-92` 那个 `raise ValueError`（未映射到信封，会成 500）的
     可达性证明：`getPrevJieQi().getName()` 的值域就是这张 24 名的表，表全则分支永不可达。
+    覆盖必须**逐名**断言而不是只数到 24 —— 数数放行的是「少一个节气、另一个节气多一格」这类
+    错位，而那正是让引擎走进裸 `ValueError` 的形状。
     """
     authority = _lunar_jieqi_names()
     assert len(authority) == 24, sorted(authority)
+    assert set(YANG_JU) == YANG_JU_TERMS, sorted(set(YANG_JU) ^ YANG_JU_TERMS)
+    assert set(YIN_JU) == YIN_JU_TERMS, sorted(set(YIN_JU) ^ YIN_JU_TERMS)
+    assert not (set(YANG_JU) & set(YIN_JU))
     assert set(YANG_JU) | set(YIN_JU) == authority
     assert len(YANG_JU) == len(YIN_JU) == 12
+
+
+def test_every_jieqi_triple_is_the_yuan_progression_of_its_shangyuan_ju() -> None:
+    """每个节气的三元局数由上元局数唯一决定：阳遁顺行 +6/+3，阴遁逆行 -6/-3（洛书九宫回环）。
+
+    拆补法按日干支符头取上/中/下元，引擎只做 `triple[yuan]` 一次索引；若某格被改成不落在该
+    节气所属元序上（例如把「雨水」的中元从 6 改成 1），表仍满 24 格、局数仍在 1–9 内，任何
+    逐格断言都放行 —— 只有「三元之间 must 差 3/6 步」这条结构性关系抓得住它。
+    """
+    for jieqi, (upper, middle, lower) in YANG_JU.items():
+        assert middle == (upper - 1 + 6) % 9 + 1, (jieqi, upper, middle)
+        assert lower == (upper - 1 + 3) % 9 + 1, (jieqi, upper, lower)
+    for jieqi, (upper, middle, lower) in YIN_JU.items():
+        assert middle == (upper - 1 - 6) % 9 + 1, (jieqi, upper, middle)
+        assert lower == (upper - 1 - 3) % 9 + 1, (jieqi, upper, lower)
 
 
 def test_the_eighteen_ju_are_complete_and_well_formed() -> None:
@@ -235,7 +275,7 @@ def test_the_eight_doors_are_one_per_direction_and_never_the_center() -> None:
     assert {d.luck for d in EIGHT_DOORS} == {"吉", "凶", "中平"}
 
 
-def test_the_eight_gods_are_named_luck_bearing_and_Nature_bearing() -> None:
+def test_the_eight_gods_are_named_luck_bearing_and_nature_bearing() -> None:
     """八神不重不漏：八将各一，吉凶表与类象表都以这八名为键，值符居首（阳遁顺布起点）。"""
     assert len(EIGHT_GODS) == 8 and len(set(EIGHT_GODS)) == 8
     assert EIGHT_GODS[0] == "值符"
@@ -247,9 +287,15 @@ def test_the_eight_gods_are_named_luck_bearing_and_Nature_bearing() -> None:
 
 
 def test_the_corpus_is_registered_under_one_book_level_source() -> None:
-    """语料出处：`QIMEN_CONTENT_SOURCES` 只登一张表、署名即 `QIMEN_SOURCE`（AGENTS 第 7 条）。
+    """奇门语料只登一张表、署名即 `QIMEN_SOURCE`；**这是登记表自身的形状，不是 §7 已合规**。
 
-    奇门盘读到的是这一张自维护语料（历法部分取 lunar-python，不在本表内，也不该混进来充数）。
+    AGENTS 第 7 条要的是「响应里披露实际读过的表」，而这条清单目前**没有消费者**：
+    `grep -rn QIMEN_CONTENT_SOURCES app/` 只命中 `app/content/__init__.py:128` 的定义处（13 张
+    清单里 8 张被引擎读了并渲染进响应的 `provenance.tables`，`QIMEN_`/`ZIWEI_`/`KABBALAH_`/
+    `LENORMAND_`/`VEDIC_` 五张是零引用的死登记），`QimenProvenance` 也还没有 `tables` 字段
+    （`app/schemas/qimen.py`）。所以本测钉的是「登记了什么、登记得对不对」（多登、漏登、署名
+    漂移都会红），别把它读成出处已经到用户手上 —— 那半步记为 findings F-A2-9，梅花的全缺是
+    同一条机制的另一半。
     """
     assert QIMEN_CONTENT_SOURCES == (("qimen", QIMEN_SOURCE),)
     assert "烟波钓叟歌" in QIMEN_SOURCE
@@ -285,10 +331,17 @@ def test_xunshou_hides_in_the_six_yi_and_the_xunkong_is_the_pair_the_xun_lacks()
 @pytest.mark.parametrize("group", TRINITIES, ids=["".join(g) for g in TRINITIES])
 def test_yima_is_the_clash_of_the_trinity_long_sheng(group: tuple[str, ...]) -> None:
     """驿马：三合局（申子辰/亥卯未/寅午戌/巳酉丑）之马在其长生支的对冲（寅巳申亥）。"""
-    head, *rest = group
+    head, *others = group
     expected = CLASH[head]
     assert expected in "寅巳申亥"
     for branch in group:
         assert YIMA_BY_ZHI[branch] == expected, (branch, group)
-        assert set(group) <= set(ZHI)
-    assert sorted({*rest}) and len(YIMA_BY_ZHI) == 12
+    # 同局三支确实同马，而三支之外的支另有其马 —— 防的是「整表填同一个值」这种看着自洽的错。
+    assert len({YIMA_BY_ZHI[b] for b in ZHI if b not in group}) > 1, group
+    assert len(others) == 2, group
+
+
+def test_yima_covers_every_branch_once() -> None:
+    """十二支各有驿马、不重不漏；表的键集与权威地支表逐一对齐。"""
+    assert sorted(YIMA_BY_ZHI) == sorted(ZHI)
+    assert set(YIMA_BY_ZHI.values()) == set("寅巳申亥")

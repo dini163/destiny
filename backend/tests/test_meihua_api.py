@@ -1,6 +1,6 @@
 """梅花端点契约（Task 6 Step 4）：顶层与逐层键集**手写**、报数入参归引擎（400）、无出处块。
 
-卦象的**对错**测在 `tests/golden/test_meihua_golden.py`（十六张手推锚卦 + 报数护栏），
+卦象的**对错**测在 `tests/golden/test_meihua_golden.py`（十五张手推锚卦 + 报数护栏），
 表的**齐不齐**测在 `tests/content/test_meihua_corpus.py`；本模块只管 HTTP 这一层有没有把
 引擎算好的盘如实、按契约递出去 —— 故一律断言 JSON，不 import 引擎函数（分派同
 `tests/test_ziwei_api.py` 与 `tests/test_qimen_api.py`）。
@@ -117,7 +117,7 @@ def test_the_cast_comes_back_with_exactly_the_hand_written_contract(client: Test
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 19  # 抄漏一格会让上面的相等变成自证
+    assert len(TOP_LEVEL_KEYS) == 19  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
     assert body["engine"] == "meihua-tiyong"
     assert body["method"] == "number"
     assert body["question"] is None
