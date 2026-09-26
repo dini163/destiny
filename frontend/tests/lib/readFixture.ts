@@ -18,7 +18,8 @@ import { fileURLToPath } from 'node:url';
  * 环境（`vitest.config.ts` 的 `environment: 'jsdom'`），字面量形式在这里必被改写成 `http:`
  * 资源 URL，所以本函数必须先拼变量；而带 `// @vitest-environment node` 的文件（如
  * `tests/architecture/*.test.ts`）不走这条改写，同样的字面量形式今天安全（`conventions.test.ts:21`
- * 与 `utc_offset_rendering.test.ts:36` 就是这么写的）。这是**现状不是许可**：若哪天架构测改用
+ * 与 `utc_offset_rendering.test.ts` 的 `const SRC = …` 行就是这么写的，复测：
+ * `grep -n "new URL(" tests/architecture/*.test.ts`）。这是**现状不是许可**：若哪天架构测改用
  * jsdom，那两处字面量就会红，修法照搬本函数。
  * 复测（控制器 2026-09-27 以临时探针实测，探针已删、不落仓库）：默认 jsdom 下字面量的
  * `href` 以 `http:` 开头，带 node 环境注解的文件下为
