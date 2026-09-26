@@ -13,10 +13,14 @@ target 2026-09-25. The anchors here are derived by hand, not read back from the 
 * **相位表** — `transit_aspects` is monotonic in orb, free of duplicate
   `(moving, natal, type)` triples, and respects the same shared `ASPECTS` per-type orb
   limits as the natal and synastry tables; the inclusive `<=` boundary is forced at
-  the 8.0 conjunction limit (`app/engines/western.py:61`).
+  the 8.0 conjunction limit (`app/engines/western.py:61`). Cross-table agreement is *not*
+  proved here — it lives in
+  `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`.
 
 The progression / solar-arc age and arc values remain engine-derived calendar facts; this
-file no longer claims its expected numbers are "read from pyswisseph … and stable".
+file deliberately does not present its expected numbers as ephemeris read-backs — a
+value copied out of the engine could only self-confirm it, so every anchor above is
+hand-derivable arithmetic instead.
 
 Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
 .venv/Scripts/python.exe -m pytest tests/golden/test_transit_golden.py -v`.
@@ -38,7 +42,13 @@ CONJUNCTION_ORB = next(orb for name, _g, _a, orb in ASPECTS if name == "conjunct
 
 
 def _mp(name: str, longitude: float) -> MovingPoint:
-    """A MovingPoint bare enough to feed `_cross_aspects` (only name/longitude are read)."""
+    """A MovingPoint bare enough to feed `_cross_aspects`.
+
+    几何判定只读 `name`/`longitude`（`app/engines/transit.py:130-134`）。但别把其余字段当惰性
+    占位：`_cross_aspects` 会把 `body.name_zh` 与 `body.glyph` 原样抄进 `CrossAspect`
+    （`app/engines/transit.py:140-141`），所以这里的空串会出现在输出里——下面的测只比 orb，
+    不碰那两处，故无需填真值。
+    """
     return MovingPoint(
         name=name, glyph="", name_zh="", longitude=longitude, sign="", sign_zh="",
         sign_glyph="", sign_index=0, degree_in_sign=0.0, degree_text="", natal_house=1,
@@ -196,11 +206,14 @@ def test_transit_aspects_are_sorted_unique_and_within_their_orbs() -> None:
         assert 0.0 <= a.orb <= limit_by_type[a.type], (a.moving, a.natal, a.type)
 
 
-def test_transit_aspect_orb_boundary_matches_the_other_tables() -> None:
-    """行运表在「恰好等于合相上限」时与本命/合盘同一口径：构造 7.9/8.0 计入、8.1 剔除。
+def test_transit_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
+    """行运表这一侧：构造 7.9/8.0 计入、8.1 剔除，只证明 `_cross_aspects` 用 `orb <= orb_limit`。
 
-    `_cross_aspects` 用同一句 `orb <= orb_limit`（`app/engines/transit.py:136-138`）。三表各钉一次
-    同一 8.0 边界即证明含/不含口径一致（本命见 `test_western_golden`，合盘见 `test_synastry_golden`）。
+    `_cross_aspects` 迭的是同一份 `ASPECTS`、同一句比较（`app/engines/transit.py:136-138`），
+    但本条看不到另外两张表——「三表同口径」由跨表关系测
+    `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`
+    一次喂三张表来证（本命、合盘各自的姊妹条同理，也只钉自己那一张）。8.0 是合相上限
+    （`CONJUNCTION_ORB`，`app/engines/western.py:61`）。
     """
     assert CONJUNCTION_ORB == 8.0
     assert [a.orb for a in _cross_aspects([_mp("Sun", 0.0)], [("Saturn", "土星", 7.9)])] == [7.9]
