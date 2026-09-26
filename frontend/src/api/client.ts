@@ -120,9 +120,20 @@ async function toApiError(response: Response): Promise<ApiError> {
       code = payload.error.code ?? code;
       message = payload.error.message;
       context = payload.error.context;
-    } else if (payload.detail !== undefined) {
+    } else if (Array.isArray(payload.detail)) {
+      // FastAPI request-validation error: an array of { loc, msg, type } entries.
       code = 'validation_error';
       message = formatValidationDetail(payload.detail);
+    } else if (typeof payload.detail === 'string' && payload.detail.trim()) {
+      // A bare string detail (e.g. a 404 "Not Found") is not a parameter problem —
+      // report it honestly instead of blaming the user's inputs. A stale backend
+      // that predates this route is the usual cause of a 404 here.
+      if (response.status === 404) {
+        code = 'not_found';
+        message = '接口不存在或后端服务未更新，请重启后端服务后重试。';
+      } else {
+        message = `请求失败（HTTP ${response.status}）：${payload.detail}`;
+      }
     }
   } catch {
     // Non-JSON error body — keep the generic status message.
