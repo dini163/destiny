@@ -22,7 +22,10 @@ would be caught rather than self-confirmed:
 * **相位表** — the natal aspect list is monotonic in orb, free of duplicate
   `(planet1, planet2, type)` triples, and respects the shared `ASPECTS` per-type orb limits;
   the inclusive `<=` boundary is forced arithmetically (orb 7.9/8.0/8.1 vs the 8.0
-  conjunction limit at `app/engines/western.py:61`).
+  conjunction limit at `app/engines/western.py:61`). The natal/transit/synastry boundary tests
+  each pin only their own table, so this file also owns the one cross-table relation test
+  (`test_aspect_orb_inclusion_is_identical_across_the_three_tables`): one construction, fed
+  into all three helpers, must be kept or dropped identically.
 
 Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
 .venv/Scripts/python.exe -m pytest tests/golden/test_western_golden.py -v`.
@@ -34,6 +37,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.errors import UnsupportedMethodError
+from app.engines.synastry import _synastry_aspects
+from app.engines.transit import _cross_aspects
 from app.engines.western import (
     ASPECTS,
     _compute_aspects,
@@ -42,6 +47,7 @@ from app.engines.western import (
     _sign_index,
     compute_western_chart,
 )
+from app.schemas.transit import MovingPoint
 from app.schemas.western import PlanetPlacement
 
 #: Conjunction's maximum orb, shared by all three aspect tables (`western.py:61`).
@@ -211,8 +217,8 @@ def test_sign_index_and_degree_at_the_sign_boundaries() -> None:
 
     边界「进位」发生在 30.0 本身（`int(30.0 // 30) == 1`），而不是靠四舍五入蒙对：29.9999
     仍是第 0 座、359.9999 仍是第 11 座、360.0 归一化回第 0 座（`_normalize_longitude`）。
-    `_degree_in_sign` 取 `round(x % 30, 4)`，30.0 归到 0.0。复测：
-    `python -c "from app.engines.western import _sign_index as s,_degree_in_sign as d;"`
+    `_degree_in_sign` 取 `round(x % 30, 4)`，30.0 归到 0.0。复测（会打印被钉的四对值）：
+    `python -c "from app.engines.western import _sign_index as s,_degree_in_sign as d;print(s(29.9999),s(30.0),d(30.0),d(29.9999))"` → `0 1 0.0 29.9999`。
     """
     assert _sign_index(0.0) == 0
     assert _sign_index(29.9999) == 0
@@ -274,18 +280,17 @@ def test_whole_sign_renumbers_houses_without_moving_the_planets() -> None:
 # ------------------------------------------------------- Step 1(d): 逆行 = 速度为负
 
 def test_retrograde_flag_is_the_sign_of_the_speed() -> None:
-    """十曜全体 `retrograde == (speed < 0)`；再钉 J2000 当天确实逆行的 Saturn 的速度符号。
+    """十曜全体 `retrograde == (speed < 0)`：逆行旗标就是速度符号，不是第二套判定。
 
     引擎 `retrograde = positions[name][3] < 0`、`speed = round(...,6)`（`app/engines/western.py:218-219`），
-    二者同号（round 到 6 位不会把真实逆行速度抹成 0，Saturn 实测 -0.019945）。Saturn 于
-    2000-01-01 12:00 UT 在金牛 10°24′（黄经 40.3956°）逆行。复测：见本文件顶部 pytest -v。
+    二者天然同号（round 到 6 位不会把真实逆行速度抹成 0）。Saturn 于 2000-01-01 12:00 UT
+    （金牛 10°24′、黄经 40.3956°）确实逆行这一**单点**锚已由
+    `test_saturn_retrograde_flag_matches_negative_speed` 钉住，本条不重复它，只把同一式子推到
+    十曜全体。复测：见本文件顶部 pytest -v。
     """
     chart = _greenwich_chart()
     for planet in chart.planets:
         assert planet.retrograde == (planet.speed < 0), planet.name
-    saturn = next(p for p in chart.planets if p.name == "Saturn")
-    assert saturn.speed < 0
-    assert saturn.retrograde is True
 
 
 # ------------------------------------------------------- Step 3: 本命相位表完备性
@@ -293,7 +298,7 @@ def test_retrograde_flag_is_the_sign_of_the_speed() -> None:
 def test_natal_aspects_are_sorted_unique_and_within_their_orbs() -> None:
     """本命相位列：orb 非降序、`(planet1, planet2, type)` 全表唯一、每种相位不越其共享容许度。
 
-    `_compute_aspects` 对 i<j 每对只留最紧一个再按 orb 排序（`app/engines.western.py:131-155`），
+    `_compute_aspects` 对 i<j 每对只留最紧一个再按 orb 排序（`app/engines/western.py:131-155`），
     所以三元组天然唯一、orb 天然非降；上限表 `ASPECTS`（合 8/六合 6/刑 7/拱 8/冲 8）是三表共用，
     这里断言本命这一表不越界。
     """
@@ -307,13 +312,14 @@ def test_natal_aspects_are_sorted_unique_and_within_their_orbs() -> None:
         assert 0.0 <= a.orb <= limit_by_type[a.type], (a.planet1, a.planet2, a.type)
 
 
-def test_aspect_orb_boundary_is_inclusive_and_identical_across_the_three_tables() -> None:
-    """「恰好等于上限」计入：用纯构造把合相 orb 逼到 7.9 / 8.0 / 8.1，只有 8.1 被剔除。
+def test_natal_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
+    """本命表这一侧：用纯构造把合相 orb 逼到 7.9 / 8.0 / 8.1，只有 8.1 被剔除。
 
-    三表（本命 `_compute_aspects`、行运 `_cross_aspects`、合盘 `_synastry_aspects`）都用同一份
-    `ASPECTS` 与同一句 `orb <= orb_limit`（见 `app/engines/transit.py:138`、
-    `app/engines/synastry.py:136`），本条在合盘/行运各自的文件里以同样 8.0 再钉一次，三处一致即
-    「口径一致」；若哪张表改成 `<` 就会在这里红。8.0 是合相上限（`CONJUNCTION_ORB`）。
+    本条只证明 `_compute_aspects` 用的是 `orb <= orb_limit`（`app/engines/western.py:143`），
+    对另外两张表一无所知——「三表同口径」是跨表关系测
+    `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`
+    的活，那里把同一份构造同时喂进三张表。行运/合盘各自文件里的姊妹条也只钉自己那一张。
+    8.0 是合相上限（`CONJUNCTION_ORB`，`app/engines/western.py:61`）。
     """
     assert CONJUNCTION_ORB == 8.0
     inside = _compute_aspects([_pp("Sun", 0.0), _pp("Moon", 7.9)])
@@ -322,3 +328,48 @@ def test_aspect_orb_boundary_is_inclusive_and_identical_across_the_three_tables(
     assert [a.orb for a in inside] == [7.9]
     assert [a.orb for a in on_the_limit] == [8.0]  # inclusive: == limit is kept
     assert outside == []  # 8.1 exceeds every orb limit at delta 8.1
+
+
+def _mp(name: str, longitude: float) -> MovingPoint:
+    """A MovingPoint bare enough to feed `_cross_aspects`.
+
+    几何只读 `name`/`longitude`（`app/engines/transit.py:130-134`）；`name_zh` 与 `glyph` 会被
+    抄进 `CrossAspect`（`app/engines/transit.py:140-141`），但下面的关系测只比 orb，所以这里的
+    占位串不进入断言。与 `tests/golden/test_transit_golden.py::_mp` 同形状（本仓第二份
+    MovingPoint 裸构造器，属已知重复、由收口轮统一处理）。
+    """
+    return MovingPoint(
+        name=name, glyph="", name_zh="", longitude=longitude, sign="", sign_zh="",
+        sign_glyph="", sign_index=0, degree_in_sign=0.0, degree_text="", natal_house=1,
+        retrograde=False, speed=0.0,
+    )
+
+
+def _pair(name: str, longitude: float) -> list[tuple[str, str, str, float]]:
+    """A single synastry point as `_synastry_aspects` wants it: `(name, name_zh, glyph, lon)`."""
+    return [(name, "", "", longitude)]
+
+
+def test_aspect_orb_inclusion_is_identical_across_the_three_tables() -> None:
+    """真正的跨表关系测：同一个 delta 喂进三张相位表，必须**同进同出**。
+
+    三条 `test_*_aspect_orb_boundary_is_inclusive_at_the_shared_limit`（本命 / 行运 / 合盘）
+    各只钉自己那一张表，谁改了另一张的含/不含口径它们都不会红；本条才是它们没有声称过的那件事：
+    同一份构造（相对 0° 点的 delta = `CONJUNCTION_ORB - 0.1 / +0.0 / +0.1`）同时走
+    `_compute_aspects`、`_cross_aspects`、`_synastry_aspects`，三个返回集合逐一相等且等于期望的
+    keep/keep/drop。上限一律从 `ASPECTS` 派生（`CONJUNCTION_ORB`），本文件不新写死数字。
+    三表共用的正是 `app/engines/western.py:60-66` 这张表与同一句 `orb <= orb_limit`
+    （`western.py:143`、`transit.py:138`、`synastry.py:136`）。
+    """
+    cases = [
+        (CONJUNCTION_ORB - 0.1, [CONJUNCTION_ORB - 0.1]),  # strictly inside
+        (CONJUNCTION_ORB, [CONJUNCTION_ORB]),              # exactly on the shared limit
+        (CONJUNCTION_ORB + 0.1, []),                       # past it
+    ]
+    for delta, expected in cases:
+        natal = [a.orb for a in _compute_aspects([_pp("Sun", 0.0), _pp("Moon", delta)])]
+        transit = [a.orb for a in _cross_aspects([_mp("Sun", delta)], [("Saturn", "土星", 0.0)])]
+        synastry = [a.orb for a in _synastry_aspects(_pair("Sun", 0.0), _pair("Saturn", delta))]
+        assert natal == expected, (delta, "natal")
+        assert transit == expected, (delta, "transit")
+        assert synastry == expected, (delta, "synastry")
