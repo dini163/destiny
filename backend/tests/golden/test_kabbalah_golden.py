@@ -121,9 +121,8 @@ def test_gematria_rejects_text_without_latin_letters(client: TestClient) -> None
 #: 手写外部表：Golden Dawn 路径号 11-32 → 字母转写名 → 该字母的希伯来 gematria 值。
 #: 表序 Aleph…Tav 与数值 1…9、10、20…100（十位）、200/300/400（百位）是公版事实，
 #: 与 ``content/kabbalah.py`` 无关，所以这条真能判语料的对错。
-#: 复测：`pytest tests/golden/test_kabbalah_golden.py -k hebrew`（下表与引擎输出逐字
-#: 相等才绿；跑不动时用它所在的那条测本身当测法）。把逐条值的第三列换成 `p.letter`
-#: 即得下面那串字形。
+#: 复测：`pytest tests/golden/test_kabbalah_golden.py -k hebrew` —— 下表与引擎输出逐字
+#: 相等才绿。把上表的第三列换成 `p.letter` 即得下面那 22 枚字形。
 HANDBOOK_LETTERS: tuple[tuple[int, str, int], ...] = (
     (11, "Aleph", 1),
     (12, "Beth", 2),
