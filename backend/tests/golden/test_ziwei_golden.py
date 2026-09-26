@@ -369,6 +369,9 @@ def test_leap_month_chart_walks_the_even_borrow_and_a_different_ju() -> None:
     chart = _leap_chart()
     assert (chart.lunar_year_ganzhi, chart.lunar_month, chart.lunar_day) == ("丙戌", 7, 10)
     assert chart.lunar_leap is True
+    # 页面直接印这一串（`ZiweiChart.lunar_date`），故逐字钉：`getMonthInChinese()` 对闰月
+    # **自带**「闰」字（同 `app/schemas/bazi_liuri.py:64` 的声明），串里只能有一个「闰」。
+    assert chart.lunar_date == "丙戌年闰七月初十"
     assert chart.time_zhi == "午"
     assert (chart.ming_gong_zhi, chart.ming_gong_ganzhi, chart.ming_gong_nayin) == (
         "寅",

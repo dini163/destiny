@@ -178,7 +178,10 @@ def compute_ziwei_chart(
 
     month_cn = lunar.getMonthInChinese()
     day_cn = lunar.getDayInChinese()
-    lunar_date = f"{year_ganzhi}年{'闰' if lunar_leap else ''}{month_cn}月{day_cn}"
+    # `getMonthInChinese()` 对闰月**自带**「闰」字（返回「闰七」），所以这里不能再按
+    # `lunar_leap` 补一次 —— 补了页面就印「闰闰七月」。同一事实的第二种写法见
+    # `app/schemas/bazi_liuri.py:64`。闰与否的机器字段另有 `lunar_leap`。
+    lunar_date = f"{year_ganzhi}年{month_cn}月{day_cn}"
 
     return ZiweiChart(
         name=name,
