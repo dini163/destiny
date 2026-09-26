@@ -97,6 +97,19 @@ class NumerologyInputError(DestinyError):
     status_code = 422
 
 
+class GematriaInputError(DestinyError):
+    """卡巴拉 gematria 入参里没有一个可称量的拉丁字母（同 `NumerologyInputError` 的道理）。
+
+    机器码只有一个：`gematria_no_latin_letters`。纯中文或纯符号的词过得了 pydantic 的
+    非空/长度校验，坏的是「英文 gematria 的 A=1…Z=26 映射定义在拉丁字母表上」这条前提，
+    而这条前提只有引擎知道。故给 422 域错误：长度归 pydantic，字符集归引擎。这里不静默
+    返回一份零值映射 —— 那样「没字母」与「算出来是 0」在响应上同形，用户不会想到改用拉丁拼写。
+    """
+
+    code = "gematria_no_latin_letters"
+    status_code = 422
+
+
 def register_error_handlers(app: FastAPI) -> None:
     """Map :class:`DestinyError` subclasses to a consistent JSON error envelope."""
 
