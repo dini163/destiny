@@ -22,15 +22,21 @@
 
 锚 1 还有一道**定义级**对照：Chitrapaksha 的公案是「Spica 落在 180°00′」，瑞士星历把它
 做成 `SIDM_TRUE_CITRA`，与本引擎的 `SIDM_LAHIRI`（同一定义的解析拟合）实测差 56.6″–66.0″。
-用定位置星表直接算 Spica 黄经这条路在本绑定**不通**（缺 `sefstars.txt`，详见
-`test_lahiri_tracks_the_chitrapaksha_definition_within_a_minute_of_arc` 的测末），故只核到定义。
+这句公案能在**星上**直接核，不必只核岁差多项式：Spica 在瑞士星历的**内置亮星表**里，
+`fixstar_ut` 不读盘就能给它的黄经（要 `sefstars.txt` 的是 Vega 那类非内置星，wheel 未打包
+该文件）。复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+"import swisseph as swe; jd=swe.julday(2000,1,1,12.0);
+print(swe.fixstar_ut('Spica',jd,0)[0][0], swe.fixstar_ut('Spica',jd,swe.FLG_SIDEREAL)[0][0])"`
+→ 203.836145 / 179.982923（恒星黄经），`SIDM_TRUE_CITRA` 下第二个数是 180.0（2026-09-27 实录）；
+推导与容差见 `test_spica_itself_sits_at_one_eighty_zero_under_the_chitrapaksha_definition`。
 
 Vimshottari 一侧的独立锚是**体系本身**：九曜值年 7·20·6·10·7·18·16·19·17（共 120 年）与
 计都→金星→太阳→太阴→火星→罗睺→木星→土星→水星的固定主序，是任何一本 Jyotish 手册
 都同意的定则；安塔尔大运按 `大运值年 × 该曜值年 ÷ 120` 切分，也全部手算得出。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/golden/test_vedic_golden.py -v` → 27 passed（2026-09-27 实录，原 12 项全留、只收紧）。
+tests/golden/test_vedic_golden.py -v` → 28 passed（2026-09-27 实录，原 12 项全留、只收紧，
+修复轮 1 另加一条在星上核 Chitrapaksha 定义的测）。
 """
 
 from datetime import date, datetime, time
@@ -251,15 +257,20 @@ def test_ayanamsa_advances_at_the_published_general_precession() -> None:
 
 
 def test_lahiri_tracks_the_chitrapaksha_definition_within_a_minute_of_arc() -> None:
-    """Chitrapaksha/Spica 路线：星表那条走不通，但定义本身可核，而且核得过。
+    """Chitrapaksha/Spica 路线：岁差多项式一侧核 Lahiri 与 TRUE_CITRA 的差，星本身另有一条测。
 
-    brief 给的「用 Spica 反推岁差」在本绑定里**部分不通**（如实记）：绑定确实暴露了
-    `fixstar_ut`（先前探测找的 `calc_fixstar_ut` 是 C 侧名字），但定位置需要星表文件
-    `sefstars.txt`——`find .venv -iname 'sefstars*' -o -iname 'sestars*'` 零命中，wheel 未打包，
-    于是 `swe.fixstar_ut("Spica", ...)` 直接报 `SwissEph file 'sefstars.txt' not found`；
-    另外 `fixstar_ut("Spica,αVir", ...)` 撞绑定的解析 bug（`invalid literal for int()`）。
-    走得通的是等价的一半：瑞士星历内置 `SIDM_TRUE_CITRA`，它的定义就是 Chitrapaksha
-    那句公案「Spica 落在 180°00′ 天秤」，与本引擎用的 `SIDM_LAHIRI`（多项式近似）互为对照。
+    探测经过本身是真的：绑定确实暴露了 `fixstar_ut`（先前探测找的 `calc_fixstar_ut` 是
+    C 侧名字，Python 侧没有），本仓 wheel 也确实没有 `sefstars.txt`
+    （`find .venv -iname 'sefstars*' -o -iname 'sestars*'` 零命中，2026-09-27）。但先前据此
+    写的「所以定位置星表这条路不通」**不成立**：Spica 在瑞士星历的内置亮星表里，
+    `swe.fixstar_ut("Spica", ...)` 直接返回热带黄经 203.836145°，读不读星表都一样；
+    真需要 `sefstars.txt` 的是 Vega 那类非内置星（它们报
+    `SwissEph file 'sefstars.txt' not found`）。先前那次「`fixstar_ut("Spica,αVir", ...)` 撞
+    绑定解析 bug（`invalid literal for int()`）」疑为 GBK 控制台伪象：
+    `PYTHONIOENCODING=utf-8` 下同一调用返回与裸名一字不差的值（复测命令见模块 docstring 锚 1）。
+    星本身的位置因此另有专测，本测只管岁差多项式这一半：瑞士星历内置 `SIDM_TRUE_CITRA`，
+    它的定义就是 Chitrapaksha 那句公案「Spica 落在 180°00′ 天秤」，与本引擎用的
+    `SIDM_LAHIRI`（多项式近似）互为对照。
 
     实测（2026-09-27，复测见本段）：
     `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import swisseph as swe
@@ -299,6 +310,44 @@ def test_lahiri_tracks_the_chitrapaksha_definition_within_a_minute_of_arc() -> N
     assert rates[0] == pytest.approx(rates[1], abs=1e-6)
 
 
+def test_spica_itself_sits_at_one_eighty_zero_under_the_chitrapaksha_definition() -> None:
+    """定义级对照落在**星上**，不只是岁差多项式的自证：Chitrapaksha 说 Spica = 180°00′。
+
+    上一条测比的是两套岁差的**差**（解析量，与天上的星无关）；这条核那颗星自己的恒星黄经：
+    `swe.fixstar_ut("Spica", jd, FLG_SIDEREAL)`。Spica 在瑞士星历的内置亮星表里，
+    本绑定 wheel 未打包 `sefstars.txt` 也照样给得出位置（Vega 那类非内置星才要那张表）。
+    实测（2026-09-27，三纪 1900/2000/2100）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import swisseph as swe
+    for mode in (swe.SIDM_LAHIRI, swe.SIDM_TRUE_CITRA):
+        swe.set_sid_mode(mode); print([swe.fixstar_ut('Spica', swe.julday(y,1,1,12.0),
+    swe.FLG_SIDEREAL)[0][0] % 360.0 for y in (1900,2000,2100)])"`
+    → TRUE_CITRA 三纪都是 180.0（定义本身，逐位精确）；LAHIRI 是
+    179.984274 / 179.982923 / 179.981674，与 180° 差 56.61″ / 61.48″ / 65.98″。
+    容差 0.02°（=72″）与上一条测同源、覆盖三纪最大 65.98″，不是一弧分——「一弧分上下」是
+    描述，不是判据。
+    """
+    epochs = (1900, 2000, 2100)
+    positions: dict[int, list[float]] = {}
+    try:
+        for mode in (swe.SIDM_LAHIRI, swe.SIDM_TRUE_CITRA):
+            swe.set_sid_mode(mode)
+            positions[mode] = [
+                swe.fixstar_ut("Spica", swe.julday(year, 1, 1, 12.0), swe.FLG_SIDEREAL)[0][0]
+                % 360.0
+                for year in epochs
+            ]
+    finally:
+        swe.set_sid_mode(swe.SIDM_LAHIRI)  # 进程级全局态：装回引擎用的那一副
+
+    # 那一副岁差模式按定义就是把这颗星压在 180°00′ 上：三纪逐位精确，不给容差。
+    for year, citra in zip(epochs, positions[swe.SIDM_TRUE_CITRA]):
+        assert citra == pytest.approx(180.0, abs=1e-9), year
+    # 本引擎用的 LAHIRI 是同一句公案的解析拟合：差在一弧分上下，且方向恒定（拟合略小）。
+    for year, lahiri in zip(epochs, positions[swe.SIDM_LAHIRI]):
+        offset = 180.0 - lahiri
+        assert 0.0 < offset < 0.02, year
+
+
 def test_sidereal_longitudes_are_tropical_minus_ayanamsa() -> None:
     """本模块自述「sidereal = tropical − ayanamsa」，那就按这句话逐曜复算一遍。
 
@@ -329,11 +378,12 @@ def test_the_sun_of_j2000_lands_where_the_textbook_elements_put_it() -> None:
     """锚 3：J2000 的太阳是公开根数，唯一能整条独立复推的曜。
 
     L₀ = 280.4664647° 是标准 J2000 太阳根数（Meeus 式 25.2 常数项，亦即 USNO/《Astronomical
-    Almanac》用的那一条）。J2000 历元当天均距点改正只有 −0.068°（M = 357.5291°，
-    C = 2e·sin M，e = 0.016709），加光行差 −20.5″，视黄经落在 280.4° 附近；
-    恒星黄经 = 280.4665 − 23.8571 = 256.609° → 射手座（240–270）第 20 宿 Purva Ashadha
-    （253.333°–266.667°）第 1 足（253.333°–256.667°）。这一串数字全由锚 1 与锚 3 手推，
-    不经引擎；引擎给的正是 Purva Ashadha pada 1。
+    Almanac》用的那一条）。J2000 历元当天 M = 357.5291°，均距点改正 C = 2e·sin M = −0.083°
+    （e = 0.016709；先前这里写 −0.068°，按该式重算于 2026-09-27 推翻），再加光行差 −20.5″
+    → 视热带黄经 280.378°；减锚 1 的岁差 23.8571° → 恒星黄经 256.521°，引擎实测
+    256.5157°（差 0.005°：一阶根数不含升交点/章动项的固有差）。256.52° 落在射手座
+    （240–270）第 20 宿 Purva Ashadha（253.333°–266.667°）第 1 足（253.333°–256.667°）。
+    这一串数字全由锚 1 与锚 3 手推，不经引擎；引擎给的正是 Purva Ashadha pada 1。
     """
     chart = _chart()
     sun = next(p for p in chart.planets if p.name == "Sun")
@@ -493,7 +543,8 @@ def test_the_timeline_starts_at_the_moon_own_nakshatra_balance() -> None:
     手推（不读 vs 的字段，只用八曜表里那个月亮黄经）：
     * 宿序 = int(199.4706 ÷ 13.3333) = 14 → Swati，主曜 Rahu（第 14 宿在九曜循环的第 5 位）。
     * 宿内比例 = (199.4706 − 14×13.3333) ÷ 13.3333 = 0.960295 → 已走过 96.03%。
-    * 余额 = 18 × (1 − 0.960295) = 0.7147 年，即出生时 Rahu 大运只剩 8.7 个月。
+    * 余额 = 18 × (1 − 0.960295) = 0.7147 年，即出生时 Rahu 大运只剩 0.7147 × 12 ≈ 8.6 个历月
+      （先前写 8.7，与本行算式不符）。
     * 首段大运的安塔尔只留一段：Rahu 轮内九段（18×各值年÷120）累计 16.95 年时仍在
       第 8 段末，已走过的 17.2853 年落进第 9 段 Mars，故截出来正是 Mars 的 0.7147 年。
     容差 1e-4 是引擎对余额与比例各自 round 的位宽，不是放宽——原来的 abs=0.01 宽 100 倍。
@@ -535,7 +586,8 @@ def test_every_full_mahadasha_splits_into_the_nine_published_antardashas() -> No
     """每个整段大运的九个小运都按 `大运值年 × 小运主曜值年 ÷ 120` 切，主序同大运主序。
 
     这条是 Step 3 的硬门：`test_antardashas_sum_to_their_mahadasha` 只核了「加起来等于
-    本段」，把九段等比放大同样能过；这里逐段点名核到 1e-4 年（约 8.8 小时）。
+    本段」，把九段等比放大同样能过；这里逐段点名核到 1e-4 年（1e-4 × 365.24219 天 ≈ 0.0365 天
+    ≈ 53 分钟）。
     首段（余额截断）与末段（120 年截断）不在射程内，各自由
     `test_the_timeline_starts_at_the_moon_own_nakshatra_balance` 与铺满轴那条测管。
     """
