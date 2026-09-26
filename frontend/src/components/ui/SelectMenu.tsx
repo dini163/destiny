@@ -64,6 +64,12 @@ export function SelectMenu({
   const listRef = useRef<HTMLDivElement>(null);
   const listId = useId();
 
+  // Why `activeIndex` last changed. Centring the highlighted row is only correct for
+  // keyboard/programmatic moves. If a wheel scroll also re-centred the row that slid
+  // under a stationary cursor, the list would chase the pointer and scroll forever, so
+  // a pointer-driven change opts out of the auto-centre effect below.
+  const activeSourceRef = useRef<'key' | 'pointer'>('key');
+
   const selectedIndex = useMemo(
     () => options.findIndex((option) => option.value === value),
     [options, value],
@@ -89,6 +95,7 @@ export function SelectMenu({
   }, [variant]);
 
   function openMenu(): void {
+    activeSourceRef.current = 'key';
     setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0);
     setOpen(true);
   }
@@ -99,6 +106,7 @@ export function SelectMenu({
   }
 
   function moveActive(delta: number): void {
+    activeSourceRef.current = 'key';
     setActiveIndex((prev) => Math.max(0, Math.min(options.length - 1, prev + delta)));
   }
 
@@ -143,12 +151,14 @@ export function SelectMenu({
       case 'Home':
         if (open) {
           event.preventDefault();
+          activeSourceRef.current = 'key';
           setActiveIndex(0);
         }
         break;
       case 'End':
         if (open) {
           event.preventDefault();
+          activeSourceRef.current = 'key';
           setActiveIndex(options.length - 1);
         }
         break;
@@ -164,17 +174,26 @@ export function SelectMenu({
   useLayoutEffect(() => {
     if (!open) return;
     place();
-    window.addEventListener('scroll', place, true);
+    // A scroll inside the popup's own list never moves the fixed popup, so ignore it;
+    // only page/ancestor scrolls (which do move the trigger) need a reposition.
+    function onScroll(event: Event): void {
+      const target = event.target;
+      if (target instanceof Node && popupRef.current?.contains(target)) return;
+      place();
+    }
+    window.addEventListener('scroll', onScroll, true);
     window.addEventListener('resize', place);
     return () => {
-      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('scroll', onScroll, true);
       window.removeEventListener('resize', place);
     };
   }, [open, place]);
 
-  // Centre the highlighted row in the scroll area whenever it moves (open or arrow keys).
+  // Centre the highlighted row when it moves via keyboard/open, never on a pointer
+  // hover, or the list would keep scrolling itself under a stationary cursor.
   useLayoutEffect(() => {
     if (!open) return;
+    if (activeSourceRef.current === 'pointer') return;
     const list = listRef.current;
     const row = list?.querySelector<HTMLElement>(`[data-index="${safeActive}"]`);
     if (list && row) {
@@ -266,7 +285,10 @@ export function SelectMenu({
                       role="option"
                       aria-selected={isSelected}
                       data-index={index}
-                      onMouseEnter={() => setActiveIndex(index)}
+                      onMouseEnter={() => {
+                        activeSourceRef.current = 'pointer';
+                        setActiveIndex(index);
+                      }}
                       onMouseDown={(event) => event.preventDefault()}
                       onClick={() => choose(index)}
                       className={`flex cursor-pointer items-center justify-between gap-3 px-3 py-1.5 text-sm transition-colors ${
