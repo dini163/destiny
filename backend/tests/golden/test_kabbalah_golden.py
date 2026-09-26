@@ -189,9 +189,9 @@ def test_tarot_trumps_are_the_major_arcana_exactly_once_each() -> None:
     """
     tree = build_tree()
     numerals = [p.tarot_numeral for p in tree.paths]
-    assert len(numerals) == len(set(numerals)) == 22
-    assert set(numerals) == set(HANDBOOK_NUMERALS)
-    # 路径 11 = 愚者 0 起，逐号 +1：序号在表里的位置 == 路径号 − 11。
+    # 路径 11 = 愚者 0 起，逐号 +1：有序列表整体全等本身就蕴含「22 枚、一枚不多一枚不少」，
+    # 不再另写 ``len(set(...)) == 22`` / ``set(...) == set(HANDBOOK_NUMERALS)`` 两句 ——
+    # 它们被这一句完全蕴含，留着只会让下一个读测的人猜哪一条才是契约。
     assert numerals == list(HANDBOOK_NUMERALS)
     for path in tree.paths:
         assert HANDBOOK_NUMERALS.index(path.tarot_numeral) == path.number - 11
@@ -260,6 +260,10 @@ def test_pillar_and_world_labels_agree_with_the_rendered_geometry() -> None:
     却把节点画到左边，页面与出处卡当场自相矛盾，测却全绿。
     实测样本（复测：``pytest tests/golden/test_kabbalah_golden.py -k pillar_and_world``；
     2026-09-27）：mercy 三点的 ``x`` 全为 0.84、severity 全为 0.16、equilibrium 全为 0.5。
+    y 阶梯钉的是字面量，不是「``ordered`` 的 y 列 == ``sorted`` 的 y 列」—— ``ordered`` 本来就是
+    按 ``(y, number)`` 排的，那种自比恒真，任何引擎改动都改不红它（下面那句「四界按 y 单调
+    降落」的承诺要靠这条字面量才兑得上）。复测（2026-09-27）：
+    ``python -c "from app.engines.kabbalah import build_tree as t; print(sorted(n.y for n in t().sephiroth))"``
     """
     tree = build_tree()
     nodes = tree.sephiroth
@@ -280,7 +284,7 @@ def test_pillar_and_world_labels_agree_with_the_rendered_geometry() -> None:
     assert [node.world for node in ordered] == (
         ["atziluth"] * 3 + ["bria"] * 3 + ["yetzirah"] * 3 + ["assiah"]
     )
-    assert [node.y for node in ordered] == sorted(node.y for node in nodes)
+    assert [node.y for node in ordered] == [0.04, 0.16, 0.16, 0.4, 0.4, 0.52, 0.66, 0.66, 0.8, 0.94]
     assert len(tree.worlds) == 4
     assert [node.world_name_zh for node in ordered] == [
         tree.worlds[rank] for rank in [0, 0, 0, 1, 1, 1, 2, 2, 2, 3]
@@ -299,8 +303,10 @@ def test_daath_is_the_only_veiled_node_and_carries_no_path() -> None:
     tree = build_tree()
     daath = tree.daath
     assert daath is not None
-    assert daath.number == 0 and daath.is_hidden is True
-    assert tree.sephirah_count == len(tree.sephiroth) == 10, "隐节点不占十原质之数"
+    # `number`/`is_hidden` 两个标量与 `sephirah_count == len(sephiroth) == 10` 归既有
+    # ``test_daath_is_the_hidden_node`` 与 ``test_tree_has_the_canonical_structure`` 所有，
+    # 这里不重复一遍；本测的牙在下面那几条结构事实（id 不占十数、端点集不含 0、隐节点唯一）
+    # 与几何事实（中柱 x=0.5、悬在 Kether 与 Tiphareth 之间）里。
     assert daath.id not in {node.id for node in tree.sephiroth}
 
     endpoints = {p.from_sephirah for p in tree.paths} | {p.to_sephirah for p in tree.paths}
@@ -324,6 +330,8 @@ def test_gematria_skips_non_latin_characters_visibly_and_adds_nothing() -> None:
     只剩 LIWEI = 12+9+23+5+9 = 58。
     ``digital_root`` 折的是 **ordinal**（1+((n−1) mod 9)，与「十进制各位递归求和到一位」
     同值），``english_reduction`` 是逐字母数字根之和 —— 它是另一个量，不是数根的中间步骤。
+    第一行的 ``LIGHT``（56/29/2）与既有 ``test_gematria_ordinal_arithmetic`` 同源，这里要的不是
+    它那三个数，而是它作为「无跳字」那一腿的对照组身份（无跳字 → 跳字 → 混合）。
     """
     cases = {
         "LIGHT": ("LIGHT", 12 + 9 + 7 + 8 + 20, 3 + 9 + 7 + 8 + 2, 2),
