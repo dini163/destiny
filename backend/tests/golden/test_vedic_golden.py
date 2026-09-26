@@ -684,9 +684,10 @@ def test_the_nakshatras_divide_the_zodiac_into_exact_thirteen_twentieths() -> No
         assert nak.span_degrees == pytest.approx(13.3333, abs=1e-4)  # 13°20'
         assert nak.start_degree == pytest.approx(nak.index * NAKSHATRA_SPAN, abs=1e-3)
     # 上面那条循环把 index 0 与 26 都遍历到了（`NAKSHATRAS[0].start_degree == 0.0` 是它的第 0 轮，
-    # 原来单列一条属恒真，已删）。循环给不出的性质留在这里：末宿的**展示值**（4 位小数）
-    # 起点加跨度仍正好回绕到 360°。循环里两个数各自容 1e-3，同向偏到位就能拼出 359.998° 的缝，
-    # 这一条把「27 段拼满一整圈」的闭合式单独钉住。
+    # 原来单列一条属恒真，已删）。循环给不出的性质留在这里：末宿的**展示值**（4 位小数）起点加
+    # 跨度仍正好回绕到 360°。循环对这两个数各容 1e-3 与 1e-4、彼此独立，同向偏到位时和的下界是
+    # 359.9989°（346.6657 + 13.3332，两条循环断言照样过），这一条把「27 段拼满一整圈」的闭合式
+    # 单独钉在 1e-3 内。
     tail = NAKSHATRAS[-1]
     assert tail.start_degree + tail.span_degrees == pytest.approx(360.0, abs=1e-3)
 
