@@ -68,8 +68,10 @@ function PrimaryLink({ item }: { item: NavItem }) {
 function SecondaryGroup({ group, first }: { group: NavGroup; first: boolean }) {
   return (
     <Fragment>
-      {!first && <span className="mx-1.5 h-3 w-px shrink-0 bg-rim" />}
-      <span className="label-caps mr-1 shrink-0">{group.title}</span>
+      {!first && <span className="mx-1.5 h-3.5 w-px shrink-0 bg-gold/25" />}
+      <span className="label-caps mr-1.5 shrink-0 select-none font-bold text-gold">
+        {group.title}
+      </span>
       {group.items.map((item) => (
         <SecondaryLink key={item.slug} item={item} />
       ))}
