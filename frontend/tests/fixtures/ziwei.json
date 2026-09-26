@@ -1,0 +1,441 @@
+{
+  "name": "walkthrough",
+  "gender": "male",
+  "calendar": "solar",
+  "standard_datetime": "2000-08-16 12:00",
+  "true_solar_time": "2000-08-16 11:41",
+  "tst_applied": true,
+  "tst_offset_minutes": -18.85,
+  "longitude": 116.4074,
+  "lunar_date": "庚辰年七月十七",
+  "lunar_year_ganzhi": "庚辰",
+  "lunar_month": 7,
+  "lunar_day": 17,
+  "lunar_leap": false,
+  "time_zhi": "午",
+  "ming_gong_zhi": "寅",
+  "ming_gong_ganzhi": "戊寅",
+  "ming_gong_nayin": "城头土",
+  "shen_gong_zhi": "寅",
+  "shen_gong_name": "命宫",
+  "wuxing_ju": "土五局",
+  "wuxing_ju_number": 5,
+  "ming_zhu": "廉贞",
+  "shen_zhu": "文昌",
+  "ziwei_zhi": "寅",
+  "tianfu_zhi": "寅",
+  "palaces": [
+    {
+      "index": 0,
+      "zhi": "子",
+      "gan": "戊",
+      "ganzhi": "戊子",
+      "name": "夫妻",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "105-114",
+      "stars": [
+        {
+          "name": "破军",
+          "kind": "主星",
+          "element": "水",
+          "yin_yang": "阴",
+          "group": "天府系",
+          "nature": "耗星·破旧立新",
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "zhi": "丑",
+      "gan": "己",
+      "ganzhi": "己丑",
+      "name": "兄弟",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "115-124",
+      "stars": [
+        {
+          "name": "天机",
+          "kind": "主星",
+          "element": "木",
+          "yin_yang": "阴",
+          "group": "紫微系",
+          "nature": "智慧·谋略机变",
+          "sihua": null
+        },
+        {
+          "name": "天魁",
+          "kind": "吉",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "zhi": "寅",
+      "gan": "戊",
+      "ganzhi": "戊寅",
+      "name": "命宫",
+      "is_ming": true,
+      "is_shen": true,
+      "dayun": "5-14",
+      "stars": [
+        {
+          "name": "紫微",
+          "kind": "主星",
+          "element": "土",
+          "yin_yang": "阴",
+          "group": "紫微系",
+          "nature": "帝座·尊贵领导",
+          "sihua": null
+        },
+        {
+          "name": "天府",
+          "kind": "主星",
+          "element": "土",
+          "yin_yang": "阳",
+          "group": "天府系",
+          "nature": "财库·稳重保守",
+          "sihua": null
+        },
+        {
+          "name": "天马",
+          "kind": "禄马",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "zhi": "卯",
+      "gan": "己",
+      "ganzhi": "己卯",
+      "name": "父母",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "15-24",
+      "stars": [
+        {
+          "name": "太阴",
+          "kind": "主星",
+          "element": "水",
+          "yin_yang": "阴",
+          "group": "天府系",
+          "nature": "田宅·富洁母性",
+          "sihua": "化科"
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "zhi": "辰",
+      "gan": "庚",
+      "ganzhi": "庚辰",
+      "name": "福德",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "25-34",
+      "stars": [
+        {
+          "name": "贪狼",
+          "kind": "主星",
+          "element": "木",
+          "yin_yang": "阳",
+          "group": "天府系",
+          "nature": "桃花·欲望才艺",
+          "sihua": null
+        },
+        {
+          "name": "右弼",
+          "kind": "吉",
+          "element": "水",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "文昌",
+          "kind": "吉",
+          "element": "金",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "铃星",
+          "kind": "煞",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "zhi": "巳",
+      "gan": "辛",
+      "ganzhi": "辛巳",
+      "name": "田宅",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "35-44",
+      "stars": [
+        {
+          "name": "巨门",
+          "kind": "主星",
+          "element": "水",
+          "yin_yang": "阴",
+          "group": "天府系",
+          "nature": "口舌·是非研究",
+          "sihua": null
+        },
+        {
+          "name": "地空",
+          "kind": "煞",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "地劫",
+          "kind": "煞",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "zhi": "午",
+      "gan": "壬",
+      "ganzhi": "壬午",
+      "name": "官禄",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "45-54",
+      "stars": [
+        {
+          "name": "廉贞",
+          "kind": "主星",
+          "element": "火",
+          "yin_yang": "阴",
+          "group": "紫微系",
+          "nature": "次桃花·政令囚星",
+          "sihua": null
+        },
+        {
+          "name": "天相",
+          "kind": "主星",
+          "element": "水",
+          "yin_yang": "阳",
+          "group": "天府系",
+          "nature": "印星·辅佐公正",
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "zhi": "未",
+      "gan": "癸",
+      "ganzhi": "癸未",
+      "name": "仆役",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "55-64",
+      "stars": [
+        {
+          "name": "天梁",
+          "kind": "主星",
+          "element": "土",
+          "yin_yang": "阳",
+          "group": "天府系",
+          "nature": "荫星·长寿消解",
+          "sihua": null
+        },
+        {
+          "name": "天钺",
+          "kind": "吉",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "陀罗",
+          "kind": "煞",
+          "element": "金",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "zhi": "申",
+      "gan": "甲",
+      "ganzhi": "甲申",
+      "name": "迁移",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "65-74",
+      "stars": [
+        {
+          "name": "七杀",
+          "kind": "主星",
+          "element": "金",
+          "yin_yang": "阴",
+          "group": "天府系",
+          "nature": "将星·冲劲肃杀",
+          "sihua": null
+        },
+        {
+          "name": "禄存",
+          "kind": "禄马",
+          "element": "土",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "火星",
+          "kind": "煞",
+          "element": "火",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "zhi": "酉",
+      "gan": "乙",
+      "ganzhi": "乙酉",
+      "name": "疾厄",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "75-84",
+      "stars": [
+        {
+          "name": "天同",
+          "kind": "主星",
+          "element": "水",
+          "yin_yang": "阳",
+          "group": "紫微系",
+          "nature": "福禄·温和享受",
+          "sihua": "化忌"
+        },
+        {
+          "name": "擎羊",
+          "kind": "煞",
+          "element": "金",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "zhi": "戌",
+      "gan": "丙",
+      "ganzhi": "丙戌",
+      "name": "财帛",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "85-94",
+      "stars": [
+        {
+          "name": "武曲",
+          "kind": "主星",
+          "element": "金",
+          "yin_yang": "阴",
+          "group": "紫微系",
+          "nature": "财帛·刚毅果决",
+          "sihua": "化权"
+        },
+        {
+          "name": "左辅",
+          "kind": "吉",
+          "element": "土",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        },
+        {
+          "name": "文曲",
+          "kind": "吉",
+          "element": "水",
+          "yin_yang": null,
+          "group": null,
+          "nature": null,
+          "sihua": null
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "zhi": "亥",
+      "gan": "丁",
+      "ganzhi": "丁亥",
+      "name": "子女",
+      "is_ming": false,
+      "is_shen": false,
+      "dayun": "95-104",
+      "stars": [
+        {
+          "name": "太阳",
+          "kind": "主星",
+          "element": "火",
+          "yin_yang": "阳",
+          "group": "紫微系",
+          "nature": "光明·博爱贵气",
+          "sihua": "化禄"
+        }
+      ]
+    }
+  ],
+  "sihua": {
+    "year_gan": "庚",
+    "lu": "太阳",
+    "quan": "武曲",
+    "ke": "太阴",
+    "ji": "天同"
+  },
+  "dayun_direction": "顺行",
+  "dayun_start_age": 5,
+  "engine": "ziwei-deterministic",
+  "provenance": {
+    "engine": "ziwei-deterministic",
+    "content_version": "2026.09",
+    "source": "《紫微斗数全书》通行安星法",
+    "school_note": "四化取《紫微斗数全书》通行本（庚干太阴化科、壬干左辅化科；他派或有天府/天相化科之异，此盘从全书派）。命宫五行局以命宫干支纳音定；大限从「阳男阴女顺行、阴男阳女逆行」，顺行即自命宫沿地支顺行（命→父母→福德→田宅…）推进，逆行则沿十二宫名次序（命→兄弟→夫妻→子女…）。闰月依同号起命，不作上下半月拆分。"
+  }
+}

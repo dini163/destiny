@@ -1,0 +1,1508 @@
+{
+  "male": {
+    "side": "male",
+    "name": "乾",
+    "four_pillars": "戊辰 甲寅 庚子 丁亥",
+    "zodiac": "龙",
+    "day_master": "庚",
+    "day_master_element": "金",
+    "favorable_elements": [
+      "土",
+      "金"
+    ],
+    "unfavorable_elements": [
+      "木",
+      "水",
+      "火"
+    ],
+    "elements": [
+      {
+        "element": "木",
+        "count": 2,
+        "score": 2.2
+      },
+      {
+        "element": "火",
+        "count": 1,
+        "score": 1.3
+      },
+      {
+        "element": "土",
+        "count": 2,
+        "score": 1.7
+      },
+      {
+        "element": "金",
+        "count": 1,
+        "score": 1.0
+      },
+      {
+        "element": "水",
+        "count": 2,
+        "score": 1.7
+      }
+    ],
+    "pillars": [
+      {
+        "position": "year",
+        "label": "年柱",
+        "ganzhi": "戊辰",
+        "shishen_gan": "偏印",
+        "nayin": "大林木"
+      },
+      {
+        "position": "month",
+        "label": "月柱",
+        "ganzhi": "甲寅",
+        "shishen_gan": "偏财",
+        "nayin": "大溪水"
+      },
+      {
+        "position": "day",
+        "label": "日柱",
+        "ganzhi": "庚子",
+        "shishen_gan": "日主",
+        "nayin": "壁上土"
+      },
+      {
+        "position": "hour",
+        "label": "时柱",
+        "ganzhi": "丁亥",
+        "shishen_gan": "正官",
+        "nayin": "屋上土"
+      }
+    ],
+    "dayun": [
+      {
+        "index": 0,
+        "ganzhi": "",
+        "start_age": 1,
+        "end_age": 6,
+        "start_year": 1988,
+        "end_year": 1993,
+        "xun": "甲子",
+        "xun_kong": "戌亥",
+        "is_current": false
+      },
+      {
+        "index": 1,
+        "ganzhi": "乙卯",
+        "start_age": 7,
+        "end_age": 16,
+        "start_year": 1994,
+        "end_year": 2003,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 2,
+        "ganzhi": "丙辰",
+        "start_age": 17,
+        "end_age": 26,
+        "start_year": 2004,
+        "end_year": 2013,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 3,
+        "ganzhi": "丁巳",
+        "start_age": 27,
+        "end_age": 36,
+        "start_year": 2014,
+        "end_year": 2023,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 4,
+        "ganzhi": "戊午",
+        "start_age": 37,
+        "end_age": 46,
+        "start_year": 2024,
+        "end_year": 2033,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": true
+      },
+      {
+        "index": 5,
+        "ganzhi": "己未",
+        "start_age": 47,
+        "end_age": 56,
+        "start_year": 2034,
+        "end_year": 2043,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 6,
+        "ganzhi": "庚申",
+        "start_age": 57,
+        "end_age": 66,
+        "start_year": 2044,
+        "end_year": 2053,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 7,
+        "ganzhi": "辛酉",
+        "start_age": 67,
+        "end_age": 76,
+        "start_year": 2054,
+        "end_year": 2063,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 8,
+        "ganzhi": "壬戌",
+        "start_age": 77,
+        "end_age": 86,
+        "start_year": 2064,
+        "end_year": 2073,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      },
+      {
+        "index": 9,
+        "ganzhi": "癸亥",
+        "start_age": 87,
+        "end_age": 96,
+        "start_year": 2074,
+        "end_year": 2083,
+        "xun": "甲寅",
+        "xun_kong": "子丑",
+        "is_current": false
+      }
+    ],
+    "true_solar_time": "1988-02-15 22:12",
+    "tst_applied": true
+  },
+  "female": {
+    "side": "female",
+    "name": "坤",
+    "four_pillars": "庚午 壬午 辛亥 癸巳",
+    "zodiac": "马",
+    "day_master": "辛",
+    "day_master_element": "金",
+    "favorable_elements": [
+      "金",
+      "土"
+    ],
+    "unfavorable_elements": [
+      "水",
+      "火",
+      "木"
+    ],
+    "elements": [
+      {
+        "element": "木",
+        "count": 0,
+        "score": 0.3
+      },
+      {
+        "element": "火",
+        "count": 3,
+        "score": 1.8
+      },
+      {
+        "element": "土",
+        "count": 0,
+        "score": 0.7
+      },
+      {
+        "element": "金",
+        "count": 2,
+        "score": 2.3
+      },
+      {
+        "element": "水",
+        "count": 3,
+        "score": 2.6
+      }
+    ],
+    "pillars": [
+      {
+        "position": "year",
+        "label": "年柱",
+        "ganzhi": "庚午",
+        "shishen_gan": "劫财",
+        "nayin": "路旁土"
+      },
+      {
+        "position": "month",
+        "label": "月柱",
+        "ganzhi": "壬午",
+        "shishen_gan": "伤官",
+        "nayin": "杨柳木"
+      },
+      {
+        "position": "day",
+        "label": "日柱",
+        "ganzhi": "辛亥",
+        "shishen_gan": "日主",
+        "nayin": "钗钏金"
+      },
+      {
+        "position": "hour",
+        "label": "时柱",
+        "ganzhi": "癸巳",
+        "shishen_gan": "食神",
+        "nayin": "长流水"
+      }
+    ],
+    "dayun": [
+      {
+        "index": 0,
+        "ganzhi": "",
+        "start_age": 1,
+        "end_age": 3,
+        "start_year": 1990,
+        "end_year": 1992,
+        "xun": "甲子",
+        "xun_kong": "戌亥",
+        "is_current": false
+      },
+      {
+        "index": 1,
+        "ganzhi": "辛巳",
+        "start_age": 4,
+        "end_age": 13,
+        "start_year": 1993,
+        "end_year": 2002,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 2,
+        "ganzhi": "庚辰",
+        "start_age": 14,
+        "end_age": 23,
+        "start_year": 2003,
+        "end_year": 2012,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 3,
+        "ganzhi": "己卯",
+        "start_age": 24,
+        "end_age": 33,
+        "start_year": 2013,
+        "end_year": 2022,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 4,
+        "ganzhi": "戊寅",
+        "start_age": 34,
+        "end_age": 43,
+        "start_year": 2023,
+        "end_year": 2032,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": true
+      },
+      {
+        "index": 5,
+        "ganzhi": "丁丑",
+        "start_age": 44,
+        "end_age": 53,
+        "start_year": 2033,
+        "end_year": 2042,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 6,
+        "ganzhi": "丙子",
+        "start_age": 54,
+        "end_age": 63,
+        "start_year": 2043,
+        "end_year": 2052,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 7,
+        "ganzhi": "乙亥",
+        "start_age": 64,
+        "end_age": 73,
+        "start_year": 2053,
+        "end_year": 2062,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 8,
+        "ganzhi": "甲戌",
+        "start_age": 74,
+        "end_age": 83,
+        "start_year": 2063,
+        "end_year": 2072,
+        "xun": "甲戌",
+        "xun_kong": "申酉",
+        "is_current": false
+      },
+      {
+        "index": 9,
+        "ganzhi": "癸酉",
+        "start_age": 84,
+        "end_age": 93,
+        "start_year": 2073,
+        "end_year": 2082,
+        "xun": "甲子",
+        "xun_kong": "戌亥",
+        "is_current": false
+      }
+    ],
+    "true_solar_time": "1990-06-15 09:45",
+    "tst_applied": true
+  },
+  "score": {
+    "value": 0.0,
+    "tier": "欠和宜慎",
+    "factors": [
+      {
+        "rule": "hehun.base",
+        "label": "基准分",
+        "delta": 50.0,
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.stem_merge",
+        "label": "两造干合（乾年×坤时）",
+        "delta": 8.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.stem_clash",
+        "label": "两造干冲（乾月×坤年）",
+        "delta": -6.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.branch_merge",
+        "label": "两造支合（乾月×坤日）",
+        "delta": 8.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.branch_harm",
+        "label": "两造支害（乾月×坤时）",
+        "delta": -5.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.punishment_insult",
+        "label": "无恩之刑（乾月×坤时）",
+        "delta": -6.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.branch_clash",
+        "label": "两造支冲（乾日×坤年）",
+        "delta": -10.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.branch_clash",
+        "label": "两造支冲（乾日×坤月）",
+        "delta": -10.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.stem_merge",
+        "label": "两造干合（乾时×坤月）",
+        "delta": 8.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.self_punishment",
+        "label": "两造自刑（乾时×坤日）",
+        "delta": -4.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.stem_clash",
+        "label": "两造干冲（乾时×坤时）",
+        "delta": -6.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.branch_clash",
+        "label": "两造支冲（乾时×坤时）",
+        "delta": -10.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.relation.reverse",
+        "label": "两造反吟（乾时×坤时）",
+        "delta": -8.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.group.half_harmony",
+        "label": "跨造半合（火）",
+        "delta": 4.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.shortfall",
+        "label": "我喜彼弱（乾视坤·土弱）",
+        "delta": -5.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.supply",
+        "label": "我喜彼旺（乾视坤·金旺）",
+        "delta": 6.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.harmless",
+        "label": "我忌彼弱（乾视坤·木弱）",
+        "delta": 3.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.clash",
+        "label": "我忌彼旺（乾视坤·水旺）",
+        "delta": -7.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.shortfall",
+        "label": "我喜彼弱（坤视乾·金弱）",
+        "delta": -5.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.yongshen.clash",
+        "label": "我忌彼旺（坤视乾·木旺）",
+        "delta": -7.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "hh.nayin.wo_ke",
+        "label": "我克（乾木·坤土）",
+        "delta": 2.0,
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      }
+    ]
+  },
+  "matrix": [
+    {
+      "male_position": "year",
+      "female_position": "year",
+      "hits": []
+    },
+    {
+      "male_position": "year",
+      "female_position": "month",
+      "hits": []
+    },
+    {
+      "male_position": "year",
+      "female_position": "day",
+      "hits": []
+    },
+    {
+      "male_position": "year",
+      "female_position": "hour",
+      "hits": [
+        {
+          "kind": "天干五合",
+          "male_character": "戊",
+          "female_character": "癸",
+          "rule": "hh.relation.stem_merge",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "month",
+      "female_position": "year",
+      "hits": [
+        {
+          "kind": "天干相冲",
+          "male_character": "甲",
+          "female_character": "庚",
+          "rule": "hh.relation.stem_clash",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "month",
+      "female_position": "month",
+      "hits": []
+    },
+    {
+      "male_position": "month",
+      "female_position": "day",
+      "hits": [
+        {
+          "kind": "地支六合",
+          "male_character": "寅",
+          "female_character": "亥",
+          "rule": "hh.relation.branch_merge",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "month",
+      "female_position": "hour",
+      "hits": [
+        {
+          "kind": "地支六害",
+          "male_character": "寅",
+          "female_character": "巳",
+          "rule": "hh.relation.branch_harm",
+          "direction": "mutual"
+        },
+        {
+          "kind": "无恩之刑",
+          "male_character": "寅",
+          "female_character": "巳",
+          "rule": "hh.relation.punishment_insult",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "day",
+      "female_position": "year",
+      "hits": [
+        {
+          "kind": "地支六冲",
+          "male_character": "子",
+          "female_character": "午",
+          "rule": "hh.relation.branch_clash",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "day",
+      "female_position": "month",
+      "hits": [
+        {
+          "kind": "地支六冲",
+          "male_character": "子",
+          "female_character": "午",
+          "rule": "hh.relation.branch_clash",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "day",
+      "female_position": "day",
+      "hits": []
+    },
+    {
+      "male_position": "day",
+      "female_position": "hour",
+      "hits": []
+    },
+    {
+      "male_position": "hour",
+      "female_position": "year",
+      "hits": []
+    },
+    {
+      "male_position": "hour",
+      "female_position": "month",
+      "hits": [
+        {
+          "kind": "天干五合",
+          "male_character": "丁",
+          "female_character": "壬",
+          "rule": "hh.relation.stem_merge",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "hour",
+      "female_position": "day",
+      "hits": [
+        {
+          "kind": "自刑",
+          "male_character": "亥",
+          "female_character": "亥",
+          "rule": "hh.relation.self_punishment",
+          "direction": "mutual"
+        }
+      ]
+    },
+    {
+      "male_position": "hour",
+      "female_position": "hour",
+      "hits": [
+        {
+          "kind": "天干相冲",
+          "male_character": "丁",
+          "female_character": "癸",
+          "rule": "hh.relation.stem_clash",
+          "direction": "mutual"
+        },
+        {
+          "kind": "地支六冲",
+          "male_character": "亥",
+          "female_character": "巳",
+          "rule": "hh.relation.branch_clash",
+          "direction": "mutual"
+        },
+        {
+          "kind": "反吟",
+          "male_character": "丁亥",
+          "female_character": "癸巳",
+          "rule": "hh.relation.reverse",
+          "direction": "mutual"
+        }
+      ]
+    }
+  ],
+  "fired": [
+    {
+      "rule": "hh.relation.stem_merge",
+      "label": "两造干合（乾年×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": 8.0,
+      "reading": "阳见阴、阴见阳为合，如男女相合而成夫妇之道；甲己中正、乙庚仁义、丙辛威制、丁壬淫慝、戊癸无情。所带五行是合化目标，非已化（须月令得旺气方论化）。；合婚主彼此情意和合、同气相求（本系统依〈天干五合〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.stem_clash",
+      "label": "两造干冲（乾月×坤年）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -6.0,
+      "reading": "地支取七位为冲，犹天干取七位为煞之义，如甲逢庚为煞、甲至庚七数；两干之禄居对冲之地，故相冲。戊己居中央，无对，故干不冲土。；合婚主两心相违、谋为各出（本系统依〈天干相冲〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.branch_merge",
+      "label": "两造支合（乾月×坤日）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": 8.0,
+      "reading": "合者，和也，乃阴阳相和，其气自合；夫合有合禄、合马、合贵之说。经云：明合不如暗合，拱实不拱虚。；合婚主行事相契、难分难解（本系统依〈地支六合〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.branch_harm",
+      "label": "两造支害（乾月×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -5.0,
+      "reading": "因六合而生六害，六害者，十二支凌战之辰。六，六亲；害，损也。犯之主六亲上有损克，故谓六害；大率主妨害孤独，骨肉参商。；合婚主六亲参商、亲族生隙（本系统依〈地支六害〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.punishment_insult",
+      "label": "无恩之刑（乾月×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -6.0,
+      "reading": "三刑生于二合。寅巳申何以谓之无恩？寅有生火刑巳上生金，巳上寄生之土刑申上长生之水，申中生水刑寅中生火，不恤所生，遥相克制，故曰无恩。生旺主人持重少语，寡欲无情。；合婚主恩反成怨、少恩寡愧（本系统依〈无恩之刑〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.branch_clash",
+      "label": "两造支冲（乾日×坤年）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -10.0,
+      "reading": "地支取七位为冲，十二支战击之神，大概为凶；然冲破有吉有凶，不可概论。冲处相生与冲处相克，判法不同。；合婚主居家动躁、聚少离多（本系统依〈地支六冲〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.branch_clash",
+      "label": "两造支冲（乾日×坤月）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -10.0,
+      "reading": "地支取七位为冲，十二支战击之神，大概为凶；然冲破有吉有凶，不可概论。冲处相生与冲处相克，判法不同。；合婚主居家动躁、聚少离多（本系统依〈地支六冲〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.stem_merge",
+      "label": "两造干合（乾时×坤月）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": 8.0,
+      "reading": "阳见阴、阴见阳为合，如男女相合而成夫妇之道；甲己中正、乙庚仁义、丙辛威制、丁壬淫慝、戊癸无情。所带五行是合化目标，非已化（须月令得旺气方论化）。；合婚主彼此情意和合、同气相求（本系统依〈天干五合〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.self_punishment",
+      "label": "两造自刑（乾时×坤日）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -4.0,
+      "reading": "辰午酉亥何以谓之自刑？无别物相加，乃曰自也。辰者水之墓，滔则盈；午者火之旺，暴则焚；酉者金之位，刚则缺；亥者水之生，旺则朽，各禀已盛太过之气而自致祸。；合婚主各怀其郁、自生枝节（本系统依〈自刑〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.stem_clash",
+      "label": "两造干冲（乾时×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -6.0,
+      "reading": "地支取七位为冲，犹天干取七位为煞之义，如甲逢庚为煞、甲至庚七数；两干之禄居对冲之地，故相冲。戊己居中央，无对，故干不冲土。；合婚主两心相违、谋为各出（本系统依〈天干相冲〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.branch_clash",
+      "label": "两造支冲（乾时×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -10.0,
+      "reading": "地支取七位为冲，十二支战击之神，大概为凶；然冲破有吉有凶，不可概论。冲处相生与冲处相克，判法不同。；合婚主居家动躁、聚少离多（本系统依〈地支六冲〉义理演绎）"
+    },
+    {
+      "rule": "hh.relation.reverse",
+      "label": "两造反吟（乾时×坤时）",
+      "family": "relation",
+      "direction": "mutual",
+      "delta": -8.0,
+      "reading": "若岁运与日相对，谓之返吟。本系统取窄口径：天干相冲且地支六冲方为反吟，阴阳相克而不冲者不算。阳刃忌反吟、伏吟。；合婚主干支相对、聚散不宁（本系统依〈反吟〉义理演绎）"
+    },
+    {
+      "rule": "hh.group.half_harmony",
+      "label": "跨造半合（火）",
+      "family": "group",
+      "direction": "mutual",
+      "delta": 4.0,
+      "reading": "三合局中见二字且含旺支（即三合中位），本系统以半合标之。《三命通会·论支元三合》明言『若三字缺一则化不成局，不可以三合化局论』，故此条只记局势之半，不论其化。；合婚主两造半成一气、需时令撑持（本系统依〈半合〉义理演绎）"
+    },
+    {
+      "rule": "hh.yongshen.shortfall",
+      "label": "我喜彼弱（乾视坤·土弱）",
+      "family": "yongshen",
+      "direction": "male_to_female",
+      "delta": -5.0,
+      "reading": "我喜用之神行，于彼造之盘退弱不足，是名为阙：同欲此气而两造皆薄，欲助无力的那一面（比值 ≤ 0.75 方论弱）"
+    },
+    {
+      "rule": "hh.yongshen.supply",
+      "label": "我喜彼旺（乾视坤·金旺）",
+      "family": "yongshen",
+      "direction": "male_to_female",
+      "delta": 6.0,
+      "reading": "我喜用之神行，于彼造之盘旺相有余，是名为补：其所缺者我有余，吾得所助（比值 ≥ 1.25 方论旺，本系统盘内均值作尺）"
+    },
+    {
+      "rule": "hh.yongshen.harmless",
+      "label": "我忌彼弱（乾视坤·木弱）",
+      "family": "yongshen",
+      "direction": "male_to_female",
+      "delta": 3.0,
+      "reading": "我忌神之五行，于彼造之盘衰弱无力，是名为安：所畏者不起，虽同气而不相害"
+    },
+    {
+      "rule": "hh.yongshen.clash",
+      "label": "我忌彼旺（乾视坤·水旺）",
+      "family": "yongshen",
+      "direction": "male_to_female",
+      "delta": -7.0,
+      "reading": "我忌神之五行，于彼造之盘旺相有力，是名为冲：彼愈旺则我之忌愈炽，最耗精神的一格"
+    },
+    {
+      "rule": "hh.yongshen.shortfall",
+      "label": "我喜彼弱（坤视乾·金弱）",
+      "family": "yongshen",
+      "direction": "female_to_male",
+      "delta": -5.0,
+      "reading": "我喜用之神行，于彼造之盘退弱不足，是名为阙：同欲此气而两造皆薄，欲助无力的那一面（比值 ≤ 0.75 方论弱）"
+    },
+    {
+      "rule": "hh.yongshen.clash",
+      "label": "我忌彼旺（坤视乾·木旺）",
+      "family": "yongshen",
+      "direction": "female_to_male",
+      "delta": -7.0,
+      "reading": "我忌神之五行，于彼造之盘旺相有力，是名为冲：彼愈旺则我之忌愈炽，最耗精神的一格"
+    },
+    {
+      "rule": "hh.nayin.wo_ke",
+      "label": "我克（乾木·坤土）",
+      "family": "nayin",
+      "direction": "mutual",
+      "delta": 2.0,
+      "reading": "我去克彼，我居其长，凡事宜主不宜客"
+    }
+  ],
+  "complement": {
+    "views": [
+      {
+        "viewer": "male",
+        "label": "乾视坤",
+        "cells": [
+          {
+            "rule": "hh.yongshen.supply",
+            "name": "补",
+            "mine": "favorable",
+            "theirs": "旺",
+            "delta": 6.0,
+            "elements": [
+              {
+                "element": "金",
+                "ratio": 1.4935
+              }
+            ]
+          },
+          {
+            "rule": "hh.yongshen.shortfall",
+            "name": "阙",
+            "mine": "favorable",
+            "theirs": "弱",
+            "delta": -5.0,
+            "elements": [
+              {
+                "element": "土",
+                "ratio": 0.4545
+              }
+            ]
+          },
+          {
+            "rule": "hh.yongshen.clash",
+            "name": "冲",
+            "mine": "unfavorable",
+            "theirs": "旺",
+            "delta": -7.0,
+            "elements": [
+              {
+                "element": "水",
+                "ratio": 1.6883
+              }
+            ]
+          },
+          {
+            "rule": "hh.yongshen.harmless",
+            "name": "安",
+            "mine": "unfavorable",
+            "theirs": "弱",
+            "delta": 3.0,
+            "elements": [
+              {
+                "element": "木",
+                "ratio": 0.1948
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "viewer": "female",
+        "label": "坤视乾",
+        "cells": [
+          {
+            "rule": "hh.yongshen.supply",
+            "name": "补",
+            "mine": "favorable",
+            "theirs": "旺",
+            "delta": 6.0,
+            "elements": []
+          },
+          {
+            "rule": "hh.yongshen.shortfall",
+            "name": "阙",
+            "mine": "favorable",
+            "theirs": "弱",
+            "delta": -5.0,
+            "elements": [
+              {
+                "element": "金",
+                "ratio": 0.6329
+              }
+            ]
+          },
+          {
+            "rule": "hh.yongshen.clash",
+            "name": "冲",
+            "mine": "unfavorable",
+            "theirs": "旺",
+            "delta": -7.0,
+            "elements": [
+              {
+                "element": "木",
+                "ratio": 1.3924
+              }
+            ]
+          },
+          {
+            "rule": "hh.yongshen.harmless",
+            "name": "安",
+            "mine": "unfavorable",
+            "theirs": "弱",
+            "delta": 3.0,
+            "elements": []
+          }
+        ]
+      }
+    ]
+  },
+  "nayin": {
+    "male": {
+      "ganzhi": "戊辰",
+      "nayin": "大林木",
+      "element": "木",
+      "imagery": "大林木者，枝干撼风，柯条撑月，耸壑昂霄之德，凌云蔽日之功。",
+      "source": "《三命通会·卷一·释六十甲子性质吉凶》"
+    },
+    "female": {
+      "ganzhi": "庚午",
+      "nayin": "路旁土",
+      "element": "土",
+      "imagery": "路旁土者，大地连途，平田万顷，禾稼赖以资生，草木由之畅茂。",
+      "source": "《三命通会·卷一·释六十甲子性质吉凶》"
+    },
+    "relation": "我克",
+    "phrase": "木克土",
+    "rule": "hh.nayin.wo_ke",
+    "delta": 2.0,
+    "reading": "乾年命大林木、坤年命路旁土，木克土为我克；我去克彼，我居其长，凡事宜主不宜客。本系统依五行生克义理演绎，非古籍合婚原文。"
+  },
+  "axis": {
+    "start_year": 2026,
+    "end_year": 2046,
+    "rows": [
+      {
+        "year": 2026,
+        "ganzhi": "丙午",
+        "male": {
+          "value": 29.0,
+          "tier": "滞",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 32.0,
+          "tier": "滞",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 3.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2027,
+        "ganzhi": "丁未",
+        "male": {
+          "value": 61.0,
+          "tier": "平",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 50.0,
+          "tier": "平",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 11.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2028,
+        "ganzhi": "戊申",
+        "male": {
+          "value": 56.0,
+          "tier": "平",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 66.0,
+          "tier": "顺",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 10.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2029,
+        "ganzhi": "己酉",
+        "male": {
+          "value": 74.0,
+          "tier": "顺",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 78.0,
+          "tier": "顺",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 4.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2030,
+        "ganzhi": "庚戌",
+        "male": {
+          "value": 59.0,
+          "tier": "平",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 73.0,
+          "tier": "顺",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 14.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2031,
+        "ganzhi": "辛亥",
+        "male": {
+          "value": 56.0,
+          "tier": "平",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 51.0,
+          "tier": "平",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 5.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2032,
+        "ganzhi": "壬子",
+        "male": {
+          "value": 27.0,
+          "tier": "滞",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 22.0,
+          "tier": "滞",
+          "dayun": "戊寅",
+          "dayun_start_age": 34
+        },
+        "gap": 5.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2033,
+        "ganzhi": "癸丑",
+        "male": {
+          "value": 48.0,
+          "tier": "平",
+          "dayun": "戊午",
+          "dayun_start_age": 37
+        },
+        "female": {
+          "value": 43.0,
+          "tier": "滞",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 5.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2034,
+        "ganzhi": "甲寅",
+        "male": {
+          "value": 23.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 45.0,
+          "tier": "平",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 22.0,
+        "sync": "背离"
+      },
+      {
+        "year": 2035,
+        "ganzhi": "乙卯",
+        "male": {
+          "value": 23.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 23.0,
+          "tier": "滞",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 0.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2036,
+        "ganzhi": "丙辰",
+        "male": {
+          "value": 46.0,
+          "tier": "平",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 51.0,
+          "tier": "平",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 5.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2037,
+        "ganzhi": "丁巳",
+        "male": {
+          "value": 30.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 13.0,
+          "tier": "滞",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 17.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2038,
+        "ganzhi": "戊午",
+        "male": {
+          "value": 41.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 43.0,
+          "tier": "滞",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 2.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2039,
+        "ganzhi": "己未",
+        "male": {
+          "value": 65.0,
+          "tier": "顺",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 70.0,
+          "tier": "顺",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 5.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2040,
+        "ganzhi": "庚申",
+        "male": {
+          "value": 52.0,
+          "tier": "平",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 66.0,
+          "tier": "顺",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 14.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2041,
+        "ganzhi": "辛酉",
+        "male": {
+          "value": 78.0,
+          "tier": "顺",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 78.0,
+          "tier": "顺",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 0.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2042,
+        "ganzhi": "壬戌",
+        "male": {
+          "value": 35.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 53.0,
+          "tier": "平",
+          "dayun": "丁丑",
+          "dayun_start_age": 44
+        },
+        "gap": 18.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2043,
+        "ganzhi": "癸亥",
+        "male": {
+          "value": 32.0,
+          "tier": "滞",
+          "dayun": "己未",
+          "dayun_start_age": 47
+        },
+        "female": {
+          "value": 32.0,
+          "tier": "滞",
+          "dayun": "丙子",
+          "dayun_start_age": 54
+        },
+        "gap": 0.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2044,
+        "ganzhi": "甲子",
+        "male": {
+          "value": 22.0,
+          "tier": "滞",
+          "dayun": "庚申",
+          "dayun_start_age": 57
+        },
+        "female": {
+          "value": 18.0,
+          "tier": "滞",
+          "dayun": "丙子",
+          "dayun_start_age": 54
+        },
+        "gap": 4.0,
+        "sync": "同频"
+      },
+      {
+        "year": 2045,
+        "ganzhi": "乙丑",
+        "male": {
+          "value": 53.0,
+          "tier": "平",
+          "dayun": "庚申",
+          "dayun_start_age": 57
+        },
+        "female": {
+          "value": 42.0,
+          "tier": "滞",
+          "dayun": "丙子",
+          "dayun_start_age": 54
+        },
+        "gap": 11.0,
+        "sync": "半同步"
+      },
+      {
+        "year": 2046,
+        "ganzhi": "丙寅",
+        "male": {
+          "value": 33.0,
+          "tier": "滞",
+          "dayun": "庚申",
+          "dayun_start_age": 57
+        },
+        "female": {
+          "value": 50.0,
+          "tier": "平",
+          "dayun": "丙子",
+          "dayun_start_age": 54
+        },
+        "gap": 17.0,
+        "sync": "半同步"
+      }
+    ],
+    "segments": [
+      {
+        "start_year": 2026,
+        "end_year": 2032,
+        "label": "乾·第 4 运 戊午（37—46 岁）／坤·第 4 运 戊寅（34—43 岁）"
+      },
+      {
+        "start_year": 2033,
+        "end_year": 2033,
+        "label": "乾·第 4 运 戊午（37—46 岁）／坤·第 5 运 丁丑（44—53 岁）"
+      },
+      {
+        "start_year": 2034,
+        "end_year": 2042,
+        "label": "乾·第 5 运 己未（47—56 岁）／坤·第 5 运 丁丑（44—53 岁）"
+      },
+      {
+        "start_year": 2043,
+        "end_year": 2043,
+        "label": "乾·第 5 运 己未（47—56 岁）／坤·第 6 运 丙子（54—63 岁）"
+      },
+      {
+        "start_year": 2044,
+        "end_year": 2046,
+        "label": "乾·第 6 运 庚申（57—66 岁）／坤·第 6 运 丙子（54—63 岁）"
+      }
+    ]
+  },
+  "yi_ji": {
+    "groups": [
+      {
+        "kind": "同宜",
+        "items": [
+          {
+            "element": "土",
+            "direction": "中",
+            "color": "黄",
+            "season": "四季"
+          },
+          {
+            "element": "金",
+            "direction": "西",
+            "color": "白",
+            "season": "秋"
+          }
+        ]
+      },
+      {
+        "kind": "乾独宜",
+        "items": []
+      },
+      {
+        "kind": "坤独宜",
+        "items": []
+      },
+      {
+        "kind": "同忌",
+        "items": [
+          {
+            "element": "木",
+            "direction": "东",
+            "color": "青",
+            "season": "春"
+          },
+          {
+            "element": "水",
+            "direction": "北",
+            "color": "黑",
+            "season": "冬"
+          },
+          {
+            "element": "火",
+            "direction": "南",
+            "color": "赤",
+            "season": "夏"
+          }
+        ]
+      },
+      {
+        "kind": "乾独忌",
+        "items": []
+      },
+      {
+        "kind": "坤独忌",
+        "items": []
+      }
+    ],
+    "declaration": "宜忌取自两造用神法（喜用五行的通说配属），非玄空坐向，不含住宅方位与化解物品。"
+  },
+  "provenance": {
+    "reference_date": "2026-09-26",
+    "engine": "lunar-python",
+    "rule_count": 29,
+    "tables": [
+      {
+        "name": "bazi_shishen",
+        "version": "2026.09",
+        "source": "《渊海子平》"
+      },
+      {
+        "name": "bazi_nayin",
+        "version": "2026.09",
+        "source": "《三命通会》"
+      },
+      {
+        "name": "bazi_wangshuai",
+        "version": "2026.09",
+        "source": "《三命通会》定等第次序 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_geju",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_tiaohou",
+        "version": "2026.09",
+        "source": "本系统季节纲要（未采用《穷通宝鉴》逐月表）"
+      },
+      {
+        "name": "bazi_shensha",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_relations",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》《滴天髓》"
+      },
+      {
+        "name": "bazi_changsheng",
+        "version": "2026.09",
+        "source": "《三命通会·论五行旺相休囚死并寄生十二宫》（偏移与阳顺阴逆为本系统表法，与 lunar-python 120 格对拍）"
+      },
+      {
+        "name": "bazi_transit_rules",
+        "version": "2026.09",
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "name": "bazi_hehun_rules",
+        "version": "2026.09",
+        "source": "对称族与成局族判语逐字引各条自己的古籍出处（见条内 source）；婚义后缀句与互济、年命、婚姻宫三族为本系统演绎 · 模型参数（本系统加权，非古籍赋分）"
+      }
+    ],
+    "method": "本系统命名与演绎（不引具体卷次）"
+  }
+}

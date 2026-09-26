@@ -1,0 +1,1574 @@
+{
+  "four_pillars": "庚辰 甲申 丙午 甲午",
+  "pillars": [
+    {
+      "position": "year",
+      "label": "年柱",
+      "ganzhi": "庚辰",
+      "gan": "庚",
+      "zhi": "辰",
+      "gan_element": "金",
+      "zhi_element": "土",
+      "nayin": "白蜡金",
+      "hidden_stems": [
+        "戊",
+        "乙",
+        "癸"
+      ],
+      "hidden_stem_elements": [
+        "土",
+        "木",
+        "水"
+      ],
+      "shishen_gan": "偏财",
+      "shishen_zhi": [
+        "食神",
+        "正印",
+        "正官"
+      ],
+      "di_shi": "冠带",
+      "xun": "甲戌",
+      "xun_kong": "申酉"
+    },
+    {
+      "position": "month",
+      "label": "月柱",
+      "ganzhi": "甲申",
+      "gan": "甲",
+      "zhi": "申",
+      "gan_element": "木",
+      "zhi_element": "金",
+      "nayin": "泉中水",
+      "hidden_stems": [
+        "庚",
+        "壬",
+        "戊"
+      ],
+      "hidden_stem_elements": [
+        "金",
+        "水",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "偏财",
+        "七杀",
+        "食神"
+      ],
+      "di_shi": "病",
+      "xun": "甲申",
+      "xun_kong": "午未"
+    },
+    {
+      "position": "day",
+      "label": "日柱",
+      "ganzhi": "丙午",
+      "gan": "丙",
+      "zhi": "午",
+      "gan_element": "火",
+      "zhi_element": "火",
+      "nayin": "天河水",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "日主",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲辰",
+      "xun_kong": "寅卯"
+    },
+    {
+      "position": "hour",
+      "label": "时柱",
+      "ganzhi": "甲午",
+      "gan": "甲",
+      "zhi": "午",
+      "gan_element": "木",
+      "zhi_element": "火",
+      "nayin": "沙中金",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲午",
+      "xun_kong": "辰巳"
+    }
+  ],
+  "day_master": "丙",
+  "day_master_element": "火",
+  "favorable_elements": [
+    "木",
+    "火"
+  ],
+  "unfavorable_elements": [
+    "金",
+    "土",
+    "水"
+  ],
+  "true_solar_time": "2000-08-16 11:41",
+  "tst_applied": true,
+  "longitude": 116.4074,
+  "solar_date": "2025-06-15",
+  "weekday": 6,
+  "lunar_day": "五二十",
+  "day_ganzhi": "乙卯",
+  "year": 2025,
+  "year_ganzhi": "乙巳",
+  "year_age": 26,
+  "dayun_index": 2,
+  "dayun_ganzhi": "丙戌",
+  "month_index": 4,
+  "month_in_chinese": "五",
+  "month_ganzhi": "壬午",
+  "month_start_solar": "2025-06-05",
+  "month_end_solar": "2025-07-06",
+  "day_score": {
+    "value": 86.0,
+    "tier": "顺",
+    "factors": [
+      {
+        "rule": "transit.base",
+        "label": "基准分",
+        "delta": 50.0,
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "yongshen.gan_favourable",
+        "label": "运干入喜用",
+        "delta": 10.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yongshen.zhi_favourable",
+        "label": "运支主气入喜用",
+        "delta": 8.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "palace.punish_month",
+        "label": "刑提纲",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "palace.combine_month",
+        "label": "合提纲",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "dayun.sui_sheng_yun",
+        "label": "岁生运",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "dishi.prosperous",
+        "label": "日主临官帝旺",
+        "delta": 7.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "shensha.jiesha",
+        "label": "劫煞",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "shensha.wangshen",
+        "label": "亡神",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.yongshen.gan_unfavourable",
+        "label": "运干入忌（流月）",
+        "delta": -10.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流月）",
+        "delta": 8.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.palace.punish_day",
+        "label": "刑本身宫（流月）",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.ganzhi.chong_day_master",
+        "label": "运干冲日主（流月）",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.dishi.prosperous",
+        "label": "日主临官帝旺（流月）",
+        "delta": 7.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.jiangxing",
+        "label": "将星（流月）",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.yuede",
+        "label": "月德贵人（流月）",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.yangren",
+        "label": "羊刃（流月）",
+        "delta": -6.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "ri.yongshen.gan_favourable",
+        "label": "运干入喜用（流日）",
+        "delta": 10.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "ri.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流日）",
+        "delta": 8.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "ri.shensha.taiji",
+        "label": "太极贵人（流日）",
+        "delta": 3.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      }
+    ]
+  },
+  "day_fired": [
+    {
+      "key": "yongshen.gan_favourable",
+      "label": "运干入喜用",
+      "family": "yongshen",
+      "delta": 10.0,
+      "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+    },
+    {
+      "key": "yongshen.zhi_favourable",
+      "label": "运支主气入喜用",
+      "family": "yongshen",
+      "delta": 8.0,
+      "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+    },
+    {
+      "key": "palace.punish_month",
+      "label": "刑提纲",
+      "family": "palace",
+      "delta": -5.0,
+      "reading": "岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）"
+    },
+    {
+      "key": "palace.combine_month",
+      "label": "合提纲",
+      "family": "palace",
+      "delta": 4.0,
+      "reading": "岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）"
+    },
+    {
+      "key": "dayun.sui_sheng_yun",
+      "label": "岁生运",
+      "family": "dayun",
+      "delta": 4.0,
+      "reading": "流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）"
+    },
+    {
+      "key": "dishi.prosperous",
+      "label": "日主临官帝旺",
+      "family": "dishi",
+      "delta": 7.0,
+      "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+    },
+    {
+      "key": "shensha.jiesha",
+      "label": "劫煞",
+      "family": "shensha",
+      "delta": -5.0,
+      "reading": "劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）"
+    },
+    {
+      "key": "shensha.wangshen",
+      "label": "亡神",
+      "family": "shensha",
+      "delta": -5.0,
+      "reading": "亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）"
+    },
+    {
+      "key": "yue.yongshen.gan_unfavourable",
+      "label": "运干入忌（流月）",
+      "family": "yongshen",
+      "delta": -10.0,
+      "reading": "岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）"
+    },
+    {
+      "key": "yue.yongshen.zhi_favourable",
+      "label": "运支主气入喜用（流月）",
+      "family": "yongshen",
+      "delta": 8.0,
+      "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+    },
+    {
+      "key": "yue.palace.punish_day",
+      "label": "刑本身宫（流月）",
+      "family": "palace",
+      "delta": -5.0,
+      "reading": "岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）"
+    },
+    {
+      "key": "yue.ganzhi.chong_day_master",
+      "label": "运干冲日主（流月）",
+      "family": "ganzhi",
+      "delta": -5.0,
+      "reading": "岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）"
+    },
+    {
+      "key": "yue.dishi.prosperous",
+      "label": "日主临官帝旺（流月）",
+      "family": "dishi",
+      "delta": 7.0,
+      "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+    },
+    {
+      "key": "yue.shensha.jiangxing",
+      "label": "将星（流月）",
+      "family": "shensha",
+      "delta": 4.0,
+      "reading": "将星入岁运之支，其年可得众（《三命通会·论将星华盖》）"
+    },
+    {
+      "key": "yue.shensha.yuede",
+      "label": "月德贵人（流月）",
+      "family": "shensha",
+      "delta": 4.0,
+      "reading": "月德在岁运之干，其年月德神加临（《三命通会·论天月德》）"
+    },
+    {
+      "key": "yue.shensha.yangren",
+      "label": "羊刃（流月）",
+      "family": "shensha",
+      "delta": -6.0,
+      "reading": "岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）"
+    },
+    {
+      "key": "ri.yongshen.gan_favourable",
+      "label": "运干入喜用（流日）",
+      "family": "yongshen",
+      "delta": 10.0,
+      "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+    },
+    {
+      "key": "ri.yongshen.zhi_favourable",
+      "label": "运支主气入喜用（流日）",
+      "family": "yongshen",
+      "delta": 8.0,
+      "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+    },
+    {
+      "key": "ri.shensha.taiji",
+      "label": "太极贵人（流日）",
+      "family": "shensha",
+      "delta": 3.0,
+      "reading": "太极贵人临岁运，其年月心神清明（《三命通会·论太极贵》）"
+    }
+  ],
+  "day_almanac": {
+    "yi": [
+      "祭祀",
+      "作灶",
+      "馀事勿取"
+    ],
+    "ji": [
+      "诸事不宜"
+    ]
+  },
+  "hours": [
+    {
+      "index": 0,
+      "zhi": "子",
+      "ganzhi": "丙子",
+      "start_clock": "23:00",
+      "end_clock": "23:59",
+      "value": 82.0,
+      "tier": "顺",
+      "qi_strength": "胎",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.palace.chong_day",
+          "label": "冲本身宫（流时）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.heyue.sanhe_unfavourable",
+          "label": "三合成忌（流时）",
+          "family": "heyue",
+          "delta": -6.0
+        },
+        {
+          "key": "shi.dishi.supportive",
+          "label": "日主临长生冠带胎养（流时）",
+          "family": "dishi",
+          "delta": 4.0
+        },
+        {
+          "key": "shi.shensha.jiangxing",
+          "label": "将星（流时）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "zhi": "丑",
+      "ganzhi": "丁丑",
+      "start_clock": "01:00",
+      "end_clock": "02:59",
+      "value": 88.0,
+      "tier": "顺",
+      "qi_strength": "养",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.palace.harm_day",
+          "label": "害本身宫（流时）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "shi.dishi.supportive",
+          "label": "日主临长生冠带胎养（流时）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "zhi": "寅",
+      "ganzhi": "戊寅",
+      "start_clock": "03:00",
+      "end_clock": "04:59",
+      "value": 78.0,
+      "tier": "顺",
+      "qi_strength": "长生",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流时）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "shi.palace.chong_month",
+          "label": "冲提纲（流时）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.palace.punish_month",
+          "label": "刑提纲（流时）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.heyue.anhe_favourable",
+          "label": "半合喜用（流时）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "shi.dishi.supportive",
+          "label": "日主临长生冠带胎养（流时）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "zhi": "卯",
+      "ganzhi": "己卯",
+      "start_clock": "05:00",
+      "end_clock": "06:59",
+      "value": 87.0,
+      "tier": "顺",
+      "qi_strength": "沐浴",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流时）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "shi.shensha.taiji",
+          "label": "太极贵人（流时）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "zhi": "辰",
+      "ganzhi": "庚辰",
+      "start_clock": "07:00",
+      "end_clock": "08:59",
+      "value": 67.0,
+      "tier": "顺",
+      "qi_strength": "冠带",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.fuyin.fuyin",
+          "label": "伏吟（流时）",
+          "family": "fuyin",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.dishi.supportive",
+          "label": "日主临长生冠带胎养（流时）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "zhi": "巳",
+      "ganzhi": "辛巳",
+      "start_clock": "09:00",
+      "end_clock": "10:59",
+      "value": 85.0,
+      "tier": "顺",
+      "qi_strength": "临官",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流时）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "shi.palace.punish_month",
+          "label": "刑提纲（流时）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.palace.combine_month",
+          "label": "合提纲（流时）",
+          "family": "palace",
+          "delta": 4.0
+        },
+        {
+          "key": "shi.ganzhi.combine_day_master",
+          "label": "运干合日主（流时）",
+          "family": "ganzhi",
+          "delta": 5.0
+        },
+        {
+          "key": "shi.dishi.prosperous",
+          "label": "日主临官帝旺（流时）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "shi.shensha.jiesha",
+          "label": "劫煞（流时）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.shensha.wangshen",
+          "label": "亡神（流时）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "zhi": "午",
+      "ganzhi": "壬午",
+      "start_clock": "11:00",
+      "end_clock": "12:59",
+      "value": 83.0,
+      "tier": "顺",
+      "qi_strength": "帝旺",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流时）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "shi.palace.punish_day",
+          "label": "刑本身宫（流时）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.ganzhi.chong_day_master",
+          "label": "运干冲日主（流时）",
+          "family": "ganzhi",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.dishi.prosperous",
+          "label": "日主临官帝旺（流时）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "shi.shensha.jiangxing",
+          "label": "将星（流时）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "shi.shensha.yuede",
+          "label": "月德贵人（流时）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "shi.shensha.yangren",
+          "label": "羊刃（流时）",
+          "family": "shensha",
+          "delta": -6.0
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "zhi": "未",
+      "ganzhi": "癸未",
+      "start_clock": "13:00",
+      "end_clock": "14:59",
+      "value": 74.0,
+      "tier": "顺",
+      "qi_strength": "衰",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.palace.combine_day",
+          "label": "合本身宫（流时）",
+          "family": "palace",
+          "delta": 5.0
+        },
+        {
+          "key": "shi.dishi.decaying",
+          "label": "日主临衰病死墓绝（流时）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "shi.shensha.tiande",
+          "label": "天德贵人（流时）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "shi.shensha.jinyu",
+          "label": "金舆（流时）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "zhi": "申",
+      "ganzhi": "甲申",
+      "start_clock": "15:00",
+      "end_clock": "16:59",
+      "value": 81.0,
+      "tier": "顺",
+      "qi_strength": "病",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.fuyin.fuyin",
+          "label": "伏吟（流时）",
+          "family": "fuyin",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.dishi.decaying",
+          "label": "日主临衰病死墓绝（流时）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "shi.shensha.wenchang",
+          "label": "文昌贵人（流时）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "zhi": "酉",
+      "ganzhi": "乙酉",
+      "start_clock": "17:00",
+      "end_clock": "18:59",
+      "value": 90.0,
+      "tier": "顺",
+      "qi_strength": "死",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.dishi.decaying",
+          "label": "日主临衰病死墓绝（流时）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "shi.shensha.tianyi",
+          "label": "天乙贵人（流时）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "shi.shensha.taiji",
+          "label": "太极贵人（流时）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "zhi": "戌",
+      "ganzhi": "丙戌",
+      "start_clock": "19:00",
+      "end_clock": "20:59",
+      "value": 85.0,
+      "tier": "顺",
+      "qi_strength": "墓",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.heyue.anhe_favourable",
+          "label": "半合喜用（流时）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "shi.dishi.decaying",
+          "label": "日主临衰病死墓绝（流时）",
+          "family": "dishi",
+          "delta": -6.0
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "zhi": "亥",
+      "ganzhi": "丁亥",
+      "start_clock": "21:00",
+      "end_clock": "22:59",
+      "value": 73.0,
+      "tier": "顺",
+      "qi_strength": "绝",
+      "hour_hits": [
+        {
+          "key": "shi.yongshen.gan_favourable",
+          "label": "运干入喜用（流时）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "shi.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流时）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "shi.palace.harm_month",
+          "label": "害提纲（流时）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "shi.dishi.decaying",
+          "label": "日主临衰病死墓绝（流时）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "shi.shensha.tianyi",
+          "label": "天乙贵人（流时）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "shi.shensha.jiesha",
+          "label": "劫煞（流时）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "shi.shensha.wangshen",
+          "label": "亡神（流时）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ]
+    }
+  ],
+  "focused": {
+    "index": 6,
+    "zhi": "午",
+    "ganzhi": "壬午",
+    "start_clock": "11:00",
+    "end_clock": "12:59",
+    "value": 83.0,
+    "tier": "顺",
+    "qi_strength": "帝旺",
+    "hour_hits": [
+      {
+        "key": "shi.yongshen.gan_unfavourable",
+        "label": "运干入忌（流时）",
+        "family": "yongshen",
+        "delta": -10.0
+      },
+      {
+        "key": "shi.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流时）",
+        "family": "yongshen",
+        "delta": 8.0
+      },
+      {
+        "key": "shi.palace.punish_day",
+        "label": "刑本身宫（流时）",
+        "family": "palace",
+        "delta": -5.0
+      },
+      {
+        "key": "shi.ganzhi.chong_day_master",
+        "label": "运干冲日主（流时）",
+        "family": "ganzhi",
+        "delta": -5.0
+      },
+      {
+        "key": "shi.dishi.prosperous",
+        "label": "日主临官帝旺（流时）",
+        "family": "dishi",
+        "delta": 7.0
+      },
+      {
+        "key": "shi.shensha.jiangxing",
+        "label": "将星（流时）",
+        "family": "shensha",
+        "delta": 4.0
+      },
+      {
+        "key": "shi.shensha.yuede",
+        "label": "月德贵人（流时）",
+        "family": "shensha",
+        "delta": 4.0
+      },
+      {
+        "key": "shi.shensha.yangren",
+        "label": "羊刃（流时）",
+        "family": "shensha",
+        "delta": -6.0
+      }
+    ],
+    "pillar": {
+      "position": "transit_hour",
+      "label": "流时",
+      "ganzhi": "壬午",
+      "gan": "壬",
+      "zhi": "午",
+      "gan_element": "水",
+      "zhi_element": "火",
+      "nayin": "杨柳木",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "七杀",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲戌",
+      "xun_kong": "申酉"
+    },
+    "ten_god": {
+      "god": "七杀",
+      "meaning": "夫七杀者，亦名偏官，喜身旺合杀、喜制伏、喜阳刃；忌身弱、忌见财，生忌无制。身旺有气为偏官，身弱无制为七杀。",
+      "source": "《渊海子平·论七杀》"
+    },
+    "score": {
+      "value": 83.0,
+      "tier": "顺",
+      "factors": [
+        {
+          "rule": "transit.base",
+          "label": "基准分",
+          "delta": 50.0,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        },
+        {
+          "rule": "yongshen.gan_favourable",
+          "label": "运干入喜用",
+          "delta": 10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yongshen.zhi_favourable",
+          "label": "运支主气入喜用",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "palace.punish_month",
+          "label": "刑提纲",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "palace.combine_month",
+          "label": "合提纲",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "dayun.sui_sheng_yun",
+          "label": "岁生运",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "dishi.prosperous",
+          "label": "日主临官帝旺",
+          "delta": 7.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shensha.jiesha",
+          "label": "劫煞",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shensha.wangshen",
+          "label": "亡神",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.yongshen.gan_unfavourable",
+          "label": "运干入忌（流月）",
+          "delta": -10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流月）",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.palace.punish_day",
+          "label": "刑本身宫（流月）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.ganzhi.chong_day_master",
+          "label": "运干冲日主（流月）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.dishi.prosperous",
+          "label": "日主临官帝旺（流月）",
+          "delta": 7.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.jiangxing",
+          "label": "将星（流月）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.yuede",
+          "label": "月德贵人（流月）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.yangren",
+          "label": "羊刃（流月）",
+          "delta": -6.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "delta": 10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "delta": 3.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.yongshen.gan_unfavourable",
+          "label": "运干入忌（流时）",
+          "delta": -10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流时）",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.palace.punish_day",
+          "label": "刑本身宫（流时）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.ganzhi.chong_day_master",
+          "label": "运干冲日主（流时）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.dishi.prosperous",
+          "label": "日主临官帝旺（流时）",
+          "delta": 7.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.shensha.jiangxing",
+          "label": "将星（流时）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.shensha.yuede",
+          "label": "月德贵人（流时）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shi.shensha.yangren",
+          "label": "羊刃（流时）",
+          "delta": -6.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        }
+      ]
+    },
+    "fired": [
+      {
+        "key": "yongshen.gan_favourable",
+        "label": "运干入喜用",
+        "family": "yongshen",
+        "delta": 10.0,
+        "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+      },
+      {
+        "key": "yongshen.zhi_favourable",
+        "label": "运支主气入喜用",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "palace.punish_month",
+        "label": "刑提纲",
+        "family": "palace",
+        "delta": -5.0,
+        "reading": "岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）"
+      },
+      {
+        "key": "palace.combine_month",
+        "label": "合提纲",
+        "family": "palace",
+        "delta": 4.0,
+        "reading": "岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）"
+      },
+      {
+        "key": "dayun.sui_sheng_yun",
+        "label": "岁生运",
+        "family": "dayun",
+        "delta": 4.0,
+        "reading": "流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）"
+      },
+      {
+        "key": "dishi.prosperous",
+        "label": "日主临官帝旺",
+        "family": "dishi",
+        "delta": 7.0,
+        "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+      },
+      {
+        "key": "shensha.jiesha",
+        "label": "劫煞",
+        "family": "shensha",
+        "delta": -5.0,
+        "reading": "劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）"
+      },
+      {
+        "key": "shensha.wangshen",
+        "label": "亡神",
+        "family": "shensha",
+        "delta": -5.0,
+        "reading": "亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）"
+      },
+      {
+        "key": "yue.yongshen.gan_unfavourable",
+        "label": "运干入忌（流月）",
+        "family": "yongshen",
+        "delta": -10.0,
+        "reading": "岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）"
+      },
+      {
+        "key": "yue.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流月）",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "yue.palace.punish_day",
+        "label": "刑本身宫（流月）",
+        "family": "palace",
+        "delta": -5.0,
+        "reading": "岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）"
+      },
+      {
+        "key": "yue.ganzhi.chong_day_master",
+        "label": "运干冲日主（流月）",
+        "family": "ganzhi",
+        "delta": -5.0,
+        "reading": "岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）"
+      },
+      {
+        "key": "yue.dishi.prosperous",
+        "label": "日主临官帝旺（流月）",
+        "family": "dishi",
+        "delta": 7.0,
+        "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+      },
+      {
+        "key": "yue.shensha.jiangxing",
+        "label": "将星（流月）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "将星入岁运之支，其年可得众（《三命通会·论将星华盖》）"
+      },
+      {
+        "key": "yue.shensha.yuede",
+        "label": "月德贵人（流月）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "月德在岁运之干，其年月德神加临（《三命通会·论天月德》）"
+      },
+      {
+        "key": "yue.shensha.yangren",
+        "label": "羊刃（流月）",
+        "family": "shensha",
+        "delta": -6.0,
+        "reading": "岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）"
+      },
+      {
+        "key": "ri.yongshen.gan_favourable",
+        "label": "运干入喜用（流日）",
+        "family": "yongshen",
+        "delta": 10.0,
+        "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+      },
+      {
+        "key": "ri.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流日）",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "ri.shensha.taiji",
+        "label": "太极贵人（流日）",
+        "family": "shensha",
+        "delta": 3.0,
+        "reading": "太极贵人临岁运，其年月心神清明（《三命通会·论太极贵》）"
+      },
+      {
+        "key": "shi.yongshen.gan_unfavourable",
+        "label": "运干入忌（流时）",
+        "family": "yongshen",
+        "delta": -10.0,
+        "reading": "岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）"
+      },
+      {
+        "key": "shi.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流时）",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "shi.palace.punish_day",
+        "label": "刑本身宫（流时）",
+        "family": "palace",
+        "delta": -5.0,
+        "reading": "岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）"
+      },
+      {
+        "key": "shi.ganzhi.chong_day_master",
+        "label": "运干冲日主（流时）",
+        "family": "ganzhi",
+        "delta": -5.0,
+        "reading": "岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）"
+      },
+      {
+        "key": "shi.dishi.prosperous",
+        "label": "日主临官帝旺（流时）",
+        "family": "dishi",
+        "delta": 7.0,
+        "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+      },
+      {
+        "key": "shi.shensha.jiangxing",
+        "label": "将星（流时）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "将星入岁运之支，其年可得众（《三命通会·论将星华盖》）"
+      },
+      {
+        "key": "shi.shensha.yuede",
+        "label": "月德贵人（流时）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "月德在岁运之干，其年月德神加临（《三命通会·论天月德》）"
+      },
+      {
+        "key": "shi.shensha.yangren",
+        "label": "羊刃（流时）",
+        "family": "shensha",
+        "delta": -6.0,
+        "reading": "岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）"
+      }
+    ],
+    "narrative": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）；岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）；流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）；岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）；劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）；亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）；岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）；岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）；岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）；将星入岁运之支，其年可得众（《三命通会·论将星华盖》）；月德在岁运之干，其年月德神加临（《三命通会·论天月德》）；岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）；岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；太极贵人临岁运，其年月心神清明（《三命通会·论太极贵》）；岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）；岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）；岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）；将星入岁运之支，其年可得众（《三命通会·论将星华盖》）；月德在岁运之干，其年月德神加临（《三命通会·论天月德》）；岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）。",
+    "relations": [
+      {
+        "kind": "天干相冲",
+        "pillar_a": "day",
+        "pillar_b": "extra0",
+        "character_a": "丙",
+        "character_b": "壬",
+        "strength": "隔位",
+        "transforming_element": null,
+        "reading": "地支取七位为冲，犹天干取七位为煞之义，如甲逢庚为煞、甲至庚七数；两干之禄居对冲之地，故相冲。戊己居中央，无对，故干不冲土。",
+        "source": "《三命通会·论冲击》七位之说（戊己中央不冲为本系统取法）"
+      },
+      {
+        "kind": "自刑",
+        "pillar_a": "day",
+        "pillar_b": "extra0",
+        "character_a": "午",
+        "character_b": "午",
+        "strength": "隔位",
+        "transforming_element": null,
+        "reading": "辰午酉亥何以谓之自刑？无别物相加，乃曰自也。辰者水之墓，滔则盈；午者火之旺，暴则焚；酉者金之位，刚则缺；亥者水之生，旺则朽，各禀已盛太过之气而自致祸。",
+        "source": "《三命通会·论三刑》"
+      },
+      {
+        "kind": "自刑",
+        "pillar_a": "hour",
+        "pillar_b": "extra0",
+        "character_a": "午",
+        "character_b": "午",
+        "strength": "紧临",
+        "transforming_element": null,
+        "reading": "辰午酉亥何以谓之自刑？无别物相加，乃曰自也。辰者水之墓，滔则盈；午者火之旺，暴则焚；酉者金之位，刚则缺；亥者水之生，旺则朽，各禀已盛太过之气而自致祸。",
+        "source": "《三命通会·论三刑》"
+      }
+    ],
+    "shensha": [
+      {
+        "name": "羊刃",
+        "quality": "凶",
+        "checked_from": "日干丙",
+        "matches": [
+          {
+            "position": "day",
+            "character": "午",
+            "at": "zhi"
+          },
+          {
+            "position": "hour",
+            "character": "午",
+            "at": "zhi"
+          },
+          {
+            "position": "extra0",
+            "character": "午",
+            "at": "zhi"
+          }
+        ],
+        "meaning": "羊言刚也，刃者取宰割之义；禄过则刃生，功成当退不退则过。甲丙戊庚壬五阳有刃，乙丁己辛癸五阴无刃。",
+        "source": "《三命通会·论羊刃》（《渊海子平》作『论阳刃』）"
+      },
+      {
+        "name": "将星",
+        "quality": "吉",
+        "checked_from": "申子辰局、寅午戌局",
+        "matches": [
+          {
+            "position": "day",
+            "character": "午",
+            "at": "zhi"
+          },
+          {
+            "position": "hour",
+            "character": "午",
+            "at": "zhi"
+          },
+          {
+            "position": "extra0",
+            "character": "午",
+            "at": "zhi"
+          }
+        ],
+        "meaning": "将星者，如将札中军也，故以三合中位谓之将星；常欲吉星相扶、贵煞加临乃为吉庆。",
+        "source": "《三命通会·论将星华盖》"
+      },
+      {
+        "name": "月德贵人",
+        "quality": "吉",
+        "checked_from": "申子辰局",
+        "matches": [
+          {
+            "position": "extra0",
+            "character": "壬",
+            "at": "gan"
+          }
+        ],
+        "meaning": "月德者，乃三合所照之方、日月会合之辰。盖日月照临之宫，凡天曜地煞尽可制服，故可回凶作吉。",
+        "source": "《三命通会·论天月德》"
+      }
+    ],
+    "branch_groups": []
+  },
+  "provenance": {
+    "reference_date": "2026-09-26",
+    "engine": "lunar-python",
+    "tables": [
+      {
+        "name": "bazi_shishen",
+        "version": "2026.09",
+        "source": "《渊海子平》"
+      },
+      {
+        "name": "bazi_nayin",
+        "version": "2026.09",
+        "source": "《三命通会》"
+      },
+      {
+        "name": "bazi_wangshuai",
+        "version": "2026.09",
+        "source": "《三命通会》定等第次序 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_geju",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_tiaohou",
+        "version": "2026.09",
+        "source": "本系统季节纲要（未采用《穷通宝鉴》逐月表）"
+      },
+      {
+        "name": "bazi_shensha",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_relations",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》《滴天髓》"
+      },
+      {
+        "name": "bazi_dimensions",
+        "version": "2026.09",
+        "source": "引文为判语（健康维只署本系统） · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_changsheng",
+        "version": "2026.09",
+        "source": "《三命通会·论五行旺相休囚死并寄生十二宫》（偏移与阳顺阴逆为本系统表法，与 lunar-python 120 格对拍）"
+      },
+      {
+        "name": "bazi_transit_rules",
+        "version": "2026.09",
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "name": "almanac_yiji",
+        "version": "1.4.8",
+        "source": "外部历法库 lunar-python（6tail/lunar-python）之通书宜忌，非本仓古籍语料，不参与任何计分"
+      }
+    ]
+  }
+}

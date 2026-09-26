@@ -116,6 +116,10 @@ out/
 # it) so the bare `lib/` Python-artifact rule above does not swallow it.
 !frontend/src/lib/
 !frontend/src/lib/**
+# Same trap for the vitest suite: `frontend/tests/lib/` holds test helpers
+# (fixture reader, logic tests) and must be trackable for the same reason.
+!frontend/tests/lib/
+!frontend/tests/lib/**
 
 # --- Logs & runtime ---------------------------------------------------------
 logs/

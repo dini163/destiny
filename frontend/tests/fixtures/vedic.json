@@ -1,0 +1,1226 @@
+{
+  "local_datetime": "2000-01-01 12:00",
+  "utc_datetime": "2000-01-01 12:00",
+  "julian_day": 2451545.0,
+  "latitude": 51.4769,
+  "longitude": -0.0005,
+  "utc_offset_hours": 0.0,
+  "utc_offset_source": "explicit",
+  "zodiac": "sidereal",
+  "ayanamsa": 23.8571,
+  "ayanamsa_name": "Lahiri (Chitrapaksha)",
+  "lagna_sign": "Mesha",
+  "lagna_sign_zh": "白羊",
+  "lagna_sign_glyph": "♈",
+  "lagna_index": 0,
+  "lagna_degree_text": "0°24'",
+  "lagna_nakshatra": "Ashwini",
+  "lagna_nakshatra_zh": "阿湿毗尼",
+  "moon_sign": "Tula",
+  "moon_sign_zh": "天秤",
+  "moon_nakshatra": "Swati",
+  "moon_nakshatra_zh": "室伐底",
+  "moon_nakshatra_lord": "Rahu",
+  "moon_nakshatra_lord_zh": "罗睺",
+  "moon_pada": 4,
+  "planets": [
+    {
+      "name": "Sun",
+      "glyph": "☉",
+      "name_zh": "太阳",
+      "name_sa": "Surya",
+      "longitude": 256.5157,
+      "sign": "Dhanu",
+      "sign_zh": "射手",
+      "sign_glyph": "♐",
+      "sign_index": 8,
+      "degree_in_sign": 16.5157,
+      "degree_text": "16°31'",
+      "house": 9,
+      "nakshatra": "Purva Ashadha",
+      "nakshatra_zh": "前阿沙荼",
+      "nakshatra_devanagari": "पूर्वाषाढा",
+      "nakshatra_lord": "Venus",
+      "nakshatra_lord_zh": "金星",
+      "pada": 1,
+      "retrograde": false,
+      "speed": 1.019392
+    },
+    {
+      "name": "Moon",
+      "glyph": "☽",
+      "name_zh": "太阴",
+      "name_sa": "Chandra",
+      "longitude": 199.4706,
+      "sign": "Tula",
+      "sign_zh": "天秤",
+      "sign_glyph": "♎",
+      "sign_index": 6,
+      "degree_in_sign": 19.4706,
+      "degree_text": "19°28'",
+      "house": 7,
+      "nakshatra": "Swati",
+      "nakshatra_zh": "室伐底",
+      "nakshatra_devanagari": "स्वाति",
+      "nakshatra_lord": "Rahu",
+      "nakshatra_lord_zh": "罗睺",
+      "pada": 4,
+      "retrograde": false,
+      "speed": 12.021143
+    },
+    {
+      "name": "Mars",
+      "glyph": "♂",
+      "name_zh": "火星",
+      "name_sa": "Mangala",
+      "longitude": 304.1101,
+      "sign": "Kumbha",
+      "sign_zh": "水瓶",
+      "sign_glyph": "♒",
+      "sign_index": 10,
+      "degree_in_sign": 4.1101,
+      "degree_text": "4°07'",
+      "house": 11,
+      "nakshatra": "Dhanishta",
+      "nakshatra_zh": "陀尼沙",
+      "nakshatra_devanagari": "धनिष्ठा",
+      "nakshatra_lord": "Mars",
+      "nakshatra_lord_zh": "火星",
+      "pada": 4,
+      "retrograde": false,
+      "speed": 0.775633
+    },
+    {
+      "name": "Mercury",
+      "glyph": "☿",
+      "name_zh": "水星",
+      "name_sa": "Budha",
+      "longitude": 248.0361,
+      "sign": "Dhanu",
+      "sign_zh": "射手",
+      "sign_glyph": "♐",
+      "sign_index": 8,
+      "degree_in_sign": 8.0361,
+      "degree_text": "8°02'",
+      "house": 9,
+      "nakshatra": "Mula",
+      "nakshatra_zh": "牟拉",
+      "nakshatra_devanagari": "मूल",
+      "nakshatra_lord": "Ketu",
+      "nakshatra_lord_zh": "计都",
+      "pada": 3,
+      "retrograde": false,
+      "speed": 1.556214
+    },
+    {
+      "name": "Jupiter",
+      "glyph": "♃",
+      "name_zh": "木星",
+      "name_sa": "Guru",
+      "longitude": 1.3998,
+      "sign": "Mesha",
+      "sign_zh": "白羊",
+      "sign_glyph": "♈",
+      "sign_index": 0,
+      "degree_in_sign": 1.3998,
+      "degree_text": "1°24'",
+      "house": 1,
+      "nakshatra": "Ashwini",
+      "nakshatra_zh": "阿湿毗尼",
+      "nakshatra_devanagari": "अश्विनी",
+      "nakshatra_lord": "Ketu",
+      "nakshatra_lord_zh": "计都",
+      "pada": 1,
+      "retrograde": false,
+      "speed": 0.040721
+    },
+    {
+      "name": "Venus",
+      "glyph": "♀",
+      "name_zh": "金星",
+      "name_sa": "Shukra",
+      "longitude": 217.7126,
+      "sign": "Vrischika",
+      "sign_zh": "天蝎",
+      "sign_glyph": "♏",
+      "sign_index": 7,
+      "degree_in_sign": 7.7126,
+      "degree_text": "7°43'",
+      "house": 8,
+      "nakshatra": "Anuradha",
+      "nakshatra_zh": "阿努罗陀",
+      "nakshatra_devanagari": "अनुराधा",
+      "nakshatra_lord": "Saturn",
+      "nakshatra_lord_zh": "土星",
+      "pada": 2,
+      "retrograde": false,
+      "speed": 1.209
+    },
+    {
+      "name": "Saturn",
+      "glyph": "♄",
+      "name_zh": "土星",
+      "name_sa": "Shani",
+      "longitude": 16.5424,
+      "sign": "Mesha",
+      "sign_zh": "白羊",
+      "sign_glyph": "♈",
+      "sign_index": 0,
+      "degree_in_sign": 16.5424,
+      "degree_text": "16°33'",
+      "house": 1,
+      "nakshatra": "Bharani",
+      "nakshatra_zh": "婆罗尼",
+      "nakshatra_devanagari": "भरणी",
+      "nakshatra_lord": "Venus",
+      "nakshatra_lord_zh": "金星",
+      "pada": 1,
+      "retrograde": true,
+      "speed": -0.019985
+    },
+    {
+      "name": "Rahu",
+      "glyph": "☊",
+      "name_zh": "罗睺",
+      "name_sa": "Rahu",
+      "longitude": 101.1874,
+      "sign": "Karka",
+      "sign_zh": "巨蟹",
+      "sign_glyph": "♋",
+      "sign_index": 3,
+      "degree_in_sign": 11.1874,
+      "degree_text": "11°11'",
+      "house": 4,
+      "nakshatra": "Pushya",
+      "nakshatra_zh": "布沙",
+      "nakshatra_devanagari": "पुष्य",
+      "nakshatra_lord": "Saturn",
+      "nakshatra_lord_zh": "土星",
+      "pada": 3,
+      "retrograde": true,
+      "speed": -0.052992
+    },
+    {
+      "name": "Ketu",
+      "glyph": "☋",
+      "name_zh": "计都",
+      "name_sa": "Ketu",
+      "longitude": 281.1874,
+      "sign": "Makara",
+      "sign_zh": "摩羯",
+      "sign_glyph": "♑",
+      "sign_index": 9,
+      "degree_in_sign": 11.1874,
+      "degree_text": "11°11'",
+      "house": 10,
+      "nakshatra": "Shravana",
+      "nakshatra_zh": "室罗伐那",
+      "nakshatra_devanagari": "श्रवण",
+      "nakshatra_lord": "Moon",
+      "nakshatra_lord_zh": "太阴",
+      "pada": 1,
+      "retrograde": true,
+      "speed": -0.052992
+    }
+  ],
+  "rashis": [
+    {
+      "sign_index": 0,
+      "sign": "Mesha",
+      "sign_zh": "白羊",
+      "sign_glyph": "♈",
+      "house": 1,
+      "is_lagna": true,
+      "planet_names": [
+        "Jupiter",
+        "Saturn"
+      ]
+    },
+    {
+      "sign_index": 1,
+      "sign": "Vrishabha",
+      "sign_zh": "金牛",
+      "sign_glyph": "♉",
+      "house": 2,
+      "is_lagna": false,
+      "planet_names": []
+    },
+    {
+      "sign_index": 2,
+      "sign": "Mithuna",
+      "sign_zh": "双子",
+      "sign_glyph": "♊",
+      "house": 3,
+      "is_lagna": false,
+      "planet_names": []
+    },
+    {
+      "sign_index": 3,
+      "sign": "Karka",
+      "sign_zh": "巨蟹",
+      "sign_glyph": "♋",
+      "house": 4,
+      "is_lagna": false,
+      "planet_names": [
+        "Rahu"
+      ]
+    },
+    {
+      "sign_index": 4,
+      "sign": "Simha",
+      "sign_zh": "狮子",
+      "sign_glyph": "♌",
+      "house": 5,
+      "is_lagna": false,
+      "planet_names": []
+    },
+    {
+      "sign_index": 5,
+      "sign": "Kanya",
+      "sign_zh": "处女",
+      "sign_glyph": "♍",
+      "house": 6,
+      "is_lagna": false,
+      "planet_names": []
+    },
+    {
+      "sign_index": 6,
+      "sign": "Tula",
+      "sign_zh": "天秤",
+      "sign_glyph": "♎",
+      "house": 7,
+      "is_lagna": false,
+      "planet_names": [
+        "Moon"
+      ]
+    },
+    {
+      "sign_index": 7,
+      "sign": "Vrischika",
+      "sign_zh": "天蝎",
+      "sign_glyph": "♏",
+      "house": 8,
+      "is_lagna": false,
+      "planet_names": [
+        "Venus"
+      ]
+    },
+    {
+      "sign_index": 8,
+      "sign": "Dhanu",
+      "sign_zh": "射手",
+      "sign_glyph": "♐",
+      "house": 9,
+      "is_lagna": false,
+      "planet_names": [
+        "Sun",
+        "Mercury"
+      ]
+    },
+    {
+      "sign_index": 9,
+      "sign": "Makara",
+      "sign_zh": "摩羯",
+      "sign_glyph": "♑",
+      "house": 10,
+      "is_lagna": false,
+      "planet_names": [
+        "Ketu"
+      ]
+    },
+    {
+      "sign_index": 10,
+      "sign": "Kumbha",
+      "sign_zh": "水瓶",
+      "sign_glyph": "♒",
+      "house": 11,
+      "is_lagna": false,
+      "planet_names": [
+        "Mars"
+      ]
+    },
+    {
+      "sign_index": 11,
+      "sign": "Meena",
+      "sign_zh": "双鱼",
+      "sign_glyph": "♓",
+      "house": 12,
+      "is_lagna": false,
+      "planet_names": []
+    }
+  ],
+  "vimshottari": {
+    "total_years": 120,
+    "balance_at_birth_years": 0.7147,
+    "moon_elapsed_fraction": 0.960295,
+    "birth_nakshatra": "Swati",
+    "birth_nakshatra_zh": "室伐底",
+    "birth_lord": "Rahu",
+    "birth_lord_zh": "罗睺",
+    "mahadashas": [
+      {
+        "lord": "Rahu",
+        "lord_zh": "罗睺",
+        "glyph": "☊",
+        "start_date": "2000-01-01",
+        "end_date": "2000-09-18",
+        "years": 0.7147,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2000-01-01",
+            "end_date": "2000-09-18",
+            "years": 0.7147,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Jupiter",
+        "lord_zh": "木星",
+        "glyph": "♃",
+        "start_date": "2000-09-18",
+        "end_date": "2016-09-18",
+        "years": 16.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2000-09-18",
+            "end_date": "2002-11-06",
+            "years": 2.1333,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2002-11-06",
+            "end_date": "2005-05-19",
+            "years": 2.5333,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2005-05-19",
+            "end_date": "2007-08-25",
+            "years": 2.2667,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2007-08-25",
+            "end_date": "2008-07-31",
+            "years": 0.9333,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2008-07-31",
+            "end_date": "2011-04-01",
+            "years": 2.6667,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2011-04-01",
+            "end_date": "2012-01-18",
+            "years": 0.8,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2012-01-18",
+            "end_date": "2013-05-19",
+            "years": 1.3333,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2013-05-19",
+            "end_date": "2014-04-25",
+            "years": 0.9333,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2014-04-25",
+            "end_date": "2016-09-18",
+            "years": 2.4,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Saturn",
+        "lord_zh": "土星",
+        "glyph": "♄",
+        "start_date": "2016-09-18",
+        "end_date": "2035-09-19",
+        "years": 19.0,
+        "is_current": true,
+        "antardashas": [
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2016-09-18",
+            "end_date": "2019-09-22",
+            "years": 3.0083,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2019-09-22",
+            "end_date": "2022-06-01",
+            "years": 2.6917,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2022-06-01",
+            "end_date": "2023-07-11",
+            "years": 1.1083,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2023-07-11",
+            "end_date": "2026-09-09",
+            "years": 3.1667,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2026-09-09",
+            "end_date": "2027-08-22",
+            "years": 0.95,
+            "is_current": true
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2027-08-22",
+            "end_date": "2029-03-22",
+            "years": 1.5833,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2029-03-22",
+            "end_date": "2030-05-01",
+            "years": 1.1083,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2030-05-01",
+            "end_date": "2033-03-07",
+            "years": 2.85,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2033-03-07",
+            "end_date": "2035-09-19",
+            "years": 2.5333,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Mercury",
+        "lord_zh": "水星",
+        "glyph": "☿",
+        "start_date": "2035-09-19",
+        "end_date": "2052-09-18",
+        "years": 17.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2035-09-19",
+            "end_date": "2038-02-14",
+            "years": 2.4083,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2038-02-14",
+            "end_date": "2039-02-11",
+            "years": 0.9917,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2039-02-11",
+            "end_date": "2041-12-12",
+            "years": 2.8333,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2041-12-12",
+            "end_date": "2042-10-19",
+            "years": 0.85,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2042-10-19",
+            "end_date": "2044-03-19",
+            "years": 1.4167,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2044-03-19",
+            "end_date": "2045-03-16",
+            "years": 0.9917,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2045-03-16",
+            "end_date": "2047-10-04",
+            "years": 2.55,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2047-10-04",
+            "end_date": "2050-01-09",
+            "years": 2.2667,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2050-01-09",
+            "end_date": "2052-09-18",
+            "years": 2.6917,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Ketu",
+        "lord_zh": "计都",
+        "glyph": "☋",
+        "start_date": "2052-09-18",
+        "end_date": "2059-09-18",
+        "years": 7.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2052-09-18",
+            "end_date": "2053-02-14",
+            "years": 0.4083,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2053-02-14",
+            "end_date": "2054-04-16",
+            "years": 1.1667,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2054-04-16",
+            "end_date": "2054-08-22",
+            "years": 0.35,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2054-08-22",
+            "end_date": "2055-03-23",
+            "years": 0.5833,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2055-03-23",
+            "end_date": "2055-08-19",
+            "years": 0.4083,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2055-08-19",
+            "end_date": "2056-09-05",
+            "years": 1.05,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2056-09-05",
+            "end_date": "2057-08-12",
+            "years": 0.9333,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2057-08-12",
+            "end_date": "2058-09-21",
+            "years": 1.1083,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2058-09-21",
+            "end_date": "2059-09-18",
+            "years": 0.9917,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Venus",
+        "lord_zh": "金星",
+        "glyph": "♀",
+        "start_date": "2059-09-18",
+        "end_date": "2079-09-18",
+        "years": 20.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2059-09-18",
+            "end_date": "2063-01-18",
+            "years": 3.3333,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2063-01-18",
+            "end_date": "2064-01-18",
+            "years": 1.0,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2064-01-18",
+            "end_date": "2065-09-18",
+            "years": 1.6667,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2065-09-18",
+            "end_date": "2066-11-18",
+            "years": 1.1667,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2066-11-18",
+            "end_date": "2069-11-18",
+            "years": 3.0,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2069-11-18",
+            "end_date": "2072-07-19",
+            "years": 2.6667,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2072-07-19",
+            "end_date": "2075-09-18",
+            "years": 3.1667,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2075-09-18",
+            "end_date": "2078-07-19",
+            "years": 2.8333,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2078-07-19",
+            "end_date": "2079-09-18",
+            "years": 1.1667,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Sun",
+        "lord_zh": "太阳",
+        "glyph": "☉",
+        "start_date": "2079-09-18",
+        "end_date": "2085-09-18",
+        "years": 6.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2079-09-18",
+            "end_date": "2080-01-06",
+            "years": 0.3,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2080-01-06",
+            "end_date": "2080-07-06",
+            "years": 0.5,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2080-07-06",
+            "end_date": "2080-11-11",
+            "years": 0.35,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2080-11-11",
+            "end_date": "2081-10-06",
+            "years": 0.9,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2081-10-06",
+            "end_date": "2082-07-25",
+            "years": 0.8,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2082-07-25",
+            "end_date": "2083-07-07",
+            "years": 0.95,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2083-07-07",
+            "end_date": "2084-05-13",
+            "years": 0.85,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2084-05-13",
+            "end_date": "2084-09-17",
+            "years": 0.35,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2084-09-17",
+            "end_date": "2085-09-18",
+            "years": 1.0,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Moon",
+        "lord_zh": "太阴",
+        "glyph": "☽",
+        "start_date": "2085-09-18",
+        "end_date": "2095-09-18",
+        "years": 10.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2085-09-18",
+            "end_date": "2086-07-19",
+            "years": 0.8333,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2086-07-19",
+            "end_date": "2087-02-17",
+            "years": 0.5833,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2087-02-17",
+            "end_date": "2088-08-18",
+            "years": 1.5,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2088-08-18",
+            "end_date": "2089-12-18",
+            "years": 1.3333,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2089-12-18",
+            "end_date": "2091-07-19",
+            "years": 1.5833,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2091-07-19",
+            "end_date": "2092-12-18",
+            "years": 1.4167,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2092-12-18",
+            "end_date": "2093-07-19",
+            "years": 0.5833,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2093-07-19",
+            "end_date": "2095-03-19",
+            "years": 1.6667,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2095-03-19",
+            "end_date": "2095-09-18",
+            "years": 0.5,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Mars",
+        "lord_zh": "火星",
+        "glyph": "♂",
+        "start_date": "2095-09-18",
+        "end_date": "2102-09-19",
+        "years": 7.0,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2095-09-18",
+            "end_date": "2096-02-14",
+            "years": 0.4083,
+            "is_current": false
+          },
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2096-02-14",
+            "end_date": "2097-03-04",
+            "years": 1.05,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2097-03-04",
+            "end_date": "2098-02-08",
+            "years": 0.9333,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2098-02-08",
+            "end_date": "2099-03-19",
+            "years": 1.1083,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2099-03-19",
+            "end_date": "2100-03-17",
+            "years": 0.9917,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2100-03-17",
+            "end_date": "2100-08-13",
+            "years": 0.4083,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2100-08-13",
+            "end_date": "2101-10-13",
+            "years": 1.1667,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2101-10-13",
+            "end_date": "2102-02-18",
+            "years": 0.35,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2102-02-18",
+            "end_date": "2102-09-19",
+            "years": 0.5833,
+            "is_current": false
+          }
+        ]
+      },
+      {
+        "lord": "Rahu",
+        "lord_zh": "罗睺",
+        "glyph": "☊",
+        "start_date": "2102-09-19",
+        "end_date": "2120-01-01",
+        "years": 17.2853,
+        "is_current": false,
+        "antardashas": [
+          {
+            "lord": "Rahu",
+            "lord_zh": "罗睺",
+            "glyph": "☊",
+            "start_date": "2102-09-19",
+            "end_date": "2105-06-01",
+            "years": 2.7,
+            "is_current": false
+          },
+          {
+            "lord": "Jupiter",
+            "lord_zh": "木星",
+            "glyph": "♃",
+            "start_date": "2105-06-01",
+            "end_date": "2107-10-25",
+            "years": 2.4,
+            "is_current": false
+          },
+          {
+            "lord": "Saturn",
+            "lord_zh": "土星",
+            "glyph": "♄",
+            "start_date": "2107-10-25",
+            "end_date": "2110-08-31",
+            "years": 2.85,
+            "is_current": false
+          },
+          {
+            "lord": "Mercury",
+            "lord_zh": "水星",
+            "glyph": "☿",
+            "start_date": "2110-08-31",
+            "end_date": "2113-03-20",
+            "years": 2.55,
+            "is_current": false
+          },
+          {
+            "lord": "Ketu",
+            "lord_zh": "计都",
+            "glyph": "☋",
+            "start_date": "2113-03-20",
+            "end_date": "2114-04-07",
+            "years": 1.05,
+            "is_current": false
+          },
+          {
+            "lord": "Venus",
+            "lord_zh": "金星",
+            "glyph": "♀",
+            "start_date": "2114-04-07",
+            "end_date": "2117-04-07",
+            "years": 3.0,
+            "is_current": false
+          },
+          {
+            "lord": "Sun",
+            "lord_zh": "太阳",
+            "glyph": "☉",
+            "start_date": "2117-04-07",
+            "end_date": "2118-03-02",
+            "years": 0.9,
+            "is_current": false
+          },
+          {
+            "lord": "Moon",
+            "lord_zh": "太阴",
+            "glyph": "☽",
+            "start_date": "2118-03-02",
+            "end_date": "2119-09-01",
+            "years": 1.5,
+            "is_current": false
+          },
+          {
+            "lord": "Mars",
+            "lord_zh": "火星",
+            "glyph": "♂",
+            "start_date": "2119-09-01",
+            "end_date": "2120-01-01",
+            "years": 0.3353,
+            "is_current": false
+          }
+        ]
+      }
+    ],
+    "current": {
+      "target_date": "2026-09-25",
+      "mahadasha_lord": "Saturn",
+      "mahadasha_lord_zh": "土星",
+      "antardasha_lord": "Sun",
+      "antardasha_lord_zh": "太阳"
+    }
+  },
+  "provenance": {
+    "engine": "pyswisseph",
+    "ayanamsa_name": "Lahiri (Chitrapaksha)",
+    "content_version": "2026.09",
+    "source": "吠陀占星（Jyotish）通行体系 · 恒星黄道以 Lahiri（Chitrapaksha）岁差为基准，27 宿（Nakshatra）各占 13°20'、分四足（pada）；Vimshottari 大运依月宿起运，九曜（Navagraha）值年共 120 年：计都 7 · 金星 20 · 太阳 6 · 太阴 10 · 火星 7 · 罗睺 18 · 木星 16 · 土星 19 · 水星 17。分宫用整宫制（一星座即一宫），以命度（Lagna）所在宿起第一宫。",
+    "note": "吠陀占星用恒星黄道（Sidereal），以 Lahiri（Chitrapaksha）岁差把热带黄经减去约 23–24° 得恒星黄经；分宫采整宫制（一星座即一宫），以命度（Lagna，恒星上升点）所在星座为第一宫顺布十二宫。九曜（Navagraha）为日、月、火、水、木、金、土，加罗睺（北交点）与计都（南交点，罗睺对冲 180°），不含天王、海王、冥王三王星。每曜定其所在 27 宿（Nakshatra，各 13°20'）与四足（pada）。Vimshottari 大运以太阴（月亮）所在宿起运：该宿守护曜为第一大运主，其于出生时的剩余年数按太阴已行过该宿的比例折算，此后九曜依固定序（计都·金星·太阳·太阴·火星·罗睺·木星·土星·水星）值年，共 120 年；每大运再分九个安塔尔大运（bhukti）。行星黄经、命度与岁差皆由瑞士星历实时计算，大运按标准值年数确定性排布，未作任何主观吉凶或个人运势的虚构演绎。"
+  },
+  "engine": "pyswisseph"
+}

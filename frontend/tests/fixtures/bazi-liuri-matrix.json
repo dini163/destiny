@@ -1,0 +1,2966 @@
+{
+  "four_pillars": "庚辰 甲申 丙午 甲午",
+  "pillars": [
+    {
+      "position": "year",
+      "label": "年柱",
+      "ganzhi": "庚辰",
+      "gan": "庚",
+      "zhi": "辰",
+      "gan_element": "金",
+      "zhi_element": "土",
+      "nayin": "白蜡金",
+      "hidden_stems": [
+        "戊",
+        "乙",
+        "癸"
+      ],
+      "hidden_stem_elements": [
+        "土",
+        "木",
+        "水"
+      ],
+      "shishen_gan": "偏财",
+      "shishen_zhi": [
+        "食神",
+        "正印",
+        "正官"
+      ],
+      "di_shi": "冠带",
+      "xun": "甲戌",
+      "xun_kong": "申酉"
+    },
+    {
+      "position": "month",
+      "label": "月柱",
+      "ganzhi": "甲申",
+      "gan": "甲",
+      "zhi": "申",
+      "gan_element": "木",
+      "zhi_element": "金",
+      "nayin": "泉中水",
+      "hidden_stems": [
+        "庚",
+        "壬",
+        "戊"
+      ],
+      "hidden_stem_elements": [
+        "金",
+        "水",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "偏财",
+        "七杀",
+        "食神"
+      ],
+      "di_shi": "病",
+      "xun": "甲申",
+      "xun_kong": "午未"
+    },
+    {
+      "position": "day",
+      "label": "日柱",
+      "ganzhi": "丙午",
+      "gan": "丙",
+      "zhi": "午",
+      "gan_element": "火",
+      "zhi_element": "火",
+      "nayin": "天河水",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "日主",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲辰",
+      "xun_kong": "寅卯"
+    },
+    {
+      "position": "hour",
+      "label": "时柱",
+      "ganzhi": "甲午",
+      "gan": "甲",
+      "zhi": "午",
+      "gan_element": "木",
+      "zhi_element": "火",
+      "nayin": "沙中金",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲午",
+      "xun_kong": "辰巳"
+    }
+  ],
+  "day_master": "丙",
+  "day_master_element": "火",
+  "favorable_elements": [
+    "木",
+    "火"
+  ],
+  "unfavorable_elements": [
+    "金",
+    "土",
+    "水"
+  ],
+  "true_solar_time": "2000-08-16 11:41",
+  "tst_applied": true,
+  "longitude": 116.4074,
+  "anchor_date": "2025-06-15",
+  "year": 2025,
+  "year_ganzhi": "乙巳",
+  "year_age": 26,
+  "dayun_index": 2,
+  "dayun_ganzhi": "丙戌",
+  "month_index": 4,
+  "month_in_chinese": "五",
+  "month_ganzhi": "壬午",
+  "month_start_solar": "2025-06-05",
+  "month_end_solar": "2025-07-06",
+  "month_score": {
+    "value": 65.0,
+    "tier": "顺",
+    "factors": [
+      {
+        "rule": "transit.base",
+        "label": "基准分",
+        "delta": 50.0,
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "yongshen.gan_favourable",
+        "label": "运干入喜用",
+        "delta": 10.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yongshen.zhi_favourable",
+        "label": "运支主气入喜用",
+        "delta": 8.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "palace.punish_month",
+        "label": "刑提纲",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "palace.combine_month",
+        "label": "合提纲",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "dayun.sui_sheng_yun",
+        "label": "岁生运",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "dishi.prosperous",
+        "label": "日主临官帝旺",
+        "delta": 7.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "shensha.jiesha",
+        "label": "劫煞",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "shensha.wangshen",
+        "label": "亡神",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.yongshen.gan_unfavourable",
+        "label": "运干入忌（流月）",
+        "delta": -10.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流月）",
+        "delta": 8.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.palace.punish_day",
+        "label": "刑本身宫（流月）",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.ganzhi.chong_day_master",
+        "label": "运干冲日主（流月）",
+        "delta": -5.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.dishi.prosperous",
+        "label": "日主临官帝旺（流月）",
+        "delta": 7.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.jiangxing",
+        "label": "将星（流月）",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.yuede",
+        "label": "月德贵人（流月）",
+        "delta": 4.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "rule": "yue.shensha.yangren",
+        "label": "羊刃（流月）",
+        "delta": -6.0,
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      }
+    ]
+  },
+  "month_fired": [
+    {
+      "key": "yongshen.gan_favourable",
+      "label": "运干入喜用",
+      "family": "yongshen",
+      "delta": 10.0,
+      "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+    },
+    {
+      "key": "yongshen.zhi_favourable",
+      "label": "运支主气入喜用",
+      "family": "yongshen",
+      "delta": 8.0,
+      "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+    },
+    {
+      "key": "palace.punish_month",
+      "label": "刑提纲",
+      "family": "palace",
+      "delta": -5.0,
+      "reading": "岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）"
+    },
+    {
+      "key": "palace.combine_month",
+      "label": "合提纲",
+      "family": "palace",
+      "delta": 4.0,
+      "reading": "岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）"
+    },
+    {
+      "key": "dayun.sui_sheng_yun",
+      "label": "岁生运",
+      "family": "dayun",
+      "delta": 4.0,
+      "reading": "流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）"
+    },
+    {
+      "key": "dishi.prosperous",
+      "label": "日主临官帝旺",
+      "family": "dishi",
+      "delta": 7.0,
+      "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+    },
+    {
+      "key": "shensha.jiesha",
+      "label": "劫煞",
+      "family": "shensha",
+      "delta": -5.0,
+      "reading": "劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）"
+    },
+    {
+      "key": "shensha.wangshen",
+      "label": "亡神",
+      "family": "shensha",
+      "delta": -5.0,
+      "reading": "亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）"
+    },
+    {
+      "key": "yue.yongshen.gan_unfavourable",
+      "label": "运干入忌（流月）",
+      "family": "yongshen",
+      "delta": -10.0,
+      "reading": "岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）"
+    },
+    {
+      "key": "yue.yongshen.zhi_favourable",
+      "label": "运支主气入喜用（流月）",
+      "family": "yongshen",
+      "delta": 8.0,
+      "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+    },
+    {
+      "key": "yue.palace.punish_day",
+      "label": "刑本身宫（流月）",
+      "family": "palace",
+      "delta": -5.0,
+      "reading": "岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）"
+    },
+    {
+      "key": "yue.ganzhi.chong_day_master",
+      "label": "运干冲日主（流月）",
+      "family": "ganzhi",
+      "delta": -5.0,
+      "reading": "岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）"
+    },
+    {
+      "key": "yue.dishi.prosperous",
+      "label": "日主临官帝旺（流月）",
+      "family": "dishi",
+      "delta": 7.0,
+      "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+    },
+    {
+      "key": "yue.shensha.jiangxing",
+      "label": "将星（流月）",
+      "family": "shensha",
+      "delta": 4.0,
+      "reading": "将星入岁运之支，其年可得众（《三命通会·论将星华盖》）"
+    },
+    {
+      "key": "yue.shensha.yuede",
+      "label": "月德贵人（流月）",
+      "family": "shensha",
+      "delta": 4.0,
+      "reading": "月德在岁运之干，其年月德神加临（《三命通会·论天月德》）"
+    },
+    {
+      "key": "yue.shensha.yangren",
+      "label": "羊刃（流月）",
+      "family": "shensha",
+      "delta": -6.0,
+      "reading": "岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）"
+    }
+  ],
+  "days": [
+    {
+      "solar_date": "2025-06-05",
+      "weekday": 3,
+      "lunar_day": "五初十",
+      "ganzhi": "乙巳",
+      "value": 79.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_month",
+          "label": "刑提纲（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.palace.combine_month",
+          "label": "合提纲（流日）",
+          "family": "palace",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "求嗣",
+          "嫁娶",
+          "纳采",
+          "合帐",
+          "裁衣",
+          "冠笄",
+          "伐木",
+          "作梁",
+          "修造",
+          "动土",
+          "起基",
+          "竖柱",
+          "上梁",
+          "安门",
+          "作灶",
+          "筑堤",
+          "造畜稠"
+        ],
+        "ji": [
+          "安葬",
+          "出行",
+          "祈福",
+          "栽种"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-06",
+      "weekday": 4,
+      "lunar_day": "五十一",
+      "ganzhi": "丙午",
+      "value": 78.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_day",
+          "label": "刑本身宫（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.fuyin.fuyin",
+          "label": "伏吟（流日）",
+          "family": "fuyin",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.yangren",
+          "label": "羊刃（流日）",
+          "family": "shensha",
+          "delta": -6.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "解除",
+          "馀事勿取"
+        ],
+        "ji": [
+          "诸事不宜"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-07",
+      "weekday": 5,
+      "lunar_day": "五十二",
+      "ganzhi": "丁未",
+      "value": 69.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.combine_day",
+          "label": "合本身宫（流日）",
+          "family": "palace",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.jinyu",
+          "label": "金舆（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "祭祀",
+          "祈福",
+          "出火",
+          "开光",
+          "求嗣",
+          "出行",
+          "拆卸",
+          "开市",
+          "交易",
+          "立券",
+          "挂匾",
+          "入宅",
+          "移徙",
+          "安床",
+          "栽种",
+          "动土"
+        ],
+        "ji": [
+          "安葬",
+          "行丧",
+          "伐木",
+          "作梁"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-08",
+      "weekday": 6,
+      "lunar_day": "五十三",
+      "ganzhi": "戊申",
+      "value": 45.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.wenchang",
+          "label": "文昌贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "开光",
+          "求嗣",
+          "出行",
+          "解除",
+          "伐木",
+          "出火",
+          "拆卸",
+          "修造",
+          "上梁",
+          "起基",
+          "入宅",
+          "移徙",
+          "开市",
+          "交易",
+          "立券",
+          "栽种",
+          "牧养",
+          "入殓",
+          "安葬",
+          "除服",
+          "成服"
+        ],
+        "ji": [
+          "置产",
+          "安床"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-09",
+      "weekday": 0,
+      "lunar_day": "五十四",
+      "ganzhi": "己酉",
+      "value": 49.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "理发",
+          "修饰垣墙",
+          "平治道涂",
+          "沐浴",
+          "整手足甲",
+          "扫舍"
+        ],
+        "ji": [
+          "出行",
+          "安门",
+          "修造",
+          "嫁娶",
+          "上梁",
+          "入宅"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-10",
+      "weekday": 1,
+      "lunar_day": "五十五",
+      "ganzhi": "庚戌",
+      "value": 44.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.anhe_favourable",
+          "label": "半合喜用（流日）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "祭祀",
+          "开光",
+          "祈福",
+          "求嗣",
+          "出行",
+          "出火",
+          "拆卸",
+          "动土",
+          "修造",
+          "进人口",
+          "入宅",
+          "移徙",
+          "安床",
+          "挂匾",
+          "交易",
+          "立券",
+          "栽种",
+          "纳畜",
+          "入殓",
+          "破土",
+          "启钻",
+          "安葬"
+        ],
+        "ji": [
+          "无"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-11",
+      "weekday": 2,
+      "lunar_day": "五十六",
+      "ganzhi": "辛亥",
+      "value": 37.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.harm_month",
+          "label": "害提纲（流日）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "ri.ganzhi.combine_day_master",
+          "label": "运干合日主（流日）",
+          "family": "ganzhi",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "祈福",
+          "求嗣",
+          "开光",
+          "出行",
+          "伐木",
+          "出火",
+          "拆卸",
+          "修造",
+          "动土",
+          "起基",
+          "安床",
+          "入宅",
+          "移徙"
+        ],
+        "ji": [
+          "嫁娶",
+          "开市",
+          "交易",
+          "行丧",
+          "安葬",
+          "修坟"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-12",
+      "weekday": 3,
+      "lunar_day": "五十七",
+      "ganzhi": "壬子",
+      "value": 32.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.chong_day",
+          "label": "冲本身宫（流日）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.sanhe_unfavourable",
+          "label": "三合成忌（流日）",
+          "family": "heyue",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.ganzhi.chong_day_master",
+          "label": "运干冲日主（流日）",
+          "family": "ganzhi",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.fuyin.fanyin",
+          "label": "反吟（流日）",
+          "family": "fuyin",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.yuede",
+          "label": "月德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "破屋",
+          "坏垣",
+          "馀事勿取"
+        ],
+        "ji": [
+          "诸事不宜"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-13",
+      "weekday": 4,
+      "lunar_day": "五十八",
+      "ganzhi": "癸丑",
+      "value": 51.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.harm_day",
+          "label": "害本身宫（流日）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.tiande",
+          "label": "天德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "开市",
+          "交易",
+          "立券",
+          "纳财",
+          "开池",
+          "开厕",
+          "结网",
+          "祭祀",
+          "修造",
+          "动土",
+          "安床",
+          "放水",
+          "经络",
+          "破土"
+        ],
+        "ji": [
+          "嫁娶",
+          "造桥",
+          "词讼",
+          "移徙",
+          "安门",
+          "作灶",
+          "栽种"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-14",
+      "weekday": 5,
+      "lunar_day": "五十九",
+      "ganzhi": "甲寅",
+      "value": 77.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.chong_month",
+          "label": "冲提纲（流日）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.punish_month",
+          "label": "刑提纲（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.heyue.anhe_favourable",
+          "label": "半合喜用（流日）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "开市",
+          "交易",
+          "立券",
+          "纳财",
+          "栽种",
+          "安床",
+          "拆卸",
+          "修造",
+          "动土",
+          "上梁",
+          "入殓",
+          "安葬",
+          "破土",
+          "除服",
+          "成服"
+        ],
+        "ji": [
+          "嫁娶",
+          "出火",
+          "伐木",
+          "祭祀",
+          "入宅",
+          "移徙",
+          "纳畜",
+          "探病"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-15",
+      "weekday": 6,
+      "lunar_day": "五二十",
+      "ganzhi": "乙卯",
+      "value": 86.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "作灶",
+          "馀事勿取"
+        ],
+        "ji": [
+          "诸事不宜"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-16",
+      "weekday": 0,
+      "lunar_day": "五廿一",
+      "ganzhi": "丙辰",
+      "value": 71.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "解除",
+          "坏垣",
+          "馀事勿取"
+        ],
+        "ji": [
+          "诸事不宜"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-17",
+      "weekday": 1,
+      "lunar_day": "五廿二",
+      "ganzhi": "丁巳",
+      "value": 79.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_month",
+          "label": "刑提纲（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.palace.combine_month",
+          "label": "合提纲（流日）",
+          "family": "palace",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "修造",
+          "动土",
+          "起基",
+          "安门",
+          "安床",
+          "栽种",
+          "筑堤",
+          "补垣",
+          "造畜稠"
+        ],
+        "ji": [
+          "嫁娶",
+          "掘井",
+          "入宅",
+          "移徙",
+          "出火",
+          "出行",
+          "行丧",
+          "安葬",
+          "开光",
+          "理发",
+          "进人口"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-18",
+      "weekday": 2,
+      "lunar_day": "五廿三",
+      "ganzhi": "戊午",
+      "value": 63.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_day",
+          "label": "刑本身宫（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.yangren",
+          "label": "羊刃（流日）",
+          "family": "shensha",
+          "delta": -6.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "教牛马",
+          "断蚁",
+          "馀事勿取"
+        ],
+        "ji": [
+          "斋醮",
+          "移徙",
+          "入宅",
+          "动土"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-19",
+      "weekday": 3,
+      "lunar_day": "五廿四",
+      "ganzhi": "己未",
+      "value": 49.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.combine_day",
+          "label": "合本身宫（流日）",
+          "family": "palace",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.jinyu",
+          "label": "金舆（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "纳采",
+          "订盟",
+          "嫁娶",
+          "祭祀",
+          "祈福",
+          "开市",
+          "纳财",
+          "立券",
+          "移徙",
+          "出行",
+          "修造",
+          "动土",
+          "起基",
+          "定磉",
+          "竖柱",
+          "拆卸",
+          "扫舍",
+          "放水",
+          "安香",
+          "安床",
+          "造船",
+          "开池",
+          "掘井",
+          "造畜稠",
+          "栽种"
+        ],
+        "ji": [
+          "行丧",
+          "安葬",
+          "破土",
+          "作灶",
+          "伐木",
+          "斋醮"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-20",
+      "weekday": 4,
+      "lunar_day": "五廿五",
+      "ganzhi": "庚申",
+      "value": 45.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.wenchang",
+          "label": "文昌贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "开光",
+          "祭祀",
+          "祈福",
+          "出行",
+          "解除",
+          "移徙",
+          "入宅",
+          "开市",
+          "纳财",
+          "起基",
+          "修造",
+          "竖柱",
+          "上梁",
+          "盖屋",
+          "作灶",
+          "出火",
+          "安香",
+          "补垣",
+          "塞穴",
+          "拆卸",
+          "放水",
+          "扫舍",
+          "造仓",
+          "造船",
+          "栽种",
+          "安葬"
+        ],
+        "ji": [
+          "纳采",
+          "订盟",
+          "安床",
+          "谢土",
+          "破土",
+          "动土"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-21",
+      "weekday": 5,
+      "lunar_day": "五廿六",
+      "ganzhi": "辛酉",
+      "value": 54.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.ganzhi.combine_day_master",
+          "label": "运干合日主（流日）",
+          "family": "ganzhi",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "祭祀",
+          "理发",
+          "作灶",
+          "修饰垣墙",
+          "平治道涂",
+          "整手足甲",
+          "沐浴",
+          "冠笄"
+        ],
+        "ji": [
+          "破土",
+          "出行",
+          "栽种"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-22",
+      "weekday": 6,
+      "lunar_day": "五廿七",
+      "ganzhi": "壬戌",
+      "value": 43.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.anhe_favourable",
+          "label": "半合喜用（流日）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "ri.ganzhi.chong_day_master",
+          "label": "运干冲日主（流日）",
+          "family": "ganzhi",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.yuede",
+          "label": "月德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "纳采",
+          "订盟",
+          "祭祀",
+          "祈福",
+          "求嗣",
+          "开光",
+          "出火",
+          "出行",
+          "拆卸",
+          "修造",
+          "动土",
+          "进人口",
+          "入宅",
+          "移徙",
+          "安床",
+          "交易",
+          "立券",
+          "挂匾",
+          "纳财",
+          "入殓",
+          "安葬",
+          "启钻",
+          "除服",
+          "成服"
+        ],
+        "ji": [
+          "掘井",
+          "破土"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-23",
+      "weekday": 0,
+      "lunar_day": "五廿八",
+      "ganzhi": "癸亥",
+      "value": 36.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.harm_month",
+          "label": "害提纲（流日）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.tiande",
+          "label": "天德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "畋猎",
+          "捕捉",
+          "结网",
+          "取渔",
+          "祭祀",
+          "沐浴",
+          "馀事勿取"
+        ],
+        "ji": [
+          "嫁娶",
+          "开市",
+          "安葬",
+          "启钻",
+          "行丧"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-24",
+      "weekday": 1,
+      "lunar_day": "五廿九",
+      "ganzhi": "甲子",
+      "value": 61.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.chong_day",
+          "label": "冲本身宫（流日）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.sanhe_unfavourable",
+          "label": "三合成忌（流日）",
+          "family": "heyue",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "破屋",
+          "坏垣",
+          "馀事勿取"
+        ],
+        "ji": [
+          "移徙",
+          "入宅",
+          "开仓",
+          "出货财"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-25",
+      "weekday": 2,
+      "lunar_day": "六初一",
+      "ganzhi": "乙丑",
+      "value": 67.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.harm_day",
+          "label": "害本身宫（流日）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "斋醮",
+          "塑绘",
+          "开光",
+          "出行",
+          "修造",
+          "动土",
+          "造畜稠",
+          "安床",
+          "放水",
+          "掘井",
+          "开池",
+          "开厕",
+          "结网",
+          "破土"
+        ],
+        "ji": [
+          "出火",
+          "入宅"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-26",
+      "weekday": 3,
+      "lunar_day": "六初二",
+      "ganzhi": "丙寅",
+      "value": 77.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.chong_month",
+          "label": "冲提纲（流日）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.punish_month",
+          "label": "刑提纲（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.heyue.anhe_favourable",
+          "label": "半合喜用（流日）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "开市",
+          "交易",
+          "立券",
+          "挂匾",
+          "开光",
+          "解除",
+          "拆卸",
+          "动土",
+          "安床",
+          "修造",
+          "上梁",
+          "置产",
+          "栽种",
+          "破土",
+          "安葬"
+        ],
+        "ji": [
+          "作灶",
+          "出火",
+          "祭祀",
+          "嫁娶",
+          "入宅"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-27",
+      "weekday": 4,
+      "lunar_day": "六初三",
+      "ganzhi": "丁卯",
+      "value": 86.0,
+      "tier": "顺",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "结网",
+          "馀事勿取"
+        ],
+        "ji": [
+          "入宅",
+          "出行",
+          "掘井",
+          "安葬"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-28",
+      "weekday": 5,
+      "lunar_day": "六初四",
+      "ganzhi": "戊辰",
+      "value": 51.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "纳采",
+          "订盟",
+          "冠笄",
+          "造车器",
+          "祭祀",
+          "开光",
+          "祈福",
+          "求嗣",
+          "出行",
+          "解除",
+          "伐木",
+          "出火",
+          "入宅",
+          "拆卸",
+          "修造",
+          "动土",
+          "上梁",
+          "安床",
+          "栽种",
+          "破土"
+        ],
+        "ji": [
+          "行丧",
+          "置产",
+          "安葬"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-29",
+      "weekday": 6,
+      "lunar_day": "六初五",
+      "ganzhi": "己巳",
+      "value": 59.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_month",
+          "label": "刑提纲（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.palace.combine_month",
+          "label": "合提纲（流日）",
+          "family": "palace",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "合帐",
+          "裁衣",
+          "冠笄",
+          "伐木",
+          "上梁",
+          "出火",
+          "拆卸",
+          "移徙",
+          "修造",
+          "动土",
+          "安门",
+          "纳财",
+          "筑堤",
+          "栽种",
+          "塞穴"
+        ],
+        "ji": [
+          "安床",
+          "祈福",
+          "出行",
+          "安葬",
+          "行丧",
+          "开光"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-06-30",
+      "weekday": 0,
+      "lunar_day": "六初六",
+      "ganzhi": "庚午",
+      "value": 63.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "family": "yongshen",
+          "delta": 8.0
+        },
+        {
+          "key": "ri.palace.punish_day",
+          "label": "刑本身宫（流日）",
+          "family": "palace",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.dishi.prosperous",
+          "label": "日主临官帝旺（流日）",
+          "family": "dishi",
+          "delta": 7.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.yangren",
+          "label": "羊刃（流日）",
+          "family": "shensha",
+          "delta": -6.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "出行",
+          "教牛马",
+          "割蜜",
+          "馀事勿取"
+        ],
+        "ji": [
+          "斋醮",
+          "盖屋",
+          "动土",
+          "破土"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-01",
+      "weekday": 1,
+      "lunar_day": "六初七",
+      "ganzhi": "辛未",
+      "value": 54.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.combine_day",
+          "label": "合本身宫（流日）",
+          "family": "palace",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.ganzhi.combine_day_master",
+          "label": "运干合日主（流日）",
+          "family": "ganzhi",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.jinyu",
+          "label": "金舆（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "祭祀",
+          "祈福",
+          "求嗣",
+          "开光",
+          "出行",
+          "解除",
+          "出火",
+          "拆卸",
+          "修造",
+          "进人口",
+          "入宅",
+          "移徙",
+          "动土",
+          "安床",
+          "纳畜",
+          "栽种",
+          "纳财",
+          "交易",
+          "立券",
+          "挂匾",
+          "造畜稠"
+        ],
+        "ji": [
+          "安葬",
+          "开生坟",
+          "行丧"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-02",
+      "weekday": 2,
+      "lunar_day": "六初八",
+      "ganzhi": "壬申",
+      "value": 44.0,
+      "tier": "滞",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.ganzhi.chong_day_master",
+          "label": "运干冲日主（流日）",
+          "family": "ganzhi",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.wenchang",
+          "label": "文昌贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.yuede",
+          "label": "月德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "安机械",
+          "祭祀",
+          "祈福",
+          "求嗣",
+          "沐浴",
+          "解除",
+          "纳采",
+          "开市",
+          "修造",
+          "竖柱",
+          "上梁",
+          "开柱眼",
+          "安碓磑",
+          "归岫",
+          "补垣",
+          "塞穴",
+          "拆卸",
+          "放水",
+          "出火",
+          "扫舍",
+          "开生坟",
+          "合寿木",
+          "安葬",
+          "谢土",
+          "启钻",
+          "除服",
+          "成服"
+        ],
+        "ji": [
+          "嫁娶",
+          "安床",
+          "作灶",
+          "动土",
+          "破土",
+          "造船"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-03",
+      "weekday": 3,
+      "lunar_day": "六初九",
+      "ganzhi": "癸酉",
+      "value": 53.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_unfavourable",
+          "label": "运干入忌（流日）",
+          "family": "yongshen",
+          "delta": -10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.tiande",
+          "label": "天德贵人（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "family": "shensha",
+          "delta": 3.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "沐浴",
+          "理发",
+          "整手足甲",
+          "修饰垣墙",
+          "平治道涂",
+          "馀事勿取"
+        ],
+        "ji": [
+          "开市",
+          "入宅",
+          "出行",
+          "修造",
+          "词讼"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-04",
+      "weekday": 4,
+      "lunar_day": "六初十",
+      "ganzhi": "甲戌",
+      "value": 56.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.anhe_favourable",
+          "label": "半合喜用（流日）",
+          "family": "heyue",
+          "delta": 3.0
+        },
+        {
+          "key": "ri.fuyin.fanyin",
+          "label": "反吟（流日）",
+          "family": "fuyin",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "嫁娶",
+          "纳采",
+          "祭祀",
+          "祈福",
+          "出行",
+          "立券",
+          "移徙",
+          "入宅",
+          "动土",
+          "破土",
+          "安葬"
+        ],
+        "ji": [
+          "开光",
+          "作灶",
+          "盖屋",
+          "架马",
+          "开仓"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-05",
+      "weekday": 5,
+      "lunar_day": "六十一",
+      "ganzhi": "乙亥",
+      "value": 52.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.harm_month",
+          "label": "害提纲（流日）",
+          "family": "palace",
+          "delta": -4.0
+        },
+        {
+          "key": "ri.dishi.decaying",
+          "label": "日主临衰病死墓绝（流日）",
+          "family": "dishi",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.shensha.tianyi",
+          "label": "天乙贵人（流日）",
+          "family": "shensha",
+          "delta": 5.0
+        },
+        {
+          "key": "ri.shensha.jiesha",
+          "label": "劫煞（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        },
+        {
+          "key": "ri.shensha.wangshen",
+          "label": "亡神（流日）",
+          "family": "shensha",
+          "delta": -5.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "纳采",
+          "订盟",
+          "冠笄",
+          "祭祀",
+          "祈福",
+          "斋醮",
+          "出行",
+          "修造",
+          "动土",
+          "移徙",
+          "入宅",
+          "安香",
+          "出火",
+          "拆卸",
+          "盖屋",
+          "起基",
+          "竖柱",
+          "上梁",
+          "定磉",
+          "安门",
+          "开池"
+        ],
+        "ji": [
+          "嫁娶",
+          "开市",
+          "合寿木",
+          "安葬"
+        ]
+      }
+    },
+    {
+      "solar_date": "2025-07-06",
+      "weekday": 6,
+      "lunar_day": "六十二",
+      "ganzhi": "丙子",
+      "value": 61.0,
+      "tier": "平",
+      "day_hits": [
+        {
+          "key": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "family": "yongshen",
+          "delta": 10.0
+        },
+        {
+          "key": "ri.yongshen.zhi_unfavourable",
+          "label": "运支主气入忌（流日）",
+          "family": "yongshen",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.palace.chong_day",
+          "label": "冲本身宫（流日）",
+          "family": "palace",
+          "delta": -8.0
+        },
+        {
+          "key": "ri.heyue.sanhe_unfavourable",
+          "label": "三合成忌（流日）",
+          "family": "heyue",
+          "delta": -6.0
+        },
+        {
+          "key": "ri.dishi.supportive",
+          "label": "日主临长生冠带胎养（流日）",
+          "family": "dishi",
+          "delta": 4.0
+        },
+        {
+          "key": "ri.shensha.jiangxing",
+          "label": "将星（流日）",
+          "family": "shensha",
+          "delta": 4.0
+        }
+      ],
+      "almanac": {
+        "yi": [
+          "祭祀",
+          "沐浴",
+          "破屋",
+          "坏垣",
+          "馀事勿取"
+        ],
+        "ji": [
+          "入宅",
+          "嫁娶",
+          "移徙"
+        ]
+      }
+    }
+  ],
+  "focused": {
+    "solar_date": "2025-06-15",
+    "weekday": 6,
+    "lunar_day": "五二十",
+    "ganzhi": "乙卯",
+    "value": 86.0,
+    "tier": "顺",
+    "day_hits": [
+      {
+        "key": "ri.yongshen.gan_favourable",
+        "label": "运干入喜用（流日）",
+        "family": "yongshen",
+        "delta": 10.0
+      },
+      {
+        "key": "ri.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流日）",
+        "family": "yongshen",
+        "delta": 8.0
+      },
+      {
+        "key": "ri.shensha.taiji",
+        "label": "太极贵人（流日）",
+        "family": "shensha",
+        "delta": 3.0
+      }
+    ],
+    "almanac": {
+      "yi": [
+        "祭祀",
+        "作灶",
+        "馀事勿取"
+      ],
+      "ji": [
+        "诸事不宜"
+      ]
+    },
+    "pillar": {
+      "position": "transit_day",
+      "label": "流日",
+      "ganzhi": "乙卯",
+      "gan": "乙",
+      "zhi": "卯",
+      "gan_element": "木",
+      "zhi_element": "木",
+      "nayin": "大溪水",
+      "hidden_stems": [
+        "乙"
+      ],
+      "hidden_stem_elements": [
+        "木"
+      ],
+      "shishen_gan": "正印",
+      "shishen_zhi": [
+        "正印"
+      ],
+      "di_shi": "沐浴",
+      "xun": "甲寅",
+      "xun_kong": "子丑"
+    },
+    "ten_god": {
+      "god": "正印",
+      "meaning": "所谓印？生我者，即印绶也，经曰：『有官无印，即非真官；有印无官，反成其福。』",
+      "source": "《渊海子平·论印绶》"
+    },
+    "score": {
+      "value": 86.0,
+      "tier": "顺",
+      "factors": [
+        {
+          "rule": "transit.base",
+          "label": "基准分",
+          "delta": 50.0,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        },
+        {
+          "rule": "yongshen.gan_favourable",
+          "label": "运干入喜用",
+          "delta": 10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yongshen.zhi_favourable",
+          "label": "运支主气入喜用",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "palace.punish_month",
+          "label": "刑提纲",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "palace.combine_month",
+          "label": "合提纲",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "dayun.sui_sheng_yun",
+          "label": "岁生运",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "dishi.prosperous",
+          "label": "日主临官帝旺",
+          "delta": 7.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shensha.jiesha",
+          "label": "劫煞",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "shensha.wangshen",
+          "label": "亡神",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.yongshen.gan_unfavourable",
+          "label": "运干入忌（流月）",
+          "delta": -10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流月）",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.palace.punish_day",
+          "label": "刑本身宫（流月）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.ganzhi.chong_day_master",
+          "label": "运干冲日主（流月）",
+          "delta": -5.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.dishi.prosperous",
+          "label": "日主临官帝旺（流月）",
+          "delta": 7.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.jiangxing",
+          "label": "将星（流月）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.yuede",
+          "label": "月德贵人（流月）",
+          "delta": 4.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "yue.shensha.yangren",
+          "label": "羊刃（流月）",
+          "delta": -6.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.yongshen.gan_favourable",
+          "label": "运干入喜用（流日）",
+          "delta": 10.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.yongshen.zhi_favourable",
+          "label": "运支主气入喜用（流日）",
+          "delta": 8.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        },
+        {
+          "rule": "ri.shensha.taiji",
+          "label": "太极贵人（流日）",
+          "delta": 3.0,
+          "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+        }
+      ]
+    },
+    "fired": [
+      {
+        "key": "yongshen.gan_favourable",
+        "label": "运干入喜用",
+        "family": "yongshen",
+        "delta": 10.0,
+        "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+      },
+      {
+        "key": "yongshen.zhi_favourable",
+        "label": "运支主气入喜用",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "palace.punish_month",
+        "label": "刑提纲",
+        "family": "palace",
+        "delta": -5.0,
+        "reading": "岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）"
+      },
+      {
+        "key": "palace.combine_month",
+        "label": "合提纲",
+        "family": "palace",
+        "delta": 4.0,
+        "reading": "岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）"
+      },
+      {
+        "key": "dayun.sui_sheng_yun",
+        "label": "岁生运",
+        "family": "dayun",
+        "delta": 4.0,
+        "reading": "流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）"
+      },
+      {
+        "key": "dishi.prosperous",
+        "label": "日主临官帝旺",
+        "family": "dishi",
+        "delta": 7.0,
+        "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+      },
+      {
+        "key": "shensha.jiesha",
+        "label": "劫煞",
+        "family": "shensha",
+        "delta": -5.0,
+        "reading": "劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）"
+      },
+      {
+        "key": "shensha.wangshen",
+        "label": "亡神",
+        "family": "shensha",
+        "delta": -5.0,
+        "reading": "亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）"
+      },
+      {
+        "key": "yue.yongshen.gan_unfavourable",
+        "label": "运干入忌（流月）",
+        "family": "yongshen",
+        "delta": -10.0,
+        "reading": "岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）"
+      },
+      {
+        "key": "yue.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流月）",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "yue.palace.punish_day",
+        "label": "刑本身宫（流月）",
+        "family": "palace",
+        "delta": -5.0,
+        "reading": "岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）"
+      },
+      {
+        "key": "yue.ganzhi.chong_day_master",
+        "label": "运干冲日主（流月）",
+        "family": "ganzhi",
+        "delta": -5.0,
+        "reading": "岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）"
+      },
+      {
+        "key": "yue.dishi.prosperous",
+        "label": "日主临官帝旺（流月）",
+        "family": "dishi",
+        "delta": 7.0,
+        "reading": "岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）"
+      },
+      {
+        "key": "yue.shensha.jiangxing",
+        "label": "将星（流月）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "将星入岁运之支，其年可得众（《三命通会·论将星华盖》）"
+      },
+      {
+        "key": "yue.shensha.yuede",
+        "label": "月德贵人（流月）",
+        "family": "shensha",
+        "delta": 4.0,
+        "reading": "月德在岁运之干，其年月德神加临（《三命通会·论天月德》）"
+      },
+      {
+        "key": "yue.shensha.yangren",
+        "label": "羊刃（流月）",
+        "family": "shensha",
+        "delta": -6.0,
+        "reading": "岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）"
+      },
+      {
+        "key": "ri.yongshen.gan_favourable",
+        "label": "运干入喜用（流日）",
+        "family": "yongshen",
+        "delta": 10.0,
+        "reading": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）"
+      },
+      {
+        "key": "ri.yongshen.zhi_favourable",
+        "label": "运支主气入喜用（流日）",
+        "family": "yongshen",
+        "delta": 8.0,
+        "reading": "支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）"
+      },
+      {
+        "key": "ri.shensha.taiji",
+        "label": "太极贵人（流日）",
+        "family": "shensha",
+        "delta": 3.0,
+        "reading": "太极贵人临岁运，其年月心神清明（《三命通会·论太极贵》）"
+      }
+    ],
+    "narrative": "岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；岁运之支与月支构成三刑，所刑在提纲（《三命通会·论三刑》）；岁运之支与月支六合，提纲被合则其令有所牵（《三命通会·论支元六合》）；流年之五行生大运之五行，运受岁之养而气不壅（本系统以五行相生定运岁关系）；岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）；劫煞临岁运之支，其年月防夺（《三命通会·论劫煞亡神》）；亡神临岁运之支，其年月防失（《三命通会·论劫煞亡神》）；岁运天干是我忌神之五行，其干所临年月宜守不宜攻（本系统以喜忌集定向背）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；岁运之支与日支构成三刑，所刑在身宫与配偶之宫（《三命通会·论三刑》）；岁运天干与日主七位相冲，其年正面相抗（《三命通会·论冲击》，戊己中央不冲为本系统取法）；岁运之支为日主临官、帝旺之地，其年月得地（《三命通会·论五行旺相休囚死并寄生十二宫》）；将星入岁运之支，其年可得众（《三命通会·论将星华盖》）；月德在岁运之干，其年月德神加临（《三命通会·论天月德》）；岁运之支为日主羊刃，刚刃易伤（《三命通会·论羊刃》，刃以日干取、五阳干方有）；岁运天干是我喜用之五行，所临之年月事来顺意（本系统喜忌由扶抑、通关、调候三法合出）；支以本气为主，本气入喜用则其年月根基得助（本系统取藏干首位为本气，与赋分权重同源）；太极贵人临岁运，其年月心神清明（《三命通会·论太极贵》）。",
+    "relations": [
+      {
+        "kind": "天干五合",
+        "pillar_a": "year",
+        "pillar_b": "extra0",
+        "character_a": "庚",
+        "character_b": "乙",
+        "strength": "远位",
+        "transforming_element": "金",
+        "reading": "阳见阴、阴见阳为合，如男女相合而成夫妇之道；甲己中正、乙庚仁义、丙辛威制、丁壬淫慝、戊癸无情。所带五行是合化目标，非已化（须月令得旺气方论化）。",
+        "source": "《三命通会·论十干合》《论十干化气》"
+      },
+      {
+        "kind": "地支六害",
+        "pillar_a": "year",
+        "pillar_b": "extra0",
+        "character_a": "辰",
+        "character_b": "卯",
+        "strength": "远位",
+        "transforming_element": null,
+        "reading": "因六合而生六害，六害者，十二支凌战之辰。六，六亲；害，损也。犯之主六亲上有损克，故谓六害；大率主妨害孤独，骨肉参商。",
+        "source": "《三命通会·论六害》"
+      },
+      {
+        "kind": "地支六破",
+        "pillar_a": "day",
+        "pillar_b": "extra0",
+        "character_a": "午",
+        "character_b": "卯",
+        "strength": "隔位",
+        "transforming_element": null,
+        "reading": "破煞，卯与午、丑与辰、子与酉、未与戌皆相破；惟寅申巳亥原破、却与合，故不取。犯者主少年灾滞，财产耗散，兼有折伤之灾。",
+        "source": "《三命通会·卷三·总论诸神煞》破煞"
+      },
+      {
+        "kind": "地支六破",
+        "pillar_a": "hour",
+        "pillar_b": "extra0",
+        "character_a": "午",
+        "character_b": "卯",
+        "strength": "紧临",
+        "transforming_element": null,
+        "reading": "破煞，卯与午、丑与辰、子与酉、未与戌皆相破；惟寅申巳亥原破、却与合，故不取。犯者主少年灾滞，财产耗散，兼有折伤之灾。",
+        "source": "《三命通会·卷三·总论诸神煞》破煞"
+      }
+    ],
+    "shensha": [
+      {
+        "name": "太极贵人",
+        "quality": "吉",
+        "checked_from": "日干丙",
+        "matches": [
+          {
+            "position": "extra0",
+            "character": "卯",
+            "at": "zhi"
+          }
+        ],
+        "meaning": "太极者，太初也，始也，物造于初为太极，成也，收也；造化始终相保，乃曰太极贵也。",
+        "source": "《三命通会·论太极贵》"
+      },
+      {
+        "name": "咸池",
+        "quality": "中性",
+        "checked_from": "申子辰局、寅午戌局",
+        "matches": [
+          {
+            "position": "extra0",
+            "character": "卯",
+            "at": "zhi"
+          }
+        ],
+        "meaning": "五行沐浴之地，名咸池，一名败神、一名桃花煞。生旺则美容仪，死绝则落魄不检；咸池非吉煞，日时与水命遇之尤凶。",
+        "source": "《三命通会·论咸池》"
+      }
+    ],
+    "branch_groups": []
+  },
+  "provenance": {
+    "reference_date": "2026-09-26",
+    "engine": "lunar-python",
+    "tables": [
+      {
+        "name": "bazi_shishen",
+        "version": "2026.09",
+        "source": "《渊海子平》"
+      },
+      {
+        "name": "bazi_nayin",
+        "version": "2026.09",
+        "source": "《三命通会》"
+      },
+      {
+        "name": "bazi_wangshuai",
+        "version": "2026.09",
+        "source": "《三命通会》定等第次序 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_geju",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_tiaohou",
+        "version": "2026.09",
+        "source": "本系统季节纲要（未采用《穷通宝鉴》逐月表）"
+      },
+      {
+        "name": "bazi_shensha",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_relations",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》《滴天髓》"
+      },
+      {
+        "name": "bazi_dimensions",
+        "version": "2026.09",
+        "source": "引文为判语（健康维只署本系统） · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_changsheng",
+        "version": "2026.09",
+        "source": "《三命通会·论五行旺相休囚死并寄生十二宫》（偏移与阳顺阴逆为本系统表法，与 lunar-python 120 格对拍）"
+      },
+      {
+        "name": "bazi_transit_rules",
+        "version": "2026.09",
+        "source": "命中条件与判语引《三命通会》《渊海子平》《滴天髓》；赋分为本系统模型参数（古籍只给喜忌序，从不给数）"
+      },
+      {
+        "name": "almanac_yiji",
+        "version": "1.4.8",
+        "source": "外部历法库 lunar-python（6tail/lunar-python）之通书宜忌，非本仓古籍语料，不参与任何计分"
+      }
+    ]
+  }
+}

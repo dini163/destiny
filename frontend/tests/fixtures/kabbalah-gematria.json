@@ -1,0 +1,78 @@
+{
+  "text": "CHAI",
+  "normalized": "CHAI",
+  "breakdown": [
+    {
+      "letter": "C",
+      "ordinal": 3,
+      "reduction": 3
+    },
+    {
+      "letter": "H",
+      "ordinal": 8,
+      "reduction": 8
+    },
+    {
+      "letter": "A",
+      "ordinal": 1,
+      "reduction": 1
+    },
+    {
+      "letter": "I",
+      "ordinal": 9,
+      "reduction": 9
+    }
+  ],
+  "english_ordinal": 21,
+  "english_reduction": 21,
+  "digital_root": 3,
+  "sephirah": {
+    "number": 1,
+    "id": "sephirah-1",
+    "name_hebrew": "כתר",
+    "name": "Kether",
+    "name_zh": "王冠",
+    "meaning": "万物未分之纯有，创造的第一点，超越一切名相的至高源头。",
+    "keywords": [
+      "源头",
+      "纯有",
+      "合一",
+      "无限光"
+    ],
+    "pillar": "equilibrium",
+    "pillar_name_zh": "中柱·平衡",
+    "world": "atziluth",
+    "world_name_zh": "原型界 · Atziluth",
+    "sphere": "原始涌动 · Primum Mobile",
+    "color": "#F7F3E3",
+    "archangel": "梅塔特隆 Metatron",
+    "divine_name": "אהיה Eheieh · 自有永有",
+    "x": 0.5,
+    "y": 0.04,
+    "is_hidden": false
+  },
+  "path": {
+    "number": 31,
+    "id": "path-31",
+    "from_sephirah": 8,
+    "to_sephirah": 10,
+    "from_name_zh": "荣耀",
+    "to_name_zh": "王国",
+    "letter": "ש",
+    "letter_name": "Shin",
+    "letter_zh": "辛",
+    "letter_value": 300,
+    "tarot": "Judgement",
+    "tarot_zh": "审判",
+    "tarot_numeral": "XX",
+    "correspondence": "火元素 Fire",
+    "meaning": "思想召唤最终的觉醒，审判号角响起，旧我死去而复活受召。"
+  },
+  "synthesis": "「CHAI」的英文 ordinal 数值为 21（reduction 21，数根 3）。折入生命之树，它相应于第 1 原质【王冠 כתר · 中柱·平衡 · 原始涌动 · Primum Mobile】——万物未分之纯有，创造的第一点，超越一切名相的至高源头。又连于第 31 路径【辛 ש（300）· 审判 XX · 火元素 Fire】——思想召唤最终的觉醒，审判号角响起，旧我死去而复活受召。两相参详：此名之数理落点，提示由「荣耀」经「审判」之路，趋近「王冠」之境的功课。",
+  "provenance": {
+    "engine": "kabbalah-gematria",
+    "content_version": "2026.09",
+    "source": "Golden Dawn 卡巴拉生命之树通行对应体系 · 十原质（Sephiroth）四界三柱与 22 路径（希伯来字母 / 塔罗大阿卡纳 / 行星星座元素），塔罗序号从黄金黎明制（力量 VIII · 正义 XI）",
+    "note": "gematria 以英文 ordinal（A=1…Z=26）逐字母求和，另附 reduction（每位数字根）与总值的数根；再以模运算把总值折到固定的十原质与 22 路径上（原质 = (值−1) mod 10 + 1，路径 = (值−1) mod 22 + 11）。这是一种供冥想的现代数理映射，并非传统卡巴拉的定论断语；命中原质与路径的释义仍取自策展语料，未作虚构。纯拉丁字母以外的字符（如中文）不计入，若一个拉丁字母也没有则报 gematria_no_latin_letters。"
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "question": "walkthrough cast",
+  "cast_time": "2024-05-15 10:30",
+  "year_ganzhi": "甲辰",
+  "month_ganzhi": "己巳",
+  "day_ganzhi": "己卯",
+  "time_ganzhi": "己巳",
+  "jieqi": "立夏",
+  "yuan": "上元",
+  "dun": "阳遁",
+  "ju_number": 4,
+  "ju_name": "阳遁四局",
+  "xunshou": "甲子",
+  "xunshou_yi": "戊",
+  "zhifu_star": "天辅",
+  "zhishi_door": "杜门",
+  "zhifu_palace": 2,
+  "zhishi_palace": 1,
+  "kongwang": "戌亥",
+  "yima": "亥",
+  "palaces": [
+    {
+      "number": 1,
+      "gua": "坎",
+      "direction": "北",
+      "element": "水",
+      "zhi": "子",
+      "row": 2,
+      "col": 1,
+      "is_center": false,
+      "dipan_gan": "丁",
+      "tianpan_gan": [
+        "乙"
+      ],
+      "stars": [
+        {
+          "name": "天冲",
+          "element": "木",
+          "luck": "吉",
+          "nature": "禄存·雷厉武动",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "杜门",
+        "element": "木",
+        "luck": "中平",
+        "nature": "杜藏闭塞·隐身躲避",
+        "is_zhishi": true
+      },
+      "god": {
+        "name": "九天",
+        "luck": "吉",
+        "nature": "扬动高远·出行扩张"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": true
+    },
+    {
+      "number": 2,
+      "gua": "坤",
+      "direction": "西南",
+      "element": "土",
+      "zhi": "未申",
+      "row": 0,
+      "col": 2,
+      "is_center": false,
+      "dipan_gan": "丙",
+      "tianpan_gan": [
+        "戊"
+      ],
+      "stars": [
+        {
+          "name": "天辅",
+          "element": "木",
+          "luck": "吉",
+          "nature": "文曲·文教辅助",
+          "is_zhifu": true
+        }
+      ],
+      "door": {
+        "name": "开门",
+        "element": "金",
+        "luck": "吉",
+        "nature": "开通发达·求财赴任",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "值符",
+        "luck": "吉",
+        "nature": "贵人首领·百恶不侵"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": true,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 3,
+      "gua": "震",
+      "direction": "东",
+      "element": "木",
+      "zhi": "卯",
+      "row": 1,
+      "col": 0,
+      "is_center": false,
+      "dipan_gan": "乙",
+      "tianpan_gan": [
+        "庚"
+      ],
+      "stars": [
+        {
+          "name": "天心",
+          "element": "金",
+          "luck": "吉",
+          "nature": "武曲·医药谋略",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "惊门",
+        "element": "金",
+        "luck": "凶",
+        "nature": "惊恐忧疑·官讼口舌",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "螣蛇",
+        "luck": "凶",
+        "nature": "虚惊怪异·缠绕不定"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 4,
+      "gua": "巽",
+      "direction": "东南",
+      "element": "木",
+      "zhi": "辰巳",
+      "row": 0,
+      "col": 0,
+      "is_center": false,
+      "dipan_gan": "戊",
+      "tianpan_gan": [
+        "辛"
+      ],
+      "stars": [
+        {
+          "name": "天柱",
+          "element": "金",
+          "luck": "凶",
+          "nature": "破军·毁折口舌",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "生门",
+        "element": "土",
+        "luck": "吉",
+        "nature": "生发兴隆·求财营造",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "太阴",
+        "luck": "吉",
+        "nature": "阴私暗助·隐秘谋划"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 5,
+      "gua": "中",
+      "direction": "中宫",
+      "element": "土",
+      "zhi": "",
+      "row": 1,
+      "col": 1,
+      "is_center": true,
+      "dipan_gan": "己",
+      "tianpan_gan": [],
+      "stars": [],
+      "door": null,
+      "god": null,
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 6,
+      "gua": "乾",
+      "direction": "西北",
+      "element": "金",
+      "zhi": "戌亥",
+      "row": 2,
+      "col": 2,
+      "is_center": false,
+      "dipan_gan": "庚",
+      "tianpan_gan": [
+        "壬"
+      ],
+      "stars": [
+        {
+          "name": "天任",
+          "element": "土",
+          "luck": "吉",
+          "nature": "左辅·诚信敦厚",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "景门",
+        "element": "火",
+        "luck": "中平",
+        "nature": "光明文书·宴乐奏章",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "六合",
+        "luck": "吉",
+        "nature": "和合婚姻·交易中介"
+      },
+      "kong": true,
+      "ma": true,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 7,
+      "gua": "兑",
+      "direction": "西",
+      "element": "金",
+      "zhi": "酉",
+      "row": 1,
+      "col": 2,
+      "is_center": false,
+      "dipan_gan": "辛",
+      "tianpan_gan": [
+        "癸"
+      ],
+      "stars": [
+        {
+          "name": "天英",
+          "element": "火",
+          "luck": "凶",
+          "nature": "右弼·血光浮躁",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "休门",
+        "element": "水",
+        "luck": "吉",
+        "nature": "休养生息·谒贵求财",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "白虎",
+        "luck": "凶",
+        "nature": "刚猛道路·凶伤血光"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 8,
+      "gua": "艮",
+      "direction": "东北",
+      "element": "土",
+      "zhi": "丑寅",
+      "row": 2,
+      "col": 0,
+      "is_center": false,
+      "dipan_gan": "壬",
+      "tianpan_gan": [
+        "丁"
+      ],
+      "stars": [
+        {
+          "name": "天蓬",
+          "element": "水",
+          "luck": "凶",
+          "nature": "贪狼·暗昧盗贼",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "死门",
+        "element": "土",
+        "luck": "凶",
+        "nature": "死寂闭塞·吊丧田猎",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "玄武",
+        "luck": "凶",
+        "nature": "盗贼暧昧·欺瞒暗昧"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    },
+    {
+      "number": 9,
+      "gua": "离",
+      "direction": "南",
+      "element": "火",
+      "zhi": "午",
+      "row": 0,
+      "col": 1,
+      "is_center": false,
+      "dipan_gan": "癸",
+      "tianpan_gan": [
+        "丙",
+        "己"
+      ],
+      "stars": [
+        {
+          "name": "天芮",
+          "element": "土",
+          "luck": "凶",
+          "nature": "巨门·疾病瘟癀",
+          "is_zhifu": false
+        },
+        {
+          "name": "天禽",
+          "element": "土",
+          "luck": "吉",
+          "nature": "廉贞·中正仁和",
+          "is_zhifu": false
+        }
+      ],
+      "door": {
+        "name": "伤门",
+        "element": "木",
+        "luck": "凶",
+        "nature": "伤害竞争·捕猎索债",
+        "is_zhishi": false
+      },
+      "god": {
+        "name": "九地",
+        "luck": "吉",
+        "nature": "沉静厚载·守藏屯兵"
+      },
+      "kong": false,
+      "ma": false,
+      "is_zhifu_palace": false,
+      "is_zhishi_palace": false
+    }
+  ],
+  "engine": "qimen-luoshu-rotating",
+  "provenance": {
+    "engine": "qimen-luoshu-rotating",
+    "content_version": "2026.09",
+    "source": "《烟波钓叟歌》阳遁/阴遁起局歌诀 · 时家奇门转盘法通行安盘",
+    "school_note": "起局用拆补法（以日干支符头定上中下元），非置闰超神接气法；排盘用转盘法（天盘/人盘整体旋转），非飞宫飞盘法。中五宫无门无神，天禽星与中宫地盘干寄坤二宫（转盘通行寄法）。八神取值符·螣蛇·太阴·六合·白虎·玄武·九地·九天八将（他派或以勾陈代白虎、朱雀代玄武）。时辰径取输入钟点，未作真太阳时校正；临界时辰请以校正后时间起局。"
+  }
+}

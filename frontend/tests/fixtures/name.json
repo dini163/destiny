@@ -1,0 +1,210 @@
+{
+  "input": {
+    "surname": "李",
+    "given": "明",
+    "resolved_traditional": "李明",
+    "modality": "单姓单名",
+    "modality_formula": "天格=姓+1；人格=姓末+名首；地格=名+1；总格=全字笔画和；外格=总格−人格+1"
+  },
+  "chars": [
+    {
+      "char": "李",
+      "resolved": "李",
+      "simplified": [],
+      "kangxi_strokes": 7,
+      "radical_no": 75,
+      "residual_strokes": 3,
+      "radical_char": "木",
+      "radical_strokes": 4,
+      "readings": [
+        {
+          "pinyin": "li",
+          "tone_number": 3,
+          "tone_name": "上声"
+        }
+      ],
+      "stroke_source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）"
+    },
+    {
+      "char": "明",
+      "resolved": "明",
+      "simplified": [],
+      "kangxi_strokes": 8,
+      "radical_no": 72,
+      "residual_strokes": 4,
+      "radical_char": "日",
+      "radical_strokes": 4,
+      "readings": [
+        {
+          "pinyin": "ming",
+          "tone_number": 2,
+          "tone_name": "阳平"
+        }
+      ],
+      "stroke_source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）"
+    }
+  ],
+  "grids": [
+    {
+      "key": "tian",
+      "label": "天格",
+      "formula": "7+1",
+      "value": 8,
+      "number": 8,
+      "fortune": "吉",
+      "yinyang": "阴",
+      "wuxing": "金",
+      "pattern_name": "八卦之数",
+      "verdict": "八卦之数，乾坎艮震，巽离坤兑，无穷无尽",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理8·粗分稿作「半吉」"
+    },
+    {
+      "key": "ren",
+      "label": "人格",
+      "formula": "7+8",
+      "value": 15,
+      "number": 15,
+      "fortune": "大吉",
+      "yinyang": "阳",
+      "wuxing": "土",
+      "pattern_name": "福寿",
+      "verdict": "福寿圆满，富贵荣誉，涵养雅量，德高望重",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理15·"
+    },
+    {
+      "key": "di",
+      "label": "地格",
+      "formula": "8+1",
+      "value": 9,
+      "number": 9,
+      "fortune": "凶",
+      "yinyang": "阳",
+      "wuxing": "水",
+      "pattern_name": "大成之数",
+      "verdict": "大成之数，蕴涵凶险，或成或败，难以把握",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理9·"
+    },
+    {
+      "key": "wai",
+      "label": "外格",
+      "formula": "15−15+1",
+      "value": 1,
+      "number": 1,
+      "fortune": "大吉",
+      "yinyang": "阳",
+      "wuxing": "木",
+      "pattern_name": "太极之数",
+      "verdict": "太极之数，万物开泰，生发无穷，利禄亨通",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理1·"
+    },
+    {
+      "key": "zong",
+      "label": "总格",
+      "formula": "7+8",
+      "value": 15,
+      "number": 15,
+      "fortune": "大吉",
+      "yinyang": "阳",
+      "wuxing": "土",
+      "pattern_name": "福寿",
+      "verdict": "福寿圆满，富贵荣誉，涵养雅量，德高望重",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理15·"
+    }
+  ],
+  "sancai": {
+    "elements": {
+      "tian": "金",
+      "ren": "土",
+      "di": "水"
+    },
+    "pairs": [
+      {
+        "pair": "天人",
+        "relation": "生我",
+        "verdict": "前者生助后者，得扶持之势，根基受养。",
+        "source": "三才配置生克关系（依五行生克图推导，措辞为通行姓名学整理，非古籍原文）"
+      },
+      {
+        "pair": "人地",
+        "relation": "我克",
+        "verdict": "前者克制后者，能任其事而需费力。",
+        "source": "三才配置生克关系（依五行生克图推导，措辞为通行姓名学整理，非古籍原文）"
+      },
+      {
+        "pair": "天地",
+        "relation": "我生",
+        "verdict": "前者泄气以生后者，付出多而自守薄。",
+        "source": "三才配置生克关系（依五行生克图推导，措辞为通行姓名学整理，非古籍原文）"
+      }
+    ],
+    "tier": "偏和"
+  },
+  "score": {
+    "value": 77.0,
+    "tier": "中上",
+    "factors": [
+      {
+        "rule": "score.base",
+        "label": "基准分",
+        "delta": 0.0,
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "rule": "name.grid.tian",
+        "label": "天格 8 数（吉·权重 0.15）",
+        "delta": 12.0,
+        "source": "模型参数（本系统加权，非古籍赋分） · 吉凶等级取自 熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理8·粗分稿作「半吉」"
+      },
+      {
+        "rule": "name.grid.ren",
+        "label": "人格 15 数（大吉·权重 0.30）",
+        "delta": 30.0,
+        "source": "模型参数（本系统加权，非古籍赋分） · 吉凶等级取自 熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理15·"
+      },
+      {
+        "rule": "name.grid.di",
+        "label": "地格 9 数（凶·权重 0.20）",
+        "delta": 0.0,
+        "source": "模型参数（本系统加权，非古籍赋分） · 吉凶等级取自 熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理9·"
+      },
+      {
+        "rule": "name.grid.wai",
+        "label": "外格 1 数（大吉·权重 0.10）",
+        "delta": 10.0,
+        "source": "模型参数（本系统加权，非古籍赋分） · 吉凶等级取自 熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理1·"
+      },
+      {
+        "rule": "name.grid.zong",
+        "label": "总格 15 数（大吉·权重 0.25）",
+        "delta": 25.0,
+        "source": "模型参数（本系统加权，非古籍赋分） · 吉凶等级取自 熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理15·"
+      }
+    ]
+  },
+  "warnings": [],
+  "provenance": {
+    "corpus": {
+      "unicode_version": "18.0.0",
+      "corpus_date": "2026-07-31",
+      "size": 30717,
+      "source": "《康熙字典》部首体系笔画，由 Unihan kRSUnicode + kTotalStrokes 推导（Unicode 18.0.0，30717 条）"
+    },
+    "tables": [
+      {
+        "name": "kangxi_strokes",
+        "version": "2026.09",
+        "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）"
+      },
+      {
+        "name": "name_numerology",
+        "version": "2026.09",
+        "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）"
+      },
+      {
+        "name": "name_sancai",
+        "version": "2026.09",
+        "source": "三才配置生克关系（依五行生克图推导，措辞为通行姓名学整理，非古籍原文）"
+      }
+    ]
+  }
+}

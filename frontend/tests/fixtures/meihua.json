@@ -1,0 +1,174 @@
+{
+  "method": "number",
+  "question": null,
+  "cast_time": "2024-05-15 10:30",
+  "derivation": {
+    "upper_number": 7,
+    "lower_number": 3,
+    "moving_position": 4,
+    "formula": "首数7÷8余7为上卦、次数3÷8余3为下卦；诸数合计10÷6余4为动爻",
+    "inputs": "报数 7、3"
+  },
+  "ben": {
+    "number": 22,
+    "name_zh": "贲",
+    "full_name_zh": "山火贲",
+    "symbol": "䷕",
+    "lines": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1
+    ],
+    "lower": {
+      "key": "li",
+      "name_zh": "离",
+      "symbol": "☲",
+      "nature_zh": "火",
+      "element": "火",
+      "position": "lower"
+    },
+    "upper": {
+      "key": "gen",
+      "name_zh": "艮",
+      "symbol": "☶",
+      "nature_zh": "山",
+      "element": "土",
+      "position": "upper"
+    },
+    "gua_ci": "亨，小利有攸往。"
+  },
+  "hu": {
+    "number": 40,
+    "name_zh": "解",
+    "full_name_zh": "雷水解",
+    "symbol": "䷧",
+    "lines": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0
+    ],
+    "lower": {
+      "key": "kan",
+      "name_zh": "坎",
+      "symbol": "☵",
+      "nature_zh": "水",
+      "element": "水",
+      "position": "lower"
+    },
+    "upper": {
+      "key": "zhen",
+      "name_zh": "震",
+      "symbol": "☳",
+      "nature_zh": "雷",
+      "element": "木",
+      "position": "upper"
+    },
+    "gua_ci": "利西南，无所往，其来复吉，有攸往，夙吉。"
+  },
+  "bian": {
+    "number": 30,
+    "name_zh": "离",
+    "full_name_zh": "离为火",
+    "symbol": "䷝",
+    "lines": [
+      1,
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "lower": {
+      "key": "li",
+      "name_zh": "离",
+      "symbol": "☲",
+      "nature_zh": "火",
+      "element": "火",
+      "position": "lower"
+    },
+    "upper": {
+      "key": "li",
+      "name_zh": "离",
+      "symbol": "☲",
+      "nature_zh": "火",
+      "element": "火",
+      "position": "upper"
+    },
+    "gua_ci": "利贞，亨。畜牝牛吉。"
+  },
+  "moving_position": 4,
+  "ti": {
+    "role": "ti",
+    "trigram": {
+      "key": "li",
+      "name_zh": "离",
+      "symbol": "☲",
+      "nature_zh": "火",
+      "element": "火",
+      "position": "lower"
+    },
+    "leixiang": "离为火：人物中女、文人、军人、美人；身体目、心、血脉；方位南；物象火、书画、甲胄、文明；性情附丽、光明、外明、性急。",
+    "wangshuai": "旺",
+    "wangshuai_text": "体卦当令而旺，气势正盛，吉者愈增其吉，凶者亦可稍减其凶，谋为有力。"
+  },
+  "yong": {
+    "role": "yong",
+    "trigram": {
+      "key": "gen",
+      "name_zh": "艮",
+      "symbol": "☶",
+      "nature_zh": "山",
+      "element": "土",
+      "position": "upper"
+    },
+    "leixiang": "艮为山：人物少男、童子、山人、僧道；身体手、指、背、鼻；方位东北；物象山石、门阙、果实、床；性情静止、稳重、固执、终止。",
+    "wangshuai": "相",
+    "wangshuai_text": "体卦得令气所生而相，气机方长，助力渐盛，吉事可成，谋为有继。"
+  },
+  "tiyong": {
+    "relation": "ti_sheng_yong",
+    "relation_zh": "体生用",
+    "verdict": "小凶",
+    "grade": -1,
+    "text": "体卦生助用卦，我气外泄、精力耗散，谋事多付出而少收获，主损耗，宜节流守成。"
+  },
+  "wangshuai": {
+    "month_zhi": "巳",
+    "season_zh": "孟夏",
+    "commanding_element": "火"
+  },
+  "hu_analysis": "互卦雷水解，下互坎水克体、上互震木生体（过程助力-1）。",
+  "bian_analysis": "用方由艮土变离火，比和体（结局+3）。",
+  "score": 52,
+  "score_factors": [
+    {
+      "label": "体用生克",
+      "detail": "离(火)为体、艮(土)为用，体生用",
+      "delta": -8
+    },
+    {
+      "label": "卦气旺衰",
+      "detail": "体卦火于孟夏（火当令）处「旺」",
+      "delta": 8
+    },
+    {
+      "label": "互卦(过程)",
+      "detail": "互卦雷水解，下互坎水克体、上互震木生体（过程助力-1）。",
+      "delta": -1
+    },
+    {
+      "label": "变卦(结局)",
+      "detail": "用方由艮土变离火，比和体（结局+3）。",
+      "delta": 3
+    }
+  ],
+  "verdict": "中平",
+  "summary": "中平。本卦山火贲，离火为体、艮山为用，体生用——体卦生助用卦，我气外泄、精力耗散，谋事多付出而少收获，主损耗，宜节流守成。体卦火于孟夏（火令）处「旺」，体卦当令而旺，气势正盛，吉者愈增其吉，凶者亦可稍减其凶，谋为有力。过程看互卦：互卦雷水解，下互坎水克体、上互震木生体（过程助力-1）。结局看变卦：用方由艮土变离火，比和体（结局+3）。卦辞曰：「亨，小利有攸往。」",
+  "engine": "meihua-tiyong"
+}

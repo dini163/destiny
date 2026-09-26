@@ -1,0 +1,90 @@
+{
+  "spread_id": "three_card",
+  "spread_name": "Three Card",
+  "spread_name_zh": "时间之流三张",
+  "spread_description": "The flow of a situation across time: past, present and future.",
+  "question": null,
+  "cards": [
+    {
+      "position_index": 0,
+      "position_key": "past",
+      "position_label": "Past",
+      "position_label_zh": "过去",
+      "position_meaning": "Roots and events already shaping the situation.",
+      "card_id": "pentacles-13",
+      "name": "Queen of Pentacles",
+      "name_zh": "星币王后",
+      "arcana": "minor",
+      "number": 13,
+      "suit": "pentacles",
+      "rank": "Queen",
+      "element": "earth",
+      "orientation": "upright",
+      "keywords": [
+        "practical",
+        "motherly",
+        "down-to-earth",
+        "security",
+        "abundance"
+      ],
+      "meaning": "The queen sits among roses holding a pentacle, warm, practical and quietly abundant."
+    },
+    {
+      "position_index": 1,
+      "position_key": "present",
+      "position_label": "Present",
+      "position_label_zh": "现在",
+      "position_meaning": "The current dynamics and where you stand now.",
+      "card_id": "pentacles-07",
+      "name": "Seven of Pentacles",
+      "name_zh": "星币七",
+      "arcana": "minor",
+      "number": 7,
+      "suit": "pentacles",
+      "rank": null,
+      "element": "earth",
+      "orientation": "reversed",
+      "keywords": [
+        "lack of long-term vision",
+        "limited reward",
+        "impatience",
+        "doubt"
+      ],
+      "meaning": "Reversed, the harvest seems too slow and effort feels unrewarded; reassess the investment."
+    },
+    {
+      "position_index": 2,
+      "position_key": "future",
+      "position_label": "Future",
+      "position_label_zh": "未来",
+      "position_meaning": "The likely direction if things continue as they are.",
+      "card_id": "major-13",
+      "name": "Death",
+      "name_zh": "死神",
+      "arcana": "major",
+      "number": 13,
+      "suit": null,
+      "rank": null,
+      "element": null,
+      "orientation": "reversed",
+      "keywords": [
+        "resistance to change",
+        "inability to move on",
+        "stagnation",
+        "fear"
+      ],
+      "meaning": "Reversed, you cling to what has already died, resisting a change that would set you free."
+    }
+  ],
+  "drawn_ids": [
+    "pentacles-13",
+    "pentacles-07",
+    "major-13"
+  ],
+  "allow_reversed": true,
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Queen of Pentacles (星币王后) upright, highlighting practical, motherly, down-to-earth. Present (现在) draws Seven of Pentacles (星币七) reversed, highlighting lack of long-term vision, limited reward, impatience. Future (未来) draws Death (死神) reversed, highlighting resistance to change, inability to move on, stagnation. 1 Major Arcana card(s) mark the significant, fated threads running through an otherwise everyday situation. 2 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
+  "major_arcana_count": 1,
+  "reversed_count": 2,
+  "rng": "secrets",
+  "engine": "content-library"
+}

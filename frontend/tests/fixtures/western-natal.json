@@ -1,0 +1,425 @@
+{
+  "local_datetime": "2000-01-01 12:00",
+  "utc_datetime": "2000-01-01 12:00",
+  "julian_day": 2451545.0,
+  "latitude": 51.4769,
+  "longitude": -0.0005,
+  "utc_offset_hours": 0.0,
+  "utc_offset_source": "explicit",
+  "house_system": "P",
+  "zodiac": "tropical",
+  "sun_sign": "Capricorn",
+  "sun_sign_zh": "摩羯",
+  "moon_sign": "Scorpio",
+  "moon_sign_zh": "天蝎",
+  "ascendant_sign": "Aries",
+  "ascendant_sign_zh": "白羊",
+  "planets": [
+    {
+      "name": "Sun",
+      "glyph": "☉",
+      "name_zh": "太阳",
+      "longitude": 280.3689,
+      "sign": "Capricorn",
+      "sign_zh": "摩羯",
+      "sign_glyph": "♑",
+      "sign_index": 9,
+      "degree_in_sign": 10.3689,
+      "degree_text": "10°22'",
+      "house": 10,
+      "retrograde": false,
+      "speed": 1.019432
+    },
+    {
+      "name": "Moon",
+      "glyph": "☽",
+      "name_zh": "月亮",
+      "longitude": 223.3238,
+      "sign": "Scorpio",
+      "sign_zh": "天蝎",
+      "sign_glyph": "♏",
+      "sign_index": 7,
+      "degree_in_sign": 13.3238,
+      "degree_text": "13°19'",
+      "house": 7,
+      "retrograde": false,
+      "speed": 12.021183
+    },
+    {
+      "name": "Mercury",
+      "glyph": "☿",
+      "name_zh": "水星",
+      "longitude": 271.8893,
+      "sign": "Capricorn",
+      "sign_zh": "摩羯",
+      "sign_glyph": "♑",
+      "sign_index": 9,
+      "degree_in_sign": 1.8893,
+      "degree_text": "1°53'",
+      "house": 9,
+      "retrograde": false,
+      "speed": 1.556254
+    },
+    {
+      "name": "Venus",
+      "glyph": "♀",
+      "name_zh": "金星",
+      "longitude": 241.5658,
+      "sign": "Sagittarius",
+      "sign_zh": "射手",
+      "sign_glyph": "♐",
+      "sign_index": 8,
+      "degree_in_sign": 1.5658,
+      "degree_text": "1°34'",
+      "house": 8,
+      "retrograde": false,
+      "speed": 1.20904
+    },
+    {
+      "name": "Mars",
+      "glyph": "♂",
+      "name_zh": "火星",
+      "longitude": 327.9633,
+      "sign": "Aquarius",
+      "sign_zh": "水瓶",
+      "sign_glyph": "♒",
+      "sign_index": 10,
+      "degree_in_sign": 27.9633,
+      "degree_text": "27°58'",
+      "house": 12,
+      "retrograde": false,
+      "speed": 0.775673
+    },
+    {
+      "name": "Jupiter",
+      "glyph": "♃",
+      "name_zh": "木星",
+      "longitude": 25.253,
+      "sign": "Aries",
+      "sign_zh": "白羊",
+      "sign_glyph": "♈",
+      "sign_index": 0,
+      "degree_in_sign": 25.253,
+      "degree_text": "25°15'",
+      "house": 1,
+      "retrograde": false,
+      "speed": 0.040761
+    },
+    {
+      "name": "Saturn",
+      "glyph": "♄",
+      "name_zh": "土星",
+      "longitude": 40.3956,
+      "sign": "Taurus",
+      "sign_zh": "金牛",
+      "sign_glyph": "♉",
+      "sign_index": 1,
+      "degree_in_sign": 10.3956,
+      "degree_text": "10°24'",
+      "house": 1,
+      "retrograde": true,
+      "speed": -0.019945
+    },
+    {
+      "name": "Uranus",
+      "glyph": "♅",
+      "name_zh": "天王星",
+      "longitude": 314.8092,
+      "sign": "Aquarius",
+      "sign_zh": "水瓶",
+      "sign_glyph": "♒",
+      "sign_index": 10,
+      "degree_in_sign": 14.8092,
+      "degree_text": "14°49'",
+      "house": 11,
+      "retrograde": false,
+      "speed": 0.050344
+    },
+    {
+      "name": "Neptune",
+      "glyph": "♆",
+      "name_zh": "海王星",
+      "longitude": 303.193,
+      "sign": "Aquarius",
+      "sign_zh": "水瓶",
+      "sign_glyph": "♒",
+      "sign_index": 10,
+      "degree_in_sign": 3.193,
+      "degree_text": "3°12'",
+      "house": 11,
+      "retrograde": false,
+      "speed": 0.03557
+    },
+    {
+      "name": "Pluto",
+      "glyph": "♇",
+      "name_zh": "冥王星",
+      "longitude": 251.4547,
+      "sign": "Sagittarius",
+      "sign_zh": "射手",
+      "sign_glyph": "♐",
+      "sign_index": 8,
+      "degree_in_sign": 11.4547,
+      "degree_text": "11°27'",
+      "house": 8,
+      "retrograde": false,
+      "speed": 0.035153
+    }
+  ],
+  "axes": [
+    {
+      "name": "ASC",
+      "label": "Ascendant",
+      "longitude": 24.2641,
+      "sign": "Aries",
+      "sign_zh": "白羊",
+      "sign_index": 0,
+      "degree_in_sign": 24.2641,
+      "degree_text": "24°16'",
+      "house": 1
+    },
+    {
+      "name": "DES",
+      "label": "Descendant",
+      "longitude": 204.2641,
+      "sign": "Libra",
+      "sign_zh": "天秤",
+      "sign_index": 6,
+      "degree_in_sign": 24.2641,
+      "degree_text": "24°16'",
+      "house": 7
+    },
+    {
+      "name": "MC",
+      "label": "Midheaven",
+      "longitude": 279.6106,
+      "sign": "Capricorn",
+      "sign_zh": "摩羯",
+      "sign_index": 9,
+      "degree_in_sign": 9.6106,
+      "degree_text": "9°37'",
+      "house": 10
+    },
+    {
+      "name": "IC",
+      "label": "Nadir",
+      "longitude": 99.6106,
+      "sign": "Cancer",
+      "sign_zh": "巨蟹",
+      "sign_index": 3,
+      "degree_in_sign": 9.6106,
+      "degree_text": "9°37'",
+      "house": 4
+    }
+  ],
+  "houses": [
+    {
+      "house": 1,
+      "longitude": 24.2641,
+      "sign": "Aries",
+      "sign_zh": "白羊",
+      "degree_in_sign": 24.2641,
+      "degree_text": "24°16'"
+    },
+    {
+      "house": 2,
+      "longitude": 61.1409,
+      "sign": "Gemini",
+      "sign_zh": "双子",
+      "degree_in_sign": 1.1409,
+      "degree_text": "1°08'"
+    },
+    {
+      "house": 3,
+      "longitude": 82.0199,
+      "sign": "Gemini",
+      "sign_zh": "双子",
+      "degree_in_sign": 22.0199,
+      "degree_text": "22°01'"
+    },
+    {
+      "house": 4,
+      "longitude": 99.6106,
+      "sign": "Cancer",
+      "sign_zh": "巨蟹",
+      "degree_in_sign": 9.6106,
+      "degree_text": "9°37'"
+    },
+    {
+      "house": 5,
+      "longitude": 119.0618,
+      "sign": "Cancer",
+      "sign_zh": "巨蟹",
+      "degree_in_sign": 29.0618,
+      "degree_text": "29°04'"
+    },
+    {
+      "house": 6,
+      "longitude": 147.7005,
+      "sign": "Leo",
+      "sign_zh": "狮子",
+      "degree_in_sign": 27.7005,
+      "degree_text": "27°42'"
+    },
+    {
+      "house": 7,
+      "longitude": 204.2641,
+      "sign": "Libra",
+      "sign_zh": "天秤",
+      "degree_in_sign": 24.2641,
+      "degree_text": "24°16'"
+    },
+    {
+      "house": 8,
+      "longitude": 241.1409,
+      "sign": "Sagittarius",
+      "sign_zh": "射手",
+      "degree_in_sign": 1.1409,
+      "degree_text": "1°08'"
+    },
+    {
+      "house": 9,
+      "longitude": 262.0199,
+      "sign": "Sagittarius",
+      "sign_zh": "射手",
+      "degree_in_sign": 22.0199,
+      "degree_text": "22°01'"
+    },
+    {
+      "house": 10,
+      "longitude": 279.6106,
+      "sign": "Capricorn",
+      "sign_zh": "摩羯",
+      "degree_in_sign": 9.6106,
+      "degree_text": "9°37'"
+    },
+    {
+      "house": 11,
+      "longitude": 299.0618,
+      "sign": "Capricorn",
+      "sign_zh": "摩羯",
+      "degree_in_sign": 29.0618,
+      "degree_text": "29°04'"
+    },
+    {
+      "house": 12,
+      "longitude": 327.7005,
+      "sign": "Aquarius",
+      "sign_zh": "水瓶",
+      "degree_in_sign": 27.7005,
+      "degree_text": "27°42'"
+    }
+  ],
+  "aspects": [
+    {
+      "planet1": "Sun",
+      "planet2": "Saturn",
+      "type": "trine",
+      "glyph": "△",
+      "angle": 120.0,
+      "orb": 0.03
+    },
+    {
+      "planet1": "Moon",
+      "planet2": "Uranus",
+      "type": "square",
+      "glyph": "□",
+      "angle": 90.0,
+      "orb": 1.49
+    },
+    {
+      "planet1": "Venus",
+      "planet2": "Neptune",
+      "type": "sextile",
+      "glyph": "⚹",
+      "angle": 60.0,
+      "orb": 1.63
+    },
+    {
+      "planet1": "Mars",
+      "planet2": "Jupiter",
+      "type": "sextile",
+      "glyph": "⚹",
+      "angle": 60.0,
+      "orb": 2.71
+    },
+    {
+      "planet1": "Moon",
+      "planet2": "Saturn",
+      "type": "opposition",
+      "glyph": "☍",
+      "angle": 180.0,
+      "orb": 2.93
+    },
+    {
+      "planet1": "Sun",
+      "planet2": "Moon",
+      "type": "sextile",
+      "glyph": "⚹",
+      "angle": 60.0,
+      "orb": 2.95
+    },
+    {
+      "planet1": "Uranus",
+      "planet2": "Pluto",
+      "type": "sextile",
+      "glyph": "⚹",
+      "angle": 60.0,
+      "orb": 3.35
+    },
+    {
+      "planet1": "Venus",
+      "planet2": "Mars",
+      "type": "square",
+      "glyph": "□",
+      "angle": 90.0,
+      "orb": 3.6
+    },
+    {
+      "planet1": "Mercury",
+      "planet2": "Mars",
+      "type": "sextile",
+      "glyph": "⚹",
+      "angle": 60.0,
+      "orb": 3.93
+    },
+    {
+      "planet1": "Saturn",
+      "planet2": "Uranus",
+      "type": "square",
+      "glyph": "□",
+      "angle": 90.0,
+      "orb": 4.41
+    },
+    {
+      "planet1": "Mercury",
+      "planet2": "Jupiter",
+      "type": "trine",
+      "glyph": "△",
+      "angle": 120.0,
+      "orb": 6.64
+    }
+  ],
+  "nodes": {
+    "north_node_longitude": 125.0406,
+    "north_node_sign": "Leo",
+    "north_node_sign_zh": "狮子",
+    "north_node_house": 5,
+    "south_node_longitude": 305.0406,
+    "south_node_sign": "Aquarius",
+    "south_node_sign_zh": "水瓶",
+    "south_node_house": 11
+  },
+  "element_balance": {
+    "fire": 3,
+    "earth": 3,
+    "air": 3,
+    "water": 1
+  },
+  "modality_balance": {
+    "cardinal": 3,
+    "fixed": 5,
+    "mutable": 2
+  },
+  "engine": "pyswisseph"
+}

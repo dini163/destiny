@@ -1,0 +1,1117 @@
+{
+  "input": {
+    "full_name": "Liam Alexander Carter",
+    "name_zh": null,
+    "birth_date": "1990-05-15",
+    "reference_date": "2026-09-26",
+    "y_as_vowel": false,
+    "age_at_reference": 36,
+    "letter_count": 19,
+    "skipped_count": 2,
+    "skipped_chars": [
+      " "
+    ],
+    "vowel_total": 28,
+    "consonant_total": 57,
+    "letter_total": 85
+  },
+  "letters": [
+    {
+      "char": "L",
+      "value": 3,
+      "is_vowel": false
+    },
+    {
+      "char": "I",
+      "value": 9,
+      "is_vowel": true
+    },
+    {
+      "char": "A",
+      "value": 1,
+      "is_vowel": true
+    },
+    {
+      "char": "M",
+      "value": 4,
+      "is_vowel": false
+    },
+    {
+      "char": "A",
+      "value": 1,
+      "is_vowel": true
+    },
+    {
+      "char": "L",
+      "value": 3,
+      "is_vowel": false
+    },
+    {
+      "char": "E",
+      "value": 5,
+      "is_vowel": true
+    },
+    {
+      "char": "X",
+      "value": 6,
+      "is_vowel": false
+    },
+    {
+      "char": "A",
+      "value": 1,
+      "is_vowel": true
+    },
+    {
+      "char": "N",
+      "value": 5,
+      "is_vowel": false
+    },
+    {
+      "char": "D",
+      "value": 4,
+      "is_vowel": false
+    },
+    {
+      "char": "E",
+      "value": 5,
+      "is_vowel": true
+    },
+    {
+      "char": "R",
+      "value": 9,
+      "is_vowel": false
+    },
+    {
+      "char": "C",
+      "value": 3,
+      "is_vowel": false
+    },
+    {
+      "char": "A",
+      "value": 1,
+      "is_vowel": true
+    },
+    {
+      "char": "R",
+      "value": 9,
+      "is_vowel": false
+    },
+    {
+      "char": "T",
+      "value": 2,
+      "is_vowel": false
+    },
+    {
+      "char": "E",
+      "value": 5,
+      "is_vowel": true
+    },
+    {
+      "char": "R",
+      "value": 9,
+      "is_vowel": false
+    }
+  ],
+  "letter_map": [
+    {
+      "value": 1,
+      "letters": [
+        "A",
+        "J",
+        "S"
+      ]
+    },
+    {
+      "value": 2,
+      "letters": [
+        "B",
+        "K",
+        "T"
+      ]
+    },
+    {
+      "value": 3,
+      "letters": [
+        "C",
+        "L",
+        "U"
+      ]
+    },
+    {
+      "value": 4,
+      "letters": [
+        "D",
+        "M",
+        "V"
+      ]
+    },
+    {
+      "value": 5,
+      "letters": [
+        "E",
+        "N",
+        "W"
+      ]
+    },
+    {
+      "value": 6,
+      "letters": [
+        "F",
+        "O",
+        "X"
+      ]
+    },
+    {
+      "value": 7,
+      "letters": [
+        "G",
+        "P",
+        "Y"
+      ]
+    },
+    {
+      "value": 8,
+      "letters": [
+        "H",
+        "Q",
+        "Z"
+      ]
+    },
+    {
+      "value": 9,
+      "letters": [
+        "I",
+        "R"
+      ]
+    }
+  ],
+  "core": [
+    {
+      "key": "life_path",
+      "label": "生命灵数 Life Path",
+      "value": 3,
+      "root": 3,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "表达之数：以言语与才艺向外发散，天生的沟通者。",
+      "keywords": [
+        "表达",
+        "创造",
+        "社交",
+        "乐观",
+        "才艺"
+      ],
+      "talent": "语言与审美俱佳，能把想法讲得动人、传得开。",
+      "challenge": "精力分散、流于表面，情绪起伏全写在脸上。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "月",
+          "expression": "5",
+          "total": 5,
+          "reduced": 5,
+          "karmic_debt": false
+        },
+        {
+          "label": "日",
+          "expression": "1+5",
+          "total": 15,
+          "reduced": 6,
+          "karmic_debt": false
+        },
+        {
+          "label": "年",
+          "expression": "1+9+9+0",
+          "total": 1990,
+          "reduced": 19,
+          "karmic_debt": false
+        },
+        {
+          "label": "年",
+          "expression": "1+9",
+          "total": 19,
+          "reduced": 10,
+          "karmic_debt": false
+        },
+        {
+          "label": "年",
+          "expression": "1+0",
+          "total": 10,
+          "reduced": 1,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "5+6+1",
+          "total": 12,
+          "reduced": 3,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数3（通行传统摘要整理，非古籍、非逐字引文）"
+    },
+    {
+      "key": "expression",
+      "label": "表达数 Expression",
+      "value": 4,
+      "root": 4,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "建构之数：以规矩与劳力垒出可被依赖的根基。",
+      "keywords": [
+        "务实",
+        "秩序",
+        "勤勉",
+        "结构",
+        "可靠"
+      ],
+      "talent": "落地能力强，能把混乱整理成一套可运转的系统。",
+      "challenge": "拘泥成规、抗拒变通，把自己和他人都管得过紧。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "全字母",
+          "expression": "3+9+1+4+1+3+5+6+1+5+4+5+9+3+1+9+2+5+9",
+          "total": 85,
+          "reduced": 13,
+          "karmic_debt": false
+        },
+        {
+          "label": "全字母",
+          "expression": "1+3",
+          "total": 13,
+          "reduced": 4,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数4（通行传统摘要整理，非古籍、非逐字引文）"
+    },
+    {
+      "key": "soul_urge",
+      "label": "灵魂冲动数 Soul Urge",
+      "value": 1,
+      "root": 1,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "起始之数：意志独立，自我主张，靠开创而非依附立身。",
+      "keywords": [
+        "独立",
+        "开创",
+        "领导",
+        "自我主张",
+        "先驱"
+      ],
+      "talent": "敢为人先，能独立定调，把一件尚无形状的事推到起点。",
+      "challenge": "易流于独断好胜，难与人共事，也难接受异议。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "元音",
+          "expression": "9+1+1+5+1+5+1+5",
+          "total": 28,
+          "reduced": 10,
+          "karmic_debt": false
+        },
+        {
+          "label": "元音",
+          "expression": "1+0",
+          "total": 10,
+          "reduced": 1,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数1（通行传统摘要整理，非古籍、非逐字引文）"
+    },
+    {
+      "key": "personality",
+      "label": "人格面具数 Personality",
+      "value": 3,
+      "root": 3,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "表达之数：以言语与才艺向外发散，天生的沟通者。",
+      "keywords": [
+        "表达",
+        "创造",
+        "社交",
+        "乐观",
+        "才艺"
+      ],
+      "talent": "语言与审美俱佳，能把想法讲得动人、传得开。",
+      "challenge": "精力分散、流于表面，情绪起伏全写在脸上。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "辅音",
+          "expression": "3+4+3+6+5+4+9+3+9+2+9",
+          "total": 57,
+          "reduced": 12,
+          "karmic_debt": false
+        },
+        {
+          "label": "辅音",
+          "expression": "1+2",
+          "total": 12,
+          "reduced": 3,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数3（通行传统摘要整理，非古籍、非逐字引文）"
+    },
+    {
+      "key": "birthday",
+      "label": "生日数 Birthday",
+      "value": 6,
+      "root": 6,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "照护之数：以责任与情感维系周遭，天然的调和者。",
+      "keywords": [
+        "责任",
+        "关爱",
+        "家庭",
+        "服务",
+        "美感"
+      ],
+      "talent": "愿意承担，能把人与环境都照料得妥帖。",
+      "challenge": "过度干涉与自我牺牲，替别人背本不属于他的责任。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "日",
+          "expression": "1+5",
+          "total": 15,
+          "reduced": 6,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数6（通行传统摘要整理，非古籍、非逐字引文）"
+    },
+    {
+      "key": "maturity",
+      "label": "成熟数 Maturity",
+      "value": 7,
+      "root": 7,
+      "is_master": false,
+      "master_title": null,
+      "meaning": "探究之数：向内向深处走，以分析与直觉求真。",
+      "keywords": [
+        "内省",
+        "研究",
+        "直觉",
+        "求真",
+        "独处"
+      ],
+      "talent": "能钻研到别人停下的深度，洞察表象之下的机理。",
+      "challenge": "过度怀疑与疏离，把想亲近的人也一并挡在门外。",
+      "unavailable_reason": null,
+      "steps": [
+        {
+          "label": "成熟",
+          "expression": "3+4",
+          "total": 7,
+          "reduced": 7,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理核心数释义·数7（通行传统摘要整理，非古籍、非逐字引文）"
+    }
+  ],
+  "karmic_debts": [],
+  "pinnacles": [
+    {
+      "index": 1,
+      "key": "first",
+      "label": "第一顶峰 First Pinnacle",
+      "value": 11,
+      "root": 2,
+      "is_master": true,
+      "expression": "月 5 + 日 15→6 = 11",
+      "start_age": 0,
+      "end_age": 33,
+      "is_current": false,
+      "meaning": "启示之期：直觉与机遇频发，宜跟随洞见而非旧有经验，也需稳住作息。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·顶峰11（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 2,
+      "key": "second",
+      "label": "第二顶峰 Second Pinnacle",
+      "value": 7,
+      "root": 7,
+      "is_master": false,
+      "expression": "日 15→6 + 年 1990→19→10→1 = 7",
+      "start_age": 34,
+      "end_age": 42,
+      "is_current": true,
+      "meaning": "内省之期：宜进修、研究与独处，向外扩张多受阻，向内反而走得远。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·顶峰7（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 3,
+      "key": "third",
+      "label": "第三顶峰 Third Pinnacle",
+      "value": 9,
+      "root": 9,
+      "is_master": false,
+      "expression": "第一顶峰 11 + 第二顶峰 7 = 18 → 9",
+      "start_age": 43,
+      "end_age": 51,
+      "is_current": false,
+      "meaning": "完成之期：宜收尾、舍弃与总结，把位置腾给下一轮。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·顶峰9（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 4,
+      "key": "fourth",
+      "label": "第四顶峰 Fourth Pinnacle",
+      "value": 6,
+      "root": 6,
+      "is_master": false,
+      "expression": "月 5 + 年 1990→19→10→1 = 6",
+      "start_age": 52,
+      "end_age": null,
+      "is_current": false,
+      "meaning": "责任之期：宜成家、担责与服务，重心自然落到亲近的人身上。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·顶峰6（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    }
+  ],
+  "challenges": [
+    {
+      "index": 1,
+      "key": "first",
+      "label": "第一挑战 First Challenge",
+      "value": 1,
+      "expression": "|月 5 − 日 15→6| = 1",
+      "duration": "自出生至约 30–35 岁",
+      "meaning": "课题在自立：难以坚持己见，容易依赖他人或被权威压过，需学着自己起头。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·挑战1（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 2,
+      "key": "second",
+      "label": "第二挑战 Second Challenge",
+      "value": 5,
+      "expression": "|日 15→6 − 年 1990→19→10→1| = 5",
+      "duration": "约自 30–35 岁至 45–50 岁",
+      "meaning": "课题在变通：或抗拒变化，或反过来被变化拖着走，需学着在不确定中自处。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·挑战5（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 3,
+      "key": "main",
+      "label": "主挑战 Main Challenge",
+      "value": 4,
+      "expression": "|第一挑战 1 − 第二挑战 5| = 4",
+      "duration": "贯穿一生",
+      "meaning": "课题在方法：做事缺条理与恒心，容易半途而废，需学着把基础打实。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·挑战4（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    {
+      "index": 4,
+      "key": "fourth",
+      "label": "第四挑战 Fourth Challenge",
+      "value": 4,
+      "expression": "|月 5 − 年 1990→19→10→1| = 4",
+      "duration": "约自 45–50 岁之后",
+      "meaning": "课题在方法：做事缺条理与恒心，容易半途而废，需学着把基础打实。",
+      "source": "西方毕达哥拉斯数理周期算法与释义·挑战4（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    }
+  ],
+  "personal_cycles": {
+    "previous_year": {
+      "key": "previous_year",
+      "label": "个人流年（前一年）",
+      "period": "2025",
+      "value": 2,
+      "root": 2,
+      "is_master": false,
+      "meaning": "宜静待与磨合：进展放缓，靠关系与耐心推进，不宜强求结果。",
+      "steps": [
+        {
+          "label": "出生月",
+          "expression": "5",
+          "total": 5,
+          "reduced": 5,
+          "karmic_debt": false
+        },
+        {
+          "label": "出生日",
+          "expression": "1+5",
+          "total": 15,
+          "reduced": 6,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标年 2025",
+          "expression": "2+0+2+5",
+          "total": 2025,
+          "reduced": 9,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "5+6+9",
+          "total": 20,
+          "reduced": 2,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理周期算法与释义·个人周期2（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    "year": {
+      "key": "year",
+      "label": "个人流年（本年）",
+      "period": "2026",
+      "value": 3,
+      "root": 3,
+      "is_master": false,
+      "meaning": "宜表达与社交：机会来自沟通、创作与人脉，适合曝光，也适合学新东西。",
+      "steps": [
+        {
+          "label": "出生月",
+          "expression": "5",
+          "total": 5,
+          "reduced": 5,
+          "karmic_debt": false
+        },
+        {
+          "label": "出生日",
+          "expression": "1+5",
+          "total": 15,
+          "reduced": 6,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标年 2026",
+          "expression": "2+0+2+6",
+          "total": 2026,
+          "reduced": 10,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标年 2026",
+          "expression": "1+0",
+          "total": 10,
+          "reduced": 1,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "5+6+1",
+          "total": 12,
+          "reduced": 3,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理周期算法与释义·个人周期3（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    "next_year": {
+      "key": "next_year",
+      "label": "个人流年（次年）",
+      "period": "2027",
+      "value": 22,
+      "root": 4,
+      "is_master": true,
+      "meaning": "大格局之程：宜启动格局更大的事、承担更重的责任，成则影响深远。",
+      "steps": [
+        {
+          "label": "出生月",
+          "expression": "5",
+          "total": 5,
+          "reduced": 5,
+          "karmic_debt": false
+        },
+        {
+          "label": "出生日",
+          "expression": "1+5",
+          "total": 15,
+          "reduced": 6,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标年 2027",
+          "expression": "2+0+2+7",
+          "total": 2027,
+          "reduced": 11,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "5+6+11",
+          "total": 22,
+          "reduced": 22,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理周期算法与释义·个人周期22（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    "month": {
+      "key": "month",
+      "label": "个人流月（本月）",
+      "period": "2026-09",
+      "value": 3,
+      "root": 3,
+      "is_master": false,
+      "meaning": "宜表达与社交：机会来自沟通、创作与人脉，适合曝光，也适合学新东西。",
+      "steps": [
+        {
+          "label": "个人年根",
+          "expression": "3",
+          "total": 3,
+          "reduced": 3,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标月 9",
+          "expression": "9",
+          "total": 9,
+          "reduced": 9,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "3+9",
+          "total": 12,
+          "reduced": 3,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理周期算法与释义·个人周期3（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    },
+    "day": {
+      "key": "day",
+      "label": "个人流日（今日）",
+      "period": "2026-09-26",
+      "value": 11,
+      "root": 2,
+      "is_master": true,
+      "meaning": "高振动之程：直觉与机遇异常活跃，宜跟随洞见，但需稳住神经与作息。",
+      "steps": [
+        {
+          "label": "个人月根",
+          "expression": "3",
+          "total": 3,
+          "reduced": 3,
+          "karmic_debt": false
+        },
+        {
+          "label": "目标日 26",
+          "expression": "2+6",
+          "total": 26,
+          "reduced": 8,
+          "karmic_debt": false
+        },
+        {
+          "label": "相加",
+          "expression": "3+8",
+          "total": 11,
+          "reduced": 11,
+          "karmic_debt": false
+        }
+      ],
+      "source": "西方毕达哥拉斯数理周期算法与释义·个人周期11（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+    }
+  },
+  "name_grid": {
+    "cells": [
+      {
+        "digit": 1,
+        "count": 4,
+        "tokens": [
+          "A",
+          "A",
+          "A",
+          "A"
+        ]
+      },
+      {
+        "digit": 2,
+        "count": 1,
+        "tokens": [
+          "T"
+        ]
+      },
+      {
+        "digit": 3,
+        "count": 3,
+        "tokens": [
+          "L",
+          "L",
+          "C"
+        ]
+      },
+      {
+        "digit": 4,
+        "count": 2,
+        "tokens": [
+          "M",
+          "D"
+        ]
+      },
+      {
+        "digit": 5,
+        "count": 4,
+        "tokens": [
+          "E",
+          "N",
+          "E",
+          "E"
+        ]
+      },
+      {
+        "digit": 6,
+        "count": 1,
+        "tokens": [
+          "X"
+        ]
+      },
+      {
+        "digit": 7,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 8,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 9,
+        "count": 4,
+        "tokens": [
+          "I",
+          "R",
+          "R",
+          "R"
+        ]
+      }
+    ],
+    "layout": [
+      [
+        4,
+        9,
+        2
+      ],
+      [
+        3,
+        5,
+        7
+      ],
+      [
+        8,
+        1,
+        6
+      ]
+    ],
+    "total": 19,
+    "karmic_lessons": [
+      {
+        "digit": 7,
+        "meaning": "缺 7：需补内省与信任。给自己独处的时间，别只凭表象就下判断。",
+        "source": "西方毕达哥拉斯数理核心数释义·业力课7（通行传统摘要整理，非古籍、非逐字引文）"
+      },
+      {
+        "digit": 8,
+        "meaning": "缺 8：需补现实感与担当。直面金钱、权力与结果，不回避世俗层面的责任。",
+        "source": "西方毕达哥拉斯数理核心数释义·业力课8（通行传统摘要整理，非古籍、非逐字引文）"
+      }
+    ],
+    "source": "西方毕达哥拉斯数理通行字母映射表（现代整理，非古籍）"
+  },
+  "loshu_grid": {
+    "cells": [
+      {
+        "digit": 1,
+        "count": 2,
+        "tokens": [
+          "年千位 1",
+          "日十位 1"
+        ]
+      },
+      {
+        "digit": 2,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 3,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 4,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 5,
+        "count": 2,
+        "tokens": [
+          "月个位 5",
+          "日个位 5"
+        ]
+      },
+      {
+        "digit": 6,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 7,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 8,
+        "count": 0,
+        "tokens": []
+      },
+      {
+        "digit": 9,
+        "count": 2,
+        "tokens": [
+          "年百位 9",
+          "年十位 9"
+        ]
+      }
+    ],
+    "layout": [
+      [
+        4,
+        9,
+        2
+      ],
+      [
+        3,
+        5,
+        7
+      ],
+      [
+        8,
+        1,
+        6
+      ]
+    ],
+    "total": 6,
+    "zero_count": 2,
+    "digits": [
+      1,
+      9,
+      9,
+      0,
+      0,
+      5,
+      1,
+      5
+    ],
+    "missing": [
+      {
+        "digit": 2,
+        "meaning": "缺 2：感受与协作的敏感度偏低，易被读作冷淡；合作时需多给回应。",
+        "source": "洛书九宫与八平面箭矢·缺数2（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "digit": 3,
+        "meaning": "缺 3：表达与记忆偏弱，想法多而说出的少；需靠书写与复述来补足。",
+        "source": "洛书九宫与八平面箭矢·缺数3（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "digit": 4,
+        "meaning": "缺 4：条理与实务能力偏弱，细节易漏；需靠清单与规程代劳。",
+        "source": "洛书九宫与八平面箭矢·缺数4（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "digit": 6,
+        "meaning": "缺 6：对家庭与美感的牵绊较少，或较难安于照护者的角色。",
+        "source": "洛书九宫与八平面箭矢·缺数6（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "digit": 7,
+        "meaning": "缺 7：行动偏缓，习惯想清楚才动，需防过度停顿而错过时机。",
+        "source": "洛书九宫与八平面箭矢·缺数7（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "digit": 8,
+        "meaning": "缺 8：对物质与结果的敏感度偏低，需刻意管理金钱与现实层面。",
+        "source": "洛书九宫与八平面箭矢·缺数8（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      }
+    ],
+    "planes": [
+      {
+        "key": "mental",
+        "name_zh": "心智平面",
+        "name_en": "Mental Plane",
+        "cells": [
+          4,
+          9,
+          2
+        ],
+        "complete": false,
+        "missing": [
+          4,
+          2
+        ],
+        "text": "心智平面不全：注意力容易涣散，记忆与理解需靠重复和外部记录来补足。",
+        "source": "洛书九宫与八平面箭矢·Mental Plane（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "emotional",
+        "name_zh": "情感平面",
+        "name_en": "Emotional Plane",
+        "cells": [
+          3,
+          5,
+          7
+        ],
+        "complete": false,
+        "missing": [
+          3,
+          7
+        ],
+        "text": "情感平面不全：情绪起伏较明显，容易积压感受，或在表达时失当。",
+        "source": "洛书九宫与八平面箭矢·Emotional Plane（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "practical",
+        "name_zh": "实务平面",
+        "name_en": "Practical Plane",
+        "cells": [
+          8,
+          1,
+          6
+        ],
+        "complete": false,
+        "missing": [
+          8,
+          6
+        ],
+        "text": "实务平面不全：日常事务与实务细节容易出漏，需靠清单与流程代劳。",
+        "source": "洛书九宫与八平面箭矢·Practical Plane（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "thought",
+        "name_zh": "思想平面",
+        "name_en": "Plane of Thought",
+        "cells": [
+          4,
+          3,
+          8
+        ],
+        "complete": false,
+        "missing": [
+          4,
+          3,
+          8
+        ],
+        "text": "思想平面不全：规划较弱，常在动手之后才发现漏掉的环节。",
+        "source": "洛书九宫与八平面箭矢·Plane of Thought（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "will",
+        "name_zh": "意志之箭",
+        "name_en": "Plane of Will",
+        "cells": [
+          9,
+          5,
+          1
+        ],
+        "complete": true,
+        "missing": [],
+        "text": "意志之箭贯通（9-5-1）：意志坚定，自信，能长期锁定目标而不偏移。",
+        "source": "洛书九宫与八平面箭矢·Plane of Will（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "action",
+        "name_zh": "行动平面",
+        "name_en": "Plane of Action",
+        "cells": [
+          2,
+          7,
+          6
+        ],
+        "complete": false,
+        "missing": [
+          2,
+          7,
+          6
+        ],
+        "text": "行动平面不全：容易拖延，或想多做少，需刻意缩短从决定到动手的距离。",
+        "source": "洛书九宫与八平面箭矢·Plane of Action（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "silver_yog",
+        "name_zh": "银弓（财富之箭）",
+        "name_en": "Silver Yog",
+        "cells": [
+          2,
+          5,
+          8
+        ],
+        "complete": false,
+        "missing": [
+          2,
+          8
+        ],
+        "text": "银弓不全：钱财进出较难掌控，需刻意建立预算与储蓄习惯。",
+        "source": "洛书九宫与八平面箭矢·Silver Yog（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      },
+      {
+        "key": "golden_yog",
+        "name_zh": "金弓（成功之箭）",
+        "name_en": "Golden Yog",
+        "cells": [
+          4,
+          5,
+          6
+        ],
+        "complete": false,
+        "missing": [
+          4,
+          6
+        ],
+        "text": "金弓不全：成果常被打折，需靠更长的周期与更实的步骤换取同样的结果。",
+        "source": "洛书九宫与八平面箭矢·Golden Yog（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      }
+    ],
+    "line_sums": [
+      15,
+      15,
+      15,
+      15,
+      15,
+      15,
+      15,
+      15
+    ],
+    "source": "洛书九宫与八平面箭矢（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+  },
+  "provenance": {
+    "reference_date": "2026-09-26",
+    "engine": "毕达哥拉斯数理（本仓纯算术实现）：无历法库、无星历、无随机，同输入恒同输出。",
+    "badge": "#NUMERO-PYTHAG",
+    "tables": [
+      {
+        "name": "numerology_pythagorean",
+        "version": "2026.09",
+        "source": "西方毕达哥拉斯数理通行字母映射表（现代整理，非古籍）"
+      },
+      {
+        "name": "numerology_meanings",
+        "version": "2026.09",
+        "source": "西方毕达哥拉斯数理核心数释义（通行传统摘要整理，非古籍、非逐字引文）"
+      },
+      {
+        "name": "numerology_cycles",
+        "version": "2026.09",
+        "source": "西方毕达哥拉斯数理周期算法与释义（Hans Decoz 通行整理，释义为摘要，非古籍、非逐字引文）"
+      },
+      {
+        "name": "numerology_loshu",
+        "version": "2026.09",
+        "source": "洛书九宫与八平面箭矢（印度数理通行整理稿，非古籍、非毕达哥拉斯体系）"
+      }
+    ],
+    "method": "生命灵数 = reduce(月) + reduce(日) + reduce(年) 再约简（三个分量各自先约简，不用全数字累加法）；表达数 = 全字母值总和；灵魂冲动数 = 元音和；人格面具数 = 辅音和；生日数 = reduce(日)；成熟数 = reduce(生命灵数 + 表达数)。主数 11/22/33 一律保留，唯一例外是四挑战。四顶峰按时序分程：第一顶峰自出生起，至「36 减去生命灵数之根」的那一年结束；其后第二顶峰与第三顶峰各九年；第四顶峰自此后持续终身，无终止年龄。四挑战的时段是区间而非确年：第一挑战自出生至约 30–35 岁；第二挑战约自 30–35 岁至 45–50 岁；第三挑战（主挑战）贯穿一生；第四挑战约自 45–50 岁之后。"
+  }
+}

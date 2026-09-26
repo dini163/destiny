@@ -1,0 +1,998 @@
+{
+  "name": "walkthrough",
+  "standard_datetime": "2000-08-16 12:00",
+  "calendar": "solar",
+  "true_solar_time": "2000-08-16 11:41",
+  "tst_applied": true,
+  "tst_offset_minutes": -18.85,
+  "longitude": 116.4074,
+  "lunar_date": "二〇〇〇年七月十七",
+  "four_pillars": "庚辰 甲申 丙午 甲午",
+  "pillars": [
+    {
+      "position": "year",
+      "label": "年柱",
+      "ganzhi": "庚辰",
+      "gan": "庚",
+      "zhi": "辰",
+      "gan_element": "金",
+      "zhi_element": "土",
+      "nayin": "白蜡金",
+      "hidden_stems": [
+        "戊",
+        "乙",
+        "癸"
+      ],
+      "hidden_stem_elements": [
+        "土",
+        "木",
+        "水"
+      ],
+      "shishen_gan": "偏财",
+      "shishen_zhi": [
+        "食神",
+        "正印",
+        "正官"
+      ],
+      "di_shi": "冠带",
+      "xun": "甲戌",
+      "xun_kong": "申酉"
+    },
+    {
+      "position": "month",
+      "label": "月柱",
+      "ganzhi": "甲申",
+      "gan": "甲",
+      "zhi": "申",
+      "gan_element": "木",
+      "zhi_element": "金",
+      "nayin": "泉中水",
+      "hidden_stems": [
+        "庚",
+        "壬",
+        "戊"
+      ],
+      "hidden_stem_elements": [
+        "金",
+        "水",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "偏财",
+        "七杀",
+        "食神"
+      ],
+      "di_shi": "病",
+      "xun": "甲申",
+      "xun_kong": "午未"
+    },
+    {
+      "position": "day",
+      "label": "日柱",
+      "ganzhi": "丙午",
+      "gan": "丙",
+      "zhi": "午",
+      "gan_element": "火",
+      "zhi_element": "火",
+      "nayin": "天河水",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "日主",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲辰",
+      "xun_kong": "寅卯"
+    },
+    {
+      "position": "hour",
+      "label": "时柱",
+      "ganzhi": "甲午",
+      "gan": "甲",
+      "zhi": "午",
+      "gan_element": "木",
+      "zhi_element": "火",
+      "nayin": "沙中金",
+      "hidden_stems": [
+        "丁",
+        "己"
+      ],
+      "hidden_stem_elements": [
+        "火",
+        "土"
+      ],
+      "shishen_gan": "偏印",
+      "shishen_zhi": [
+        "劫财",
+        "伤官"
+      ],
+      "di_shi": "帝旺",
+      "xun": "甲午",
+      "xun_kong": "辰巳"
+    }
+  ],
+  "zodiac": "龙",
+  "day_master": "丙",
+  "day_master_element": "火",
+  "ming_gong": "己卯",
+  "ming_gong_nayin": "城头土",
+  "tai_yuan": "乙亥",
+  "tai_yuan_nayin": "山头火",
+  "wuxing": [
+    {
+      "element": "木",
+      "count": 2,
+      "score": 2.3
+    },
+    {
+      "element": "火",
+      "count": 3,
+      "score": 2.2
+    },
+    {
+      "element": "土",
+      "count": 1,
+      "score": 1.3
+    },
+    {
+      "element": "金",
+      "count": 2,
+      "score": 1.6
+    },
+    {
+      "element": "水",
+      "count": 0,
+      "score": 0.4
+    }
+  ],
+  "missing_elements": [],
+  "analysis": {
+    "day_master": "丙",
+    "day_master_element": "火",
+    "strength": {
+      "value": 41.12,
+      "tier": "身弱",
+      "factors": [
+        {
+          "rule": "strength.base",
+          "label": "基准分",
+          "delta": 0.0,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        },
+        {
+          "rule": "strength.deling.囚",
+          "label": "得令 · 月令申（金）· 日主火处囚 × 0.4 = 12.00",
+          "delta": 12.0,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        },
+        {
+          "rule": "strength.dedi.share",
+          "label": "得地 · 通根 1.50/3.80 × 100 × 0.4 = 15.79",
+          "delta": 15.7895,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        },
+        {
+          "rule": "strength.deshi.share",
+          "label": "得势 · 生扶 2/3 干（月柱干甲、时柱干甲） × 0.2 = 13.33",
+          "delta": 13.3333,
+          "source": "模型参数（本系统加权，非古籍赋分）"
+        }
+      ]
+    },
+    "borderline": false,
+    "level": "weak",
+    "label": "身弱",
+    "favorable_elements": [
+      "木",
+      "火"
+    ],
+    "unfavorable_elements": [
+      "金",
+      "土",
+      "水"
+    ],
+    "summary": "日主丙（火）生于申月，三因子合分41.12，判为身弱；喜用木、火，忌金、土、水。"
+  },
+  "dayun_direction": "forward",
+  "dayun_start_solar": "2008-01-05",
+  "dayun": [
+    {
+      "index": 0,
+      "ganzhi": "",
+      "start_age": 1,
+      "end_age": 8,
+      "start_year": 2000,
+      "end_year": 2007,
+      "xun": "甲子",
+      "xun_kong": "戌亥",
+      "is_current": false
+    },
+    {
+      "index": 1,
+      "ganzhi": "乙酉",
+      "start_age": 9,
+      "end_age": 18,
+      "start_year": 2008,
+      "end_year": 2017,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 2,
+      "ganzhi": "丙戌",
+      "start_age": 19,
+      "end_age": 28,
+      "start_year": 2018,
+      "end_year": 2027,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": true
+    },
+    {
+      "index": 3,
+      "ganzhi": "丁亥",
+      "start_age": 29,
+      "end_age": 38,
+      "start_year": 2028,
+      "end_year": 2037,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 4,
+      "ganzhi": "戊子",
+      "start_age": 39,
+      "end_age": 48,
+      "start_year": 2038,
+      "end_year": 2047,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 5,
+      "ganzhi": "己丑",
+      "start_age": 49,
+      "end_age": 58,
+      "start_year": 2048,
+      "end_year": 2057,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 6,
+      "ganzhi": "庚寅",
+      "start_age": 59,
+      "end_age": 68,
+      "start_year": 2058,
+      "end_year": 2067,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 7,
+      "ganzhi": "辛卯",
+      "start_age": 69,
+      "end_age": 78,
+      "start_year": 2068,
+      "end_year": 2077,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 8,
+      "ganzhi": "壬辰",
+      "start_age": 79,
+      "end_age": 88,
+      "start_year": 2078,
+      "end_year": 2087,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    },
+    {
+      "index": 9,
+      "ganzhi": "癸巳",
+      "start_age": 89,
+      "end_age": 98,
+      "start_year": 2088,
+      "end_year": 2097,
+      "xun": "甲申",
+      "xun_kong": "午未",
+      "is_current": false
+    }
+  ],
+  "current_liunian": [
+    {
+      "year": 2018,
+      "age": 19,
+      "ganzhi": "戊戌"
+    },
+    {
+      "year": 2019,
+      "age": 20,
+      "ganzhi": "己亥"
+    },
+    {
+      "year": 2020,
+      "age": 21,
+      "ganzhi": "庚子"
+    },
+    {
+      "year": 2021,
+      "age": 22,
+      "ganzhi": "辛丑"
+    },
+    {
+      "year": 2022,
+      "age": 23,
+      "ganzhi": "壬寅"
+    },
+    {
+      "year": 2023,
+      "age": 24,
+      "ganzhi": "癸卯"
+    },
+    {
+      "year": 2024,
+      "age": 25,
+      "ganzhi": "甲辰"
+    },
+    {
+      "year": 2025,
+      "age": 26,
+      "ganzhi": "乙巳"
+    },
+    {
+      "year": 2026,
+      "age": 27,
+      "ganzhi": "丙午"
+    },
+    {
+      "year": 2027,
+      "age": 28,
+      "ganzhi": "丁未"
+    }
+  ],
+  "geju": {
+    "name": "偏财格",
+    "from_pillar": "month",
+    "ten_god": "偏财",
+    "is_success": false,
+    "notes": [
+      "偏财以官星为归，官星不见则财无所丽。『偏财身旺要官星，运入乡发利名。』（《三命通会·论偏财》引古歌）"
+    ],
+    "source": "《三命通会·论偏财》"
+  },
+  "yongshen": {
+    "favorable_elements": [
+      "木",
+      "火"
+    ],
+    "unfavorable_elements": [
+      "金",
+      "土",
+      "水"
+    ],
+    "methods": [
+      {
+        "method": "扶抑",
+        "fired_rule": "weak.take-resource-and-parallel",
+        "chosen_elements": [
+          "木",
+          "火"
+        ],
+        "already_present": false,
+        "source": "《渊海子平》强弱扶抑之简化（档位取值见 bazi_strength 模型参数）"
+      },
+      {
+        "method": "通关",
+        "fired_rule": "top-two.no-clash",
+        "chosen_elements": [],
+        "already_present": false,
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "method": "调候",
+        "fired_rule": "season-balanced",
+        "chosen_elements": [],
+        "already_present": false,
+        "source": "本系统季节纲要（未采用《穷通宝鉴》逐月表）"
+      }
+    ],
+    "conflict": null
+  },
+  "shensha": [
+    {
+      "name": "文昌贵人",
+      "quality": "吉",
+      "checked_from": "日干丙",
+      "matches": [
+        {
+          "position": "month",
+          "character": "申",
+          "at": "zhi"
+        }
+      ],
+      "meaning": "文昌与天乙、太极同为贵神之类，主学业文思；本表以日干禄顺数第三辰取之。",
+      "source": "《三命通会·论十干禄》禄表·禄前第三辰（《三命通会·卷三》文昌贵别本未采）"
+    },
+    {
+      "name": "羊刃",
+      "quality": "凶",
+      "checked_from": "日干丙",
+      "matches": [
+        {
+          "position": "day",
+          "character": "午",
+          "at": "zhi"
+        },
+        {
+          "position": "hour",
+          "character": "午",
+          "at": "zhi"
+        }
+      ],
+      "meaning": "羊言刚也，刃者取宰割之义；禄过则刃生，功成当退不退则过。甲丙戊庚壬五阳有刃，乙丁己辛癸五阴无刃。",
+      "source": "《三命通会·论羊刃》（《渊海子平》作『论阳刃』）"
+    },
+    {
+      "name": "驿马",
+      "quality": "中性",
+      "checked_from": "申子辰局、寅午戌局",
+      "matches": [
+        {
+          "position": "month",
+          "character": "申",
+          "at": "zhi"
+        }
+      ],
+      "meaning": "驿马者，三命中发用，喜庆之神。君子遇之常居荣位，小人主丰赡；凡柱中马，若不值空亡、破败、交退、伏神，须荣贵。",
+      "source": "《三命通会·论驿马》"
+    },
+    {
+      "name": "华盖",
+      "quality": "中性",
+      "checked_from": "申子辰局、寅午戌局",
+      "matches": [
+        {
+          "position": "year",
+          "character": "辰",
+          "at": "zhi"
+        }
+      ],
+      "meaning": "华盖者，喻如宝盖，以三合底处得库谓之。凡人命得华盖，多主孤寡，总贵亦不免孤独，作僧道艺术论。",
+      "source": "《三命通会·论将星华盖》"
+    },
+    {
+      "name": "将星",
+      "quality": "吉",
+      "checked_from": "申子辰局、寅午戌局",
+      "matches": [
+        {
+          "position": "day",
+          "character": "午",
+          "at": "zhi"
+        },
+        {
+          "position": "hour",
+          "character": "午",
+          "at": "zhi"
+        }
+      ],
+      "meaning": "将星者，如将札中军也，故以三合中位谓之将星；常欲吉星相扶、贵煞加临乃为吉庆。",
+      "source": "《三命通会·论将星华盖》"
+    }
+  ],
+  "ten_god_readings": [
+    {
+      "ten_god": "劫财",
+      "count": 2,
+      "positions": [
+        "day.zhi(丁)",
+        "hour.zhi(丁)"
+      ],
+      "meaning": "亦名『逆刃』，如乙见甲为劫财。乙以庚为夫，见丙克庚，故克夫；男命则克妻。五阳见五阴为败财，主克妻害子。五阴见五阳为劫财，主破耗、防小人，不克妻。",
+      "six_relation": null,
+      "source": "《渊海子平·论劫财》"
+    },
+    {
+      "ten_god": "食神",
+      "count": 2,
+      "positions": [
+        "year.zhi(戊)",
+        "month.zhi(戊)"
+      ],
+      "meaning": "食神者，生我财神之谓也；如甲属木，丙属火，名盗气，故谓之『食神』。",
+      "six_relation": "食神是男孙",
+      "source": "《渊海子平·论食神》"
+    },
+    {
+      "ten_god": "伤官",
+      "count": 2,
+      "positions": [
+        "day.zhi(己)",
+        "hour.zhi(己)"
+      ],
+      "meaning": "伤官者，其验如神。伤官务要伤尽；伤之不尽，官来乘旺，其祸不可胜言。",
+      "six_relation": "伤官是女孙及祖母也",
+      "source": "《渊海子平·论伤官》"
+    },
+    {
+      "ten_god": "偏财",
+      "count": 2,
+      "positions": [
+        "year.gan",
+        "month.zhi(庚)"
+      ],
+      "meaning": "何谓之偏财？盖阳见阳财，阴见阴财也。然而偏财者，乃众人之财也，只恐兄弟姊妹有夺之，则福不全；若有官星，祸患百出。",
+      "six_relation": "偏财是父，乃母之夫星也，亦为偏妻",
+      "source": "《渊海子平·论偏财》"
+    },
+    {
+      "ten_god": "七杀",
+      "count": 1,
+      "positions": [
+        "month.zhi(壬)"
+      ],
+      "meaning": "夫七杀者，亦名偏官，喜身旺合杀、喜制伏、喜阳刃；忌身弱、忌见财，生忌无制。身旺有气为偏官，身弱无制为七杀。",
+      "six_relation": "七杀是男",
+      "source": "《渊海子平·论七杀》"
+    },
+    {
+      "ten_god": "正官",
+      "count": 1,
+      "positions": [
+        "year.zhi(癸)"
+      ],
+      "meaning": "夫正官者，甲见辛之类；乃阴见阳为官，阳见阴为鬼，阴阳配合成其道也。大抵要行官旺乡，月令是也。",
+      "six_relation": "正官是女",
+      "source": "《渊海子平·正官论》"
+    },
+    {
+      "ten_god": "偏印",
+      "count": 2,
+      "positions": [
+        "month.gan",
+        "hour.gan"
+      ],
+      "meaning": "夫倒食者，冲财神之谓也；一名『吞啗煞』。用财神大忌见之，用食神亦忌见之。",
+      "six_relation": "偏印偏母及祖父也",
+      "source": "《渊海子平·论倒食》"
+    },
+    {
+      "ten_god": "正印",
+      "count": 1,
+      "positions": [
+        "year.zhi(乙)"
+      ],
+      "meaning": "所谓印？生我者，即印绶也，经曰：『有官无印，即非真官；有印无官，反成其福。』",
+      "six_relation": "正印正母",
+      "source": "《渊海子平·论印绶》"
+    }
+  ],
+  "relations": [
+    {
+      "kind": "天干相冲",
+      "pillar_a": "year",
+      "pillar_b": "month",
+      "character_a": "庚",
+      "character_b": "甲",
+      "strength": "紧临",
+      "transforming_element": null,
+      "reading": "地支取七位为冲，犹天干取七位为煞之义，如甲逢庚为煞、甲至庚七数；两干之禄居对冲之地，故相冲。戊己居中央，无对，故干不冲土。",
+      "source": "《三命通会·论冲击》七位之说（戊己中央不冲为本系统取法）"
+    },
+    {
+      "kind": "天干相冲",
+      "pillar_a": "year",
+      "pillar_b": "hour",
+      "character_a": "庚",
+      "character_b": "甲",
+      "strength": "远位",
+      "transforming_element": null,
+      "reading": "地支取七位为冲，犹天干取七位为煞之义，如甲逢庚为煞、甲至庚七数；两干之禄居对冲之地，故相冲。戊己居中央，无对，故干不冲土。",
+      "source": "《三命通会·论冲击》七位之说（戊己中央不冲为本系统取法）"
+    },
+    {
+      "kind": "自刑",
+      "pillar_a": "day",
+      "pillar_b": "hour",
+      "character_a": "午",
+      "character_b": "午",
+      "strength": "紧临",
+      "transforming_element": null,
+      "reading": "辰午酉亥何以谓之自刑？无别物相加，乃曰自也。辰者水之墓，滔则盈；午者火之旺，暴则焚；酉者金之位，刚则缺；亥者水之生，旺则朽，各禀已盛太过之气而自致祸。",
+      "source": "《三命通会·论三刑》"
+    }
+  ],
+  "branch_groups": [],
+  "hidden_stem_ledger": [
+    {
+      "position": "year",
+      "branch": "辰",
+      "stem": "戊",
+      "role": "本气",
+      "weight": 0.6,
+      "ten_god": "食神",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "year",
+      "branch": "辰",
+      "stem": "乙",
+      "role": "中气",
+      "weight": 0.3,
+      "ten_god": "正印",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "year",
+      "branch": "辰",
+      "stem": "癸",
+      "role": "余气",
+      "weight": 0.1,
+      "ten_god": "正官",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "month",
+      "branch": "申",
+      "stem": "庚",
+      "role": "本气",
+      "weight": 0.6,
+      "ten_god": "偏财",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "month",
+      "branch": "申",
+      "stem": "壬",
+      "role": "中气",
+      "weight": 0.3,
+      "ten_god": "七杀",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "month",
+      "branch": "申",
+      "stem": "戊",
+      "role": "余气",
+      "weight": 0.1,
+      "ten_god": "食神",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "day",
+      "branch": "午",
+      "stem": "丁",
+      "role": "本气",
+      "weight": 0.6,
+      "ten_god": "劫财",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "day",
+      "branch": "午",
+      "stem": "己",
+      "role": "中气",
+      "weight": 0.3,
+      "ten_god": "伤官",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "hour",
+      "branch": "午",
+      "stem": "丁",
+      "role": "本气",
+      "weight": 0.6,
+      "ten_god": "劫财",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    },
+    {
+      "position": "hour",
+      "branch": "午",
+      "stem": "己",
+      "role": "中气",
+      "weight": 0.3,
+      "ten_god": "伤官",
+      "source": "模型参数（本系统加权，非古籍赋分）"
+    }
+  ],
+  "dayun_current": {
+    "index": 2,
+    "ganzhi": "丙戌",
+    "start_age": 19,
+    "end_age": 28,
+    "relations": [
+      {
+        "kind": "地支六冲",
+        "pillar_a": "year",
+        "pillar_b": "extra0",
+        "character_a": "辰",
+        "character_b": "戌",
+        "strength": "远位",
+        "transforming_element": null,
+        "reading": "地支取七位为冲，十二支战击之神，大概为凶；然冲破有吉有凶，不可概论。冲处相生与冲处相克，判法不同。",
+        "source": "《三命通会·论冲击》（查表同 LunarUtil.CHONG）"
+      }
+    ]
+  },
+  "interpretation": {
+    "six_dimensions": [
+      {
+        "dimension": "事业",
+        "score": {
+          "value": 68.0,
+          "tier": "顺",
+          "factors": [
+            {
+              "rule": "career.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "career.officer.restrained",
+              "label": "杀有制化",
+              "delta": 8.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "career.star.jiangxing",
+              "label": "将星临命",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "career.star.wenchang",
+              "label": "文昌照命",
+              "delta": 4.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "杀有制化",
+          "将星临命",
+          "文昌照命"
+        ],
+        "cautions": [],
+        "narrative": "七杀得食神制之则不为攻身之凶（《三命通会·论偏官》引古歌『身弱煞强无制神，多生灾祸不堪论』）；将星如中军之札，主可得众（《三命通会·论将星华盖》『常欲吉星相扶、贵煞加临乃为吉庆』）；文昌居贵神之类，主文书可倚（《三命通会·论十干禄》禄前第三辰）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "dimension": "财运",
+        "score": {
+          "value": 66.0,
+          "tier": "顺",
+          "factors": [
+            {
+              "rule": "wealth.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "wealth.star.present",
+              "label": "财星成形",
+              "delta": 10.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "wealth.source.output",
+              "label": "食伤生财",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "财星成形",
+          "食伤生财"
+        ],
+        "cautions": [],
+        "narrative": "财为养命之源，一位成形则财有可取（《渊海子平·论正财》『大抵正财，吾妻之财也』）；我生之气能生我财，财源有续（《渊海子平·论食神》『食神者，生我财神之谓也』）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "dimension": "婚姻",
+        "score": {
+          "value": 60.0,
+          "tier": "平",
+          "factors": [
+            {
+              "rule": "marriage.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "marriage.star.present",
+              "label": "配偶星有力",
+              "delta": 10.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "配偶星有力"
+        ],
+        "cautions": [],
+        "narrative": "男以正财为妻、女取官星为夫星，星有力则婚姻有主（《渊海子平·六亲总篇》）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "dimension": "健康",
+        "score": {
+          "value": 62.0,
+          "tier": "平",
+          "factors": [
+            {
+              "rule": "health.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "health.root.sturdy",
+              "label": "根本有荫",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "health.flow.unobstructed",
+              "label": "五行流转",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "根本有荫",
+          "五行流转"
+        ],
+        "cautions": [],
+        "narrative": "印为生气、比劫为同气，二有力则根柢有荫（《三命通会·论印绶》『乃我气之源，为生气，为父母』）；五行各得其气则流转不穷（本系统以五行加权分下限判流转）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "dimension": "学业",
+        "score": {
+          "value": 86.0,
+          "tier": "顺",
+          "factors": [
+            {
+              "rule": "study.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "study.seal.present",
+              "label": "印星为学之本",
+              "delta": 12.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "study.seal.favourable",
+              "label": "印为喜用",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "study.output.present",
+              "label": "食伤吐秀",
+              "delta": 8.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "study.wenchang",
+              "label": "文昌照命",
+              "delta": 10.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "印星为学之本",
+          "印为喜用",
+          "食伤吐秀",
+          "文昌照命"
+        ],
+        "cautions": [],
+        "narrative": "印者，生我之名，学业有所受（《三命通会·论印绶》『印绶者，乃五行生我之名』）；印星之五行入喜用，则受荫而能化（本系统以喜忌集定印之向背）；我生之气外发为才（《渊海子平·论食神》『名盗气，故谓之食神』）；文昌与天乙、太极同为贵神之类，主学业文思（《三命通会·论十干禄》禄前第三辰）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "dimension": "人际",
+        "score": {
+          "value": 56.0,
+          "tier": "平",
+          "factors": [
+            {
+              "rule": "social.base",
+              "label": "基准分",
+              "delta": 50.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            },
+            {
+              "rule": "social.parallel.wide",
+              "label": "同气相求",
+              "delta": 6.0,
+              "source": "模型参数（本系统加权，非古籍赋分）"
+            }
+          ]
+        },
+        "strengths": [
+          "同气相求"
+        ],
+        "cautions": [],
+        "narrative": "比肩为兄弟，同气易相聚（《渊海子平·论兄弟姊妹》『比肩者，兄弟也』）。",
+        "source": "模型参数（本系统加权，非古籍赋分）"
+      }
+    ],
+    "summary": "事业顺、财运顺、婚姻平、健康平、学业顺、人际平"
+  },
+  "provenance": {
+    "reference_date": "2026-09-26",
+    "engine": "lunar-python",
+    "tables": [
+      {
+        "name": "bazi_shishen",
+        "version": "2026.09",
+        "source": "《渊海子平》"
+      },
+      {
+        "name": "bazi_nayin",
+        "version": "2026.09",
+        "source": "《三命通会》"
+      },
+      {
+        "name": "bazi_wangshuai",
+        "version": "2026.09",
+        "source": "《三命通会》定等第次序 · 模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "bazi_geju",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_tiaohou",
+        "version": "2026.09",
+        "source": "本系统季节纲要（未采用《穷通宝鉴》逐月表）"
+      },
+      {
+        "name": "bazi_shensha",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》"
+      },
+      {
+        "name": "bazi_relations",
+        "version": "2026.09",
+        "source": "《三命通会》《渊海子平》《滴天髓》"
+      },
+      {
+        "name": "bazi_dimensions",
+        "version": "2026.09",
+        "source": "引文为判语（健康维只署本系统） · 模型参数（本系统加权，非古籍赋分）"
+      }
+    ]
+  },
+  "engine": "lunar-python"
+}
