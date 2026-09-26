@@ -240,8 +240,11 @@ def test_nested_objects_carry_exactly_their_declared_keys(client: TestClient) ->
         assert set(md) == MAHADASHA_KEYS, md["lord"]
         for ad in md["antardashas"]:
             assert set(ad) == ANTARDASHA_KEYS, (md["lord"], ad["lord"])
-    if vs["current"] is not None:
-        assert set(vs["current"]) == CURRENT_KEYS
+    # 默认 PAYLOAD 的目标日（2026-09-25）在出生之后，`current` 必不为 null；真成了 null
+    # 就该红，而不是静默跳过这一层。「出生前的目标日 → current 为 null」那一形状另有其主：
+    # `test_a_target_date_before_birth_leaves_no_current_period`。
+    assert vs["current"] is not None
+    assert set(vs["current"]) == CURRENT_KEYS
     assert set(body["provenance"]) == PROVENANCE_KEYS
 
 
@@ -256,7 +259,8 @@ def test_the_json_numbers_respect_the_declared_rounding(client: TestClient) -> N
     """位宽是契约：页面按定宽印度数与值年，round 的位数一变表格就错位。
 
     引擎侧的 round 位宽（`app/engines/vedic.py`）：黄经与 ayanamsa 4 位、儒略日 5 位、
-    速度 6 位、值年与宿内比例分别 4 位与 6 位。
+    速度 6 位、值年与宿内比例分别 4 位与 6 位；星座内度数走
+    `app/engines/western.py:80-81` 的 `_degree_in_sign`，也是 4 位。
     """
     body = _body(client)
     assert _decimal_places(body["julian_day"]) <= 5
@@ -264,7 +268,9 @@ def test_the_json_numbers_respect_the_declared_rounding(client: TestClient) -> N
     for planet in body["planets"]:
         assert _decimal_places(planet["longitude"]) <= 4, planet["name"]
         assert _decimal_places(planet["speed"]) <= 6, planet["name"]
-        assert _decimal_places(planet["degree_in_sign"]) <= 6, planet["name"]
+        # 上限 4 的出处是 `western._degree_in_sign` 的 `round(..., 4)`；原来给 6 宽了两档，
+        # 八曜实测最多 4 位小数（2026-09-27）。
+        assert _decimal_places(planet["degree_in_sign"]) <= 4, planet["name"]
     vs = body["vimshottari"]
     assert _decimal_places(vs["balance_at_birth_years"]) <= 4
     assert _decimal_places(vs["moon_elapsed_fraction"]) <= 6
@@ -554,8 +560,10 @@ def test_the_response_contains_no_field_the_frontend_never_declared(client: Test
         assert not set(md) - FRONTEND_MAHADASHA_KEYS, md["lord"]
         for ad in md["antardashas"]:
             assert not set(ad) - FRONTEND_ANTARDASHA_KEYS, (md["lord"], ad["lord"])
-    if vs["current"] is not None:
-        assert not set(vs["current"]) - FRONTEND_CURRENT_KEYS
+    # 默认 PAYLOAD 的目标日在出生之后 → current 恒不为 null（null 那一形状由
+    # `test_a_target_date_before_birth_leaves_no_current_period` 用另一份载荷钉）。
+    assert vs["current"] is not None
+    assert not set(vs["current"]) - FRONTEND_CURRENT_KEYS
     assert not set(body["provenance"]) - FRONTEND_PROVENANCE_KEYS
 
 
@@ -572,13 +580,17 @@ def test_the_frontend_declares_no_field_the_response_never_sends(client: TestCli
         "...mahadashas[].antardashas[]": next(
             ad for md in vs["mahadashas"] for ad in md["antardashas"]
         ),
-        "vimshottari.current": vs["current"] or {},
+        "vimshottari.current": vs["current"],
         "provenance": body["provenance"],
     }
+    # 默认 PAYLOAD 下 current 必不为 null（同 `test_nested_objects_carry_exactly_their_declared_keys`
+    # 的口径），所以原来那句「可能为 null」和 `or {}` 的死分支一并去掉：真为 null 就是要红，
+    # 而不是这一层 quietly 不测。「出生前的目标日」那种载荷归
+    # `test_a_target_date_before_birth_leaves_no_current_period` 管。
+    assert vs["current"] is not None
     for path, declared, frontend, _ in KEY_LAYERS:
         node = samples[path]
-        if node:  # current 可能为 null（目标日在出生前），此时只核两份抄写不自相矛盾
-            assert not frontend - set(node), f"{path} 前端声明了响应里没有的字段: {sorted(frontend - set(node))}"
+        assert not frontend - set(node), f"{path} 前端声明了响应里没有的字段: {sorted(frontend - set(node))}"
         assert declared == frontend, f"{path} 的手写契约与前端抄本不同"
     assert TOP_LEVEL_KEYS == FRONTEND_CHART_KEYS
     assert REQUEST_KEYS == FRONTEND_REQUEST_KEYS

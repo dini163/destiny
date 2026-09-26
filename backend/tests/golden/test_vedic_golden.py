@@ -124,6 +124,23 @@ def _chart_at(year: int) -> object:
     )
 
 
+def _degree_text(longitude: float) -> str:
+    """按引擎的度分排版规则自行组装一条 `12°34'`（`app/engines/western.py:84-92`
+    的 `_format_degree`，`app/engines/vedic.py:297` 经它印命度）。
+
+    三步一条都不能省：①先折到**星座内**度数（0–30），不是 0–360 全黄经；②角分是
+    **四舍五入**（`int(round(...))`），不是截断；③舍入到 60 分时度 +1、分归 0。
+    独立性来自换路径而不是换实现——本测不调 `_format_degree`，把规则另写一遍再逐字符对。
+    """
+    within = (longitude % 360.0) % 30.0
+    degrees = int(within)
+    minutes = int(round((within - degrees) * 60))
+    if minutes == 60:  # 舍入撞满 60 分时度 +1、分归 0——不写这一步就和引擎不同
+        degrees += 1
+        minutes = 0
+    return f"{degrees}°{minutes:02d}'"
+
+
 # ---------------------------------------------------------------- 参考盘与时标
 
 
@@ -401,10 +418,13 @@ def test_the_lagna_is_the_sidereal_ascendant_of_the_same_instant() -> None:
     """命度也要能独立复推：swe.houses 的热带上升点减岁差，就是印在盘上的度分。
 
     上升点公式本身归瑞士星历（AGENTS 第 6 条不许自算），所以独立性来自**换了条路径**：
-    这里取不带 FLG_SIDEREAL 的 houses()，自己减 ayanamsa，再按「整度 + 截断到角分」
-    的排版规则组装字符串，与引擎的 lagna_degree_text 逐字符对。
-    实测：ascmc[0] = 24.26414° → 24.26414 − 23.85709 = 0.40705° → 0°24′（2026-09-27 实录），
-    同时钉住整宫制的第 1 宫就是它所在的 Mesha。
+    这里取不带 FLG_SIDEREAL 的 houses()，自己减 ayanamsa，再按引擎那套「星座内度数 +
+    角分四舍五入 + 满 60 进 1」的排版规则（`_degree_text`，见其 docstring 的三步）组装字符串，
+    与引擎的 lagna_degree_text 逐字符对。
+    实测：ascmc[0] = 24.26414° → 24.26414 − 23.85709 = 0.40705° → 0°24′（2026-09-27 实录）。
+    参考盘的 0.40705° 折算出的 24.423′ 恰好在截断与四舍五入的同侧，所以本测另钉一个
+    **两条规则分道扬镳**的取值：不另加测的话，「把舍入写成截断」在这张盘上悄无声息。
+    同时钉住整宫制的第 1 宫就是命度所在的 Mesha。
     """
     chart = _chart()
     swe.set_sid_mode(swe.SIDM_LAHIRI)  # 与 _sidereal_flags 同一调用，幂等；见测末说明
@@ -412,7 +432,12 @@ def test_the_lagna_is_the_sidereal_ascendant_of_the_same_instant() -> None:
     ayanamsa = swe.get_ayanamsa_ut(JD_J2000)
     lagna = (ascmc[0] - ayanamsa) % 360.0
     assert lagna == pytest.approx(0.4071, abs=0.01)
-    assert f"{int(lagna)}°{int((lagna % 1) * 60):02d}'" == chart.lagna_degree_text
+    assert _degree_text(lagna) == chart.lagna_degree_text
+    # 舍入 + 进位：10.9918° 的分数部分 ×60 = 59.508′，截断给 59、四舍五入给 60 再进位到 11°00'。
+    assert _degree_text(10.9918) == "11°00'"
+    assert f"{int(10.9918)}°{int((10.9918 % 1) * 60):02d}'" == "10°59'"  # 旧写法（截断）留在原地作对照
+    # 排版口径是「星座内」：同一位置写成全黄经 370.9918° 必须折回同一条字符串。
+    assert _degree_text(370.9918) == "11°00'"
     assert chart.lagna_sign == "Mesha" and chart.lagna_index == 0
     assert chart.lagna_nakshatra == "Ashwini"
 
@@ -469,17 +494,20 @@ def test_a_swieph_request_without_data_files_is_silently_answered_by_moshier() -
     swe.set_sid_mode(swe.SIDM_LAHIRI)  # 与引擎同一句，幂等：全仓只有 vedic 会设 sid mode
     swieph = swe.FLG_SPEED | swe.FLG_SWIEPH | swe.FLG_SIDEREAL
     moshier = swe.FLG_SPEED | swe.FLG_MOSEPH | swe.FLG_SIDEREAL
-    worst_arcsec = 0.0
+    # 最大角差**独立复算**一遍：另起一路 fresh 调用，不复用下面逐位相同断言的那两个值。
+    # 这个数字是 F-A1-9 的证据（也是本测 docstring 末那条复测命令的断言化），值得真算。
+    worst_arcsec = max(
+        abs(swe.calc_ut(JD_J2000, body, swieph)[0][0] - swe.calc_ut(JD_J2000, body, moshier)[0][0])
+        * 3600.0 for _, body in _MOON_BODIES
+    )
+    assert worst_arcsec == 0.0  # 两法逐位相同；配好 DE 件后这条转红是故意的哨兵
     for name, body in _MOON_BODIES:
         claimed, ret_swieph = swe.calc_ut(JD_J2000, body, swieph)
         actual, ret_mos = swe.calc_ut(JD_J2000, body, moshier)
         assert claimed == actual, name  # 逐位相同：拿不到 DE431 的任何差别
-        gap = abs(claimed[0] - actual[0]) * 3600.0
-        worst_arcsec = max(worst_arcsec, gap)
         if name != "Rahu":  # 平交点是解析项，不算「用了哪副星历」的证据
             assert ret_swieph & swe.FLG_MOSEPH, name
             assert not ret_swieph & swe.FLG_SWIEPH, name
-    assert worst_arcsec == 0.0
 
 
 def test_the_default_configuration_leaves_the_engine_on_the_analytical_branch() -> None:
@@ -493,7 +521,9 @@ def test_the_default_configuration_leaves_the_engine_on_the_analytical_branch() 
 
     default_path = Settings.model_fields["sweph_ephe_path"].default
     assert default_path == ""
-    assert (default_path or None) is None
+    # 不再另断 `(default_path or None) is None`：上一行的空串已经钉死，那条恒真。折值表达式照样
+    # 复现一遍（`app/api/v1/vedic.py:32`），但别把它读成「少了折值就红」——`_sidereal_flags`
+    # 用的是真值判断，空串与 None 在这一支同义。
     flags = _sidereal_flags(default_path or None)
     assert flags & swe.FLG_MOSEPH and not flags & swe.FLG_SWIEPH
 
@@ -647,7 +677,10 @@ def test_the_nakshatras_divide_the_zodiac_into_exact_thirteen_twentieths() -> No
     for nak in NAKSHATRAS:
         assert nak.span_degrees == pytest.approx(13.3333, abs=1e-4)  # 13°20'
         assert nak.start_degree == pytest.approx(nak.index * NAKSHATRA_SPAN, abs=1e-3)
-    assert NAKSHATRAS[0].start_degree == 0.0
+    # 上面那条循环把 index 0 与 26 都遍历到了（`NAKSHATRAS[0].start_degree == 0.0` 是它的第 0 轮，
+    # 原来单列一条属恒真，已删）。循环给不出的性质留在这里：末宿的**展示值**（4 位小数）
+    # 起点加跨度仍正好回绕到 360°。循环里两个数各自容 1e-3，同向偏到位就能拼出 359.998° 的缝，
+    # 这一条把「27 段拼满一整圈」的闭合式单独钉住。
     tail = NAKSHATRAS[-1]
     assert tail.start_degree + tail.span_degrees == pytest.approx(360.0, abs=1e-3)
 
@@ -683,12 +716,16 @@ def test_exact_boundary_multiples_of_the_span_fall_one_mansion_early() -> None:
     """
     affected = [index for index in range(27) if nakshatra_of(index * NAKSHATRA_SPAN).index != index]
     assert affected == [3, 6, 9, 12, 15, 18, 19, 21, 24]
-    for index in affected:
-        landed = nakshatra_of(index * NAKSHATRA_SPAN)
-        assert landed.index == (index - 1) % 27
-        assert pada_of(index * NAKSHATRA_SPAN) == 4
-    # 反过来，用 40/3 的精确分数算就不错位：证明毛病出在除法取整，不在位次表。
-    assert int(40.0 * 27 // 360) == 3
+    for shifted in affected:
+        landed = nakshatra_of(shifted * NAKSHATRA_SPAN)
+        assert landed.index == (shifted - 1) % 27, shifted
+        assert pada_of(shifted * NAKSHATRA_SPAN) == 4, shifted
+    # 整数域算法（`int(lon * 27 // 360)`，docstring 末提的那个修法）与 `nakshatra_of` 在同一个
+    # 取值上分道扬镳：前者给 3（Rohini 初足，正确），后者给 2（Krittika 末足，现状）。原来这条
+    # 写的是纯字面量算术（`int(40.0 * 27 // 360) == 3`），恒真、给虚假覆盖感，故换成函数断言：
+    # 毛病出在除法取整，不在位次表。`nakshatra_of` 哪天真改用整数算术，这条转红，届时连同
+    # docstring 一起重定（哨兵口径同 F-A1-9 那条星历对拍）。
+    assert (nakshatra_of(40.0).index, int(40.0 * 27 // 360)) == (2, 3)
 
 
 # ---------------------------------------------------------------- 端点（留在 golden 的两条）
