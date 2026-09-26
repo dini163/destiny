@@ -128,7 +128,7 @@ def test_every_natal_and_moving_point_is_internally_consistent_with_its_longitud
     """行运响应的每一条 placement 都过落座算术：natal 三表 + 三个运动层，逐条核验。
 
     与本命那条同源、同口径：`tests/test_western_api.py::
-    test_every_placement_is_internally_consistent_with_its_longitude`。差别只在这一盘的
+    test_every_placement_is_internally_consistent_with_its_own_longitude`。差别只在这一盘的
     placement 不止嵌在 `natal` 里——`transit_positions`、`progression.positions`、
     `solar_arc.positions` 三个运动层是同一批 `MovingPoint`（`app/schemas/transit.py:38-53`），
     计划 Step 1(b) 要求「三系统响应里每一个 placement 都过落座算术」，漏的就是这三层。
