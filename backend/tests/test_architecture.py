@@ -39,16 +39,36 @@ FORBIDDEN: list[tuple[str, str]] = [
 #: 而非契约依赖 —— 裁定见 AGENTS.md 第 1 条例外段与 ledger F-A2-1。
 BASELINE: dict[str, int] = {"content->schemas": 3}
 
+#: 上面那三个计数的**身份**（路径与 `BASELINE` 逐项对应）：报错里的「新增」按身份差集
+#: 判定，不按排序切片。旧写法 `offenders[limit:]` 与 `conventions.test.ts` 同轮删掉的
+#: 那句是同一个缺陷 —— 修掉一处旧违规的同时新增一处、且新文件在 sort 里更靠前时，
+#: 切片会把新文件留在窗口外、点名一个根本没变的旧文件（评审 2026-09-26 实测）。
+BASELINE_OFFENDERS: dict[str, frozenset[str]] = {
+    "content->schemas": frozenset(
+        {
+            "app/content/__init__.py",
+            "app/content/bazi_hehun_rules.py",
+            "app/content/synastry.py",
+        }
+    ),
+}
+
 
 def assert_no_new_violations(kind: str, count: int, offenders: list[str]) -> None:
-    """棘轮断言：`count <= BASELINE.get(kind, 0)`，并把新 offenders 报出来。
+    """棘轮断言：`count <= BASELINE.get(kind, 0)`，并按身份点名未登记的 offenders。
 
     修掉一处违规后把基线调低一格是义务；调高需要先在 findings ledger 立一条
-    新发现并给出裁定，不得为了让测试变绿而上调。
+    新发现并给出裁定，不得为了让测试变绿而上调。报错同时给全量清单与已登记例外，
+    这样「谁新增」不依赖排序位置。
     """
     limit = BASELINE.get(kind, 0)
+    registered = BASELINE_OFFENDERS.get(kind, frozenset())
+    unregistered = [o for o in offenders if o not in registered]
     assert count <= limit, (
-        f"{kind} 违规 {count} 处，超出基线 {limit}；新增: {offenders[limit:] or offenders}"
+        f"{kind} 违规 {count} 处，超出基线 {limit}；"
+        f"未登记新增: {', '.join(unregistered) or '无'}；"
+        f"已登记例外: {', '.join(sorted(registered)) or '无'}；"
+        f"当前全部违规: {', '.join(offenders) or '无'}"
     )
 
 
@@ -112,8 +132,12 @@ def _system_names() -> list[str]:
 def test_every_system_has_backend_pieces(system: str) -> None:
     """AGENTS.md 第 2 条：后端四件（content 语料、引擎、契约、路由）逐系统齐备。
 
-    前端五件由 `frontend/tests/architecture/conventions.test.ts` 负责，
-    两边不得重复断言同一件事（分工条文见 AGENTS.md 第 2 条）。
+    前端一侧不由本文件负责，也不是「逐系统件齐备」：
+    `frontend/tests/architecture/conventions.test.ts` 断言的是契约配对、页面必有路由、
+    跨目录 import 与体量/重复棘轮、adoption 名单这七条；`hooks/use<Sys>.ts`、
+    `components/<sys>/`、`pages/<Sys>Page.tsx` 因命名别名（PlumBlossomPage /
+    NorseRunesPage / useTarotSpread 等）今天没有机器门，见 AGENTS.md 第 2 条与
+    ledger F-A2-7。两边不得重复断言同一件事（分工条文见 AGENTS.md 第 2 条）。
     """
     stem = CONTENT_STEM_ALIAS.get(system, system)
     missing = []
