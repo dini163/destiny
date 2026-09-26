@@ -150,7 +150,7 @@ CLASSICAL_SANHE: dict[frozenset[str], tuple[str, str, str]] = {
 }
 
 #: 命主十二支（《全书》「子属贪狼丑亥门，寅戌禄存卯酉文曲，辰申廉贞巳未武曲，午破军」）。
-#: 本表只锁**表体**；命主到底逐年支还是逐命宫支有两版歌诀，见 ledger F-A1-1，
+#: 本表只锁**表体**；命主到底逐年支还是逐命宫支有两版歌诀，见 ledger F-A1-4，
 #: 故这里不钉取哪一支进表，golden 也不钉这个字段。
 CLASSICAL_MING_ZHU: dict[str, str] = {
     "子": "贪狼", "丑": "巨门", "寅": "禄存", "卯": "文曲", "辰": "廉贞", "巳": "武曲",
@@ -539,7 +539,7 @@ def test_ming_zhu_and_shen_zhu_tables_are_twelve_branches_of_known_stars() -> No
     """命主、身主两张表十二支齐、值全在星名域内。
 
     命主到底逐年支还是逐命宫支有两版歌诀（本仓取年支），本轮**不钉取值口径**，
-    只钉表体与定义域 —— 详见 ledger F-A1-1 与 `tests/golden/test_ziwei_golden.py`
+    只钉表体与定义域 —— 详见 ledger F-A1-4 与 `tests/golden/test_ziwei_golden.py`
     里那条刻意不给命主下断言的说明。
     """
     assert MING_ZHU == CLASSICAL_MING_ZHU

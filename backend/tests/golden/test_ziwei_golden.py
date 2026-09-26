@@ -303,7 +303,7 @@ def test_ming_zhu_stays_unpinned_until_the_school_ruling_lands() -> None:
 
     逐年支：庚辰 → 辰 → 廉贞；逐命宫支：命宫寅 → 禄存。表体（十二支 → 星）本身
     两版一致，见 `tests/content/test_ziwei_corpus.py`；分歧只在**取哪一支**，
-    而引擎 `app/engines/ziwei.py:205` 取年支、`ZIWEI_SOURCE` 未声明此口径。
+    而引擎 `app/engines/ziwei.py:208` 取年支、`ZIWEI_SOURCE` 未声明此口径。
     钉任何一版都是替裁定做主，这里只钉「它是斗数星名之一，且落在两版候选之内」。
     """
     chart = _chart()
