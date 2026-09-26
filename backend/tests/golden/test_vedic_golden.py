@@ -20,12 +20,17 @@
    Algorithms》式 25.2 的第一项）。九曜里太阳是唯一能用一行公式独立复算的，故用它来
    证明「恒星黄经 = 热带黄经 − 岁差」这条本模块自述的换算真的发生了。
 
+锚 1 还有一道**定义级**对照：Chitrapaksha 的公案是「Spica 落在 180°00′」，瑞士星历把它
+做成 `SIDM_TRUE_CITRA`，与本引擎的 `SIDM_LAHIRI`（同一定义的解析拟合）实测差 56.6″–66.0″。
+用定位置星表直接算 Spica 黄经这条路在本绑定**不通**（缺 `sefstars.txt`，详见
+`test_lahiri_tracks_the_chitrapaksha_definition_within_a_minute_of_arc` 的测末），故只核到定义。
+
 Vimshottari 一侧的独立锚是**体系本身**：九曜值年 7·20·6·10·7·18·16·19·17（共 120 年）与
 计都→金星→太阳→太阴→火星→罗睺→木星→土星→水星的固定主序，是任何一本 Jyotish 手册
 都同意的定则；安塔尔大运按 `大运值年 × 该曜值年 ÷ 120` 切分，也全部手算得出。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/golden/test_vedic_golden.py -v` → 26 passed（2026-09-27 实录，原 12 项全留、只收紧）。
+tests/golden/test_vedic_golden.py -v` → 27 passed（2026-09-27 实录，原 12 项全留、只收紧）。
 """
 
 from datetime import date, datetime, time
@@ -230,9 +235,12 @@ def test_ayanamsa_advances_at_the_published_general_precession() -> None:
     实测（复测命令见模块 docstring 的锚 1，把年份换成 1900/2000/2100）：
     22.460550 / 23.857092 / 25.254287 → 逐段 1.396543° 与 1.397195°，
     与 1.396971° 分别差 1.543″ 与 0.806″（2026-09-27 实录）。
-    容差给 0.01°/世纪（36″），既容得下岁差模型的二次项，也照样杀得掉整副副周期模型：
-    Raman 与 Lahiri 在 1900-2100 的**速率**差达 0.02°/世纪以上，一旦 set_sid_mode 被
-    改掉，本测与 ayanamsa 数值钉一起红。
+    容差 0.01°/世纪（36″）容得下岁差模型的二次项，也照样杀得掉「换了一副岁差模型」
+    （IAU 常数错一位、或干脆不累积）。它**杀不掉**只换零点的同率派：实测 RAMAN、
+    KRISHNAMURTI、YUKTESHWAR、JN_BHASIN、LAHIRI_1940 与 LAHIRI 的逐段增量相同到 1e-6°，
+    差别只是一个常数（LAHIRI − RAMAN = 1.446301°，三个纪元一字不差）。那一类由
+    ayanamsa 绝对值钉与本文件下一条 Chitrapaksha 交叉核对管（2026-09-27 实录，
+    复测命令见下一条）。
     """
     first, middle, last = (_chart_at(year) for year in (1900, 2000, 2100))
     assert first.ayanamsa < middle.ayanamsa < last.ayanamsa
@@ -240,6 +248,55 @@ def test_ayanamsa_advances_at_the_published_general_precession() -> None:
     assert last.ayanamsa - middle.ayanamsa == pytest.approx(PRECISION_DEG_PER_CENTURY, abs=0.01)
     # 岁差在加速：IAU 模型的二阶项让后半世纪比前半世纪略快。
     assert last.ayanamsa - middle.ayanamsa > middle.ayanamsa - first.ayanamsa
+
+
+def test_lahiri_tracks_the_chitrapaksha_definition_within_a_minute_of_arc() -> None:
+    """Chitrapaksha/Spica 路线：星表那条走不通，但定义本身可核，而且核得过。
+
+    brief 给的「用 Spica 反推岁差」在本绑定里**部分不通**（如实记）：绑定确实暴露了
+    `fixstar_ut`（先前探测找的 `calc_fixstar_ut` 是 C 侧名字），但定位置需要星表文件
+    `sefstars.txt`——`find .venv -iname 'sefstars*' -o -iname 'sestars*'` 零命中，wheel 未打包，
+    于是 `swe.fixstar_ut("Spica", ...)` 直接报 `SwissEph file 'sefstars.txt' not found`；
+    另外 `fixstar_ut("Spica,αVir", ...)` 撞绑定的解析 bug（`invalid literal for int()`）。
+    走得通的是等价的一半：瑞士星历内置 `SIDM_TRUE_CITRA`，它的定义就是 Chitrapaksha
+    那句公案「Spica 落在 180°00′ 天秤」，与本引擎用的 `SIDM_LAHIRI`（多项式近似）互为对照。
+
+    实测（2026-09-27，复测见本段）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import swisseph as swe
+    f=lambda:[swe.get_ayanamsa_ut(swe.julday(y,1,1,12.0)) for y in (1900,2000,2100)]
+    swe.set_sid_mode(swe.SIDM_LAHIRI); l=f()
+    swe.set_sid_mode(swe.SIDM_TRUE_CITRA); c=f()
+    swe.set_sid_mode(swe.SIDM_RAMAN); r=f()
+    print([round(x,6) for x in l], [round(x-y,6) for x,y in zip(l,c)],
+    [round(x-y,6) for x,y in zip(l,r)])"`
+    → LAHIRI 22.460550/23.857092/25.254287；LAHIRI−TRUE_CITRA 0.015726/0.017077/0.018326°
+    （56.6″/61.5″/66.0″，一弧分上下）；LAHIRI−RAMAN 恒为 1.446301°。
+    容差 0.02°（72″）：Lahiri 的官方口径本就是「最接近 Chitrapaksha 的解析拟合」，
+    真把岁差模式设错（如 J2000 固定框，1900→2000 段会变成 −358.60°）就红。
+    """
+    epochs = (1900, 2000, 2100)
+
+    def series(mode: int) -> list[float]:
+        swe.set_sid_mode(mode)
+        return [swe.get_ayanamsa_ut(swe.julday(year, 1, 1, 12.0)) for year in epochs]
+
+    try:
+        lahiri = series(swe.SIDM_LAHIRI)
+        citra = series(swe.SIDM_TRUE_CITRA)
+        raman = series(swe.SIDM_RAMAN)
+    finally:
+        swe.set_sid_mode(swe.SIDM_LAHIRI)  # 进程级全局态：必须装回引擎用的那一副
+
+    for value, expected in zip(lahiri, (22.460550, 23.857092, 25.254287)):
+        assert value == pytest.approx(expected, abs=1e-6)  # 本引擎实际用的那一副的三纪值
+    for index in range(3):
+        assert abs(lahiri[index] - citra[index]) < 0.02  # 与 Spica=180° 的定义差不到一弧分强
+        assert lahiri[index] > citra[index]  # 且方向恒定：Lahiri 略大
+    # 只换零点的同率派：率相同、差为常数——上一条测的容差为什么杀不到它，证据在这里。
+    offsets = {round(lahiri[index] - raman[index], 6) for index in range(3)}
+    assert offsets == {1.446301}
+    rates = [lahiri[1] - lahiri[0], raman[1] - raman[0]]
+    assert rates[0] == pytest.approx(rates[1], abs=1e-6)
 
 
 def test_sidereal_longitudes_are_tropical_minus_ayanamsa() -> None:
