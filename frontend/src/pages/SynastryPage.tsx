@@ -1,0 +1,255 @@
+import { SynastryAspectList } from '../components/synastry/SynastryAspectList';
+import { SynastryBiWheel } from '../components/synastry/SynastryBiWheel';
+import { SynastryConsole } from '../components/synastry/SynastryConsole';
+import { SynastryScoreRing } from '../components/synastry/SynastryScoreRing';
+import { AstroWheel } from '../components/western/AstroWheel';
+import { ElementBalance } from '../components/western/ElementBalance';
+import { HouseTable } from '../components/western/HouseTable';
+import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
+import { ResultCard } from '../components/ui/ResultCard';
+import { useSynastry } from '../hooks/useSynastry';
+import { aspectStyle } from '../lib/astro';
+import type { SynastryChart, SynastryRequest } from '../types/synastry';
+
+/** House-system code → label, for the summary strip (mirrors the console's options). */
+const HOUSE_SYSTEM_LABELS: Record<string, string> = {
+  P: '普拉西度 Placidus',
+  K: '科赫 Koch',
+  R: '雷吉奥蒙塔努斯 Regiomontanus',
+  E: '等宫制 Equal',
+  W: '全星座 Whole Sign',
+};
+
+/** The five major aspects, for the wheel's colour legend. */
+const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
+  { type: 'conjunction', angle: '0°' },
+  { type: 'sextile', angle: '60°' },
+  { type: 'square', angle: '90°' },
+  { type: 'trine', angle: '120°' },
+  { type: 'opposition', angle: '180°' },
+];
+
+/**
+ * 西洋合盘页（Synastry & Composite）。
+ *
+ * 一页 = 双人输入台 + 相契度总分环 + 合盘双轮盘 + 人对人相位清单 + 组合盘（中点盘）
+ * + 组合盘元素形态与宫头 + 溯源。所有星体黄经、四轴与宫头皆由瑞士星历实时计算，组合盘
+ * 取两造同名点的短弧中点（纯几何、可复算），相契度只由「人对人」的合盘相位按模型参数加权
+ * 累加，账本逐条可核（PRD 无 mock 铁律）。页面上唯一的意志是两造生辰、定位与共用分宫制。
+ */
+export function SynastryPage() {
+  const synastry = useSynastry();
+
+  function handleSubmit(request: SynastryRequest): void {
+    synastry.mutate(request);
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
+      <SynastryConsole pending={synastry.isPending} onSubmit={handleSubmit} />
+
+      {synastry.error ? (
+        <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-4 py-3 text-sm text-ink">
+          <Icon name="alert" size={18} className="mt-0.5 shrink-0 text-wuxing-fire" />
+          <span>{synastry.error.message}</span>
+        </div>
+      ) : null}
+
+      {synastry.isPending && !synastry.data ? (
+        <p className="label-caps text-ink-muted">正在依瑞士星历比对两张本命盘、合成中点组合盘…</p>
+      ) : null}
+
+      {synastry.data ? <SynastryResults chart={synastry.data} /> : null}
+    </div>
+  );
+}
+
+/** The full two-person composition rendered once a real result is available. */
+function SynastryResults({ chart }: { chart: SynastryChart }) {
+  const { composite } = chart;
+  return (
+    <>
+      <SummaryStrip chart={chart} />
+
+      <ResultCard
+        eyebrow="COMPATIBILITY SCORE"
+        title="相契度总分"
+        icon="gauge"
+        actions={
+          <span className="label-caps text-ink-muted">
+            {chart.synastry_aspects.filter((a) => a.counted).length} 条计入 · 账本 {chart.score.factors.length} 行
+          </span>
+        }
+        elevated
+      >
+        <SynastryScoreRing score={chart.score} />
+      </ResultCard>
+
+      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
+        <div className="flex flex-col gap-6 xl:col-span-7">
+          <ResultCard
+            title="合盘双轮盘"
+            eyebrow="SYNASTRY BI-WHEEL"
+            icon="compass"
+            actions={<span className="label-caps text-gold-soft">内{chart.person_a_name} · 外{chart.person_b_name}</span>}
+            elevated
+          >
+            <div className="relative mx-auto aspect-square w-full max-w-[620px]">
+              <SynastryBiWheel
+                chartA={chart.person_a}
+                chartB={chart.person_b}
+                aspects={chart.synastry_aspects}
+                nameA={chart.person_a_name}
+                nameB={chart.person_b_name}
+              />
+            </div>
+            <WheelLegend />
+          </ResultCard>
+
+          <ResultCard
+            title="人对人相位"
+            eyebrow="SYNASTRY ASPECTS"
+            icon="sparkle"
+            actions={<span className="label-caps text-ink-muted">共 {chart.synastry_aspects.length} 对</span>}
+            elevated
+          >
+            <SynastryAspectList aspects={chart.synastry_aspects} />
+          </ResultCard>
+        </div>
+
+        <div className="flex flex-col gap-6 xl:col-span-5">
+          <ResultCard
+            title="组合中点盘"
+            eyebrow="COMPOSITE CHART"
+            icon="sun"
+            actions={<span className="label-caps text-ink-muted">{composite.method} · 短弧中点</span>}
+            elevated
+          >
+            <div className="flex flex-col gap-3">
+              <p className="text-sm text-ink-variant">
+                组合日
+                <span className="font-display text-gold-bright"> {composite.sun_sign_zh} </span>· 组合月
+                <span className="font-display text-gold-bright"> {composite.moon_sign_zh} </span>· 组合升
+                <span className="font-display text-gold-bright"> {composite.ascendant_sign_zh}</span>
+              </p>
+              <div className="relative mx-auto aspect-square w-full max-w-[420px]">
+                <AstroWheel
+                  planets={composite.planets}
+                  axes={composite.axes}
+                  houses={composite.houses}
+                  aspects={composite.aspects}
+                />
+              </div>
+            </div>
+          </ResultCard>
+
+          <ResultCard title="组合盘元素与形态" eyebrow="COMPOSITE BALANCE" icon="seal" elevated>
+            <ElementBalance
+              elementBalance={composite.element_balance}
+              modalityBalance={composite.modality_balance}
+            />
+          </ResultCard>
+
+          <ResultCard title="组合盘十二宫头" eyebrow="COMPOSITE HOUSES" icon="timeline" elevated>
+            <HouseTable houses={composite.houses} />
+          </ResultCard>
+        </div>
+      </div>
+
+      <ResultCard eyebrow="PROVENANCE" title="算法与星历溯源" icon="seal">
+        <ProvenancePanel
+          tables={chart.provenance.tables}
+          meta={[
+            { label: '推演引擎', value: chart.provenance.engine },
+            { label: '黄道基准', value: chart.person_a.zodiac === 'tropical' ? '热带黄道 (Tropical)' : chart.person_a.zodiac },
+            {
+              label: '分宫制',
+              value: HOUSE_SYSTEM_LABELS[chart.person_a.house_system] ?? chart.person_a.house_system,
+            },
+            { label: '组合盘法', value: composite.method },
+          ]}
+          notes={[chart.provenance.note, chart.provenance.method]}
+        />
+      </ResultCard>
+    </>
+  );
+}
+
+/** Headline strip: both natals' trinity plus the composite trinity. */
+function SummaryStrip({ chart }: { chart: SynastryChart }) {
+  const a = chart.person_a;
+  const b = chart.person_b;
+  const c = chart.composite;
+  return (
+    <div className="panel flex flex-col gap-4 p-5 sm:p-6">
+      <div className="flex flex-col gap-1">
+        <span className="label-caps">西洋合盘 · SYNASTRY &amp; COMPOSITE</span>
+        <span className="font-display text-2xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-3xl">
+          {chart.person_a_name} × {chart.person_b_name}
+        </span>
+      </div>
+      <div className="gold-rule" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <TrinityCell caption={chart.person_a_name} sun={a.sun_sign_zh} moon={a.moon_sign_zh} asc={a.ascendant_sign_zh} when={a.local_datetime} />
+        <TrinityCell caption={chart.person_b_name} sun={b.sun_sign_zh} moon={b.moon_sign_zh} asc={b.ascendant_sign_zh} when={b.local_datetime} />
+        <TrinityCell caption="组合盘 Composite" sun={c.sun_sign_zh} moon={c.moon_sign_zh} asc={c.ascendant_sign_zh} />
+      </div>
+    </div>
+  );
+}
+
+/** One person's (or the composite's) 日/月/升 trinity in a compact cell. */
+function TrinityCell({
+  caption,
+  sun,
+  moon,
+  asc,
+  when,
+}: {
+  caption: string;
+  sun: string;
+  moon: string;
+  asc: string;
+  when?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5 rounded-element border border-rim-soft bg-surface px-4 py-3">
+      <span className="label-caps text-ink-muted">{caption}</span>
+      <span className="font-display text-lg text-ink">
+        日{sun} · 月{moon} · 升{asc}
+      </span>
+      {when ? <span className="numeric text-xs text-ink-muted">当地生时 {when}</span> : null}
+    </div>
+  );
+}
+
+/** Legend: what the two rings mean plus the aspect chord colours. */
+function WheelLegend() {
+  return (
+    <div className="mt-4 flex flex-col gap-2 border-t border-rim-soft pt-3">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-ink-variant">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded-full border-2 border-gold" />
+          外圈：乙方（带金环）
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded-full border-2 border-ink-muted" />
+          内圈：甲方
+        </span>
+        <span className="text-ink-muted">连线为计入相契度的人对人相位（核心轴更粗）</span>
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+        {ASPECT_LEGEND.map((item) => {
+          const style = aspectStyle(item.type);
+          return (
+            <span key={item.type} className="flex items-center gap-1.5 text-xs text-ink-variant">
+              <span className="h-0.5 w-4 rounded-full" style={{ backgroundColor: style.color }} />
+              {style.label} {item.angle}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
