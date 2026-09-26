@@ -11,6 +11,10 @@
   与独立儒略日反算都读 `body["natal"]`。
 * **target 只管后三层、不动本命**：`target_date` 只喂 `target_julian_day`/推运/行运，本命时刻
   由 `birth_*` 决定，二者各测各的。
+* **交付 JSON 的落座自洽**：`natal` 的行星/轴/宫头三表与 `transit_positions`、
+  `progression.positions`、`solar_arc.positions` 三个运动层，每条都过
+  `degree_in_sign == round(longitude % 30, 4)`（带 `sign_index` 者再核 `sign_index`），
+  口径与 `tests/test_western_api.py` 一致，不引引擎。
 * **错误分工（AGENTS 第 4 条）**：`utc_offset_hours/latitude/longitude` 越界 → 422 pydantic
   `detail`；`target_date` 缺失是必填字段缺失 → 422 `missing`；`target < birth` 与未知宫制由引擎
   抛 `UnsupportedMethodError` → 422 信封；缺坐标 → `InvalidBirthDataError` → 400 信封。读码不读文案。
@@ -114,6 +118,50 @@ def test_the_top_level_has_no_utc_offset_hours_only_the_natal_carries_it(client:
     assert "utc_offset_hours" not in body
     assert "utc_offset_source" not in body
     assert "utc_offset_hours" in body["natal"]
+
+
+# ------------------------------------------------------------------ 响应内部自洽（落座算术）
+
+def test_every_natal_and_moving_point_is_internally_consistent_with_its_longitude(
+    client: TestClient,
+) -> None:
+    """行运响应的每一条 placement 都过落座算术：natal 三表 + 三个运动层，逐条核验。
+
+    与本命那条同源、同口径：`tests/test_western_api.py::
+    test_every_placement_is_internally_consistent_with_its_longitude`。差别只在这一盘的
+    placement 不止嵌在 `natal` 里——`transit_positions`、`progression.positions`、
+    `solar_arc.positions` 三个运动层是同一批 `MovingPoint`（`app/schemas/transit.py:38-53`），
+    计划 Step 1(b) 要求「三系统响应里每一个 placement 都过落座算术」，漏的就是这三层。
+
+    断言的是对**已交付 JSON** 的内部一致性，不引引擎、不回读原始值：
+    `degree_in_sign == round(longitude % 30, 4)`；带 `sign_index` 的对象再核
+    `sign_index == int(longitude // 30)`。`HouseCusp` 根本没有 `sign_index`
+    （`app/schemas/western.py:47-55`），所以走 `if "sign_index" in item` 这条真实分支跳过它，
+    而不是给它造字段。
+
+    潜在陷阱（finding，同本命那条）：`_degree_in_sign` 对 29.99996° 这类座首值会 round 到
+    30.0，而响应 longitude 同时 round 到整 30° → 二者在该刀锋点会不自洽；本参考盘不落在刀锋上
+    （实测通过），故钉现状、不改引擎。复测：
+    `python -c "from app.engines.western import _degree_in_sign as d;print(d(29.99996))"` → 30.0。
+    """
+    body = _body(client)
+    natal = body["natal"]
+    layers = {
+        "natal.planets": natal["planets"],
+        "natal.axes": natal["axes"],
+        "natal.houses": natal["houses"],
+        "transit_positions": body["transit_positions"],
+        "progression.positions": body["progression"]["positions"],
+        "solar_arc.positions": body["solar_arc"]["positions"],
+    }
+    for name, items in layers.items():
+        assert items, name  # 空层会让下面的循环真空通过，先各钉一次非空
+    for name, items in layers.items():
+        for item in items:
+            longitude = item["longitude"]
+            assert item["degree_in_sign"] == round(longitude % 30, 4), (name, item.get("name", item.get("house")))
+            if "sign_index" in item:
+                assert item["sign_index"] == int(longitude // 30), (name, item.get("name"))
 
 
 # ------------------------------------------------------------------ 错误分工
