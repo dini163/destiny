@@ -82,8 +82,9 @@ describe('MovingPointTable 三层各自挂载（Task 8B 判据 4）', () => {
     modes.forEach((mode, index) => {
       const { points, rows } = mountLayer(mode);
       expect(points.filter((point) => point.retrograde)).toHaveLength(expected[index]);
+      // 逐格的 ℞/— 相等已由第 1 条的 textContent 断言钉住（那条更强：直接比字面量，
+      // 不经 `retroMark` 的「非 ℞ 即 —」折叠）。这里只留整表条数对账，不重复逐格比对。
       const marks = rows.slice(1).map((row) => retroMark(cellsOf(row)[4]));
-      expect(marks).toEqual(points.map((point) => (point.retrograde ? '℞' : '—')));
       expect(marks.filter((mark) => mark === '℞')).toHaveLength(expected[index]);
     });
   });
