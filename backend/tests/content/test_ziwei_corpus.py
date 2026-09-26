@@ -13,8 +13,9 @@
 2. **四化表 10 干 × 4 化无空洞**，且与四化诀逐字相符——一格被抹平或填错，
    页面拿到的是「太阳化禄」与「武曲化禄」两种互斥的命读，而 JSON 上无从看出。
 3. **十二宫地支固定序 + 宫名序**——宫序一乱，十二个宫名整体错位，每一宫的名字都在骗人。
-4. **大限区间对五个五行局各自无缝、不重叠、每段十年**——起运岁数即局数，
-   局数错一格，一生十二段大限全部平移。
+4. **五行局的局数与局名**——局数就是起运虚岁，中文数字写错一位，页面上的局名与十二段
+   大限当场对不上；**区间的无缝/不重叠不在这条里**（表里没有区间，区间由引擎按局数摊出），
+   它住在 golden 的扫盘条，五局各有实盘。
 
 外加一条最狠的 `test_major_star_pairings_match_the_classical_combo_table`：把两条 offset
 序列在寅申轴镜像下摊成 12 张盘，逐对主星同宫落宫与《全书》通行「双星同宫」表逐字比对。
@@ -45,6 +46,7 @@ from app.content.ziwei import (
     ZHI,
     ZHI_INDEX,
     ZIWEI_SERIES,
+    ZIWEI_SOURCE,
 )
 
 # ---------------------------------------------------------------- 独立抄写的锚
@@ -462,23 +464,17 @@ def test_wuxing_ju_maps_five_elements_to_two_through_six() -> None:
 
 
 @pytest.mark.parametrize("element", sorted(CLASSICAL_WUXING_JU))
-def test_dayun_ranges_are_seamless_and_disjoint_for_every_ju(element: str) -> None:
-    """每个五行局各自摊出十二段大限：起运 = 局数、每段十年、首尾相接、互不重叠。
+def test_every_ju_is_named_by_its_element_and_number(element: str) -> None:
+    """局名一律「五行 + 中文数字 + 局」，局数落在 2–6。
 
-    局数与局名都取自**手抄的** `CLASSICAL_WUXING_JU`，不取仓库那张表 —— 否则这张表
-    被改成「土六局」时，区间照样自洽无缝，这条门就白写。
+    起运虚岁就是局数（`app/engines/ziwei.py` 的 `dayun_start_age=ju_number`），所以这一格
+    写错一位中文数字，页面上的局名与大限起运岁数当场对不上，而 JSON 仍是合法字符串。
+    大限十二段**区间**的无缝/不重叠不在这里测：那张表里根本没有区间，区间是引擎按局数
+    摊出来的，故钉在 `tests/golden/test_ziwei_golden.py`
+    `::test_the_twelve_dayun_blocks_tile_the_lifespan_without_gaps`（五局各有实盘）。
     """
-    ju_number, ju_name = CLASSICAL_WUXING_JU[element]
-    assert WUXING_JU[element] == (ju_number, ju_name), f"{element} 行的局数/局名与手册不符"
-    ranges = [(ju_number + 10 * step, ju_number + 10 * step + 9) for step in range(12)]
-    assert [start for start, _ in ranges] == [ju_number + 10 * s for s in range(12)]
-    assert all(end - start == 9 for start, end in ranges)  # 十年一段（虚岁含首尾）
-    assert ranges[0][0] == ju_number  # 起运虚岁即局数
-    assert ranges[-1][1] == ju_number + 119
-    flat = [age for start, end in ranges for age in range(start, end + 1)]
-    assert len(flat) == len(set(flat)) == 120  # 无缝且不重叠
-    assert flat == list(range(ju_number, ju_number + 120))
-    # 局名逐字：土五局 / 木三局 …… 中文数字写错一位也算改表。
+    ju_number, ju_name = WUXING_JU[element]
+    assert 2 <= ju_number <= 6, f"{element} 行的局数越界: {ju_number}"
     assert ju_name == f"{element}{CLASSICAL_JU_CN_NUMBERS[ju_number]}局"
 
 
@@ -556,7 +552,5 @@ def test_ming_zhu_and_shen_zhu_tables_are_twelve_branches_of_known_stars() -> No
 
 def test_source_line_names_the_book_and_the_school() -> None:
     """出处串必须点名《紫微斗数全书》并声明四化派别 —— 派别不说，读者无从复核。"""
-    from app.content.ziwei import ZIWEI_SOURCE
-
     assert "紫微斗数全书" in ZIWEI_SOURCE
     assert "四化" in ZIWEI_SOURCE and "全书" in ZIWEI_SOURCE
