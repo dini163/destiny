@@ -50,6 +50,9 @@ describe('行运三层的取法（Task 8B 判据 4）', () => {
     const movingNames = new Set(transit.transit_positions.map((point) => point.name));
     expect(movingNames.size).toBe(10);
     expect(transit.transit_aspects.length).toBeGreaterThan(0);
+    // 字面量条数钉：36 是录制快照 `tests/fixtures/transit.json` 的事实，夹具重录必须同步此数。
+    // 复测：cd frontend && node -e "console.log(require('./tests/fixtures/transit.json').transit_aspects.length)"
+    expect(transit.transit_aspects).toHaveLength(36);
     transit.transit_aspects.forEach((aspect) => expect(movingNames.has(aspect.moving)).toBe(true));
 
     // `natalLongitudeByName` 就是页面给相位线找终点用的那张表（10 曜 + 4 轴 = 14 项）。
@@ -80,6 +83,10 @@ describe('行运页眉的两个标量口径（Task 8B 判据 4）', () => {
     const birthUtc = new Date(`${natal.utc_datetime.replace(' ', 'T')}:00Z`);
     expect(Number.isNaN(birthUtc.getTime()), `natal.utc_datetime 不是可解析的 "YYYY-MM-DD HH:MM"`).toBe(false);
     const landed = new Date(birthUtc.getTime() + (progression.progressed_julian_day - natal.julian_day) * 86400000);
+    // 本锚点在正午生时夹具（natal.utc_datetime = "2000-01-01 12:00"）下无日界风险：落点距当日
+    // 两端各留半天，精确比字符串是安全的。换用近午夜生时的夹具时必须改为 ±1 日容差，否则会
+    // 被时区/推进小数位造成的日界抖动误报成推运错。
+    // 复测：cd frontend && node -e "console.log(require('./tests/fixtures/transit.json').natal.utc_datetime)"
     expect(landed.toISOString().slice(0, 10)).toBe(progression.progressed_date);
   });
 
