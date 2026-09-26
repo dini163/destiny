@@ -7,13 +7,21 @@ import { BaziLiuriPage } from './pages/BaziLiuriPage';
 import { BaziHehunPage } from './pages/BaziHehunPage';
 import { BaziNatalPage } from './pages/BaziNatalPage';
 import { BaziTransitPage } from './pages/BaziTransitPage';
+import { KabbalahPage } from './pages/KabbalahPage';
+import { LenormandPage } from './pages/LenormandPage';
 import { NamePage } from './pages/NamePage';
 import { NorseRunesPage } from './pages/NorseRunesPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { NumerologyPage } from './pages/NumerologyPage';
+import { PlumBlossomPage } from './pages/PlumBlossomPage';
 import { PortalPage } from './pages/PortalPage';
+import { QimenPage } from './pages/QimenPage';
+import { SynastryPage } from './pages/SynastryPage';
 import { TarotPage } from './pages/TarotPage';
+import { TransitPage } from './pages/TransitPage';
+import { VedicPage } from './pages/VedicPage';
 import { WesternNatalPage } from './pages/WesternNatalPage';
+import { ZiweiPage } from './pages/ZiweiPage';
 import { ZhouyiPage } from './pages/ZhouyiPage';
 
 /** Nested child paths are relative; strip the leading slash from absolute ROUTES. */
@@ -44,11 +52,19 @@ export const router = createBrowserRouter([
       { path: segment(ROUTES.baziLiuri), element: <BaziLiuriPage /> },
       { path: segment(ROUTES.baziLiushi), element: <BaziLiushiPage /> },
       { path: segment(ROUTES.westernNatal), element: <WesternNatalPage /> },
+      { path: segment(ROUTES.transit), element: <TransitPage /> },
+      { path: segment(ROUTES.synastry), element: <SynastryPage /> },
       { path: segment(ROUTES.tarot), element: <TarotPage /> },
+      { path: segment(ROUTES.lenormand), element: <LenormandPage /> },
+      { path: segment(ROUTES.kabbalah), element: <KabbalahPage /> },
       { path: segment(ROUTES.zhouyi), element: <ZhouyiPage /> },
+      { path: segment(ROUTES.ziwei), element: <ZiweiPage /> },
+      { path: segment(ROUTES.qimen), element: <QimenPage /> },
+      { path: segment(ROUTES.plumBlossom), element: <PlumBlossomPage /> },
       { path: segment(ROUTES.nameMetric), element: <NamePage /> },
       { path: segment(ROUTES.numerologyMatrix), element: <NumerologyPage /> },
       { path: segment(ROUTES.norseRunes), element: <NorseRunesPage /> },
+      { path: segment(ROUTES.vedic), element: <VedicPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
