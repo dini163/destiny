@@ -5,9 +5,11 @@
  *
  * 判据文字见仓库根 `AGENTS.md`（第 2 条的前端分工、第 8 条「数字必须带测法」）；本模块用
  * node:fs 直读 `src/**` 源码文本，不 import 被测代码，环境刻意是 node（要真文件系统）。
- * 棘轮而非硬门：已裁定保留的例外写进 BASELINE / 例外清单（附理由与 ledger 行号），
- * 断言只保证「不再变差」；现测为零的规则就是硬门。
- * 复测口径（2026-09-26 全绿）：
+ * 棘轮而非硬门：已裁定保留的例外写进**身份清单**（附理由与 ledger 行号），断言只保证
+ * 「不再变差」；现测为零的规则就是硬门。为什么是身份而不是计数（评审 Minor 5）：
+ * `BASELINE = 1` 这种纯计数棘轮允许「修掉这条边、换一条同样非法的边」照样绿，
+ * 身份子集判定则任何未登记的新违规（哪怕总数不变）都红。
+ * 复测口径（2026-09-26 全绿，10 项）：
  * `cd frontend && npx vitest run tests/architecture/conventions.test.ts`
  */
 import { readdirSync, readFileSync } from 'node:fs';
@@ -18,25 +20,46 @@ import { describe, expect, it } from 'vitest';
 /** 从本文件定位 `src/`，不用 process.cwd()：CI 的调用目录不可依赖（同 tests/lib/readFixture.ts）。 */
 const SRC = fileURLToPath(new URL('../../src/', import.meta.url));
 
-/** 现测（2026-09-26）仍存在的违规数；未登记的 kind 基线为 0（硬门）。 */
-const BASELINE: Record<string, number> = {
-  // components/<A>/ -> components/<B>/（B≠ui）：唯一一处是
-  // `components/meihua/HexagramTriad.tsx` 引 `../zhouyi/HexagramGlyph`——卦画字形
-  // 是两系统共用的视觉件，暂居 zhouyi 未提升为 ui/，裁定见 ledger F-A2-4。
-  '跨系统组件 import': 1,
-  // `function formatDelta` 的重复定义：components/bazi/hehun/HehunFiredList.tsx、
-  // components/bazi/transit/TransitFiredList.tsx、components/ui/ScoreLedger.tsx、
-  // lib/meihua.ts 各一处，合并留作后续收口点（ledger F-A2-5）。
-  'formatDelta 重复定义': 4,
-};
+/**
+ * 计数型例外的基线上限；表留空即每条规则都是硬门（`assertNoNewViolations` 缺省基线 0）。
+ * 本表原本有两条计数棘轮（`跨系统组件 import` = 1、`formatDelta 重复定义` = 4），
+ * 2026-09-26 评审轮把它们换成下面的身份清单：更强（同数量置换也红），且例外本身与
+ * ledger 行号同处登记。将来确有「同一身份的违规数只能减」型例外时再回到这张表。
+ */
+const BASELINE: Record<string, number> = {};
 
-/** 棘轮断言：offenders 数不得超过该 kind 的基线，并把全部违规报出来。 */
+/** 已裁定的跨系统组件 import 边（`components/<A>/ -> components/<B>/`，B≠ui）全仓唯一一处：
+ * `components/meihua/HexagramTriad.tsx` 引 `../zhouyi/HexagramGlyph`——卦画字形是梅花与
+ * 周易共用的视觉件，暂居 zhouyi 未提升为 ui/，裁定见 ledger F-A2-4。提升后清单清空即硬门。 */
+const ADJUDICATED_CROSS_SYSTEM_EDGES = [
+  'components/meihua/HexagramTriad.tsx -> ../zhouyi/HexagramGlyph',
+];
+
+/** `function formatDelta` 的四处已登记定义（ledger F-A2-5）：前两处逐字复制、后两处签名不同，
+ * 合并进 ui/ScoreLedger 或 lib 共用件后逐条从清单划掉（每划掉一条离硬门近一格）。 */
+const ADJUDICATED_FORMAT_DELTA_DEFINERS = [
+  'components/bazi/hehun/HehunFiredList.tsx',
+  'components/bazi/transit/TransitFiredList.tsx',
+  'components/ui/ScoreLedger.tsx',
+  'lib/meihua.ts',
+];
+
+/** 计数棘轮：offenders 数不得超过该 kind 的基线（缺省 0 = 硬门），并把全部违规报出来。 */
 function assertNoNewViolations(kind: string, offenders: string[]): void {
   const limit = BASELINE[kind] ?? 0;
   expect(
     offenders.length,
     `${kind} 违规 ${offenders.length} 处，超出基线 ${limit}；清单: ${offenders.join(', ') || '无'}`,
   ).toBeLessThanOrEqual(limit);
+}
+
+/** 身份棘轮：offenders 必须全部落在已登记例外里；任何未登记身份（新增或置换）都红。 */
+function assertOnlyAdjudicated(kind: string, offenders: string[], adjudicated: string[]): void {
+  const unlisted = offenders.filter((o) => !adjudicated.includes(o));
+  expect(
+    unlisted,
+    `${kind} 出现未登记例外 ${unlisted.join(', ') || '无'}；已裁定例外: ${adjudicated.join(', ') || '（无）'}`,
+  ).toEqual([]);
 }
 
 /** 递归列出目录下匹配扩展名的文件（绝对路径，排序保证报错确定性）。 */
@@ -62,26 +85,51 @@ function importSpecs(path: string): string[] {
 }
 
 describe('不变式 1：页面网络必须经 hooks/（AGENTS.md 分层惯例）', () => {
-  // 现测 0：`grep -rl "apiPost\|apiGet" pages` 与 pages 内 `fetch(` 均零命中，故硬门。
-  // `fetch(` 全仓唯一出现在 `api/client.ts`（fetch 包装器本身，不是漏网调用点）；
-  // 页面直连 apiPost/apiGet 会绕开 hooks 层的重发保果与错误约定（不变式 7）。
-  it('pages/** 不得直接 apiPost/apiGet/fetch(', () => {
+  // 现测 0（2026-09-26，两条命令都从 `frontend/` 跑）：
+  //   grep -rln "apiPost\|apiGet" src/pages  → 0 命中
+  //   grep -rln "from '\.\./api"  src/pages  → 0 命中
+  // `fetch(` 全仓唯一出现在 `api/client.ts`（fetch 包装器本身，不是漏网调用点）。
+  // 不再要求名字紧跟 `(`（评审 Important 1）：本仓真调用一律带泛型参数
+  // （`api/bazi.ts:9` 的 `apiPost<BaziChart>('/bazi/natal', request, signal)`），
+  // 旧正则 `/\b(apiPost|apiGet|fetch)\s*\(/` 对 `apiPost<BaziChart>(` 零命中，
+  // 于是"把 api/bazi.ts 那一行抄进页面"这条最自然的绕过路径是绿的。
+  // 页面无条件不许 import `src/api/` 任何东西：接线的唯一去处是 `hooks/`
+  // （不变式 7 的重发保果与错误约定都挂在那一层）。
+  it('pages/** 不得出现 apiPost/apiGet/fetch(', () => {
     const offenders = listFiles(resolve(SRC, 'pages'), ['ts', 'tsx'])
-      .filter((p) => /\b(apiPost|apiGet|fetch)\s*\(/.test(readFileSync(p, 'utf8')))
+      .filter((p) => /\b(apiPost|apiGet)\b|\bfetch\s*\(/.test(readFileSync(p, 'utf8')))
       .map(rel);
     assertNoNewViolations('页面直连 HTTP', offenders);
   });
+
+  it('pages/** 不得 import src/api/ 的任何东西', () => {
+    const apiDir = resolve(SRC, 'api');
+    const offenders = listFiles(resolve(SRC, 'pages'), ['ts', 'tsx'])
+      .filter((p) =>
+        importSpecs(p).some((spec) => {
+          if (!spec.startsWith('.')) return false;
+          const target = resolve(p, '..', spec);
+          return target === apiDir || target.startsWith(apiDir + sep);
+        }),
+      )
+      .map(rel);
+    assertNoNewViolations('页面直连 api 层', offenders);
+  });
 });
 
-describe('不变式 2：components/<A>/ 不得 import components/<B>/', () => {
-  // 共享 UI 的唯一合法去处是 components/ui/。现测 1（棘轮，见 BASELINE）：
-  // meihua -> zhouyi/HexagramGlyph（ledger F-A2-4）。layout/portal 两个平台目录
-  // 现测既不外流也不被引（`grep -rln "components/layout\|components/portal"` 排除
-  // 自身后零命中），故不为其开后门——哪天引了就是新增违规。
+describe('不变式 2：components/<A>/ 不得 import components/<B>/（B≠ui）', () => {
+  // 共享 UI 的唯一合法去处是 components/ui/。现测（2026-09-26）1 处：
+  // meihua -> zhouyi/HexagramGlyph（ledger F-A2-4），登记为 ADJUDICATED_CROSS_SYSTEM_EDGES
+  // 的边身份而非计数：换一条同样数量的边照样红。layout/portal 两个平台目录现测既不
+  // 外流也不被引（复测命令按本目录口径 scoping：`cd frontend && grep -rln
+  // "components/layout\|components/portal" src/components` = 0 命中；不带 src/components
+  // 的仓内全量 grep 会有 3 个命中——router.tsx:3、pages/NotFoundPage.tsx:3、
+  // pages/PortalPage.tsx:4-5，那三处不是本不变式的射程），故不为其开后门：哪天引了
+  // 就是未登记身份，直接红。
   const topDir = (path: string): string => relative(resolve(SRC, 'components'), path).split(sep)[0];
   const componentsDir = resolve(SRC, 'components');
 
-  it('跨系统组件 import 不得超过基线', () => {
+  it('跨系统组件 import 只能是被裁定的那条边', () => {
     const offenders: string[] = [];
     for (const file of listFiles(componentsDir, ['ts', 'tsx'])) {
       for (const spec of importSpecs(file)) {
@@ -92,7 +140,7 @@ describe('不变式 2：components/<A>/ 不得 import components/<B>/', () => {
         if (from !== to && to !== 'ui') offenders.push(`${rel(file)} -> ${spec}`);
       }
     }
-    assertNoNewViolations('跨系统组件 import', offenders);
+    assertOnlyAdjudicated('跨系统组件 import', offenders, ADJUDICATED_CROSS_SYSTEM_EDGES);
   });
 });
 
@@ -124,27 +172,36 @@ describe('不变式 3：types/*.ts 与 api/*.ts 一一对应（契约层不缺�
   });
 });
 
-describe('不变式 4：每个 pages/<X>.tsx 必须出现在 router.tsx（防孤儿页）', () => {
-  // 现测 0：21 个页面文件全部被 router.tsx import（含走 '*' 兜底的 NotFoundPage），故硬门。
+describe('不变式 4：每个 pages/<X>.tsx 必须被 router.tsx 引且渲染（防孤儿页）', () => {
+  // 现测 0：21 个页面文件全部既被 import 又渲染（含走 `'*'` 兜底的 NotFoundPage），故硬门。
   // 复测：`cd frontend && grep -c "from './pages" src/router.tsx`（21）对 `ls src/pages | wc -l`（21）。
+  // 判定用「import 指称 + 渲染元素」两道（评审 Important 2）：只看去后缀的文件名是否出现在
+  // router.tsx 里，会被同名前缀遮蔽——`pages/TransitPage.tsx` 就靠 `BaziTransitPage`
+  // （router.tsx:9,51）蒙了过去，删掉它自己的 import 与路由仍是绿的；注释里提一句名字
+  // 同样能骗过名字匹配，元素匹配堵的就是这条。
   it('无孤儿页', () => {
     const router = readFileSync(resolve(SRC, 'router.tsx'), 'utf8');
     const offenders = listFiles(resolve(SRC, 'pages'), ['tsx'])
       .map(rel)
-      .filter((p) => !router.includes(p.replace(/^pages\//, '').replace(/\.tsx$/, '')))
-      .map((p) => `${p} 未被 router.tsx 引用`);
+      .filter((p) => {
+        const name = p.replace(/^pages\//, '').replace(/\.tsx$/, '');
+        return (
+          !router.includes(`from './pages/${name}'`) || !new RegExp(`<${name}[\\s/>]`).test(router)
+        );
+      })
+      .map((p) => `${p} 未被 router.tsx import 并渲染`);
     assertNoNewViolations('孤儿页', offenders);
   });
 });
 
 describe('不变式 5：重复逻辑抽样 formatDelta', () => {
-  // 基线 4 的四处路径已列在 BASELINE 注释；此数为棘轮上限，合并进
-  // ui/ScoreLedger 或 lib 共用件后应逐格调小（ledger F-A2-5）。
-  it('function formatDelta 定义处不超过基线', () => {
+  // 四处已登记身份见 ADJUDICATED_FORMAT_DELTA_DEFINERS；合并进 ui/ScoreLedger 或 lib
+  // 共用件后逐条从清单划掉（ledger F-A2-5），新增一处同名定义即未登记身份，直接红。
+  it('function formatDelta 只能定义在已登记的四处', () => {
     const offenders = listFiles(SRC, ['ts', 'tsx'])
       .filter((p) => /function\s+formatDelta\b/.test(readFileSync(p, 'utf8')))
       .map(rel);
-    assertNoNewViolations('formatDelta 重复定义', offenders);
+    assertOnlyAdjudicated('formatDelta 重复定义', offenders, ADJUDICATED_FORMAT_DELTA_DEFINERS);
   });
 });
 
@@ -179,7 +236,9 @@ describe('不变式 7：重发保果 —— hooks/useLastSuccessMutation adoptio
   // 上一次成功结果留在屏上，载体就是这个 hook。现测（2026-09-26）：25 个 hook 文件里
   // 7 个采用（`grep -rl useLastSuccessMutation hooks | grep -v useLastSuccessMutation.ts | wc -l`），
   // 另外 12 个直调 useMutation 的 hook 未采用（其页面同样可重发）——缺口记在
-  // ledger F-A2-6，本测试钉住「已采用的 7 个不许掉、总数不许跌」，只准增不准减。
+  // ledger F-A2-6。机制只有一个（评审 Important 3）：ADOPTED_BY 是名单身份，丢掉任一个即红；
+  // 「总数不低于 7」是名单的直接推论，不另设断言——旧那行在名单断言通过后永不可能失败。
+  // 「只准增不准减」的语义就住在名单里：新采用者要进名单，名单条目只能加长。
   const ADOPTED_BY = [
     'useBaziHehun',
     'useBaziLiuri',
@@ -191,13 +250,12 @@ describe('不变式 7：重发保果 —— hooks/useLastSuccessMutation adoptio
   ];
   const SELF = 'useLastSuccessMutation';
 
-  it('既有采用者不得丢失，adoption 数不低于 7', () => {
+  it('既有采用者一个都不许丢（名单只准加长）', () => {
     const adopters = readdirSync(resolve(SRC, 'hooks'))
       .filter((f) => f.endsWith('.ts') && f !== `${SELF}.ts`)
       .filter((f) => readFileSync(resolve(SRC, 'hooks', f), 'utf8').includes(SELF))
       .map((f) => f.replace(/\.ts$/, ''));
     const dropped = ADOPTED_BY.filter((n) => !adopters.includes(n));
     expect(dropped, `丢掉重发保果模式的 hook: ${dropped.join(', ')}`).toEqual([]);
-    expect(adopters.length).toBeGreaterThanOrEqual(ADOPTED_BY.length);
   });
 });
