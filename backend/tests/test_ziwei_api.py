@@ -283,7 +283,11 @@ def test_an_out_of_range_coordinate_is_rejected_by_pydantic(client: TestClient) 
 
 
 def test_birth_time_is_mandatory_down_to_the_minute(client: TestClient) -> None:
-    """斗数离不开生时（命宫 = 生月 ± 生时），缺生时不能退成「正午」。"""
+    """斗数离不开生时（命宫 = 生月 ± 生时），缺生时不能退成「正午」。
+
+    这条与 PRD §3.2/§9 的「未知出生时间按 12:00 起盘 + 时柱待验徽标」互斥，是
+    findings F-A1-3 记下的功能缺口：条文落地时本条须连同契约一起重定，不是改断言。
+    """
     response = client.post(URL, json={k: v for k, v in PAYLOAD.items() if k != "birth_time"})
     assert response.status_code == 422
     assert response.json()["detail"][0]["loc"] == ["body", "birth_time"]
@@ -330,6 +334,42 @@ def test_a_lunar_input_reproduces_the_same_board_as_its_solar_equivalent(client:
         assert lunar[field] == solar[field], field
     assert lunar["palaces"] == solar["palaces"]
     assert lunar["sihua"] == solar["sihua"]
+
+
+#: PRD §4.1 承诺的支持区间两端点（1900–2100）。两张盘都按 `PAYLOAD` 的午时、不开校正，
+#: 好让回显的农历串就是断言对象；日期本身另在
+#: `tests/golden/test_ziwei_golden.py::SWEPT_BIRTHS` 有引擎层的扫盘锚。
+#: 农历串取权威库复核（AGENTS.md 第 6 条：不自算历法），复测
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "`
+#: `from lunar_python import Solar;print(Solar.fromYmdHms(1900,1,1,12,0,0).getLunar().toString())"`
+DATE_ENDPOINTS: list[tuple[str, str, str, str, str]] = [
+    ("1900-01-01", "己亥年腊月初一", "土五局", "逆行", "未"),
+    ("2100-12-31", "庚申年腊月初一", "木三局", "顺行", "未"),
+]
+
+
+@pytest.mark.parametrize(("birth", "lunar", "ju", "direction", "ming_zhi"), DATE_ENDPOINTS)
+def test_the_two_prd_date_endpoints_come_back_as_full_boards(
+    client: TestClient, birth: str, lunar: str, ju: str, direction: str, ming_zhi: str
+) -> None:
+    """区间端点必须**整盘**回来，不是「不报错就行」。
+
+    控制台把年份下拉的上限卡在**当前年**，2100 在页面上根本选不到（走查项 5 记此不可达），
+    所以这一层只能在这里验：端点若被历法库悄悄裁掉，页面拿到的会是一张缺星缺宫的盘，
+    而不是一个错误。
+    """
+    body = _post(client, birth_date=birth).json()
+    assert body["lunar_date"] == lunar
+    assert body["wuxing_ju"] == ju and body["dayun_direction"] == direction
+    assert body["ming_gong_zhi"] == ming_zhi
+    assert len(body["palaces"]) == 12
+    ming = [palace for palace in body["palaces"] if palace["is_ming"]]
+    assert [(palace["name"], palace["zhi"]) for palace in ming] == [("命宫", ming_zhi)]
+    assert [palace["name"] for palace in body["palaces"]].count("命宫") == 1
+    # 十四主星之外，乙级星（禄存、擎羊、陀罗、火铃、地空地劫、天马、六吉）也要在场：
+    kinds = {star["kind"] for palace in body["palaces"] for star in palace["stars"]}
+    assert kinds == {"主星", "吉", "煞", "禄马"}, f"端点盘的星类不齐: {sorted(kinds)}"
+
 
 
 # ------------------------------------------------------------------ 确定性与「不许编数」
