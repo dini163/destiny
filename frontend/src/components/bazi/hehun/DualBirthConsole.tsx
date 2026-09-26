@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { Icon } from '../../ui/Icon';
 import { LabeledField } from '../../ui/LabeledField';
+import { ChineseDateField, ChineseTimeField } from '../../ui/DateTimeField';
 import { LocationField } from '../../ui/LocationField';
 import type { LocationValue } from '../../ui/LocationField';
 import { SegmentedControl } from '../../ui/SegmentedControl';
@@ -91,27 +92,18 @@ function SideColumn({ side, state, onChange }: SideColumnProps) {
           />
         }
       >
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-            <Icon name="calendar" size={16} className="shrink-0 text-ink-muted" />
-            <input
-              className="numeric w-full bg-transparent text-sm text-ink outline-none"
-              type="date"
-              value={state.birthDate}
-              onChange={(event) => onChange({ birthDate: event.target.value })}
-              aria-label={`${caption}出生日期`}
-            />
-          </div>
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-            <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
-            <input
-              className="numeric w-full bg-transparent text-sm text-ink outline-none"
-              type="time"
-              value={state.birthTime}
-              onChange={(event) => onChange({ birthTime: event.target.value })}
-              aria-label={`${caption}出生时间`}
-            />
-          </div>
+        <div className="flex flex-col gap-2">
+          <ChineseDateField
+            value={state.birthDate}
+            onChange={(next) => onChange({ birthDate: next })}
+            calendar={state.calendar}
+            ariaLabel={`${caption}出生`}
+          />
+          <ChineseTimeField
+            value={state.birthTime}
+            onChange={(next) => onChange({ birthTime: next })}
+            ariaLabel={`${caption}出生`}
+          />
         </div>
       </LabeledField>
 

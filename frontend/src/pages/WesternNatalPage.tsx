@@ -10,6 +10,7 @@ import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { SelectMenu } from '../components/ui/SelectMenu';
 import { ResultCard } from '../components/ui/ResultCard';
 import { aspectStyle } from '../lib/astro';
 import { useWesternNatal } from '../hooks/useWesternNatal';
@@ -83,18 +84,13 @@ export function WesternNatalPage() {
         }
       >
         <LabeledField label="分宫制 / HOUSE SYSTEM">
-          <select
+          <SelectMenu
+            variant="field"
             value={houseSystem}
-            onChange={(event) => setHouseSystem(event.target.value)}
-            className="w-full rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none transition focus:border-rim-strong"
-            aria-label="分宫制"
-          >
-            {HOUSE_SYSTEM_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onChange={(next) => setHouseSystem(next)}
+            ariaLabel="分宫制"
+            options={HOUSE_SYSTEM_OPTIONS}
+          />
         </LabeledField>
         <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">小时</span>}>
           <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 
 import type { CalendarType } from '../../types/common';
+import { ChineseDateField, ChineseTimeField } from './DateTimeField';
 import { Icon } from './Icon';
 import { LabeledField } from './LabeledField';
 import { LocationField } from './LocationField';
@@ -146,27 +147,13 @@ export function InputBar({
             ) : undefined
           }
         >
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-              <Icon name="calendar" size={16} className="shrink-0 text-ink-muted" />
-              <input
-                className="numeric w-full bg-transparent text-sm text-ink outline-none"
-                type="date"
-                value={birthDate}
-                onChange={(event) => setBirthDate(event.target.value)}
-                aria-label="出生日期"
-              />
-            </div>
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-              <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
-              <input
-                className="numeric w-full bg-transparent text-sm text-ink outline-none"
-                type="time"
-                value={birthTime}
-                onChange={(event) => setBirthTime(event.target.value)}
-                aria-label="出生时间"
-              />
-            </div>
+          <div className="flex flex-col gap-2">
+            <ChineseDateField
+              value={birthDate}
+              onChange={setBirthDate}
+              calendar={showCalendar ? calendar : 'solar'}
+            />
+            <ChineseTimeField value={birthTime} onChange={setBirthTime} />
           </div>
         </LabeledField>
 

@@ -5,6 +5,7 @@ import { CAST_METHODS, coinLabel, lineValueMeta } from '../../lib/zhouyi';
 import type { CoinFace } from '../../lib/zhouyi';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
+import { ChineseDateTimeField } from '../ui/DateTimeField';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 interface CastControlsProps {
@@ -111,13 +112,7 @@ export function CastControls({
           </LabeledField>
 
           <LabeledField label="起卦时刻 / CAST TIME" hint={<span className="text-ink-muted">留空取当前</span>}>
-            <input
-              type="datetime-local"
-              value={castTime}
-              onChange={(event) => onCastTimeChange(event.target.value)}
-              className="field [color-scheme:dark]"
-              aria-label="起卦时刻"
-            />
+            <ChineseDateTimeField value={castTime} onChange={onCastTimeChange} ariaLabel="起卦" />
           </LabeledField>
         </div>
       </div>

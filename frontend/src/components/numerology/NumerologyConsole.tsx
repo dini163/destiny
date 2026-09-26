@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
+import { ChineseDateField } from '../ui/DateTimeField';
 import type { NumerologyChartRequest } from '../../types/numerology';
 
 /** 表单状态。与 `NumerologyChartRequest` 同义，只是各字段的形状跟着控件走。 */
@@ -140,31 +141,17 @@ export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyCon
           />
         </LabeledField>
         <LabeledField label="公历生日（必填）">
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-            <Icon name="calendar" size={16} className="shrink-0 text-ink-muted" />
-            <input
-              className="numeric w-full bg-transparent text-sm text-ink outline-none"
-              type="date"
-              value={state.birthDate}
-              onChange={(event) => patch({ birthDate: event.target.value })}
-              aria-label="公历生日"
-            />
-          </div>
+          <ChineseDateField value={state.birthDate} onChange={(next) => patch({ birthDate: next })} />
         </LabeledField>
         <LabeledField
           label="基准日（选填）"
           hint={<span className="label-caps text-ink-muted">留空取今天</span>}
         >
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
-            <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
-            <input
-              className="numeric w-full bg-transparent text-sm text-ink outline-none"
-              type="date"
-              value={state.referenceDate}
-              onChange={(event) => patch({ referenceDate: event.target.value })}
-              aria-label="个人周期的基准日"
-            />
-          </div>
+          <ChineseDateField
+            value={state.referenceDate}
+            onChange={(next) => patch({ referenceDate: next })}
+            ariaLabel="基准"
+          />
         </LabeledField>
       </div>
 
