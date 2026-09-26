@@ -16,7 +16,9 @@ anchors here are hand-derivable arithmetic, not engine read-backs:
 * **相位表** — `synastry_aspects` is monotonic in orb and free of duplicate
   `(point_a, point_b, type)` triples; its per-type orb ceiling is the same shared
   `ASPECTS` table (`app/engines/western.py:60-66`) the natal and transit tables use, and the
-  inclusive `<=` boundary is forced at the 8.0 conjunction limit.
+  inclusive `<=` boundary is forced at the 8.0 conjunction limit. Cross-table agreement is
+  *not* proved here — it lives in
+  `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`.
 * **对称性** — swapping the two people leaves the (unordered) aspect set and the score value
   unchanged; `counted` is decided by whether *both* endpoints are personal points, not by
   which side is A.
@@ -40,10 +42,9 @@ from app.schemas.synastry import SynastryPerson
 #: Recount: `python -c "from app.engines.western import ASPECTS; print(ASPECTS)"`.
 CONJUNCTION_ORB = next(orb for name, _g, _a, orb in ASPECTS if name == "conjunction")
 
-#: The personal points a synastry aspect must touch on both ends to count toward the score
-#: (mirrors `SYNASTRY_PERSONAL_POINTS`); hand-listed so the test is an external oracle.
-#: Recount: `python -c "from app.content.synastry import SYNASTRY_PERSONAL_POINTS as s; print(sorted(s))"`.
-PERSONAL_POINTS = {"Sun", "Moon", "Mercury", "Venus", "Mars", "ASC"}
+# 「个人点」六名集合的 external oracle 以字面量住在 `test_only_personal_point_pairs_are_counted`
+# 里（Task 8A 修复轮 1 的裁定：不把它换成模块常量，因为那要动既有测）。这里不再留第二份，
+# 因为 F2 删掉了 swap 测里那段与既有测逐字重复的判定循环后，本文件已无人用它。
 
 LAT = 51.4769
 LON = -0.0005
@@ -230,22 +231,28 @@ def test_diametric_midpoint_walks_counterclockwise_from_a() -> None:
 # ------------------------------------------------------- Step 3: 相位表完备性与对称
 
 def test_synastry_aspects_are_sorted_unique_and_within_their_orbs() -> None:
-    """人对人相位列：orb 非降序、`(point_a, point_b, type)` 全表唯一、不越共享容许度上限。"""
+    """合盘相位列的独有条：`(point_a, point_b, type)` 三元组全表唯一 + 按类型不越共享上限。
+
+    「orb 非降序」已由 `test_synastry_aspects_are_valid_and_sorted` 钉过，本条不重复；本条多出来
+    的是三元组唯一性，以及把上限从写死的 8.0 换成按 `ASPECTS` 逐型收紧（六合 6.0、刑 7.0 在
+    `app/engines/western.py:60-66`），那是强化而非重复。
+    """
     limit_by_type = {name: orb for name, _g, _a, orb in ASPECTS}
     aspects = _chart().synastry_aspects
-    orbs = [a.orb for a in aspects]
-    assert orbs == sorted(orbs)
     triples = {(a.point_a, a.point_b, a.type) for a in aspects}
     assert len(triples) == len(aspects)
     for a in aspects:
         assert 0.0 <= a.orb <= limit_by_type[a.type], (a.point_a, a.point_b, a.type)
 
 
-def test_synastry_aspect_orb_boundary_matches_the_other_tables() -> None:
-    """合盘表在「恰好等于合相上限」时与本命/行运同一口径：构造 7.9/8.0 计入、8.1 剔除。
+def test_synastry_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
+    """合盘表这一侧：构造 7.9/8.0 计入、8.1 剔除，只证明 `_synastry_aspects` 用 `orb <= orb_limit`。
 
-    `_synastry_aspects` 用同一句 `orb <= orb_limit`（`app/engines/synastry.py:134-136`）。三表各钉
-    一次同一 8.0 边界即证明含/不含一致（本命、行运见各自 golden 文件）。
+    `_synastry_aspects` 迭同一份 `ASPECTS`、同一句比较（`app/engines/synastry.py:134-136`），
+    但本条看不到另外两张表——「三表同口径」由跨表关系测
+    `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`
+    一次喂三张表来证（本命、行运各自的姊妹条同理，也只钉自己那一张）。8.0 是合相上限
+    （`CONJUNCTION_ORB`，`app/engines/western.py:61`）。
     """
     assert CONJUNCTION_ORB == 8.0
     points = lambda lon: [("Sun", "太阳", "☉", lon)]  # noqa: E731 — 仅构造单点输入
@@ -255,10 +262,11 @@ def test_synastry_aspect_orb_boundary_matches_the_other_tables() -> None:
 
 
 def test_swapping_the_two_people_leaves_the_aspect_set_and_score_unchanged() -> None:
-    """交换 A/B 后相位「集合」相等（无序对 + 类型 + orb），score.value 不变，counted 与谁在 A 无关。
+    """交换 A/B 后相位「集合」相等（无序对 + 类型 + orb）、score.value 不变、counted 相位照样对得上。
 
-    相位是两两几何关系，人对调只交换 point_a/point_b 的角色，不改变 orb；score 只由 counted
-    条目加权，counted 取决于两端是否个人点（与顺序无关）——所以整张表在交换下对称。
+    相位是两两几何关系，人对调只交换 point_a/point_b 的角色，不改变 orb；score 只由 counted 条目
+    加权——「counted 取决于两端是否个人点」这条判据本身已由 `test_only_personal_point_pairs_are_counted`
+    钉住，本条不重复那段循环，只证它在交换下不变。
     """
     swapped = compute_synastry(
         person_a=_person(date(1992, 11, 20), time(18, 45), "B"),
@@ -279,9 +287,6 @@ def test_swapping_the_two_people_leaves_the_aspect_set_and_score_unchanged() -> 
     assert {round(a.orb, 2) for a in original.synastry_aspects if a.counted} == {
         round(a.orb, 2) for a in swapped.synastry_aspects if a.counted
     }
-    # counted 只由「两端皆个人点」决定，与放在 A 侧还是 B 侧无关。
-    for a in original.synastry_aspects:
-        assert a.counted == (a.point_a in PERSONAL_POINTS and a.point_b in PERSONAL_POINTS)
 
 
 def test_only_counted_aspects_enter_the_score_ledger() -> None:
