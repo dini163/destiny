@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { MeihuaCast, MeihuaHexagram, MeihuaTrigram } from '../../types/meihua';
 import { wuxingText } from '../../lib/wuxing';
-import { HexagramGlyph } from '../zhouyi/HexagramGlyph';
+import { HexagramGlyph } from '../ui/HexagramGlyph';
 
 interface HexagramTriadProps {
   /** The complete cast — supplies 本/互/变卦, the moving line and the 体用 roles. */

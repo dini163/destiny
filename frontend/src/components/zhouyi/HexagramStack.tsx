@@ -2,7 +2,7 @@ import type { HexagramInfo, ZhouyiLine } from '../../types/zhouyi';
 import { wuxingText } from '../../lib/wuxing';
 import { lineValueMeta, liushenColor } from '../../lib/zhouyi';
 import { Icon } from '../ui/Icon';
-import { LineBar } from './LineBar';
+import { LineBar } from '../ui/LineBar';
 
 interface HexagramStackProps {
   /** 本卦 — the primary hexagram (identity for the column header). */

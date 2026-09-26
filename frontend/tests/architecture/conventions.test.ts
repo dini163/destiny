@@ -28,12 +28,12 @@ const SRC = fileURLToPath(new URL('../../src/', import.meta.url));
  */
 const BASELINE: Record<string, number> = {};
 
-/** 已裁定的跨系统组件 import 边（`components/<A>/ -> components/<B>/`，B≠ui）全仓唯一一处：
- * `components/meihua/HexagramTriad.tsx` 引 `../zhouyi/HexagramGlyph`——卦画字形是梅花与
- * 周易共用的视觉件，暂居 zhouyi 未提升为 ui/，裁定见 ledger F-A2-4。提升后清单清空即硬门。 */
-const ADJUDICATED_CROSS_SYSTEM_EDGES = [
-  'components/meihua/HexagramTriad.tsx -> ../zhouyi/HexagramGlyph',
-];
+/** 已裁定的跨系统组件 import 边（`components/<A>/ -> components/<B>/`，B≠ui）。
+ * 曾唯一一处是 `components/meihua/HexagramTriad.tsx` 引 `../zhouyi/HexagramGlyph`
+ * （ledger F-A2-4）：卦画字形与爻条是梅花、周易共用的视觉件，2026-09-26 已提升到
+ * `components/ui/{HexagramGlyph,LineBar}.tsx`，清单清空。空表仍保留——它是「例外必须先
+ * 登记身份」这一机制的接口，不是待还的债。 */
+const ADJUDICATED_CROSS_SYSTEM_EDGES: string[] = [];
 
 /** `function formatDelta` 的四处已登记定义（ledger F-A2-5）：前两处逐字复制、后两处签名不同，
  * 合并进 ui/ScoreLedger 或 lib 共用件后逐条从清单划掉（每划掉一条离硬门近一格）。 */
@@ -118,9 +118,10 @@ describe('不变式 1：页面网络必须经 hooks/（AGENTS.md 分层惯例）
 });
 
 describe('不变式 2：components/<A>/ 不得 import components/<B>/（B≠ui）', () => {
-  // 共享 UI 的唯一合法去处是 components/ui/。现测（2026-09-26）1 处：
-  // meihua -> zhouyi/HexagramGlyph（ledger F-A2-4），登记为 ADJUDICATED_CROSS_SYSTEM_EDGES
-  // 的边身份而非计数：换一条同样数量的边照样红。layout/portal 两个平台目录现测既不
+  // 共享 UI 的唯一合法去处是 components/ui/。现测（2026-09-26）0 处：曾有的
+  // meihua -> zhouyi/HexagramGlyph（ledger F-A2-4）随该件提升到 ui/ 而消失，
+  // ADJUDICATED_CROSS_SYSTEM_EDGES 归零即硬门——登记的是边身份而非计数，
+  // 换一条同样数量的边照样红。layout/portal 两个平台目录现测既不
   // 外流也不被引（复测命令按本目录口径 scoping：`cd frontend && grep -rln
   // "components/layout\|components/portal" src/components` = 0 命中；不带 src/components
   // 的仓内全量 grep 会有 3 个命中——router.tsx:3、pages/NotFoundPage.tsx:3、

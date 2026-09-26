@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { HexagramInfo } from '../../types/zhouyi';
 import { wuxingChip } from '../../lib/wuxing';
-import { HexagramGlyph } from './HexagramGlyph';
+import { HexagramGlyph } from '../ui/HexagramGlyph';
 
 interface HexagramCardProps {
   /** The hexagram to describe (变卦 or 互卦). */
