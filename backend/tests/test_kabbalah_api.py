@@ -16,7 +16,7 @@
 * **`synthesis` 含三个数字字面量**：「响应自己印的字面 ⊆ 响应自己给的数据」那一族在
   HTTP 层的落点，防 ``engines/kabbalah.py`` 里那串 f-string 与字段脱钩。
 * **两种 422 不是一种**：``GematriaRequest.text`` 的 `min_length=1, max_length=64`
-  （``schemas/kabbalah.py:92``）坏在字段自身，走 FastAPI 默认 ``detail`` 形状；一个拉丁
+  （``schemas/kabbalah.py``）坏在字段自身，走 FastAPI 默认 ``detail`` 形状；一个拉丁
   字母也没有坏在引擎前提，走 ``{error: {code, message}}`` 信封（AGENTS §4 的分工）。
   前端一律读 ``error.code``，把二者混成一份 ``detail`` 就等于让页面失去可分支的码。
 """
@@ -31,8 +31,8 @@ TREE_URL = "/api/v1/kabbalah/tree"
 GEMATRIA_URL = "/api/v1/kabbalah/gematria"
 
 #: 手写而不从 `KabbalahTree.model_fields` 取：加/删顶层字段应当是一次显式改动。
-#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
-#: from app.engines.kabbalah import build_tree as b; print(sorted(b().model_dump()))"`
+#: 复测：`pytest tests/test_kabbalah_api.py -k byte_for_byte` —— 这个集合与
+#: `build_tree().model_dump()` 的键集在同一条断言里比，两边一漂移就红。
 TOP_LEVEL_KEYS = {
     "pillars",
     "worlds",
@@ -69,19 +69,21 @@ def test_get_tree_hands_the_assembled_map_over_byte_for_byte(client: TestClient)
 
 
 def test_the_three_pillars_are_printed_with_their_sides(client: TestClient) -> None:
-    """`pillars` 是页面图例的来源：三条的 `side` 必须与柱 id 一一对上。
+    """`pillars` 是页面图例的来源：三条的 id / 中文名 / 英文名 / `side` 逐条整体对拍。
 
     右 = 慈悲（Jachin）、左 = 严厉（Boaz）、中 = 平衡（Middle），照的是
-    ``content/kabbalah.py`` 的策展表（`PILLARS`）。这里按响应里的顺序整体比，
-    顺带钉住「图例顺序 = 中柱 → 右柱 → 左柱」这一交付现状。
+    ``content/kabbalah.py`` 的 `PILLARS` 表；顺序本身也是交付现状（图例按
+    中柱 → 右柱 → 左柱 印）。`virtue` 是一句人读的品德描述文案，改动它不该红契约，
+    故只断非空，不逐字钉。
     """
     pillars = client.get(TREE_URL).json()["pillars"]
-    assert [(pillar["id"], pillar["side"], pillar["name_en"]) for pillar in pillars] == [
-        ("equilibrium", "middle", "Middle"),
-        ("mercy", "right", "Jachin"),
-        ("severity", "left", "Boaz"),
+    rows = [(p["id"], p["name_zh"], p["name_en"], p["side"]) for p in pillars]
+    assert rows == [
+        ("equilibrium", "中柱·平衡", "Middle", "middle"),
+        ("mercy", "慈悲之柱", "Jachin", "right"),
+        ("severity", "严厉之柱", "Boaz", "left"),
     ]
-    assert all(pillar["name_zh"] and pillar["virtue"] for pillar in pillars)
+    assert all(pillar["virtue"] for pillar in pillars)
 
 
 def test_every_sphere_including_daath_arrives_with_a_hex_colour(client: TestClient) -> None:
@@ -134,9 +136,12 @@ def test_a_word_without_latin_letters_is_an_engine_error_envelope(client: TestCl
 def test_text_length_bounds_are_pydantic_validation_not_domain_errors(client: TestClient) -> None:
     """`text` 的 1..64 是字段自身的约束 → FastAPI 默认 `detail`，不是 `{error}` 信封。
 
-    复测（2026-09-27，与 ``schemas/kabbalah.py:92`` 的 `min_length=1, max_length=64` 同源）：
-    `python -c` 打 65 字与空串，两份响应体的键都是 `['detail']`，而 64 字正常 200。
-    与雷诺曼 `question`（120 字）是同一条分工：长度归 pydantic，字符集归引擎（AGENTS §4）。
+    约束住在 ``schemas/kabbalah.py`` 的 ``GematriaRequest.text``（``min_length=1``、
+    ``max_length=64``，2026-09-27 复核）：复测就是本函数 ——
+    ``pytest tests/test_kabbalah_api.py -k text_length_bounds``。65 字与空串各回一份只有
+    ``detail`` 的 422（``type`` 分别是 ``string_too_long`` / ``string_too_short``），
+    64 字正常 200。与雷诺曼 ``question``（120 字）是同一条分工：长度归 pydantic，
+    字符集归引擎（AGENTS §4）。
     """
     for text, expected_type in ((("A" * 65), "string_too_long"), ("", "string_too_short")):
         response = client.post(GEMATRIA_URL, json={"text": text})
