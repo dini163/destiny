@@ -8,16 +8,19 @@
  * 反向同理——串行的实现（两次渲染共用 state、或按索引而非按 `name` 取行）只会让其中一侧变红。
  *
  * 为什么按 `name` 取行而不是按位置：`BigThree.tsx:17-19` 用
- * `planets.find(name === 'Sun')` / `'Moon'` 与 `axes.find(name === 'ASC')`，夹具里两造的
- * 十曜顺序相同，按索引取在真盘上「碰巧对」，遇到后端换序就会静默错行——把度数逐字对上卡面，
- * 这条也一并钉住。
+ * `planets.find(name === 'Sun')` / `'Moon'` 与 `axes.find(name === 'ASC')`。夹具里
+ * 十曜恰按 Sun…Pluto 排、ASC 在轴首，按下标取在真盘上「碰巧对」，遇到换序就静默错行。
+ * 这个「碰巧对」由第 3 例钉住：把**同一份真实响应的数组换序**再灌（不伪造字段值，
+ * 派生方式与 8A 的 `model_copy` 造确定性几何同理，AGENTS §9），三张卡必须仍按 `name`
+ * 命中。变异实测（2026-09-27，把 :17-19 改成 `planets[0]/[1]`、`axes[0]`）：第 3 例
+ * 变红，前两例仍绿——前两例钉的是字面量卡面与两造互斥，不钉取法。
  *
  * RTL 陷阱（本仓库第一套 .tsx 测，实录一次以免后人重踩）：`render()` 返回的那组查询绑定的是
  * `baseElement`（默认 `document.body`）而**不是** `view.container`，所以同一个 `it` 里连挂
  * 两次时 `viewA.getByText(...)` 会同时看见乙的 DOM。跨渲染的对拍一律走
  * `within(view.container)`，否则负向断言是假的。
  *
- * 复测口径（2026-09-27 全绿，2 项）：
+ * 复测口径（2026-09-27 全绿，3 项）：
  *   cd frontend && npx vitest run tests/components/western/BigThree.test.tsx
  */
 import { cleanup, render, within } from '@testing-library/react';
@@ -103,5 +106,28 @@ describe('BigThree 的取行与两造互斥（Task 8B 判据 5）', () => {
     cardsB.forEach(({ eyebrow, body }) => {
       expect(within(cardFor(scopeB, eyebrow)).getByText(body.degree_text)).toBeInTheDocument();
     });
+  });
+
+  it('同一份真实响应换序再灌：三张卡仍按 name 命中，不跟着新下标走（钉死「按下标取行」）', () => {
+    // 派生方式＝同一份真实录制响应的数组换序，不伪造任何字段值（AGENTS §9）。
+    // 换序刻意让 planets[0]/[1]、axes[0] 都落到「错」的名字上：按下标取的实现必须红。
+    const { planets, axes } = synastry.person_a;
+    const shuffledPlanets = [...planets.slice(3), ...planets.slice(0, 3)]; // Sun→下标7、Moon→下标8
+    const shuffledAxes = [...axes].reverse(); // ASC 从轴首换到轴尾
+    expect(shuffledPlanets[0].name).toBe('Venus');
+    expect(shuffledAxes[0].name).toBe('IC');
+    expect(shuffledPlanets).toHaveLength(10);
+    expect(shuffledAxes).toHaveLength(4);
+
+    const scope = scopeOf(render(<BigThree planets={shuffledPlanets} axes={shuffledAxes} />));
+    trinity(synastry.person_a).forEach(({ eyebrow, body }) => {
+      const card = cardFor(scope, eyebrow);
+      expect(within(card).getByText(body.degree_text)).toBeInTheDocument();
+      expect(within(card).getByText(body.sign_zh)).toBeInTheDocument();
+      expect(within(card).getByText(`第 ${body.house} 宫`)).toBeInTheDocument();
+    });
+    // 反向腿：换序后的头名（Venus 18°36′ / IC 3°05′）不该出现在任何一张卡上。
+    expect(scope.queryByText(shuffledPlanets[0].degree_text)).toBeNull();
+    expect(scope.queryByText(shuffledAxes[0].degree_text)).toBeNull();
   });
 });
