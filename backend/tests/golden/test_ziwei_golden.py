@@ -400,7 +400,7 @@ def test_leap_month_chart_shen_zhu_follows_the_year_branch() -> None:
 
 # ------------------------------------------------- 扫盘：大限平铺与身宫落点（结构不变量）
 
-#: 六张实盘，覆盖五行局里的四种（水二、木三、金四、土五、火六）、两种大限方向、
+#: 七张实盘，五行局五种全覆盖（水二、木三、金四、土五、火六）、两种大限方向、
 #: 闰月与两个日期端点。每张盘的局数与起运在别处已有手推锚，这里取其内部一致性。
 SWEPT_BIRTHS: list[tuple[str, str, Gender]] = [
     ("2000-08-16", "12:00", Gender.MALE),     # 土五局 · 顺行
@@ -409,6 +409,7 @@ SWEPT_BIRTHS: list[tuple[str, str, Gender]] = [
     ("1900-01-31", "12:00", Gender.MALE),     # 水二局 · 庚子年正月初一
     ("1970-01-01", "05:15", Gender.MALE),     # 金四局 · 逆行 · 卯时
     ("2100-12-31", "12:00", Gender.FEMALE),   # 木三局 · 日期上端
+    ("1992-10-03", "12:00", Gender.MALE),     # 火六局 · 阳男顺行（五行局里唯一没被别处压到的一局）
 ]
 
 #: 身宫只由生时决定落在哪一格（诀：「子午命宫、丑未福德、寅申官禄、卯酉迁移、
@@ -443,7 +444,7 @@ def test_the_twelve_dayun_blocks_tile_the_lifespan_without_gaps(
 
     这是「大限」唯一的算术不变量：局数错一格、或某一段被写成九年，一生十二段运气
     当场平移或留缝，而 JSON 上每宫仍各有一个区间。逐宫点名的锚在 `PALACE_ANCHORS`
-    与 `FEMALE_DAYUN_ANCHORS`，本条把它推广到任意盘（含逆行盘与其余三个五行局）。
+    与 `FEMALE_DAYUN_ANCHORS`，本条把它推广到任意盘（顺逆两行、五行局五种全覆盖）。
     """
     chart = _swept_chart(birth, hour, sex)
     starts = []
@@ -467,5 +468,4 @@ def test_the_shen_palace_lands_where_the_hour_says(birth: str, hour: str, sex: G
     shen = [palace for palace in chart.palaces if palace.is_shen]
     assert len(shen) == 1, f"身宫标记应当只有一宫: {[(p.zhi, p.is_shen) for p in chart.palaces]}"
     assert shen[0].zhi == chart.shen_gong_zhi
-    assert chart.time_zhi in CLASSICAL_SHEN_GONG
     assert shen[0].name == chart.shen_gong_name == CLASSICAL_SHEN_GONG[chart.time_zhi]
