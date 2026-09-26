@@ -92,6 +92,10 @@ def test_every_sphere_including_daath_arrives_with_a_hex_colour(client: TestClie
     原子的失败形状是「字段在，值不是 CSS 认的颜色」—— 页面会画出一块无色节点而不报错，
     故这里扫全部 11 个，而不是抽样。实测样本：`#3FBF6F`（Netzach）、`#4B5BD6`（Chesed）、
     `#5B3A6E`（Binah）、`#C9C3A0`（Daath）。
+    最后那句「11 枚颜色互不相同」是**现状围栏，不是契约**（同 golden 判据 ③ 的度数多重集）：
+    合法换配色、或让两个原质复用同一色号，都会红在一个端点契约测里 —— 改色号的人请连同那一
+    行一起改，别把它当引擎缺陷修。复测：``pytest tests/test_kabbalah_api.py -k hex_colour``
+    绿 = 11 点仍是 11 色（2026-09-27 实测；上面四枚样本就是这 11 个值里的四枚）。
     """
     body = client.get(TREE_URL).json()
     nodes = body["sephiroth"] + [body["daath"]]
