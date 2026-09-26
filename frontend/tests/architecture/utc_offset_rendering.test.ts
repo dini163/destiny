@@ -30,6 +30,15 @@
  *   （如 `utcOffset === '' ? undefined : Number(utcOffset)`），出现在请求对象里。
  * - 两种形态都不匹配的命中（例如赋值式 `req.utc_offset_hours = …`）按未裁定形态报红，
  *   强制重新思考口径，而不是静默放过。
+ * - **注释不参与分类**：判定口径只裁代码——注释既不是读取也不是构造，对它表态等于把
+ *   措辞改动误报成行为回归（变异实测 2026-09-27：往 `TransitPage.tsx` 插一行
+ *   `// TODO: echo data.natal.utc_offset_source here` 曾让现状钉变红，行为零变化）。
+ *   整行 `//`、`/* … *\/` 起、`*` 头（JSDoc 续行）跳过；代码行内的块注释段与 `//`
+ *   尾注先剥再判。复测两腿（改完 `classify` 必须都过，之后逐字节还原 `src/`）：
+ *   ① 临时在 `src/pages/TransitPage.tsx` 末尾加一行含 `data.natal.utc_offset_source`
+ *      的 `//` 注释 → 本测**仍绿**（注释不再是表态对象）；
+ *   ② 再加一行真实读取 `const probe = (chart: { utc_offset_source?: string }) => chart?.utc_offset_source;`
+ *      → 现状钉**必须红**（read 形态进了扫描面）；两腿后 `git checkout -- src/pages/TransitPage.tsx`。
  *
  * **将来行运页/合盘结果加了偏移回显，本测按新行为重写，不是把它删掉或放宽**——
  * 它是「回显目前缺席」这一现状的证据，现状变了证据就该换形状（AGENTS §8）。
@@ -64,11 +73,16 @@ function listTsx(dir: string): string[] {
 function classify(path: string): Occurrence[] {
   const lines = readFileSync(path, 'utf8').split('\n');
   const out: Occurrence[] = [];
-  lines.forEach((text, i) => {
+  lines.forEach((raw, i) => {
+    // 判据口径只裁**代码**：整行注释（//、块注释起首 /*、JSDoc 续行 * 头）先剥掉，
+    // 代码行内的 /* … */ 段与 // 尾注也剥——否则一句措辞改动就被误报成回显上线。
+    const trimmed = raw.trim();
+    if (trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*')) return;
+    const text = trimmed.replace(/\/\*.*?\*\//g, '').replace(/\/\/.*$/, '').trim();
     if (!IDENTIFIERS.some((id) => new RegExp(`\\b${id}\\b`).test(text))) return;
     const read = IDENTIFIERS.some((id) => new RegExp(`\\.\\s*\\b${id}\\b`).test(text));
     const construct = IDENTIFIERS.some((id) => new RegExp(`\\b${id}\\b\\s*\\??\\s*:`).test(text));
-    out.push({ line: i + 1, text: text.trim(), kind: read ? 'read' : construct ? 'construct' : 'unknown' });
+    out.push({ line: i + 1, text, kind: read ? 'read' : construct ? 'construct' : 'unknown' });
   });
   return out;
 }
@@ -93,7 +107,7 @@ const PIN_SCOPES = [
   ...listTsx(resolve(SRC, 'components/transit')),
 ];
 
-describe('F-A1-11：utc 偏移回显的现状（本命页渲染，行运/合盘只构造）', () => {
+describe('F-A1-11：utc 偏移回显的现状（本命页渲染，行运/吠陀/合盘只构造）', () => {
   it('正向：本命页对两个标识符都存在响应读取（点号访问），不只是请求构造', () => {
     const occurrences = classify(NATAL_PAGE);
     for (const id of IDENTIFIERS) {
