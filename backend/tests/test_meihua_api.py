@@ -23,7 +23,8 @@
   偏移一丢就是整盘换了卦。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/test_meihua_api.py -q` → 28 passed（2026-09-26 实录，含域错误六条 + pydantic 六条参数化）。
+tests/test_meihua_api.py -q` → 32 passed（2026-09-27 实录：域错误六条 + pydantic 六条
+参数化 + 极值日期四条参数化，其余单条）。
 """
 
 import re
@@ -279,6 +280,37 @@ def test_the_time_method_needs_no_numbers_at_all(client: TestClient) -> None:
     assert body["method"] == "time"
     assert "农历" in body["derivation"]["inputs"]
     assert body["derivation"]["upper_number"] in range(1, 9)
+
+
+# ------------------------------------------------------------------ 极值日期（PRD §4.1 区间）
+
+
+@pytest.mark.parametrize(
+    "cast_time",
+    ["1900-01-01T10:30:00", "2100-12-31T10:30:00", "1800-01-01T10:30:00", "2200-01-01T10:30:00"],
+    ids=["区间起点", "区间终点", "区间前", "区间后"],
+)
+def test_every_parsable_datetime_returns_a_full_cast_never_an_envelope(
+    client: TestClient, cast_time: str
+) -> None:
+    """梅花的时间法没有 `DestinyError` 可达路径：任何能解析的时刻都给整盘，绝不出信封。
+
+    PRD §4.1 的支持区间是 1900-2100（端点两条），区间外的两条同样按盘给出 —— `lunar-python`
+    在这个区间仍算得出农历四数，「越界」在这里不是错误而是如实计算。页面上的年份下拉只到
+    1900..当前年（走查实录 128 项 = `----` + 2026..1900），故 2100 一条在 App 内不可达，
+    只能在端点层钉（同 `tests/test_qimen_api.py::test_every_parsable_datetime_returns_a_full_board_never_an_envelope`）。
+    """
+    response = _post(client, method="time", numbers=None, cast_time=cast_time)
+    assert response.status_code == 200
+    body = response.json()
+    assert "error" not in body and "detail" not in body
+    assert body["cast_time"] == cast_time[:10] + " " + cast_time[11:16]
+    assert all(1 <= body[key]["number"] <= 64 for key in ("ben", "hu", "bian"))
+    assert body["moving_position"] in range(1, 7)
+    assert body["derivation"]["upper_number"] in range(1, 9)
+    assert body["derivation"]["lower_number"] in range(1, 9)
+    assert len(body["score_factors"]) == 4
+    assert body["score"] == 50 + sum(f["delta"] for f in body["score_factors"])
 
 
 # ------------------------------------------------------------------ 确定性（无随机源）
