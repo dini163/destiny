@@ -3,7 +3,7 @@
  *
  * This is curated *navigational* content (which systems exist, what each one is,
  * which are live now), not computed results, so it honours the no-mock rule: the
- * seven live systems point at real routes from `nav.ts` (the single source of truth
+ * live systems point at real routes from `nav.ts` (the single source of truth
  * for paths), and every other system is declared Phase-2 with `route: null` and an
  * honest build status. Blurbs describe each discipline factually; no chart value,
  * reading or almanac verdict is invented here.
@@ -46,17 +46,16 @@ export interface PortalSystem {
   icon: IconName;
 }
 
-/** A system is navigable exactly when it has a real route (the seven live ones). */
+/** A system is navigable exactly when it has a real route (the live ones). */
 export function isLive(system: PortalSystem): boolean {
   return system.route !== null;
 }
 
 /**
- * The full 16-system roadmap. Seven of them are live and carry a real route: the
- * four Phase-1 MVP systems lead the list (八字 / 周易 / 西洋本命 / 塔罗), while
- * 姓名学、数字命理 and 北欧卢恩 each sit at their catalogue position inside the
- * 华夏术数、西洋秘学 and 吠陀与北欧 blocks. The remaining nine are Phase-2 and
- * carry an honest status instead of a link.
+ * The full 16-system roadmap. All are live and carry a real route except
+ * 麻衣面相神鉴（physiognomy）, which remains Phase-2 (`CV 模型校准`) with an honest
+ * status instead of a link. `LIVE_SYSTEM_COUNT` is derived from this array, so the
+ * hero copy never drifts as systems ship.
  */
 export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
   {
@@ -114,9 +113,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'chinese',
     blurb: '十二宫垣星曜罗列，紫微天府南北斗交辉，四化飞星直断流年大限气数。',
     highlights: ['十二宫四化体系'],
-    cta: '',
-    route: null,
-    status: '研发中',
+    cta: '排定命盘',
+    route: ROUTES.ziwei,
+    status: null,
     icon: 'vault',
   },
   {
@@ -126,9 +125,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'chinese',
     blurb: '帝王之术，九星八门八神九宫定局，天地人神四盘交错，谋定决策时空场。',
     highlights: ['时家转盘法'],
-    cta: '',
-    route: null,
-    status: '研发中',
+    cta: '起局排盘',
+    route: ROUTES.qimen,
+    status: null,
     icon: 'gauge',
   },
   {
@@ -138,9 +137,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'chinese',
     blurb: '邵康节灵应法门，随感随应、物象心机，报数方位声色皆可起体用卦象。',
     highlights: ['体用互变论'],
-    cta: '',
-    route: null,
-    status: '算法验证中',
+    cta: '起卦断体用',
+    route: ROUTES.plumBlossom,
+    status: null,
     icon: 'seal',
   },
   {
@@ -174,9 +173,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'western',
     blurb: '欧式 36 张生活微观象征图画，大画卷（Grand Tableau）全景排布直析吉凶线索。',
     highlights: ['36 张全景大阵'],
-    cta: '',
-    route: null,
-    status: '美工渲染中',
+    cta: '洗牌抽牌',
+    route: ROUTES.lenormand,
+    status: null,
     icon: 'vault',
   },
   {
@@ -186,9 +185,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'western',
     blurb: '外行星过境、太阳弧与次限法双重时间轴对碰，动态叠加本命盘。',
     highlights: ['多盘动态重叠'],
-    cta: '',
-    route: null,
-    status: '研发中',
+    cta: '叠加行运盘',
+    route: ROUTES.transit,
+    status: null,
     icon: 'timeline',
   },
   {
@@ -210,9 +209,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'western',
     blurb: '十原质（Sephiroth）与 22 条神圣路径，对应塔罗大阿卡纳与希伯来字母创世密源。',
     highlights: ['原质路径升华'],
-    cta: '',
-    route: null,
-    status: '文献整理',
+    cta: '探索生命之树',
+    route: ROUTES.kabbalah,
+    status: null,
     icon: 'compass',
   },
   {
@@ -220,12 +219,12 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     nameZh: '合盘与相契度',
     nameEn: 'SYNASTRY',
     category: 'western',
-    blurb: '双人本命比较盘、组合盘（Composite）及八字三元合婚纳音法，直击因缘契合力学。',
-    highlights: ['双轨关系合力'],
-    cta: '',
-    route: null,
-    status: '架构中',
-    icon: 'check',
+    blurb: '双人本命比较盘（Synastry）人对人相位、短弧中点组合盘（Composite）与相契度总分账本，直击两人因缘契合力学。',
+    highlights: ['双轮合盘', '相契度账本'],
+    cta: '开始合盘',
+    route: ROUTES.synastry,
+    status: null,
+    icon: 'compass',
   },
   {
     slug: 'vedic-astrology',
@@ -234,9 +233,9 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     category: 'vedicNorse',
     blurb: '基于恒星黄道（Lahiri Ayanamsa）及 27 宿（Nakshatras），推演业力因果与达夏大运。',
     highlights: ['南印 / 北印方盘'],
-    cta: '',
-    route: null,
-    status: '内测中',
+    cta: '排定星盘',
+    route: ROUTES.vedic,
+    status: null,
     icon: 'sun',
   },
   {
