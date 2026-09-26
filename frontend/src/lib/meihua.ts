@@ -76,13 +76,6 @@ export function deltaText(delta: number): string {
   return 'text-ink-muted';
 }
 
-/** Format a signed delta with an explicit sign, e.g. +8 / −5 / 0. */
-export function formatDelta(delta: number): string {
-  if (delta > 0) return `+${delta}`;
-  if (delta < 0) return `−${Math.abs(delta)}`;
-  return '0';
-}
-
 // --- Positions --------------------------------------------------------------
 
 /** 初爻…上爻, indexed by (position − 1). */

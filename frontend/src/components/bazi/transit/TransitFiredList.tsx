@@ -1,3 +1,4 @@
+import { formatDelta } from '../../../lib/scoring';
 import type { TransitFired } from '../../../types/baziTransit';
 
 /**
@@ -71,10 +72,4 @@ function FamilyBlock({ family, rows }: { family: string; rows: TransitFired[] })
       </ul>
     </div>
   );
-}
-
-/** Signed, one decimal — the same shape the ledger table prints. */
-function formatDelta(delta: number): string {
-  const text = Math.abs(delta).toFixed(1);
-  return delta < 0 ? `-${text}` : `+${text}`;
 }

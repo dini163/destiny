@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Icon } from './Icon';
 import { SourceNote } from './SourceNote';
+import { formatDelta } from '../../lib/scoring';
 import type { ScoreValue } from '../../types/scoring';
 
 interface ScoreLedgerProps {
@@ -67,11 +68,4 @@ export function ScoreLedger({ score, label }: ScoreLedgerProps) {
       ) : null}
     </div>
   );
-}
-
-/** The base row is a plain amount; the increments carry their sign. */
-function formatDelta(delta: number, is_base: boolean): string {
-  const text = Math.abs(delta).toFixed(1);
-  if (is_base) return text;
-  return delta < 0 ? `-${text}` : `+${text}`;
 }

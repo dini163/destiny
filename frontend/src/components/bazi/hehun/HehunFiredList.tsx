@@ -1,3 +1,4 @@
+import { formatDelta } from '../../../lib/scoring';
 import type { HehunFired } from '../../../types/baziHehun';
 
 /** 五族的中文标题（§6.1 的分组名）。只作呈现，族序跟响应走。 */
@@ -67,10 +68,4 @@ function FamilyBlock({ family, rows }: { family: string; rows: HehunFired[] }) {
       </ul>
     </div>
   );
-}
-
-/** 带符号、一位小数 —— 与账本表同一形状。 */
-function formatDelta(delta: number): string {
-  const text = Math.abs(delta).toFixed(1);
-  return delta < 0 ? `-${text}` : `+${text}`;
 }

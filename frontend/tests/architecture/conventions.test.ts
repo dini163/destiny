@@ -35,15 +35,6 @@ const BASELINE: Record<string, number> = {};
  * 登记身份」这一机制的接口，不是待还的债。 */
 const ADJUDICATED_CROSS_SYSTEM_EDGES: string[] = [];
 
-/** `function formatDelta` 的四处已登记定义（ledger F-A2-5）：前两处逐字复制、后两处签名不同，
- * 合并进 ui/ScoreLedger 或 lib 共用件后逐条从清单划掉（每划掉一条离硬门近一格）。 */
-const ADJUDICATED_FORMAT_DELTA_DEFINERS = [
-  'components/bazi/hehun/HehunFiredList.tsx',
-  'components/bazi/transit/TransitFiredList.tsx',
-  'components/ui/ScoreLedger.tsx',
-  'lib/meihua.ts',
-];
-
 /** 计数棘轮：offenders 数不得超过该 kind 的基线（缺省 0 = 硬门），并把全部违规报出来。 */
 function assertNoNewViolations(kind: string, offenders: string[]): void {
   const limit = BASELINE[kind] ?? 0;
@@ -196,13 +187,21 @@ describe('不变式 4：每个 pages/<X>.tsx 必须被 router.tsx 引且渲染�
 });
 
 describe('不变式 5：重复逻辑抽样 formatDelta', () => {
-  // 四处已登记身份见 ADJUDICATED_FORMAT_DELTA_DEFINERS；合并进 ui/ScoreLedger 或 lib
-  // 共用件后逐条从清单划掉（ledger F-A2-5），新增一处同名定义即未登记身份，直接红。
-  it('function formatDelta 只能定义在已登记的四处', () => {
-    const offenders = listFiles(SRC, ['ts', 'tsx'])
-      .filter((p) => /function\s+formatDelta\b/.test(readFileSync(p, 'utf8')))
-      .map(rel);
-    assertOnlyAdjudicated('formatDelta 重复定义', offenders, ADJUDICATED_FORMAT_DELTA_DEFINERS);
+  // 曾四处各自定义同名 `formatDelta`（ledger F-A2-5：两处逐字复制、两处签名不同）。
+  // 2026-09-26 收口为共用件一处：账本/命中列表的一位小数形状 `formatDelta`，
+  // 梅花整数步长另名 `formatStepDelta`，两种形状同册并置、差异写在名字上。
+  // 清单换成「唯一定义处」断言后，再复制一份（哪怕换个目录、数量不变）就是第二个定义处，直接红。
+  const SHARED_FORMATTER_FILE = 'lib/scoring.ts';
+  it('账本增量的两种印刷形状各自只有一个定义处', () => {
+    for (const name of ['formatDelta', 'formatStepDelta']) {
+      const definers = listFiles(SRC, ['ts', 'tsx'])
+        .filter((p) => new RegExp(`function\\s+${name}\\b`).test(readFileSync(p, 'utf8')))
+        .map(rel);
+      expect(
+        definers,
+        `${name} 的定义处应恰为 ${SHARED_FORMATTER_FILE}，实测: ${definers.join(', ') || '无'}`,
+      ).toEqual([SHARED_FORMATTER_FILE]);
+    }
   });
 });
 

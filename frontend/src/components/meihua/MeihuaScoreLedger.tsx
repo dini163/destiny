@@ -1,5 +1,6 @@
 import type { MeihuaCast } from '../../types/meihua';
-import { deltaText, formatDelta, scoreBarClass, verdictText } from '../../lib/meihua';
+import { deltaText, scoreBarClass, verdictText } from '../../lib/meihua';
+import { formatStepDelta } from '../../lib/scoring';
 
 interface MeihuaScoreLedgerProps {
   /** The complete cast — supplies the 吉凶指数, its factor ledger and the 综合断语. */
@@ -47,7 +48,7 @@ export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
               <span className="text-[11px] leading-snug text-ink-muted">{factor.detail}</span>
             </div>
             <span className={`numeric shrink-0 text-sm font-semibold ${deltaText(factor.delta)}`}>
-              {formatDelta(factor.delta)}
+              {formatStepDelta(factor.delta)}
             </span>
           </li>
         ))}
