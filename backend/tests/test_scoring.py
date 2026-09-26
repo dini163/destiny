@@ -2,7 +2,8 @@
 
 import pytest
 
-from app.schemas.scoring import MODEL_PARAM_SOURCE, ScoreFactor, ScoreValue, build_ledger
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 
 
 def test_ledger_value_is_base_plus_deltas() -> None:

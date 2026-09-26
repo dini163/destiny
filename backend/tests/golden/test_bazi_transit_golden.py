@@ -17,6 +17,7 @@ from functools import cache
 import pytest
 
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_transit import (
@@ -28,7 +29,6 @@ from app.engines.bazi_transit import (
 )
 from app.schemas.bazi_transit import TransitMonth, TransitYear
 from app.schemas.common import CalendarType, Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 _BIRTH = dict(
     birth_date=date(1988, 2, 15),

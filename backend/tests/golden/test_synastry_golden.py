@@ -17,8 +17,8 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.synastry import _midpoint, compute_synastry
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 from app.schemas.synastry import SynastryPerson
 
 LAT = 51.4769

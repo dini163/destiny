@@ -25,7 +25,7 @@ from app.content.bazi_hehun_rules import (
     hehun_rule,
 )
 from app.content.bazi_relations import RELATION_TABLES
-from app.schemas.scoring import MODEL_PARAM_SOURCE
+from app.core.provenance import MODEL_PARAM_SOURCE
 
 FAMILY_COUNTS = {"relation": 12, "group": 3, "yongshen": 4, "nayin": 5, "palace": 5}
 

@@ -20,7 +20,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.content.bazi_relations import RELATION_TABLES
-from app.schemas.scoring import MODEL_PARAM_SOURCE
+from app.core.provenance import MODEL_PARAM_SOURCE
 
 #: 合婚基准分，含义同 `TRANSIT_BASE`：中性的起评，不是"及格"。
 HEHUN_BASE = 50.0

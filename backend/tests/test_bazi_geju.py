@@ -9,10 +9,10 @@ import re
 from datetime import date, time
 
 from app.content.bazi_geju import GEJU_COUNT, GEJU_RULES, GEJU_SOURCES, geju_rule
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_strength import detect_geju, geju_verdict, hidden_stem_ledger
 from app.schemas.common import Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 
 def _chart(y, m, d, hh, mm, longitude, gender=Gender.MALE):

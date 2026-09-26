@@ -20,9 +20,10 @@ from app.content.wuxing import (
     GENERATES,
     ZHI_ELEMENT,
 )
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.schemas.bazi import BaziPillar
 from app.schemas.bazi_strength import GeJu, HiddenStemWeight
-from app.schemas.scoring import MODEL_PARAM_SOURCE, ScoreFactor, ScoreValue, build_ledger
+from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from pydantic import BaseModel, Field
 
 # 藏干本/中/余气权重（spec §6.1）；单藏干支的本气即整支，取 1.0。

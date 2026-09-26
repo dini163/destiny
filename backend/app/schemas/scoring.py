@@ -14,9 +14,7 @@ the UI.
 
 from pydantic import BaseModel, Field, field_validator
 
-#: The one wording used when a figure comes from this system's own weighting
-#: instead of a classic. Defined once so no module paraphrases it differently.
-MODEL_PARAM_SOURCE = "模型参数（本系统加权，非古籍赋分）"
+from app.core.provenance import MODEL_PARAM_SOURCE
 
 
 class ScoreFactor(BaseModel):

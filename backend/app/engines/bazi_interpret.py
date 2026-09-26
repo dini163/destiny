@@ -12,13 +12,14 @@ from dataclasses import dataclass
 from app.content.bazi_dimensions import DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, dim_rule
 from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, CONTROLLED_BY, ELEMENT_ORDER, GENERATED_BY, GENERATES
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi_strength import StrengthAssessment, element_weight_scores, hidden_stem_weight
 from app.schemas.bazi import BaziPillar
 from app.schemas.bazi_interpret import BaziInterpretation, DimensionReading
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.bazi_strength import GeJu, Yongshen
 from app.schemas.common import Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE, ScoreFactor, build_ledger
+from app.schemas.scoring import ScoreFactor, build_ledger
 
 TRANSPARENT_STEM_WEIGHT = 1.0  # 模型参数：天干一字一力，无藏干权重（§6.4 得势同款）
 STAR_PRESENT = 1.0  # 阈值：1.0 = 一字透干，是最小可读单位，不是古籍赋分

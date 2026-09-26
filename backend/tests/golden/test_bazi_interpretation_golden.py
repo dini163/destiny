@@ -18,13 +18,13 @@ from app.content.bazi_nayin import NAYIN_COUNT, NAYIN_MEANING
 from app.content.bazi_relations import RELATION_COUNT, RELATION_TABLES
 from app.content.bazi_shensha import SHENSHA_COUNT, SHENSHA_RULES
 from app.content.bazi_shishen import TEN_GOD_COUNT, TEN_GOD_MEANING
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_interpret import TEN_GOD_GROUPS, interpret_chart
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import assess_strength, detect_geju, element_weight_scores
 from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.common import Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 BOOKS = ("《渊海子平", "《三命通会", "《滴天髓", "《协纪辨方书")  # 出处到章，故只比书名前缀
 CITABLE_TABLES = {

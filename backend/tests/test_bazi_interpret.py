@@ -8,13 +8,13 @@ import pytest
 from app.content.bazi_dimensions import (
     DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, DIMENSION_RULE_COUNT, dim_rule,
 )
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_interpret import interpret_chart, ten_god_strength
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import assess_strength, detect_geju, element_weight_scores
 from app.engines.bazi_yongshen import select_yongshen
 from app.schemas.common import Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 CHART = compute_bazi_chart(  # 基准命 A：戊辰 甲寅 庚子 丁亥
     birth_date=date(1988, 2, 15), birth_time=time(23, 30),

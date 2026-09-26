@@ -23,6 +23,7 @@ from app.content.kangxi_strokes import (
     traditional_candidates,
 )
 from app.core.errors import NameInputError
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.schemas.common import ProvenanceTable
 from app.schemas.name import (
     CorpusProvenance,
@@ -36,7 +37,7 @@ from app.schemas.name import (
     SancaiElements,
     SancaiPair,
 )
-from app.schemas.scoring import MODEL_PARAM_SOURCE, ScoreFactor, ScoreValue, build_ledger
+from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 
 #: 允许进入引擎的字符集。语料范围外的汉字（扩展 B 及以后）不是非法输入：它们是
 #: "确为汉字但本系统不覆盖"（spec §5.1），按未收录走 None + warning；只有非汉字

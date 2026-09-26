@@ -13,9 +13,9 @@ from app.content.bazi_tiaohou import (
     TIAOHOU_SOURCE,
 )
 from app.content.wuxing import CONTROLS, ELEMENT_ORDER, GENERATES
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi_strength import fuyin_choices
 from app.schemas.bazi_strength import Yongshen, YongshenConflict, YongshenMethod
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 # 力量前二行的比值：≥0.8 才算"对峙"，才轮到通关说话（模型参数，spec §6.5）。
 TONGGUAN_MIN_RATIO = 0.8

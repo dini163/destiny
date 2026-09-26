@@ -32,26 +32,19 @@ FORBIDDEN: list[tuple[str, str]] = [
     ("engines", "api"),
 ]
 
-#: 现测（2026-09-26）仍存在的违规数；未登记的 kind 基线为 0（硬门）。
-#: 唯一非零项 `content->schemas`：`app/content/__init__.py`、
-#: `app/content/bazi_hehun_rules.py`、`app/content/synastry.py` 三处从
-#: `app.schemas.scoring` 只引出处措辞常量 MODEL_PARAM_SOURCE，属常量住所不佳
-#: 而非契约依赖 —— 裁定见 AGENTS.md 第 1 条例外段与 ledger F-A2-1。
-BASELINE: dict[str, int] = {"content->schemas": 3}
+#: 现测（2026-09-26 修复轮）：六对反向依赖全部为零，`BASELINE` 因此是空表 —— 每对都是硬门。
+#: 唯一曾非零的 `content->schemas` 已在 ledger F-A2-1 的处置里归零：出处措辞常量
+#: `MODEL_PARAM_SOURCE` 从 `app/schemas/scoring.py` 迁到 `app/core/provenance.py`（它的读者
+#: 横跨 content/schemas/engines 三层，住在中间那层必然要让最底层反向引用），迁完三处
+#: `content/` 的违规 import 自然消失。空表保留而非删除，是因为下一条例外要往这里登记时
+#: 不该顺便重写这套机制。
+BASELINE: dict[str, int] = {}
 
-#: 上面那三个计数的**身份**（路径与 `BASELINE` 逐项对应）：报错里的「新增」按身份差集
+#: 每个登记计数的**身份**（路径与 `BASELINE` 逐项对应）：报错里的「新增」按身份差集
 #: 判定，不按排序切片。旧写法 `offenders[limit:]` 与 `conventions.test.ts` 同轮删掉的
 #: 那句是同一个缺陷 —— 修掉一处旧违规的同时新增一处、且新文件在 sort 里更靠前时，
 #: 切片会把新文件留在窗口外、点名一个根本没变的旧文件（评审 2026-09-26 实测）。
-BASELINE_OFFENDERS: dict[str, frozenset[str]] = {
-    "content->schemas": frozenset(
-        {
-            "app/content/__init__.py",
-            "app/content/bazi_hehun_rules.py",
-            "app/content/synastry.py",
-        }
-    ),
-}
+BASELINE_OFFENDERS: dict[str, frozenset[str]] = {}
 
 
 def assert_no_new_violations(kind: str, count: int, offenders: list[str]) -> None:

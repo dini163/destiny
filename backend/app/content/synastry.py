@@ -12,7 +12,7 @@
 仍随相位表呈现，但不进总分。
 """
 
-from app.schemas.scoring import MODEL_PARAM_SOURCE
+from app.core.provenance import MODEL_PARAM_SOURCE
 
 #: 相契度基准分：中性的起评，不是"及格"（含义同合婚与岁运的 base）。
 SYNASTRY_BASE = 50.0

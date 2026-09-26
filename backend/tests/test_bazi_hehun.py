@@ -26,6 +26,7 @@ from app.content.bazi_hehun_rules import (
 )
 from app.content.bazi_nayin import nayin_meaning
 from app.core.errors import InvalidBirthDataError, TransitRangeError
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import (
     PALACE_BRANCH_CLASH,
@@ -82,7 +83,6 @@ from app.engines.bazi_transit import compute_transit
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult, HehunAxis, HehunProfile
 from app.schemas.common import Gender
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 from app.solar.geo import resolve_longitude
 
 

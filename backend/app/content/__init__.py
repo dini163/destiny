@@ -29,7 +29,7 @@ from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
-from app.schemas.scoring import MODEL_PARAM_SOURCE
+from app.core.provenance import MODEL_PARAM_SOURCE
 
 CONTENT_VERSION = "2026.09"
 

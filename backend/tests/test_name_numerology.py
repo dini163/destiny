@@ -5,6 +5,7 @@ import pytest
 from app.content import CONTENT_VERSION
 from app.content.kangxi_strokes import lookup
 from app.core.errors import DestinyError, NameInputError
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines import name_numerology as engine
 from app.engines.name_numerology import (
     GRID_ORDER,
@@ -20,7 +21,6 @@ from app.engines.name_numerology import (
     number_element,
     number_yinyang,
 )
-from app.schemas.scoring import MODEL_PARAM_SOURCE
 
 
 def _strokes(text: str) -> list[int]:
