@@ -8,8 +8,22 @@ houses, Moshier ephemeris (no data files):
 
 Composite longitudes are the shorter-arc midpoints of the two natal longitudes and are
 checked against that arithmetic directly (composite Sun = midpoint of 83.99 and 238.71
-= 161.35). The score is a ledger: ``Σ factors[].delta == value`` and the base leads. All
-other values were read from pyswisseph 2.10 (Moshier) via the engine and are stable.
+= 161.35). The score is a ledger: ``Σ factors[].delta == value`` and the base leads. The
+anchors here are hand-derivable arithmetic, not engine read-backs:
+
+* **中点** — `_midpoint` is pure modular arithmetic; the wrap-through-0° case and the
+  diametric (exactly 180° apart) tie-break are pinned below with the reason for the choice.
+* **相位表** — `synastry_aspects` is monotonic in orb and free of duplicate
+  `(point_a, point_b, type)` triples; its per-type orb ceiling is the same shared
+  `ASPECTS` table (`app/engines/western.py:60-66`) the natal and transit tables use, and the
+  inclusive `<=` boundary is forced at the 8.0 conjunction limit.
+* **对称性** — swapping the two people leaves the (unordered) aspect set and the score value
+  unchanged; `counted` is decided by whether *both* endpoints are personal points, not by
+  which side is A.
+* **账本** — only `counted` rows enter the ledger; a non-counted aspect's rule is absent.
+
+Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
+.venv/Scripts/python.exe -m pytest tests/golden/test_synastry_golden.py -v`.
 """
 
 from datetime import date, time
@@ -18,8 +32,18 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.provenance import MODEL_PARAM_SOURCE
-from app.engines.synastry import _midpoint, compute_synastry
+from app.engines.synastry import _midpoint, _synastry_aspects, compute_synastry
+from app.engines.western import ASPECTS
 from app.schemas.synastry import SynastryPerson
+
+#: Conjunction's maximum orb, shared across the three aspect tables (`western.py:61`).
+#: Recount: `python -c "from app.engines.western import ASPECTS; print(ASPECTS)"`.
+CONJUNCTION_ORB = next(orb for name, _g, _a, orb in ASPECTS if name == "conjunction")
+
+#: The personal points a synastry aspect must touch on both ends to count toward the score
+#: (mirrors `SYNASTRY_PERSONAL_POINTS`); hand-listed so the test is an external oracle.
+#: Recount: `python -c "from app.content.synastry import SYNASTRY_PERSONAL_POINTS as s; print(sorted(s))"`.
+PERSONAL_POINTS = {"Sun", "Moon", "Mercury", "Venus", "Mars", "ASC"}
 
 LAT = 51.4769
 LON = -0.0005
@@ -186,3 +210,92 @@ def test_missing_person_is_a_pydantic_422_not_a_domain_error(client: TestClient)
     assert response.status_code == 422
     assert "error" not in body
     assert {item["loc"][-1] for item in body["detail"]} == {"person_b"}
+
+
+# ------------------------------------------------------- Step 1(a): 中点的纯模运算
+
+def test_diametric_midpoint_walks_counterclockwise_from_a() -> None:
+    """两点相差恰 180° 时无短弧，两个合法答案相差 180°；实现取「从 A 逆时针 +90°」这一支。
+
+    `_midpoint`（`app/engines/synastry.py:99-102`）先算 `delta = (lon_b - lon_a) % 360`，
+    恰好 180 时 `delta > 180` 为假，不减 360，于是结果 = `lon_a + 180/2 = lon_a + 90`。所以
+    `_midpoint(0, 180) == 90`（A+90）、`_midpoint(180, 0) == 270`（仍是 A+90，A=180）。
+    这是「按参数顺序定方向」的确定性取舍，不是几何唯一解——把这条写死，谁改了取法会在这里红。
+    """
+    assert _midpoint(0.0, 180.0) == pytest.approx(90.0)
+    assert _midpoint(180.0, 0.0) == pytest.approx(270.0)
+    assert _midpoint(350.0, 10.0) == pytest.approx(0.0)  # 短弧过 0°（已有锚的镜像）
+
+
+# ------------------------------------------------------- Step 3: 相位表完备性与对称
+
+def test_synastry_aspects_are_sorted_unique_and_within_their_orbs() -> None:
+    """人对人相位列：orb 非降序、`(point_a, point_b, type)` 全表唯一、不越共享容许度上限。"""
+    limit_by_type = {name: orb for name, _g, _a, orb in ASPECTS}
+    aspects = _chart().synastry_aspects
+    orbs = [a.orb for a in aspects]
+    assert orbs == sorted(orbs)
+    triples = {(a.point_a, a.point_b, a.type) for a in aspects}
+    assert len(triples) == len(aspects)
+    for a in aspects:
+        assert 0.0 <= a.orb <= limit_by_type[a.type], (a.point_a, a.point_b, a.type)
+
+
+def test_synastry_aspect_orb_boundary_matches_the_other_tables() -> None:
+    """合盘表在「恰好等于合相上限」时与本命/行运同一口径：构造 7.9/8.0 计入、8.1 剔除。
+
+    `_synastry_aspects` 用同一句 `orb <= orb_limit`（`app/engines/synastry.py:134-136`）。三表各钉
+    一次同一 8.0 边界即证明含/不含一致（本命、行运见各自 golden 文件）。
+    """
+    assert CONJUNCTION_ORB == 8.0
+    points = lambda lon: [("Sun", "太阳", "☉", lon)]  # noqa: E731 — 仅构造单点输入
+    assert [a.orb for a in _synastry_aspects(points(0.0), points(7.9))] == [7.9]
+    assert [a.orb for a in _synastry_aspects(points(0.0), points(8.0))] == [8.0]
+    assert _synastry_aspects(points(0.0), points(8.1)) == []
+
+
+def test_swapping_the_two_people_leaves_the_aspect_set_and_score_unchanged() -> None:
+    """交换 A/B 后相位「集合」相等（无序对 + 类型 + orb），score.value 不变，counted 与谁在 A 无关。
+
+    相位是两两几何关系，人对调只交换 point_a/point_b 的角色，不改变 orb；score 只由 counted
+    条目加权，counted 取决于两端是否个人点（与顺序无关）——所以整张表在交换下对称。
+    """
+    swapped = compute_synastry(
+        person_a=_person(date(1992, 11, 20), time(18, 45), "B"),
+        person_b=_person(date(1990, 6, 15), time(8, 30), "A"),
+        house_system="P",
+        ephemeris_path=None,
+    )
+
+    def signature(chart) -> set[tuple[tuple[str, str], str, float]]:
+        return {
+            (tuple(sorted((a.point_a, a.point_b))), a.type, round(a.orb, 2))
+            for a in chart.synastry_aspects
+        }
+
+    original = _chart()
+    assert signature(original) == signature(swapped)
+    assert original.score.value == pytest.approx(swapped.score.value, abs=1e-9)
+    assert {round(a.orb, 2) for a in original.synastry_aspects if a.counted} == {
+        round(a.orb, 2) for a in swapped.synastry_aspects if a.counted
+    }
+    # counted 只由「两端皆个人点」决定，与放在 A 侧还是 B 侧无关。
+    for a in original.synastry_aspects:
+        assert a.counted == (a.point_a in PERSONAL_POINTS and a.point_b in PERSONAL_POINTS)
+
+
+def test_only_counted_aspects_enter_the_score_ledger() -> None:
+    """账本逐条对相位：非 counted 的相位其 rule 绝不出现在 factors；counted 的 rule 一条不缺。
+
+    `_synastry_score` 跳过 `counted=False`（`app/engines/synastry.py:163-165`），每条 counted 相位生成
+    一行 `synastry.<a>.<b>.<type>`。所以 factors（除 base）的 rule 集合恰等于 counted rule 集合，
+    且所有 non-counted 的 rule 都在其外——这是一条真正的「进账门」，不靠数数相等蒙混。
+    """
+    chart = _chart()
+    rules = {f.rule for f in chart.score.factors}
+    assert "synastry.base" in rules
+    counted_rules = {f"synastry.{a.point_a}.{a.point_b}.{a.type}" for a in chart.synastry_aspects if a.counted}
+    not_counted_rules = {f"synastry.{a.point_a}.{a.point_b}.{a.type}" for a in chart.synastry_aspects if not a.counted}
+    non_base_rules = {r for r in rules if r != "synastry.base"}
+    assert non_base_rules == counted_rules
+    assert not (non_base_rules & not_counted_rules)
