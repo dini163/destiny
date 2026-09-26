@@ -7,8 +7,13 @@
  *
  * 现状：`SideColumn` 给称谓与时区偏移两个字段按 `${caption}` 加了前缀
  * （`SynastryConsole.tsx:61`、`:97`），日期时间也带了 `ariaLabel={caption}`（`:71`、`:76`），
- * 所以它们是 `甲方年`、`乙方分` 这种独一名；但 `LocationField` 的 props 里没有 `ariaLabel`
- * 入参，三个 `aria-label` 是写死的裸串——「出生城市搜索」（`LocationField.tsx:96`）、
+ * 所以它们是 `甲方年`、`乙方分` 这种独一名——**连写、caption 在前**（`甲方称谓`），不是
+ * 简报预测的空格前缀形态（`称谓 甲`）；称谓字段那个带空格的可见文案是另一回事
+ * （`SynastryConsole.tsx:54` 的 `称谓（甲方，仅回显）` 是 `<label>` 文本，被 input 自己的
+ * `aria-label` 覆盖，不进 accessible name 的计算）。复测：
+ * `grep -n "aria-label" src/components/synastry/SynastryConsole.tsx`。
+ * 但 `LocationField` 的 props 里没有 `ariaLabel` 入参，三个 `aria-label` 是写死的裸串——
+ * 「出生城市搜索」（`components/ui/LocationField.tsx:96`，注意它在 `ui/` 不在 `synastry/`）、
  * 「纬度」（`:154`）、「经度」（`:169`）。于是同一张 `<form>` 里并排的两列各产出两份同名
  * 控件，读屏用户听到的都是「纬度」，靠 DOM 归属（哪个 `<fieldset>`）才分得清甲乙。
  * 本测把「重复 2 份 / 前缀 1 份」和「归属确实分得开」同时钉住：前者是债的形状，后者是
