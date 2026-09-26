@@ -144,8 +144,8 @@ describe('SynastryAspectList 的筛选与计数（Task 8B 判据 5）', () => {
       expect(found, `计入的一行在「全部」里找不到同文行: ${row}`).toBeGreaterThanOrEqual(0);
       cursor += found + 1;
     });
-    // 未计入的 48 行确实只是被隐藏：全表比计入多出的正是这 48 行。
-    expect(allRows.length - shownRows.length).toBe(aspects.filter((aspect) => !aspect.counted).length);
+    // 未计入的 48 行确实只是被隐藏：字面量 48 与上面的 56/8 对账（全表−计入=未计入
+    // 这一差值不再单独断言——56、8、48 三个数都各自有钉，差值永不自立变红）。
     expect(aspects.filter((aspect) => !aspect.counted)).toHaveLength(48);
   });
 
@@ -158,7 +158,6 @@ describe('SynastryAspectList 的筛选与计数（Task 8B 判据 5）', () => {
     const tally = new Map<string, number>();
     unordered.forEach((key) => tally.set(key, (tally.get(key) ?? 0) + 1));
     expect([...tally.values()].filter((count) => count === 2)).toHaveLength(9);
-    expect([...tally.values()].reduce((sum, count) => sum + count, 0)).toBe(56);
   });
 
   it('计入相契度的 8 条与账本除基准外的 8 行一一对应，规则串由点名与相位拼成', () => {

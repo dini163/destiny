@@ -94,7 +94,6 @@ describe('MovingPointTable 三层各自挂载（Task 8B 判据 4）', () => {
     const keys = mounted.map(({ points }) =>
       points.map((point) => `${point.name}:${point.degree_text}:${point.natal_house}`),
     );
-    expect(keys).toHaveLength(3);
     expect(new Set(keys.map((list) => list.join('|'))).size).toBe(3);
 
     // 逐行比对，只有次限/太阳弧的太阳（index 0）相同；其余 20 个跨层同行位置全不同。

@@ -88,7 +88,8 @@ describe('SynastryConsole 的可访问名现状（Task 8B 判据 7）', () => {
       '乙方时',
       '乙方分',
     ];
-    expect(prefixed).toHaveLength(14);
+    // 数组自身的 14 这个数不再单独断言：它是本测字面量的算术，永不红；
+    // 每个名字恰有一个控件由下面的 forEach 逐个钉。
     prefixed.forEach((name) => expect(scope.getAllByLabelText(name)).toHaveLength(1));
 
     // 全页共用的分宫制只有一份（两造必须同口径）。

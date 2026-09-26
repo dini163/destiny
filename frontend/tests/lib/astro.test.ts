@@ -83,7 +83,6 @@ describe('度数链条的自制腿（Task 8B 判据 1）', () => {
     expect(transit.progression.positions).toHaveLength(10);
     expect(transit.solar_arc.positions).toHaveLength(10);
     expect(transit.progression.angles).toHaveLength(2);
-    expect([...transitNatalRows, ...transitMovingRows]).toHaveLength(58);
     assertSameReading(transitNatalRows, 'transit.natal');
     assertSameReading(transitMovingRows, 'transit.moving');
   });
@@ -99,8 +98,9 @@ describe('度数链条的自制腿（Task 8B 判据 1）', () => {
   it('162 个 degree_text 里没有一个走到后端的 30°00′，所以 29°60′ 至今没在页面上出现过', () => {
     // 这条为下面的 F-A1-12 定性：分叉窗口真实存在，但本次录制的三张盘没落进去——
     // 「今天没错」不等于「口径一致」，所以仍要用纯函数测钉住现状。
+    // 总数 162 = 26+26+32+78，四个加数已由本文件上面三条夹具长度断言各自钉住，
+    // 这里不再重复求和（修复轮 2 G3 删去 `expect(all).toHaveLength(162)` 空转断言）。
     const all = [...natalRows, ...transitNatalRows, ...transitMovingRows, ...synastryRows];
-    expect(all).toHaveLength(162);
     expect(all.filter((row) => row.degree_text === "30°00'")).toEqual([]);
   });
 });
