@@ -100,7 +100,7 @@ function Hero() {
       <div className="relative z-10 flex flex-col gap-4">
         <span className="label-caps inline-flex w-fit items-center gap-1.5 rounded-full border border-rim bg-gold/10 px-3 py-1 text-gold">
           <Icon name="sparkle" size={14} />
-          瑞士星历 pyswisseph · 实时真太阳时校准
+          瑞士星历 pyswisseph · 权威历法 lunar-python
         </span>
 
         <div className="flex flex-col gap-2">

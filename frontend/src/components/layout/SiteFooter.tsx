@@ -16,7 +16,7 @@ const SEALS: Seal[] = [
   {
     title: '天文与时空基准',
     caption: 'EPHEMERIS & TRUE SOLAR TIME',
-    body: '瑞士星历 pyswisseph 计算行星黄经与均时差 E(t)；真太阳时按经度时差（每度 4 分钟）与轨道偏心率动态校准，经纬度解析全球坐标。',
+    body: '瑞士星历 pyswisseph 计算行星黄经与宫头；真太阳时按经度时差（每度 4 分钟）与均时差 E(t) 动态校准（E(t) 取 NOAA 解析近似），经纬度解析全球坐标。',
   },
   {
     title: '古籍历法溯源',
