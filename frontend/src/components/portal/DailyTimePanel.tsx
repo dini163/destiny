@@ -3,33 +3,11 @@ import type { ReactNode } from 'react';
 import { useApiHealth } from '../../hooks/useApiHealth';
 import { useNow } from '../../hooks/useNow';
 import { useTrueSolarTime } from '../../hooks/useTrueSolarTime';
+import { beijingTime } from '../../lib/beijingTime';
 import { Icon } from '../ui/Icon';
 
 /** The standard meridian for Beijing Time (UTC+8), used for the live TST broadcast. */
 const REFERENCE_LONGITUDE = 120;
-
-function pad2(value: number): string {
-  return String(value).padStart(2, '0');
-}
-
-/**
- * The current Beijing (UTC+8) wall clock, derived from the real client time and
- * independent of the viewer's own timezone.
- *
- * `getTimezoneOffset` converts the local `Date` to true UTC milliseconds; adding
- * eight hours and reading the `getUTC*` fields yields Beijing civil time honestly
- * (no fabricated offset).
- */
-function beijingTime(now: Date): { date: string; minute: string; clock: string } {
-  const utcMs = now.getTime() + now.getTimezoneOffset() * 60_000;
-  const beijing = new Date(utcMs + 8 * 3_600_000);
-  const minute = `${pad2(beijing.getUTCHours())}:${pad2(beijing.getUTCMinutes())}`;
-  return {
-    date: `${beijing.getUTCFullYear()}-${pad2(beijing.getUTCMonth() + 1)}-${pad2(beijing.getUTCDate())}`,
-    minute,
-    clock: `${minute}:${pad2(beijing.getUTCSeconds())}`,
-  };
-}
 
 /** Format a signed equation-of-time offset in minutes as e.g. `+3.42 分钟`. */
 function formatOffset(minutes: number): string {
