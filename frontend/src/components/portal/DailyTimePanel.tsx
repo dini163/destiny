@@ -3,11 +3,18 @@ import type { ReactNode } from 'react';
 import { useApiHealth } from '../../hooks/useApiHealth';
 import { useNow } from '../../hooks/useNow';
 import { useTrueSolarTime } from '../../hooks/useTrueSolarTime';
-import { beijingTime } from '../../lib/beijingTime';
+import { beijingTime, localClock } from '../../lib/civilTime';
 import { Icon } from '../ui/Icon';
 
-/** The standard meridian for Beijing Time (UTC+8), used for the live TST broadcast. */
-const REFERENCE_LONGITUDE = 120;
+/**
+ * 喂给 `/meta/true-solar-time` 的经度。
+ *
+ * 后端算的是 `标准时 + (经度 − 120°) × 4 分钟 + E(t)`，传 120 即经度项归零，面板演算的是
+ * 「本地钟面 + 均时差」。这不需要访客的真实经度：钟面本身就定义在所属时区的标准经线上
+ * （偏移分钟 ÷ 4 = 该经度，见 `civilTime.localClock`），而我们在时区之内再取一个点是虚构。
+ * 排盘的真太阳时走的是另一条路——按输入的出生地经纬度校正，与本面板无关。
+ */
+const STANDARD_MERIDIAN_LONGITUDE = 120;
 
 /** Format a signed equation-of-time offset in minutes as e.g. `+3.42 分钟`. */
 function formatOffset(minutes: number): string {
@@ -18,20 +25,21 @@ function formatOffset(minutes: number): string {
 /**
  * The live astronomical time broadcast (今日天文授时).
  *
- * Everything shown is real: a ticking Beijing clock from the client's own time,
- * the True Solar Time and equation-of-time E(t) computed by the backend's
- * pyswisseph engine for the current minute at the 120°E standard meridian, and the
- * computation API's live health. The mockup's 岁次干支 / 月相 / 行星落座 / 黄历宜忌
- * pillars are deliberately omitted — the engine does not compute them yet, and the
- * no-mock rule forbids inventing them; the footnote says so plainly.
+ * Everything shown is real: a ticking wall clock read through the visitor's own
+ * browser timezone (with Beijing printed alongside whenever the two differ), the
+ * True Solar Time and equation-of-time E(t) computed by the backend for the current
+ * minute, and the computation API's live health. The mockup's 岁次干支 / 月相 /
+ * 行星落座 / 黄历宜忌 pillars are deliberately omitted — the engine does not compute
+ * them yet, and the no-mock rule forbids inventing them; the footnote says so plainly.
  */
 export function DailyTimePanel() {
   const now = useNow(1000);
-  const { date, minute, clock } = beijingTime(now);
+  const local = localClock(now);
+  const beijing = beijingTime(now);
   const trueSolarTime = useTrueSolarTime({
-    date,
-    time: minute,
-    longitude: REFERENCE_LONGITUDE,
+    date: local.date,
+    time: local.minute,
+    longitude: STANDARD_MERIDIAN_LONGITUDE,
   });
   const health = useApiHealth();
 
@@ -51,8 +59,13 @@ export function DailyTimePanel() {
       </div>
 
       <div className="flex flex-col gap-1">
-        <span className="numeric text-4xl font-semibold text-ink tabular-nums">{clock}</span>
-        <span className="label-caps">北京时间 · {date} · 东经 {REFERENCE_LONGITUDE}° 标准时</span>
+        <span className="numeric text-4xl font-semibold text-ink tabular-nums">{local.clock}</span>
+        <span className="label-caps">
+          {local.zoneLabel} · {local.date} · {local.offsetLabel}
+        </span>
+        {local.sameAsBeijing ? null : (
+          <span className="label-caps text-ink-muted">北京时间 {beijing.clock}（流时辰界基准）</span>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -70,7 +83,7 @@ export function DailyTimePanel() {
         <Metric
           label="标准时基准"
           value={trueSolarTime.data ? shortTime(trueSolarTime.data.standard_time) : '…'}
-          sub={`经度 ${REFERENCE_LONGITUDE}°E`}
+          sub={local.meridianLabel}
         />
         <Metric
           label="计算引擎"
@@ -91,7 +104,7 @@ export function DailyTimePanel() {
       <p className="mt-auto flex items-start gap-2 rounded-element border border-rim-soft bg-surface px-3 py-2 text-[11px] leading-relaxed text-ink-muted">
         <Icon name="sparkle" size={14} className="mt-0.5 shrink-0 text-gold" />
         <span>
-          真太阳时与均时差由后端 pyswisseph 依当前时刻实时演算，每分钟自动校准。月相、行星落座与黄历宜忌等完整天象播报将随后续星历接口上线——当前绝不虚构。
+          本页授时以你所在时区的标准经线为基准，均时差 E(t) 由后端解析历算模型（NOAA 近似）依当前时刻实时演算，每分钟自动校准；排盘的真太阳时按输入的出生时间与出生地经度另行核算，不受本页时区影响。月相、行星落座与黄历宜忌等完整天象播报将随后续星历接口上线——当前绝不虚构。
         </span>
       </p>
     </div>
