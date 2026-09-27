@@ -116,7 +116,8 @@ def test_an_empty_body_casts_the_documented_defaults(client: TestClient) -> None
     `question` 三种。两条复测都钉在本条加入前那一笔（钉 sha 而不写 `HEAD~1` 的理由见下方
     音值那条）：`git grep -n allow_reversed cfbd24e -- backend/tests/test_runes_api.py`
     → 只命中响应键清单 `TOP_LEVEL_KEYS` 一行，请求侧零条 —— 逆位开关只在
-    `tests/test_runes.py` 直调 `draw()` 时传过，从没进过 HTTP 请求体。而
+    `tests/test_runes.py` 直调 `draw()` 时传过，从没进过**卢恩的** HTTP 请求体（塔罗端有
+    同名参数 `allow_reversed`，那是另一个系统的契约，不在这条的取证范围内）。而
     `git grep -n "_post(client, question" cfbd24e -- backend/tests/test_runes_api.py` → 两条，
     即 `question` 填过两次，都在长度与回显那两测
     （`test_question_length_is_pydantic_validation_not_a_domain_error`、
