@@ -9,9 +9,10 @@ import 引擎函数 —— 只 import 一个正则与 ``TestClient``。与 ``tes
 
 三条值得单说：
 
-* **`row`/`col`/`position_key` 必须原样到浏览器**：前端大桌按 ``(row, col)`` 落格
-  （``LenormandBoard.tsx:67`` 的 ``gridCell(card.row, card.col)``），React key 用的是
-  ``position_index``（同文件 ``:51``）；``position_key`` 今天在前端只出现在类型声明
+* **`row`/`col`/`position_key` 必须原样到浏览器**：前端大桌按 ``(row, col)`` 落格、React key
+  用 ``position_index``，两件事在同一行 —— ``LenormandBoard.tsx:51`` 的
+  ``<div key={card.position_index} style={gridCell(card.row, card.col)} …>``（`gridCell` 自己是
+  ``:66-67``）；``position_key`` 今天在前端只出现在类型声明
   （``types/lenormand.ts:52``）—— 于是下面那条 SEAT_KEY 格式断言钉的是**契约面**（键名在
   传输中丢失或改名即坏），不是「页面的 key」。席位表本身的形状归 golden 判据 ⑨，这里只验
   「传输层没把它弄丢或改名」—— 于是断言的是键存在、类型是 ``int``、36 席的 key 互不相同。
