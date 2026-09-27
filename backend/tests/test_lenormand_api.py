@@ -9,9 +9,12 @@ import 引擎函数 —— 只 import 一个正则与 ``TestClient``。与 ``tes
 
 三条值得单说：
 
-* **`row`/`col`/`position_key` 必须原样到浏览器**：前端大桌那块网格按 ``(row, col)`` 落格、
-  按 ``position_key`` 做 key。席位表本身的形状归 golden 判据 ⑨，这里只验「传输层没把它
-  弄丢或改名」—— 于是断言的是键存在、类型是 ``int``、36 席的 key 互不相同。
+* **`row`/`col`/`position_key` 必须原样到浏览器**：前端大桌按 ``(row, col)`` 落格
+  （``LenormandBoard.tsx:67`` 的 ``gridCell(card.row, card.col)``），React key 用的是
+  ``position_index``（同文件 ``:51``）；``position_key`` 今天在前端只出现在类型声明
+  （``types/lenormand.ts:52``）—— 于是下面那条 SEAT_KEY 格式断言钉的是**契约面**（键名在
+  传输中丢失或改名即坏），不是「页面的 key」。席位表本身的形状归 golden 判据 ⑨，这里只验
+  「传输层没把它弄丢或改名」—— 于是断言的是键存在、类型是 ``int``、36 席的 key 互不相同。
 * **两种 422 不是一种**：``question`` 的 ``max_length=120``（``schemas/lenormand.py:23``）
   坏在字段自身，走 FastAPI 默认 ``detail`` 形状；``spread_id`` 未知坏在引擎前提，走
   ``{error: {code}}`` 信封（后者已由既有 ``test_lenormand_endpoint_rejects_unknown_spread``
@@ -107,9 +110,8 @@ def test_grand_tableau_over_http_delivers_every_grid_field_the_page_needs(client
     assert body["rng"] == "secrets"
     assert body["engine"] == "lenormand-combination"
     assert set(body["provenance"]) == PROVENANCE_KEYS
-    # 出处诚实性（AGENTS §7）：source 印「36 张」，本次就发满 36 张。
+    # 出处诚实性（AGENTS §7）：source 印「36 张」，本次张数已在上面钉死为 36，两侧互证。
     assert "36" in body["provenance"]["source"]
-    assert len(cards) == 36
 
     # snake_case 端到端：整棵树里不许出现一个 camelCase 键。
     keys = _walk_keys(body)
@@ -153,9 +155,14 @@ def test_an_unlisted_significator_downgrades_silently_to_seven_pairs(client: Tes
     计划，本轮不动 ``app/**``。**这条测的是今天的行为**：将来加了枚举校验，此测按新行为重写，
     不要留着一个红灯当纪念碑。
 
-    为什么现在必须钉住：不钉的话，「用户要女人牌、拿到一份无指示牌读法」这件事无人知晓 ——
-    ``"MAN"``/``"男"`` 都是前端很容易送出的字面值（英文大写常量、中文标签），而它们恰好
-    在映射表里取不到。实测（2026-09-27，本函数即复测命令：
+    为什么现在必须钉住：不钉的话，「用户要女人牌、拿到一份无指示牌读法」这件事无人知晓。
+    定级要说实话：今天的 UI 送不出 ``"MAN"``/``"男"`` —— 前端 ``lib/lenormand.ts:46-50`` 的
+    ``SIGNIFICATOR_OPTIONS`` 只有 ``none|male|female``，``:53-54`` 把它们映射成
+    ``'male'|'female'|null``，``LenormandPage.tsx:23`` 的 state 就是那个联合，页面也不从 URL
+    读该参数。这条钉住的是**直接打 API 的消费者**这条坏路径；一旦有第二个客户端可达
+    （分享链接带参 / 移动端 / 开放 API），它就从「小」升「中」—— 后果不是文案难看，而是
+    **换了一份读法**：2/3/4 条四正邻位读 → 7 条首行线读，``significator`` 整块不渲染。
+    实测（2026-09-27，本函数即复测命令：
     ``pytest tests/test_lenormand_api.py -k unlisted_significator``）：两个值都 200、
     ``significator`` 为 ``null``、``combinations`` 恰 7 条、无一席带 ``is_significator``。
     """

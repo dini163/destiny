@@ -171,8 +171,9 @@ def test_the_significator_mapping_and_the_card_names_are_the_same_fact() -> None
     说这两处必须相等**：改牌名只红一条测，改映射常量则可能全绿 —— 页面会安静地把「女性问卜」
     的指示牌画成另一枚牌。这条把两侧焊在一起：从表里按 `name_zh` 反查编号，必须等于常量。
 
-    顺带钉两件同族事实：全库只有这两枚牌是中性（`polarity == 0`），且它们的 `keywords` 里
-    都写着「指示牌」—— 三个独立字段（编号映射 / 极性 / 关键词）必须指向同两枚牌。
+    本测只钉三同族字段里的第一件（编号映射 ↔ 表内按牌名回查）；全库仅这两枚中性
+    （`polarity == 0`）与「指示牌」关键词由下一条测 :func:`test_the_two_significator_cards_are_the_only_neutral_ones`
+    （同文件 `:185`，跑它用 `-k only_neutral`）钉住。
     复测：`pytest tests/golden/test_lenormand_golden.py -k significator_mapping_and_the_card_names`。
     """
     assert SIGNIFICATOR_BY_GENDER == {"male": 28, "female": 29}
@@ -187,6 +188,12 @@ def test_the_two_significator_cards_are_the_only_neutral_ones() -> None:
     与上一条同族但看的是另外两个字段：`polarity == 0` 的集合、`keywords` 含「指示牌」的集合，
     都必须恰为映射常量指到的那两枚。坏法举例：给某枚吉凶牌补一个「指示牌」关键词，或把男人
     改成极性 +1 —— 只有这一条会红。
+
+    「仅 28/29 中性」是**现状围栏、不是契约**（同 `tests/test_kabbalah_api.py` 的
+    `-k hex_colour` 那条 11 色互异的口径）：Petit Lenormand 若干传统把 26 书 / 36 十字也读作
+    中性，语料重新定性是完全合法的编辑动作 —— 若日后有意让第三枚牌转中性，本测应当被**显式
+    改写**而不是被当成回归修回去。复测：`pytest tests/golden/test_lenormand_golden.py
+    -k only_neutral` 绿 = 两集合仍恰为 {28, 29}（2026-09-27 实测）。
     """
     mapped = set(SIGNIFICATOR_BY_GENDER.values())
     assert mapped == {28, 29}
@@ -245,8 +252,8 @@ def test_grand_tableau_seats_are_four_rows_of_eight_plus_four_not_an_eight_by_ei
     last_row = [(pos.col, pos.key) for pos in positions if pos.row == 4]
     assert sorted(last_row) == [(0, "seat-33"), (1, "seat-34"), (2, "seat-35"), (3, "seat-36")]
 
-    # 不是 8×8：包围盒 40 格、36 席，缺的四格全在末行右侧。
-    assert len(cells) != 64 and rowcounts != [8, 8, 8, 8, 8]
+    # 不是 8×8：包围盒 40 格、36 席，缺的四格全在末行右侧（行计数 [8,8,8,8,4] 与末行席位
+    # 两条已在上面钉死，这里补齐包围盒那半边）。
     bounding_box = {(row, col) for row in range(5) for col in range(8)}
     assert bounding_box - set(cells) == {(4, 4), (4, 5), (4, 6), (4, 7)}
 
@@ -272,7 +279,6 @@ def test_the_box_reads_its_centre_against_every_other_seat() -> None:
         "核心 × 过去", "核心 × 显象", "核心 × 未来", "核心 × 内因",
         "核心 × 外缘", "核心 × 根基", "核心 × 隐情", "核心 × 归宿",
     ]
-    assert all("核心" in combo.context for combo in combos)
     assert {combo.left.number for combo in combos} == {centre.number}
     ring = {card.number for card in reading.cards} - {centre.number}
     assert {combo.right.number for combo in combos} == ring
@@ -337,8 +343,8 @@ LEGS: dict[str, tuple[tuple[int, int], str]] = {
 }
 
 #: 六个席位的 (row, col) 与逐一手算的 `context` 序列。
-#: 2026-09-27 06:40 实测（探针 `lenormand_9b_probe.py`），复测：
-#: `pytest tests/golden/test_lenormand_golden.py -k orthogonal_neighbours_that_exist`。
+#: 2026-09-27 实测；(row, col) 与 context 序列两侧都被本测的断言当场复核（本测即复测：
+#: `pytest tests/golden/test_lenormand_golden.py -k orthogonal_neighbours_that_exist`）。
 #: 选这六个是因为它们把边界穷尽了：左上角、右上角、内席、末行左端、以及只有 4 席的末行两端。
 SIGNIFICATOR_LEGS: dict[str, tuple[tuple[int, int], tuple[str, ...]]] = {
     "seat-01": ((0, 0), ("指示牌之后 · 近未来", "指示牌之下 · 潜意识")),
@@ -392,7 +398,6 @@ def test_the_significator_reads_only_the_orthogonal_neighbours_that_exist(
 
     combos = _legs_with_significator(tableau_cards, seat)
     assert [combo.context for combo in combos] == list(expected_contexts), seat
-    assert len(combos) == len(expected_contexts), seat
 
     by_cell = {(card.row, card.col): card for card in tableau_cards}
     for combo in combos:
@@ -444,7 +449,6 @@ def test_a_combination_phrase_qualifies_the_subject_with_the_modifier(tableau_ca
         reversed_ = modifier_by_number[combo.left.number] + essence_by_number[combo.right.number]
         assert combo.phrase == forward, combo.context
         assert combo.phrase != reversed_, combo.context
-        assert combo.phrase.endswith(essence_by_number[combo.left.number]), combo.context
     assert "as_modifier" not in combos[0].left.model_dump(), (
         "CardRef 一旦补上 as_modifier（F-A2-17 修法①），本测应改为响应内自证")
 
