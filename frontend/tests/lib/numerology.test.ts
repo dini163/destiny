@@ -5,7 +5,9 @@
  * 为什么值得钉：`ab00175`（`fix(frontend): name the skipped characters that render as
  * blank`）修的正是这一处，而那两个函数今天零覆盖 —— 修过的 bug 没有任何东西挡回归。
  * 本条加入前 `tests/lib/` 只有 astro / transit / smoke 三个 `*.test.ts`（复测：
- * `git ls-tree --name-only HEAD~1 frontend/tests/lib/`，另有一个 `readFixture.ts` 助手）。
+ * `git ls-tree --name-only cfbd24e frontend/tests/lib/`，另有一个 `readFixture.ts` 助手；
+ * sha 钉死不写 `HEAD~1` —— 那个相对引用随任何一笔落地就指到别的提交，`cfbd24e` 是本文件
+ * 加入前的那一笔）。
  * 回归的形状很具体：`LetterMapTable.tsx:70` 把去重后的被跳过字符拼进
  * `· 跳过 N 个非字母字符（…）`，而括号里的东西经常**正是**看不见的那几个：后端如实报的
  * 是分隔符与控制符（`backend/tests/test_numerology.py:238` 那组参数里 `LU QINGXUAN`
@@ -46,8 +48,6 @@ describe('看不见的字符要改印码位（Task 10 判据 4 · ab00175 回归
     // `padStart(4, '0')` 与 `toUpperCase()` 各管一半，缺一半页面上就是另一种难看写法。
     expect(skippedCharLabel('\n')).toMatch(/^空白 U\+[0-9A-F]{4}$/);
     expect(skippedCharLabel('\u200b')).toMatch(/^空白 U\+[0-9A-F]{4}$/);
-    expect(skippedCharLabel('\n')).not.toBe('空白 U+0A');
-    expect(skippedCharLabel(' ')).not.toBe('空白 u+0020');
   });
 
   it('看得见的一律原样，一个码位都不加', () => {

@@ -192,6 +192,10 @@ def test_the_master_card_arrives_with_its_title(client: TestClient) -> None:
     （`tests/golden/test_numerology_golden.py:140-142`），称号文本本身住在
     `tests/content/test_numerology_corpora.py`。本条只管序列化：字段在 response model
     里被改名、或被哪一层 `exclude_none` 抹掉，上面三条都还是绿的，而页面已经印不出来了。
+
+    顺序在这里再断一次（`test_the_chart_comes_back_whole_and_in_the_documented_order`
+    已锁过同一个 `CORE_ORDER`）不是抄第二份：下面几行是按位置取 `core[5]`，没有这一行，
+    `core[5]` 指到哪张卡就没人保证 —— 它是这段位置索引的前提，不是结论。
     """
     core = _post(client).json()["core"]
     assert [card["key"] for card in core] == CORE_ORDER

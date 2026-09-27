@@ -111,10 +111,24 @@ def test_an_empty_body_casts_the_documented_defaults(client: TestClient) -> None
     """一个字段都不填时的那六个值（缺省形状见 spec §6.1 的抽牌签名）。
 
     spec 写的是 `draw(spread_id, include_wyrd=False, allow_reversed=True, question=None)`，
-    而 `DEFAULT_SPREAD_ID = "three"`。本文件其余每条铸石请求都经 `_post` 至少填了
-    `spread_id`，四个字段一起空着这条路今天没人走。它却正是前端的常态路径：
+    而 `DEFAULT_SPREAD_ID = "three"`。四个默认字段里今天真正零覆盖的只有 `allow_reversed`：
+    本文件其余每条铸石请求都经 `_post`，填出来的字段只有 `spread_id`、`include_wyrd`、
+    `question` 三种。两条复测都钉在本条加入前那一笔（钉 sha 而不写 `HEAD~1` 的理由见下方
+    音值那条）：`git grep -n allow_reversed cfbd24e -- backend/tests/test_runes_api.py`
+    → 只命中响应键清单 `TOP_LEVEL_KEYS` 一行，请求侧零条 —— 逆位开关只在
+    `tests/test_runes.py` 直调 `draw()` 时传过，从没进过 HTTP 请求体。而
+    `git grep -n "_post(client, question" cfbd24e -- backend/tests/test_runes_api.py` → 两条，
+    即 `question` 填过两次，都在长度与回显那两测
+    （`test_question_length_is_pydantic_validation_not_a_domain_error`、
+    `test_a_question_at_the_limit_is_accepted_and_echoed`），且都带着 `PAYLOAD` 里的
+    `spread_id`，从不与其余三个一起空着。所以本条钉的新东西是「四个一起空」这整个形状，
+    不是哪个字段头一回出现。它却正是前端的常态路径：
     `src/api/runes.ts:18` 把整个 `RuneCastRequest` 原样交给 fetch，`useRunes.ts` 少传一个
     字段，行为就由 `app/schemas/runes.py:51-61` 那四个默认决定。
+
+    六个值里的 `question is None` 在 `test_the_cast_comes_back_whole_for_every_spread`
+    那里已经有主（那条的请求同样不填 `question`），本条留这一行只为把全空的六个值凑成一份
+    完整快照 —— 少了它，「一个字段都不填」就只剩五个值的证据。
 
     六个值全是字面量，不从 `DEFAULT_SPREAD_ID` 或 schema 的默认取：默认与默认同源的那条
     断言永远绿，而 `include_wyrd` 被翻成 `True` 恰恰是这里最想要的一次红 —— 决策 3 裁定
@@ -182,7 +196,8 @@ def test_glyphs_survive_the_round_trip_and_still_match_their_codepoints(
 def test_phonemes_survive_the_round_trip_verbatim(client: TestClient) -> None:
     """音值这一列全典抽屉逐枚印（`FutharkCodex.tsx:101`），而它在本条之前零命中。
 
-    复测：`git grep -n phoneme HEAD~1 -- backend/tests` → 无输出。`phoneme` 是
+    复测：`git grep -n phoneme cfbd24e -- backend/tests` → 无输出（sha 钉死不写
+    `HEAD~1`：后者随任何一笔落地就指到别的提交，`cfbd24e` 是本条加入前的那一笔）。`phoneme` 是
     `CodexRune` 的必填字段（`app/schemas/runes.py:160`），从语料递到响应只有一处走
     （`app/engines/runes.py:362` 的 `phoneme=rune.phoneme`），所以「对回语料」那一行
     管的是传输与装配：字段漏递、串号、被别的列顶替。
