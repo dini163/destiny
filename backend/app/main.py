@@ -1,9 +1,10 @@
 """FastAPI application factory for the Destiny computation API.
 
 The backend is stateless: it performs authoritative astronomical / calendrical
-computation and returns charts as JSON. User history and favorites are stored
-client-side (IndexedDB, E2EE) per the PRD privacy requirements, so no server
-database is required.
+computation and returns charts as JSON. Nothing is persisted server-side (no
+database, no accounts, no cookies) and the browser keeps no local store, so no
+server database is required. PRD §9's client-side E2EE archive is not
+implemented -- do not claim it in user-facing copy until it exists.
 """
 
 from fastapi import FastAPI

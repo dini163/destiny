@@ -25,8 +25,8 @@ const SEALS: Seal[] = [
   },
   {
     title: '隐私与天机安全',
-    caption: 'PRIVACY · E2EE',
-    body: '后端为无状态纯计算 API，不落盘明文命谱；生辰与推演档案仅在客户端本地加密存储（IndexedDB / 端对端）。',
+    caption: 'PRIVACY · STATELESS',
+    body: '后端为无状态纯计算 API：无账号、无数据库、不下发 cookie，命盘与生辰不在服务端作任何留存；浏览器端同样不做本地持久化，关闭页面即无痕。',
   },
 ];
 
