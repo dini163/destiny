@@ -45,6 +45,20 @@ function stubScroll(): void {
   vi.stubGlobal('scrollTo', () => {});
 }
 
+/**
+ * 本测只读路由表的三样：`path` / `element` / `children`。
+ * 为什么要在测试里声明这个形状而不是直接用 `router.routes` 的类型：react-router 把
+ * `AgnosticDataRouteObject` 定义成「index 分支」与「普通分支」的联合，而 **index 分支上没有
+ * `element` 这个属性** —— 于是 `child.element` 在联合类型上就是 TS2339，而「每条子路由都带 element」
+ * 恰恰是第③条断言的本体。在此收窄成本地形状，比在每个断言点写一遍 `'element' in child` 少一层噪声，
+ * 且形状与本测的读法一一对应（多出来的属性本测不读，也不因它红）。
+ */
+interface RouteShape {
+  path?: string;
+  element?: unknown;
+  children?: readonly RouteShape[];
+}
+
 describe('合规免责声明（PRD §4.3）', () => {
   it('全站唯一渲染点 SiteFooter 印的就是 PRD 那一行，一字不差', () => {
     stubScroll();
@@ -63,14 +77,15 @@ describe('合规免责声明（PRD §4.3）', () => {
 
   it('路由表只有一个顶层路由，且它的 element 就是 AppShell', () => {
     expect(router.routes).toHaveLength(1);
-    const layout = router.routes[0];
+    const layout = (router.routes as readonly RouteShape[])[0];
     expect(layout.path).toBe('/');
     const element = layout.element as { type?: { name?: string } };
     expect(element.type?.name).toBe('AppShell');
   });
 
   it('每个页面路由（含 404 兜底）都是 AppShell 的后代，没有一条漏在 shell 外', () => {
-    const children = router.routes[0].children ?? [];
+    const layout = (router.routes as readonly RouteShape[])[0];
+    const children = layout.children ?? [];
     expect(children.length).toBeGreaterThan(0);
     // 每条子路由都得有可渲染的 element（index 路由的 Navigate 也是 element）。
     const bare = children.filter((child) => child.element === undefined);
