@@ -179,6 +179,29 @@ def test_a_missing_core_number_never_turns_into_a_zero(client: TestClient) -> No
     assert any(card["value"] is None for card in core)
 
 
+def test_the_master_card_arrives_with_its_title(client: TestClient) -> None:
+    """主角盘上唯一那张主数卡，两个字段必须成对到浏览器。
+
+    为什么是「成对」而不是「有值」：`CoreNumberHero.tsx:30-32` 与
+    `CoreNumberCard.tsx:65-67` 的渲染条件是 `card.is_master && card.master_title`，
+    没有 else 分支 —— `is_master` 为真而 `master_title` 为空时，页面上那一行「主数 ·」
+    角标**静默消失**，卡上仍印着 11/2，读者无从知道少了一样东西。
+
+    引擎层那一环已有 `(item.master_title is not None) == item.is_master`
+    （`tests/test_numerology.py:305`）与 golden 的 `[False]*5 + [True]`
+    （`tests/golden/test_numerology_golden.py:140-142`），称号文本本身住在
+    `tests/content/test_numerology_corpora.py`。本条只管序列化：字段在 response model
+    里被改名、或被哪一层 `exclude_none` 抹掉，上面三条都还是绿的，而页面已经印不出来了。
+    """
+    core = _post(client).json()["core"]
+    assert [card["key"] for card in core] == CORE_ORDER
+    assert [card["is_master"] for card in core] == [False] * 5 + [True]
+    assert [card["master_title"] is not None for card in core] == [False] * 5 + [True]
+    assert core[5]["key"] == "maturity" and core[5]["value"] == 11
+    assert core[5]["master_title"] == "MASTER INTUITION · 灵性直觉者"
+    assert [card["master_title"] for card in core[:5]] == [None] * 5
+
+
 # ------------------------------------------------------------------ 决策 13 / 14 守卫
 
 

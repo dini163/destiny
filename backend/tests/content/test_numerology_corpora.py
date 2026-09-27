@@ -218,6 +218,33 @@ def test_master_entries_carry_root_and_title_and_the_rest_do_not() -> None:
             assert entry.master_title is None
 
 
+#: spec §5.2 印出的那一行（"如 33 → `MASTER TEACHER · 精神导师`"）。上一条只管「有没有
+#: 称号」这一维，它的非主数分支（`is None`）顺带锁住了「有称号 ⟺ 是主数」；三个称号
+#: **到底是哪三串字**，在本仓的全部命中处就是下面这张表与 `tests/test_numerology_api.py`
+#: 的那一句（复测：`grep -rl --include=*.py "MASTER \(INTUITION\|BUILDER\|TEACHER\)" tests/`）。
+#: 字面量值得钉的理由在页面上：`CoreNumberHero.tsx:30-32` 与 `CoreNumberCard.tsx:65-67`
+#: 的渲染条件是 `is_master && card.master_title`，两者同时为真才印那一行 —— 于是称号一旦
+#: 被改写（哪怕只是「灵性直觉者」缩成「直觉者」），角标照印，读者看到的却是书里查不到的
+#: 名字，而这条链上没有任何一处会报错。
+MASTER_TITLE_TEXTS: dict[int, str] = {
+    11: "MASTER INTUITION · 灵性直觉者",
+    22: "MASTER BUILDER · 宏图建构者",
+    33: "MASTER TEACHER · 精神导师",
+}
+
+
+def test_master_titles_are_the_three_the_spec_prints() -> None:
+    """三个称号逐字对回 spec。集合方向上它只补一个洞：`MASTER_NUMBERS` 添员时释义必须跟上。
+
+    「给 7 编一个称号」那种红不归这里 —— 上面那条的非主数分支（`master_title is None`）
+    已经守着它了；本条的键域等式管的是另一头：有人把 44 加进主数集并补了释义，
+    却没人核对那一串字该印成什么，页面上就会多出一个来路不明的称号。
+    """
+    assert set(MASTER_TITLE_TEXTS) == set(MASTER_NUMBERS)
+    for number, text in MASTER_TITLE_TEXTS.items():
+        assert CORE_MEANINGS[number].master_title == text, f"数 {number} 的称号不是这一串"
+
+
 def test_every_core_entry_is_filled_and_cited() -> None:
     for number, entry in CORE_MEANINGS.items():
         assert entry.number == number

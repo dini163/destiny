@@ -22,6 +22,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.content import CONTENT_VERSION, RUNE_CONTENT_SOURCES
+from app.content.rune_futhark import get_rune
 from app.content.rune_spreads import SPREAD_IDS, SPREADS
 
 URL = "/api/v1/runes/cast"
@@ -106,6 +107,31 @@ def test_symmetric_stones_never_come_back_reversed_over_http(client: TestClient)
                 assert stone["orientation"] == "upright", stone["name"]
 
 
+def test_an_empty_body_casts_the_documented_defaults(client: TestClient) -> None:
+    """一个字段都不填时的那六个值（缺省形状见 spec §6.1 的抽牌签名）。
+
+    spec 写的是 `draw(spread_id, include_wyrd=False, allow_reversed=True, question=None)`，
+    而 `DEFAULT_SPREAD_ID = "three"`。本文件其余每条铸石请求都经 `_post` 至少填了
+    `spread_id`，四个字段一起空着这条路今天没人走。它却正是前端的常态路径：
+    `src/api/runes.ts:18` 把整个 `RuneCastRequest` 原样交给 fetch，`useRunes.ts` 少传一个
+    字段，行为就由 `app/schemas/runes.py:51-61` 那四个默认决定。
+
+    六个值全是字面量，不从 `DEFAULT_SPREAD_ID` 或 schema 的默认取：默认与默认同源的那条
+    断言永远绿，而 `include_wyrd` 被翻成 `True` 恰恰是这里最想要的一次红 —— 决策 3 裁定
+    开关默认关，为的是默认按 Kylver 石碑那 24 枚古符文起卦，而不是 1982 年才出现的
+    商业牌组（spec §2.6）。
+    """
+    response = client.post(URL, json={})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["spread_id"] == "three"
+    assert len(body["stones"]) == 3
+    assert body["allow_reversed"] is True
+    assert body["include_wyrd"] is False
+    assert body["question"] is None
+    assert body["provenance"]["deck_size"] == 24
+
+
 # ------------------------------------------------------------------ 空白符开关
 
 
@@ -151,6 +177,30 @@ def test_glyphs_survive_the_round_trip_and_still_match_their_codepoints(
 
     wyrd = codex["wyrd"]
     assert wyrd["codepoint"] is None and wyrd["unicode_name"] is None
+
+
+def test_phonemes_survive_the_round_trip_verbatim(client: TestClient) -> None:
+    """音值这一列全典抽屉逐枚印（`FutharkCodex.tsx:101`），而它在本条之前零命中。
+
+    复测：`git grep -n phoneme HEAD~1 -- backend/tests` → 无输出。`phoneme` 是
+    `CodexRune` 的必填字段（`app/schemas/runes.py:160`），从语料递到响应只有一处走
+    （`app/engines/runes.py:362` 的 `phoneme=rune.phoneme`），所以「对回语料」那一行
+    管的是传输与装配：字段漏递、串号、被别的列顶替。
+
+    单断 Wyrd 那一句管另一头，而且是本仓最要防的那一头：空白石本无音值（spec §2.6 裁定
+    它是 1980 年代的商业增补，连 Wyrd 这个名字都是今人补的），语料里如实写着「没有」。
+    若有人把它换成一个听起来合理的读音，对回语料那行照旧绿 —— 只有这一句字面量会红。
+    """
+    codex = _post(client).json()["codex"]
+    entries = [rune for group in codex["aettir"] for rune in group["runes"]]
+    entries.append(codex["wyrd"])
+    assert len(entries) == 25, "空集合会让下面的逐条断言白白通过"
+
+    assert [rune["phoneme"] for rune in entries] == [
+        get_rune(rune["key"]).phoneme for rune in entries
+    ]
+    assert [rune["key"] for rune in entries if not rune["phoneme"].strip()] == []
+    assert codex["wyrd"]["phoneme"] == "无 —— 它不是字母，没有音值"
 
 
 # ------------------------------------------------------------------ 决策 6 / 7 守卫
