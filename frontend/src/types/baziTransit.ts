@@ -121,6 +121,6 @@ export interface BaziTransitResult {
   dayun_covered: DayunStep[];
   years: TransitYear[];
 
-  /** `tables` = 主命盘八张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。 */
+  /** `tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。 */
   provenance: Provenance;
 }

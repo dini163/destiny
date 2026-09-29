@@ -134,6 +134,6 @@ export interface BaziLiuriResult {
   days: TransitDayCell[];
   /** 仅 `focus_date` 所指之日给出，其余为 null。 */
   focused: TransitDayDetail | null;
-  /** `tables` = 主命盘八张 + 岁运两张 + 历注一张 = 11。 */
+  /** `tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12。 */
   provenance: Provenance;
 }

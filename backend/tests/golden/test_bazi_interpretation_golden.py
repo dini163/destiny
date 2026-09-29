@@ -15,6 +15,7 @@ from app.content.bazi_dimensions import (
 )
 from app.content.bazi_geju import GEJU_COUNT, GEJU_RULES
 from app.content.bazi_nayin import NAYIN_COUNT, NAYIN_MEANING
+from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.bazi_relations import RELATION_COUNT, RELATION_TABLES
 from app.content.bazi_shensha import SHENSHA_COUNT, SHENSHA_RULES
 from app.content.bazi_shishen import TEN_GOD_COUNT, TEN_GOD_MEANING
@@ -204,6 +205,14 @@ def test_six_dimensions_stay_self_consistent(name: str) -> None:
         assert reading.score.tier == expected, (name, reading.dimension, value)
         fired = [dim_rule(k).reading for k in _fired_keys(reading)]
         assert reading.narrative == "；".join(fired) + "。"
+        prefix = DIMENSION_RULES[reading.dimension][0].key.split(".", maxsplit=1)[0]
+        fired = _fired_keys(reading)
+        assert reading.plain == "\n".join(
+            [DIMENSION_OPENERS[prefix],
+             *[PLAIN_READINGS[k] for k in fired if dim_rule(k).delta > 0],
+             *[PLAIN_READINGS[k] for k in fired if dim_rule(k).delta < 0],
+             TIER_CLOSERS[reading.score.tier]]
+        )
         assert reading.source == MODEL_PARAM_SOURCE          # 六维 delta 不许伪装成古籍赋分
         assert all(factor.source == MODEL_PARAM_SOURCE for factor in reading.score.factors)
     assert bundle["interpretation"].summary == "、".join(
@@ -242,3 +251,11 @@ def test_every_citable_entry_names_an_allowed_source() -> None:
         assert entries, table
         for entry in entries:
             assert any(entry.source.startswith(book) for book in BOOKS), (table, entry)
+
+
+def test_plain_summary_restates_the_tiers_without_new_verdicts() -> None:
+    """总论只许是 `summary` 的套壳：白话层不借总论偷偷加判断。"""
+    for name in sorted(CASES):
+        interp = _bundle(CASES[name])["interpretation"]
+        assert interp.summary in interp.plain_summary
+        assert interp.plain_summary.count("\n") == 0

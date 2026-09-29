@@ -11,23 +11,23 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "pentacles-13",
-      "name": "Queen of Pentacles",
-      "name_zh": "星币王后",
+      "card_id": "wands-05",
+      "name": "Five of Wands",
+      "name_zh": "权杖五",
       "arcana": "minor",
-      "number": 13,
-      "suit": "pentacles",
-      "rank": "Queen",
-      "element": "earth",
+      "number": 5,
+      "suit": "wands",
+      "rank": null,
+      "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "practical",
-        "motherly",
-        "down-to-earth",
-        "security",
-        "abundance"
+        "disagreement",
+        "competition",
+        "strife",
+        "tension",
+        "conflict"
       ],
-      "meaning": "The queen sits among roses holding a pentacle, warm, practical and quietly abundant."
+      "meaning": "Five figures clash their wands in spirited contest, a struggle of egos that sharpens rather than destroys."
     },
     {
       "position_index": 1,
@@ -35,22 +35,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "pentacles-07",
-      "name": "Seven of Pentacles",
-      "name_zh": "星币七",
+      "card_id": "wands-09",
+      "name": "Nine of Wands",
+      "name_zh": "权杖九",
       "arcana": "minor",
-      "number": 7,
-      "suit": "pentacles",
+      "number": 9,
+      "suit": "wands",
       "rank": null,
-      "element": "earth",
-      "orientation": "reversed",
+      "element": "fire",
+      "orientation": "upright",
       "keywords": [
-        "lack of long-term vision",
-        "limited reward",
-        "impatience",
-        "doubt"
+        "courage",
+        "persistence",
+        "test of faith",
+        "resilience"
       ],
-      "meaning": "Reversed, the harvest seems too slow and effort feels unrewarded; reassess the investment."
+      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance."
     },
     {
       "position_index": 2,
@@ -58,33 +58,33 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "major-13",
-      "name": "Death",
-      "name_zh": "死神",
-      "arcana": "major",
-      "number": 13,
-      "suit": null,
+      "card_id": "pentacles-09",
+      "name": "Nine of Pentacles",
+      "name_zh": "星币九",
+      "arcana": "minor",
+      "number": 9,
+      "suit": "pentacles",
       "rank": null,
-      "element": null,
-      "orientation": "reversed",
+      "element": "earth",
+      "orientation": "upright",
       "keywords": [
-        "resistance to change",
-        "inability to move on",
-        "stagnation",
-        "fear"
+        "luxury",
+        "self-sufficiency",
+        "financial independence",
+        "self-worth"
       ],
-      "meaning": "Reversed, you cling to what has already died, resisting a change that would set you free."
+      "meaning": "A poised woman stands in her abundant vineyard, a falcon on her hand, enjoying self-made independence."
     }
   ],
   "drawn_ids": [
-    "pentacles-13",
-    "pentacles-07",
-    "major-13"
+    "wands-05",
+    "wands-09",
+    "pentacles-09"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Queen of Pentacles (星币王后) upright, highlighting practical, motherly, down-to-earth. Present (现在) draws Seven of Pentacles (星币七) reversed, highlighting lack of long-term vision, limited reward, impatience. Future (未来) draws Death (死神) reversed, highlighting resistance to change, inability to move on, stagnation. 1 Major Arcana card(s) mark the significant, fated threads running through an otherwise everyday situation. 2 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
-  "major_arcana_count": 1,
-  "reversed_count": 2,
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Five of Wands (权杖五) upright, highlighting disagreement, competition, strife. Present (现在) draws Nine of Wands (权杖九) upright, highlighting courage, persistence, test of faith. Future (未来) draws Nine of Pentacles (星币九) upright, highlighting luxury, self-sufficiency, financial independence. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. Every card fell upright, suggesting these energies express themselves clearly and without obstruction.",
+  "major_arcana_count": 0,
+  "reversed_count": 0,
   "rng": "secrets",
   "engine": "content-library"
 }

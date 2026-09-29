@@ -11,27 +11,28 @@
       "position_label": "Urðr · What Has Become",
       "position_label_zh": "乌尔德 · 源起",
       "position_meaning": "已经织成的那一段：事情从何而来，哪些已成定局、不可再改。Urðr 之名出自古埃达《女先知之歌》第 20 节，本义近「已发生之事」；但把它当牌阵位次读作「过去」，是现代占卜的类比。",
-      "order": 21,
-      "key": "laguz",
-      "glyph": "ᛚ",
-      "name": "Laguz",
-      "name_zh": "拉古兹",
-      "transliteration": "l",
-      "name_meaning": "原始日耳曼语 *laguz「水、湖」",
+      "order": 9,
+      "key": "hagalaz",
+      "glyph": "ᚺ",
+      "name": "Hagalaz",
+      "name_zh": "哈加拉兹",
+      "transliteration": "h",
+      "name_meaning": "原始日耳曼语 *haglaz「冰雹」—— 从天而降、不由人定",
       "name_meaning_uncertain": false,
-      "aett": "tyr",
-      "aett_zh": "提尔之族",
-      "reversible": true,
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
+      "reversible": false,
       "is_wyrd": false,
-      "orientation": "reversed",
+      "orientation": "upright",
       "keywords": [
-        "直觉失灵",
-        "被情绪卷走",
-        "逆流",
-        "自欺的想象"
+        "天灾",
+        "突变",
+        "不由人",
+        "破而后立",
+        "考验"
       ],
-      "meaning": "水成了漩涡：判断被情绪带跑、直觉失灵，或沉在想象里不肯上岸。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Laguz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Hagalaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
       "position_index": 1,
@@ -39,27 +40,27 @@
       "position_label": "Verðandi · What Is Becoming",
       "position_label_zh": "薇尔丹蒂 · 显相",
       "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
-      "order": 17,
-      "key": "tiwaz",
-      "glyph": "ᛏ",
-      "name": "Tiwaz",
-      "name_zh": "提瓦兹",
-      "transliteration": "t",
-      "name_meaning": "原始日耳曼语 *tīwaz「战神提尔」—— 与拉丁语 deus、希腊语 Zeus 同源于 *dyeus",
+      "order": 15,
+      "key": "algiz",
+      "glyph": "ᛉ",
+      "name": "Algiz",
+      "name_zh": "阿尔吉兹",
+      "transliteration": "z",
+      "name_meaning": "原始日耳曼语 *algiz「驼鹿」—— 一说与「保护」同源，另解作「莎草」",
       "name_meaning_uncertain": false,
-      "aett": "tyr",
-      "aett_zh": "提尔之族",
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
       "reversible": true,
       "is_wyrd": false,
       "orientation": "reversed",
       "keywords": [
-        "失义",
-        "决断失误",
-        "争讼不利",
-        "白费的牺牲"
+        "失去庇荫",
+        "警戒失效",
+        "被利用",
+        "孤立"
       ],
-      "meaning": "理不直或断错了：争讼不利、誓言失效，或付出了却没换来该换来的。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Tiwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Algiz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
       "position_index": 2,
@@ -67,13 +68,13 @@
       "position_label": "Skuld · What Shall Be",
       "position_label_zh": "诗蔻蒂 · 必然",
       "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
-      "order": 2,
-      "key": "uruz",
-      "glyph": "ᚢ",
-      "name": "Uruz",
-      "name_zh": "乌鲁兹",
-      "transliteration": "u",
-      "name_meaning": "原始日耳曼语 *ūruz「原牛」—— 已绝迹的欧洲野牛，力与野性的原型",
+      "order": 3,
+      "key": "thurisaz",
+      "glyph": "ᚦ",
+      "name": "Thurisaz",
+      "name_zh": "图里萨兹",
+      "transliteration": "þ",
+      "name_meaning": "原始日耳曼语 *þurisaz「巨人、破坏者」—— 亦与「刺、荆棘」同源",
       "name_meaning_uncertain": false,
       "aett": "freyja",
       "aett_zh": "弗蕾亚之族",
@@ -81,19 +82,19 @@
       "is_wyrd": false,
       "orientation": "reversed",
       "keywords": [
-        "力弱",
-        "错失时机",
-        "蛮力失控",
-        "体虚"
+        "受困于阻",
+        "逞强",
+        "危险的鲁莽",
+        "旧伤未愈"
       ],
-      "meaning": "力气不济或用错了地方：时机过去、身体透支，或空有蛮力而无方向。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Uruz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Thurisaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     }
   ],
   "drawn_keys": [
-    "laguz",
-    "tiwaz",
-    "uruz"
+    "hagalaz",
+    "algiz",
+    "thurisaz"
   ],
   "allow_reversed": true,
   "include_wyrd": false,
@@ -108,13 +109,13 @@
       "key": "heimdall",
       "name": "Heimdall's Aett",
       "name_zh": "海姆达尔之族",
-      "count": 0
+      "count": 2
     },
     {
       "key": "tyr",
       "name": "Tyr's Aett",
       "name_zh": "提尔之族",
-      "count": 2
+      "count": 0
     },
     {
       "key": "wyrd",
@@ -123,57 +124,40 @@
       "count": 0
     }
   ],
-  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起（Urðr · What Has Become）落得Laguz（拉古兹，逆位），要点为直觉失灵、被情绪卷走、逆流：水成了漩涡：判断被情绪带跑、直觉失灵，或沉在想象里不肯上岸。薇尔丹蒂 · 显相（Verðandi · What Is Becoming）落得Tiwaz（提瓦兹，逆位），要点为失义、决断失误、争讼不利：理不直或断错了：争讼不利、誓言失效，或付出了却没换来该换来的。诗蔻蒂 · 必然（Skuld · What Shall Be）落得Uruz（乌鲁兹，逆位），要点为力弱、错失时机、蛮力失控：力气不济或用错了地方：时机过去、身体透支，或空有蛮力而无方向。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 0 枚、提尔之族 2 枚。其中 提尔之族 占 2 枚，现代解读作「超越、律法与宿命」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 3 枚可逆符文中有 3 枚为逆位。",
+  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起（Urðr · What Has Become）落得Hagalaz（哈加拉兹，正位），要点为天灾、突变、不由人：从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。薇尔丹蒂 · 显相（Verðandi · What Is Becoming）落得Algiz（阿尔吉兹，逆位），要点为失去庇荫、警戒失效、被利用：护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。诗蔻蒂 · 必然（Skuld · What Shall Be）落得Thurisaz（图里萨兹，逆位），要点为受困于阻、逞强、危险的鲁莽：阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 2 枚、提尔之族 0 枚。其中 海姆达尔之族 占 2 枚，现代解读作「磨砺、秩序与觉醒」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 2 枚可逆符文中有 2 枚为逆位。",
   "shadow_counsel": [
     {
-      "key": "laguz",
-      "name": "Laguz",
-      "name_zh": "拉古兹",
-      "glyph": "ᛚ",
-      "position_key": "urd",
-      "position_label_zh": "乌尔德 · 源起",
-      "drawn_orientation": "reversed",
-      "shadow_keywords": [
-        "直觉失灵",
-        "被情绪卷走",
-        "逆流",
-        "自欺的想象"
-      ],
-      "shadow_meaning": "水成了漩涡：判断被情绪带跑、直觉失灵，或沉在想象里不肯上岸。",
-      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
-    },
-    {
-      "key": "tiwaz",
-      "name": "Tiwaz",
-      "name_zh": "提瓦兹",
-      "glyph": "ᛏ",
+      "key": "algiz",
+      "name": "Algiz",
+      "name_zh": "阿尔吉兹",
+      "glyph": "ᛉ",
       "position_key": "verdandi",
       "position_label_zh": "薇尔丹蒂 · 显相",
       "drawn_orientation": "reversed",
       "shadow_keywords": [
-        "失义",
-        "决断失误",
-        "争讼不利",
-        "白费的牺牲"
+        "失去庇荫",
+        "警戒失效",
+        "被利用",
+        "孤立"
       ],
-      "shadow_meaning": "理不直或断错了：争讼不利、誓言失效，或付出了却没换来该换来的。",
+      "shadow_meaning": "护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。",
       "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
     },
     {
-      "key": "uruz",
-      "name": "Uruz",
-      "name_zh": "乌鲁兹",
-      "glyph": "ᚢ",
+      "key": "thurisaz",
+      "name": "Thurisaz",
+      "name_zh": "图里萨兹",
+      "glyph": "ᚦ",
       "position_key": "skuld",
       "position_label_zh": "诗蔻蒂 · 必然",
       "drawn_orientation": "reversed",
       "shadow_keywords": [
-        "力弱",
-        "错失时机",
-        "蛮力失控",
-        "体虚"
+        "受困于阻",
+        "逞强",
+        "危险的鲁莽",
+        "旧伤未愈"
       ],
-      "shadow_meaning": "力气不济或用错了地方：时机过去、身体透支，或空有蛮力而无方向。",
+      "shadow_meaning": "阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。",
       "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
     }
   ],

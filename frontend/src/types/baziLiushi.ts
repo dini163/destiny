@@ -128,6 +128,6 @@ export interface BaziLiushiResult {
   hours: TransitHourCell[];
   /** 仅 `focus_hour_zhi` 所指那一格给出，其余为 null。 */
   focused: TransitHourDetail | null;
-  /** `tables` = 主命盘八张 + 岁运两张 + 历注一张 = 11，与流日页同源。 */
+  /** `tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12，与流日页同源。 */
   provenance: Provenance;
 }

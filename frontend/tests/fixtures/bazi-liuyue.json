@@ -3858,6 +3858,11 @@
         "source": "引文为判语（健康维只署本系统） · 模型参数（本系统加权，非古籍赋分）"
       },
       {
+        "name": "bazi_plain",
+        "version": "2026.09",
+        "source": "本系统白话转述 · 逐条对应 bazi_dimensions 判语"
+      },
+      {
         "name": "bazi_changsheng",
         "version": "2026.09",
         "source": "《三命通会·论五行旺相休囚死并寄生十二宫》（偏移与阳顺阴逆为本系统表法，与 lunar-python 120 格对拍）"
