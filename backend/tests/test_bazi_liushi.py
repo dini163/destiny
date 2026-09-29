@@ -230,10 +230,15 @@ def test_an_absent_day_falls_back_to_the_reference_segment() -> None:
     assert result.focused is None and len(result.hours) == 12
 
 
-def test_the_provenance_is_the_same_eleven_tables_as_the_liuri_page() -> None:
-    """11 张表只有一处产出（决策 7）：两张表名逐字，条数钉死，多一行少一行都算谎。"""
+def test_the_provenance_is_the_same_twelve_tables_as_the_liuri_page() -> None:
+    """12 张表只有一处产出（决策 7）：两张表名逐字，条数钉死，多一行少一行都算谎。
+
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from
+    datetime import date; from app.engines.bazi_liuri import liuri_provenance;
+    print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
+    """
     tables = {table.name: table for table in _focused().provenance.tables}
-    assert len(_focused().provenance.tables) == 11
+    assert len(_focused().provenance.tables) == 12
     assert tables["almanac_yiji"].version == "1.4.8"
     assert tables["bazi_transit_rules"].version == CONTENT_VERSION
     assert _focused().provenance.engine == "lunar-python"

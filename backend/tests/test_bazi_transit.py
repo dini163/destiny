@@ -910,7 +910,7 @@ def test_the_ten_god_block_quotes_the_corpus_verbatim() -> None:
 
 
 def test_the_provenance_lists_the_natal_tables_plus_the_two_transit_ones() -> None:
-    """溯源=真用过的表：主命盘八张在前、岁运两张在后，一张不多一张不少（spec §7.3）。"""
+    """溯源=真用过的表：主命盘九张在前、岁运两张在后，一张不多一张不少（spec §7.3）。"""
     tables = _default().provenance.tables
     assert [(table.name, table.source) for table in tables] == [
         *CONTENT_SOURCES,

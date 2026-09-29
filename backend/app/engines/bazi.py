@@ -33,7 +33,7 @@ either side would close that circle.
 
 from datetime import date, time
 
-from app.content import CONTENT_SOURCES, CONTENT_VERSION, PLAIN_CONTENT_SOURCES
+from app.content import CONTENT_SOURCES, CONTENT_VERSION
 from app.content.bazi_shishen import TEN_GOD_MEANING, ten_god_meaning
 from app.content.wuxing import ELEMENT_ORDER, GAN_ELEMENT
 from app.engines.bazi_interpret import interpret_chart
@@ -352,7 +352,7 @@ def compute_bazi_chart(
             engine="lunar-python",
             tables=[
                 ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
-                for module, source in (*CONTENT_SOURCES, *PLAIN_CONTENT_SOURCES)
+                for module, source in CONTENT_SOURCES
             ],
         ),
     )

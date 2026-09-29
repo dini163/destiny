@@ -10,7 +10,7 @@
 
 四个内核心（`LiuriMonthSegment` / `LiuriMonthBase` / `LiuriDayRow` / `liuri_day_row`）
 与 `liuri_provenance` 是模块级的：切片 4 的 `bazi_liushi` 要拿"日所在的段、段的基准、
-那一日的三段账本与十二长生、以及那 11 行溯源"，而跨模块传私有名等于把切片 3 §5.4 的
+那一日的三段账本与十二长生、以及那 12 行溯源"，而跨模块传私有名等于把切片 3 §5.4 的
 纪律作废。
 """
 
@@ -271,7 +271,12 @@ def _focused_row(
 
 
 def liuri_provenance(reference: date) -> Provenance:
-    """溯源那 11 行：主命盘 8 + 岁运 2 + 历注 1（切片 3 spec §7.4）。
+    """溯源那 12 行：主命盘 9 + 岁运 2 + 历注 1（切片 3 spec §7.4 定的是「三份清单相接」
+    这个口径，行数随清单长度走 —— 主命盘那张清单刚收进 `bazi_plain`，这里就跟着到 12）。
+
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from
+    app.content import CONTENT_SOURCES as c, TRANSIT_CONTENT_SOURCES as t,
+    ALMANAC_CONTENT_SOURCES as a; print(len(c) + len(t) + len(a))"` → 12。
 
     提到模块级是流时那一轮的事：一页 = 一日十二时，用的是同一批表、同一个版本口径，
     而再复制一份 `tables` 清单等于给"多一行是谎称引用、少一行是不认账"这条纪律开出

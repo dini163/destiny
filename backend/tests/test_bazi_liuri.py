@@ -327,13 +327,18 @@ def test_the_almanac_is_passed_through_without_invention() -> None:
         assert len(set(cell.almanac.yi)) == len(cell.almanac.yi)
 
 
-def test_the_provenance_carries_eleven_tables_and_the_library_version() -> None:
-    """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。"""
+def test_the_provenance_carries_twelve_tables_and_the_library_version() -> None:
+    """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。
+
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from
+    datetime import date; from app.engines.bazi_liuri import liuri_provenance;
+    print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
+    """
     from importlib.metadata import version
 
     result = compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
     tables = {table.name: table for table in result.provenance.tables}
-    assert len(result.provenance.tables) == 11
+    assert len(result.provenance.tables) == 12
     assert tables["almanac_yiji"].version == version("lunar-python") == "1.4.8"
     assert "外部历法库" in tables["almanac_yiji"].source
     assert tables["bazi_transit_rules"].version == CONTENT_VERSION

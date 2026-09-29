@@ -114,5 +114,7 @@ class BaziLiuriResult(BaseModel):
     days: list[TransitDayCell]
     focused: TransitDayDetail | None = Field(default=None, description="仅 `focus_date` 所指之日给出。")
     provenance: Provenance = Field(
-        description="`tables` = 主命盘八张 + 岁运两张 + 历注一张 = 11。"
+        description="`tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12"
+        "（`content/__init__.py` 的 `CONTENT_SOURCES` + `TRANSIT_CONTENT_SOURCES` + "
+        "`ALMANAC_CONTENT_SOURCES` 三份清单相接，长度即真值）。"
     )

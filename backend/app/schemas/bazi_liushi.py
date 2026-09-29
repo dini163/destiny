@@ -105,4 +105,4 @@ class BaziLiushiResult(BaseModel):
 
     hours: list[TransitHourCell] = Field(description="恒 12 格，子时首格在 0。")
     focused: TransitHourDetail | None = Field(default=None, description="仅 `focus_hour_zhi` 所指那一格给出。")
-    provenance: Provenance = Field(description="与流日页同源：11 张表，由 `liuri_provenance` 一处产出。")
+    provenance: Provenance = Field(description="与流日页同源：12 张表，由 `liuri_provenance` 一处产出。")

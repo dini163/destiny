@@ -133,5 +133,5 @@ class BaziTransitResult(BaseModel):
     years: list[TransitYear]
 
     provenance: Provenance = Field(
-        description="`tables` = 主命盘八张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。"
+        description="`tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。"
     )
