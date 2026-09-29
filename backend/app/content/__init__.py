@@ -59,7 +59,7 @@ CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_plain", PLAIN_SOURCE),
 )
 
-#: 姓名学三表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:378`
+#: 姓名学三表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:355`
 #: 整表回显进每一个八字响应，把姓名学语料混进去就是让八字声称自己引用了它没用的表。
 NAME_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kangxi_strokes", KANGXI_STROKE_SOURCE),
