@@ -40,6 +40,7 @@ def test_every_plain_reading_meets_the_wording_contract(key: str) -> None:
     text = PLAIN_READINGS[key]
     assert len(text) >= 40, key
     assert text.endswith("。") and text.count("。") == 1, key
+    assert "你" in text, key
     for token in FORBIDDEN:
         assert token not in text, (key, token)
 
@@ -50,10 +51,12 @@ def test_every_plain_reading_meets_the_wording_contract(key: str) -> None:
 def test_frame_sentences_meet_the_same_contract(text: str) -> None:
     assert len(text) >= 20, text
     assert text.endswith("。") and text.count("。") == 1, text
+    assert "你" in text, text
     for token in FORBIDDEN:
         assert token not in text, (text, token)
 
 
 def test_summary_frame_carries_the_placeholder_only() -> None:
     assert "{summary}" in PLAIN_SUMMARY_FRAME
-    assert "；" not in PLAIN_SUMMARY_FRAME
+    for token in FORBIDDEN:
+        assert token not in PLAIN_SUMMARY_FRAME
