@@ -237,12 +237,16 @@ export interface DimensionReading {
   cautions: string[];
   /** Fired rules' `reading` joined by 「；」— no sentence is composed in the frontend. */
   narrative: string;
+  /** Plain-language section: opener + one line per fired rule + tier closer, `\n`-joined. */
+  plain: string;
   source: string;
 }
 
 export interface BaziInterpretation {
   six_dimensions: DimensionReading[];
   summary: string;
+  /** The six tiers restated in plain language; carries no extra verdict. */
+  plain_summary: string;
 }
 
 /** Complete BaZi natal chart produced by the backend engine. */

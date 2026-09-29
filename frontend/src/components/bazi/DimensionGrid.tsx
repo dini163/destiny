@@ -3,9 +3,10 @@ import { SourceNote } from '../ui/SourceNote';
 import type { BaziInterpretation, DimensionReading } from '../../types/bazi';
 
 /**
- * 六维详批. `narrative` is the engine's join of the fired rules' own readings,
- * and every score opens into its ledger — the grid never composes a sentence of
- * its own (spec §6.7, §8.2).
+ * 六维详批. `narrative` is the engine's join of the fired rules' own readings and
+ * `plain` is the engine's join of their plain-language mirrors — the grid composes
+ * no sentence of its own either way; it only fixes the reading order (plain first,
+ * technical as the footnote). Spec §6.7, §8.2, plain-reading spec §6.
  */
 export function DimensionGrid({ reading }: { reading: BaziInterpretation }) {
   return (
@@ -15,6 +16,9 @@ export function DimensionGrid({ reading }: { reading: BaziInterpretation }) {
           <DimensionCard key={dimension.dimension} dimension={dimension} />
         ))}
       </div>
+      <p className="whitespace-pre-line rounded-card border border-rim bg-surface p-4 font-display text-sm leading-relaxed text-ink">
+        {reading.plain_summary}
+      </p>
       <p className="text-sm text-ink-variant">{reading.summary}</p>
     </div>
   );
@@ -31,6 +35,9 @@ function DimensionCard({ dimension }: { dimension: DimensionReading }) {
       {dimension.cautions.length > 0 ? (
         <LineList tone="cautions" items={dimension.cautions} />
       ) : null}
+      <p className="whitespace-pre-line font-display text-sm leading-relaxed text-ink">
+        {dimension.plain}
+      </p>
       <p className="text-xs leading-relaxed text-ink-variant">{dimension.narrative}</p>
       <span className="self-end">
         <SourceNote source={dimension.source} />
