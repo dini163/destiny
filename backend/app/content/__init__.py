@@ -40,9 +40,10 @@ CONTENT_VERSION = "2026.09"
 #: 这份清单是被 `engines/bazi.py` 整表回显的那一份，所以它的准入条件是「凡是在响应里
 #: 呈现六维解读的那一页都读得到」：`bazi_plain` 与 `bazi_dimensions` 的唯一读者
 #: 都是 `interpret_chart`，而流日/流时/岁运页经 `compute_bazi_chart` 照样调它
-#: （`bazi_liuri.py:325`、`bazi_transit.py:746`、`bazi_liushi.py:206`）。把这些页已经
+#: （三个调用点各在其 `_focused_row`/装配函数里，复测：`cd backend && grep -n "compute_bazi_chart(" app/engines/bazi_liuri.py app/engines/bazi_transit.py app/engines/bazi_liushi.py`）。把这些页已经
 #: 认账的兄表列着、把同一条路径上的弟表单列出去，就是 AGENTS.md §7 反过来的那种不诚实
-#: ——「少一行是不认账」（`bazi_liuri.py:277`）。故白话表随兄表同进本清单，不另立
+#: ——「少一行是不认账」（`bazi_liuri.py` 的 `liuri_provenance` 头注，复测：
+#: `cd backend && grep -n "少一行是不认账" app/engines/bazi_liuri.py`）。故白话表随兄表同进本清单，不另立
 #: `PLAIN_CONTENT_SOURCES`；只按页显式列举的清单（`HEHUN_CONTENT_SOURCES`）不跟着加，
 #: 合婚页连 `bazi_dimensions` 都不列。
 #: 条目数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import CONTENT_SOURCES; print(len(CONTENT_SOURCES))"` → 9。
