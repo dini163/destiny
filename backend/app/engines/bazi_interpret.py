@@ -10,6 +10,11 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.content.bazi_dimensions import DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, dim_rule
+from app.content.bazi_plain import (
+    DIMENSION_OPENERS,
+    PLAIN_READINGS,
+    TIER_CLOSERS,
+)
 from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, CONTROLLED_BY, ELEMENT_ORDER, GENERATED_BY, GENERATES
 from app.core.provenance import MODEL_PARAM_SOURCE
@@ -218,6 +223,26 @@ def _tier(value: float) -> str:
     if value >= 65.0:
         return "顺"
     return "平" if value >= 45.0 else "滞"
+
+
+def plain_reading(key: str) -> str:
+    """白话转述按键取；未知键同 `dim_rule` 的口径，是编程错误而不是用户错误。"""
+    try:
+        return PLAIN_READINGS[key]
+    except KeyError as exc:
+        raise KeyError(f"未知白话规则键：{key}") from exc
+
+
+def build_plain(dimension: str, keys: Sequence[str], tier: str) -> str:
+    """命中键 → 白话长文：开篇句 + 正向逐条 + 注意逐条 + 档位收尾，段间以换行分隔。
+
+    本函数不产中文句子，只做受控条目的有序拼接（白话 spec §4）；衔接由段落结构承担，
+    所以这里不出现任何自造的过渡短语。
+    """
+    prefix = DIMENSION_RULES[dimension][0].key.split(".", maxsplit=1)[0]
+    strengths = [plain_reading(key) for key in keys if dim_rule(key).delta > 0]
+    cautions = [plain_reading(key) for key in keys if dim_rule(key).delta < 0]
+    return "\n".join([DIMENSION_OPENERS[prefix], *strengths, *cautions, TIER_CLOSERS[tier]])
 
 
 def _base_rule(dimension: str) -> str:

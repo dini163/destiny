@@ -8,9 +8,10 @@ import pytest
 from app.content.bazi_dimensions import (
     DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, DIMENSION_RULE_COUNT, dim_rule,
 )
+from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
-from app.engines.bazi_interpret import interpret_chart, ten_god_strength
+from app.engines.bazi_interpret import build_plain, interpret_chart, plain_reading, ten_god_strength
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import assess_strength, detect_geju, element_weight_scores
 from app.engines.bazi_yongshen import select_yongshen
@@ -132,3 +133,54 @@ def test_marriage_dimension_is_omitted_without_gender() -> None:
         "事业", "财运", "健康", "学业", "人际",
     ]
     assert "婚姻" not in result.summary
+
+
+def test_build_plain_is_an_ordered_concat_of_controlled_entries() -> None:
+    """白话长文 = 开篇 + 正向逐条 + 注意逐条 + 档位收尾，段间换行，中间无一个自造词。"""
+    keys = ["career.officer.present", "career.body.weak-under-officer"]
+    assert build_plain("事业", keys, "顺") == "\n".join(
+        [
+            DIMENSION_OPENERS["career"],
+            PLAIN_READINGS["career.officer.present"],
+            PLAIN_READINGS["career.body.weak-under-officer"],
+            TIER_CLOSERS["顺"],
+        ]
+    )
+
+
+def test_build_plain_keeps_fired_order_within_each_band() -> None:
+    """同侧多因子按命中序排，不按字典序——账本可核对的前提是顺序也是事实。"""
+    keys = ["career.star.wenchang", "career.officer.present"]
+    lines = build_plain("事业", keys, "平").split("\n")
+    assert lines[1:3] == [PLAIN_READINGS[k] for k in keys]
+
+
+def test_build_plain_with_no_fired_rule_yields_opener_and_closer_only() -> None:
+    assert build_plain("人际", [], "滞").split("\n") == [
+        DIMENSION_OPENERS["social"],
+        TIER_CLOSERS["滞"],
+    ]
+
+
+def test_plain_reading_rejects_an_unknown_key() -> None:
+    with pytest.raises(KeyError, match="未知白话规则键"):
+        plain_reading("career.does.not.exist")
+
+
+def test_every_dimension_carries_a_plain_section() -> None:
+    """白话随命盘齐备：开篇句、档位收尾句、每个命中因子的转述句都在。
+
+    中段顺序按 spec §4 是「正向逐条再注意逐条」，**不是**账本 `factors` 的命中序——
+    实测 `DIMENSION_PREDICATES['社交']` 里 `social.officer.moderate`(+4) 排在
+    `social.parallel.unchecked`(−8) 之后，按命中序断言会在有正有负的盘上假红
+    （控制器 pre-flight 裁定，见 ledger）。
+    """
+    for reading in _interpretation().six_dimensions:
+        prefix = DIMENSION_RULES[reading.dimension][0].key.split(".", maxsplit=1)[0]
+        lines = reading.plain.split("\n")
+        fired = [f.rule for f in reading.score.factors if f.rule in PLAIN_READINGS]
+        expected = [PLAIN_READINGS[k] for k in fired if dim_rule(k).delta > 0]
+        expected += [PLAIN_READINGS[k] for k in fired if dim_rule(k).delta < 0]
+        assert lines[0] == DIMENSION_OPENERS[prefix]
+        assert lines[-1] == TIER_CLOSERS[reading.score.tier]
+        assert lines[1:-1] == expected
