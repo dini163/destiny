@@ -11,23 +11,22 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "wands-05",
-      "name": "Five of Wands",
-      "name_zh": "权杖五",
+      "card_id": "swords-13",
+      "name": "Queen of Swords",
+      "name_zh": "宝剑王后",
       "arcana": "minor",
-      "number": 5,
-      "suit": "wands",
-      "rank": null,
-      "element": "fire",
+      "number": 13,
+      "suit": "swords",
+      "rank": "Queen",
+      "element": "air",
       "orientation": "upright",
       "keywords": [
-        "disagreement",
-        "competition",
-        "strife",
-        "tension",
-        "conflict"
+        "quick thinker",
+        "organized",
+        "perceptive",
+        "independent"
       ],
-      "meaning": "Five figures clash their wands in spirited contest, a struggle of egos that sharpens rather than destroys."
+      "meaning": "The queen sits aloft, sword upright and hand raised, judging clearly with keen perception and independence."
     },
     {
       "position_index": 1,
@@ -35,22 +34,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "wands-09",
-      "name": "Nine of Wands",
-      "name_zh": "权杖九",
+      "card_id": "swords-07",
+      "name": "Seven of Swords",
+      "name_zh": "宝剑七",
       "arcana": "minor",
-      "number": 9,
-      "suit": "wands",
+      "number": 7,
+      "suit": "swords",
       "rank": null,
-      "element": "fire",
+      "element": "air",
       "orientation": "upright",
       "keywords": [
-        "courage",
-        "persistence",
-        "test of faith",
-        "resilience"
+        "betrayal",
+        "deception",
+        "getting away with it",
+        "stealth"
       ],
-      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance."
+      "meaning": "A figure slips away with five swords, glancing back, leaving two behind by cunning and stealth."
     },
     {
       "position_index": 2,
@@ -58,33 +57,33 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "pentacles-09",
-      "name": "Nine of Pentacles",
-      "name_zh": "星币九",
-      "arcana": "minor",
-      "number": 9,
-      "suit": "pentacles",
+      "card_id": "major-04",
+      "name": "The Emperor",
+      "name_zh": "皇帝",
+      "arcana": "major",
+      "number": 4,
+      "suit": null,
       "rank": null,
-      "element": "earth",
-      "orientation": "upright",
+      "element": null,
+      "orientation": "reversed",
       "keywords": [
-        "luxury",
-        "self-sufficiency",
-        "financial independence",
-        "self-worth"
+        "domination",
+        "excessive control",
+        "rigidity",
+        "lack of discipline"
       ],
-      "meaning": "A poised woman stands in her abundant vineyard, a falcon on her hand, enjoying self-made independence."
+      "meaning": "Reversed, authority hardens into domination or rigidity, or discipline collapses into chaos."
     }
   ],
   "drawn_ids": [
-    "wands-05",
-    "wands-09",
-    "pentacles-09"
+    "swords-13",
+    "swords-07",
+    "major-04"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Five of Wands (权杖五) upright, highlighting disagreement, competition, strife. Present (现在) draws Nine of Wands (权杖九) upright, highlighting courage, persistence, test of faith. Future (未来) draws Nine of Pentacles (星币九) upright, highlighting luxury, self-sufficiency, financial independence. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. Every card fell upright, suggesting these energies express themselves clearly and without obstruction.",
-  "major_arcana_count": 0,
-  "reversed_count": 0,
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Queen of Swords (宝剑王后) upright, highlighting quick thinker, organized, perceptive. Present (现在) draws Seven of Swords (宝剑七) upright, highlighting betrayal, deception, getting away with it. Future (未来) draws The Emperor (皇帝) reversed, highlighting domination, excessive control, rigidity. 1 Major Arcana card(s) mark the significant, fated threads running through an otherwise everyday situation. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
+  "major_arcana_count": 1,
+  "reversed_count": 1,
   "rng": "secrets",
   "engine": "content-library"
 }

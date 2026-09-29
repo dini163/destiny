@@ -11,35 +11,6 @@
       "position_label": "Urðr · What Has Become",
       "position_label_zh": "乌尔德 · 源起",
       "position_meaning": "已经织成的那一段：事情从何而来，哪些已成定局、不可再改。Urðr 之名出自古埃达《女先知之歌》第 20 节，本义近「已发生之事」；但把它当牌阵位次读作「过去」，是现代占卜的类比。",
-      "order": 9,
-      "key": "hagalaz",
-      "glyph": "ᚺ",
-      "name": "Hagalaz",
-      "name_zh": "哈加拉兹",
-      "transliteration": "h",
-      "name_meaning": "原始日耳曼语 *haglaz「冰雹」—— 从天而降、不由人定",
-      "name_meaning_uncertain": false,
-      "aett": "heimdall",
-      "aett_zh": "海姆达尔之族",
-      "reversible": false,
-      "is_wyrd": false,
-      "orientation": "upright",
-      "keywords": [
-        "天灾",
-        "突变",
-        "不由人",
-        "破而后立",
-        "考验"
-      ],
-      "meaning": "从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Hagalaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
-    },
-    {
-      "position_index": 1,
-      "position_key": "verdandi",
-      "position_label": "Verðandi · What Is Becoming",
-      "position_label_zh": "薇尔丹蒂 · 显相",
-      "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
       "order": 15,
       "key": "algiz",
       "glyph": "ᛉ",
@@ -63,38 +34,68 @@
       "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Algiz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
+      "position_index": 1,
+      "position_key": "verdandi",
+      "position_label": "Verðandi · What Is Becoming",
+      "position_label_zh": "薇尔丹蒂 · 显相",
+      "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
+      "order": 11,
+      "key": "isa",
+      "glyph": "ᛁ",
+      "name": "Isa",
+      "name_zh": "伊萨",
+      "transliteration": "i",
+      "name_meaning": "原始日耳曼语 *īsaz「冰」",
+      "name_meaning_uncertain": false,
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
+      "reversible": false,
+      "is_wyrd": false,
+      "orientation": "upright",
+      "keywords": [
+        "停滞",
+        "封冻",
+        "静止",
+        "守成",
+        "自我"
+      ],
+      "meaning": "结了冰的水面：停滞、冻结与不得不动的静止。宜等、宜守，硬闯只会破冰落水。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Isa（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+    },
+    {
       "position_index": 2,
       "position_key": "skuld",
       "position_label": "Skuld · What Shall Be",
       "position_label_zh": "诗蔻蒂 · 必然",
       "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
-      "order": 3,
-      "key": "thurisaz",
-      "glyph": "ᚦ",
-      "name": "Thurisaz",
-      "name_zh": "图里萨兹",
-      "transliteration": "þ",
-      "name_meaning": "原始日耳曼语 *þurisaz「巨人、破坏者」—— 亦与「刺、荆棘」同源",
+      "order": 13,
+      "key": "eihwaz",
+      "glyph": "ᛇ",
+      "name": "Eihwaz",
+      "name_zh": "艾赫瓦兹",
+      "transliteration": "ï",
+      "name_meaning": "原始日耳曼语 *īhwaz「紫杉」—— 常青、长寿，也是制弓之材",
       "name_meaning_uncertain": false,
-      "aett": "freyja",
-      "aett_zh": "弗蕾亚之族",
-      "reversible": true,
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
+      "reversible": false,
       "is_wyrd": false,
-      "orientation": "reversed",
+      "orientation": "upright",
       "keywords": [
-        "受困于阻",
-        "逞强",
-        "危险的鲁莽",
-        "旧伤未愈"
+        "长寿",
+        "韧性",
+        "转变",
+        "生死之间",
+        "弓材"
       ],
-      "meaning": "阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Thurisaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "常青的紫杉，也是制弓之材：耐力、跨越与转化。宜撑住这一段，弯而不折。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Eihwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     }
   ],
   "drawn_keys": [
-    "hagalaz",
     "algiz",
-    "thurisaz"
+    "isa",
+    "eihwaz"
   ],
   "allow_reversed": true,
   "include_wyrd": false,
@@ -103,13 +104,13 @@
       "key": "freyja",
       "name": "Freyja's Aett",
       "name_zh": "弗蕾亚之族",
-      "count": 1
+      "count": 0
     },
     {
       "key": "heimdall",
       "name": "Heimdall's Aett",
       "name_zh": "海姆达尔之族",
-      "count": 2
+      "count": 3
     },
     {
       "key": "tyr",
@@ -124,15 +125,15 @@
       "count": 0
     }
   ],
-  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起（Urðr · What Has Become）落得Hagalaz（哈加拉兹，正位），要点为天灾、突变、不由人：从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。薇尔丹蒂 · 显相（Verðandi · What Is Becoming）落得Algiz（阿尔吉兹，逆位），要点为失去庇荫、警戒失效、被利用：护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。诗蔻蒂 · 必然（Skuld · What Shall Be）落得Thurisaz（图里萨兹，逆位），要点为受困于阻、逞强、危险的鲁莽：阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 2 枚、提尔之族 0 枚。其中 海姆达尔之族 占 2 枚，现代解读作「磨砺、秩序与觉醒」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 2 枚可逆符文中有 2 枚为逆位。",
+  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起（Urðr · What Has Become）落得Algiz（阿尔吉兹，逆位），要点为失去庇荫、警戒失效、被利用：护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。薇尔丹蒂 · 显相（Verðandi · What Is Becoming）落得Isa（伊萨，正位），要点为停滞、封冻、静止：结了冰的水面：停滞、冻结与不得不动的静止。宜等、宜守，硬闯只会破冰落水。诗蔻蒂 · 必然（Skuld · What Shall Be）落得Eihwaz（艾赫瓦兹，正位），要点为长寿、韧性、转变：常青的紫杉，也是制弓之材：耐力、跨越与转化。宜撑住这一段，弯而不折。三组配比（本次共 3 枚）：弗蕾亚之族 0 枚、海姆达尔之族 3 枚、提尔之族 0 枚。其中 海姆达尔之族 占 3 枚，现代解读作「磨砺、秩序与觉醒」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 1 枚可逆符文中有 1 枚为逆位。",
   "shadow_counsel": [
     {
       "key": "algiz",
       "name": "Algiz",
       "name_zh": "阿尔吉兹",
       "glyph": "ᛉ",
-      "position_key": "verdandi",
-      "position_label_zh": "薇尔丹蒂 · 显相",
+      "position_key": "urd",
+      "position_label_zh": "乌尔德 · 源起",
       "drawn_orientation": "reversed",
       "shadow_keywords": [
         "失去庇荫",
@@ -141,23 +142,6 @@
         "孤立"
       ],
       "shadow_meaning": "护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。",
-      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
-    },
-    {
-      "key": "thurisaz",
-      "name": "Thurisaz",
-      "name_zh": "图里萨兹",
-      "glyph": "ᚦ",
-      "position_key": "skuld",
-      "position_label_zh": "诗蔻蒂 · 必然",
-      "drawn_orientation": "reversed",
-      "shadow_keywords": [
-        "受困于阻",
-        "逞强",
-        "危险的鲁莽",
-        "旧伤未愈"
-      ],
-      "shadow_meaning": "阻力占了上风，或以暴制暴反伤自身。也指不肯面对的旧患在此时发作。",
       "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
     }
   ],
