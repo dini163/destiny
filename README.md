@@ -26,6 +26,10 @@
 | 前端拿到假数据开发，上线全走形 | 前端测试夹具全部由脚本打真实后端录制（`scripts/record_frontend_fixtures.py`），零 mock |
 | 界面花哨但口径混乱 | 统一设计系统 `Celestial Obsidian`（曜石暗金），全站 App Shell 同一导航与状态栏 |
 
+**测算大厅（首页）** —— 顶部双文明圈导航 + 实时真太阳时授时卡 + 16 体系聚合矩阵：
+
+![测算大厅首页](docs/assets/screenshot-portal.png)
+
 ## 快速开始
 
 **方式一：Docker（一条命令起全站）**
@@ -94,6 +98,17 @@ flowchart LR
 | 希伯来 | 卡巴拉 / 数字学 | `kabbalah` `numerology` | `/kabbalah-tree` `/numerology-matrix` | 毕达哥拉斯/洛书语料 + Gematria 表 |
 | 印度 | 吠陀占星 | `vedic` | `/vedic-astrology` | pyswisseph（恒星黄道） |
 | 北欧 | 卢恩符文 | `runes` | `/norse-runes` | Elder Futhark 词表 + `secrets` |
+
+### 实拍图廊
+
+以下均为本地真实运行的计算结果（示例生辰见各页头注），非设计稿：
+
+<table>
+  <tr>
+    <td width="50%"><b>四柱八字精算排盘</b><br>真太阳时校正 → 干支/十神/藏干/纳音 → 身强身弱得分 → 用神三层 → 大运时间轴 → 命格/格局/运势详批 → 数据溯源账本<br><img src="docs/assets/screenshot-bazi.png" alt="八字排盘结果页" width="100%"></td>
+    <td width="50%"><b>本命星盘与时空推运</b><br>pyswisseph 天球黄道命盘轮图（Placidus 分宫）→ 本命三巨头 → 十大主星与交点历表 → 元素/形态分布 → 关键相位网格<br><img src="docs/assets/screenshot-western.png" alt="西洋本命星盘结果页" width="100%"></td>
+  </tr>
+</table>
 
 ## 工程铁律
 
