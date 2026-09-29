@@ -52,7 +52,7 @@ PLAIN_READINGS: dict[str, str] = {
     ),
     "career.officer.unfavourable": (
         "官星落在你的忌的一侧，同样的职责于你更偏向压力而不是名分，你在正式场合与硬性"
-        "考核里容易紧绷，需要主动给自己留出缓冲的余地。"
+        "考核里容易紧绷，绷得太久的那一段，往往不是事变了，是人先空了。"
     ),
     "career.officer.restrained": (
         "盘里的七杀被食神管住了，外界的冲击与高压不会直接砸在你身上，你擅长把难缠的局面"
@@ -130,7 +130,7 @@ PLAIN_READINGS: dict[str, str] = {
     ),
     "marriage.output-hurts-officer": (
         "女命以官星为夫星，你盘里伤官的力量压过了它，表达与主见容易在亲密关系里变成摩擦，"
-        "说话留三分余地会顺很多。"
+        "话说得越满的那一头，摩擦就越先显出来。"
     ),
     # 健康（health）
     "health.balance.peaceful": (
