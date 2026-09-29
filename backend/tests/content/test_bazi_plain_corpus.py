@@ -6,7 +6,7 @@
 
 import pytest
 
-from app.content.bazi_dimensions import DIMENSION_RULES
+from app.content.bazi_dimensions import DIMENSION_RULES, dim_rule
 from app.content.bazi_plain import (
     DIMENSION_OPENERS,
     PLAIN_READINGS,
@@ -25,6 +25,14 @@ FORBIDDEN = ("；", "（《", "』")
 
 def test_plain_keys_mirror_the_judgment_corpus_exactly() -> None:
     assert set(PLAIN_READINGS) == ALL_KEYS
+
+
+def test_every_rule_has_a_non_zero_delta_so_no_plain_line_is_dropped() -> None:
+    """`build_plain` 用 delta 的正负分带，delta 为 0 的键会两头都不进——静默少一条白话。
+
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.bazi_dimensions import DIMENSION_RULES; print(sum(1 for rs in DIMENSION_RULES.values() for r in rs if r.delta == 0))"` → 0。
+    """
+    assert all(dim_rule(key).delta != 0 for key in ALL_KEYS)
 
 
 def test_openers_cover_every_dimension_prefix() -> None:

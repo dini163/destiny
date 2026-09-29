@@ -37,16 +37,15 @@ CONTENT_VERSION = "2026.09"
 #: 书级出处，按模块名回显在响应的 `provenance.tables` 里。逐条出处始终在各条目
 #: 自己的 `source` 字段（到章不到书），这里只到书；模型参数与古籍同表时必须两段都写，
 #: 免得一张表看起来比它实际有的更"有出处"。
-#: 这份清单是被 `engines/bazi.py` 整表回显的那一份，所以它的准入条件是「凡是跑到
-#: `interpret_chart` 的那一页都读得到」：`bazi_plain` 与 `bazi_dimensions` 的唯一读者
+#: 这份清单是被 `engines/bazi.py` 整表回显的那一份，所以它的准入条件是「凡是在响应里
+#: 呈现六维解读的那一页都读得到」：`bazi_plain` 与 `bazi_dimensions` 的唯一读者
 #: 都是 `interpret_chart`，而流日/流时/岁运页经 `compute_bazi_chart` 照样调它
 #: （`bazi_liuri.py:325`、`bazi_transit.py:746`、`bazi_liushi.py:206`）。把这些页已经
 #: 认账的兄表列着、把同一条路径上的弟表单列出去，就是 AGENTS.md §7 反过来的那种不诚实
 #: ——「少一行是不认账」（`bazi_liuri.py:277`）。故白话表随兄表同进本清单，不另立
 #: `PLAIN_CONTENT_SOURCES`；只按页显式列举的清单（`HEHUN_CONTENT_SOURCES`）不跟着加，
 #: 合婚页连 `bazi_dimensions` 都不列。
-#: 条目数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
-#: "from app.content import CONTENT_SOURCES; print(len(CONTENT_SOURCES))"` → 9。
+#: 条目数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import CONTENT_SOURCES; print(len(CONTENT_SOURCES))"` → 9。
 CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_shishen", "《渊海子平》"),
     ("bazi_nayin", "《三命通会》"),

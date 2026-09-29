@@ -27,21 +27,14 @@ function precedes(a: Element, b: Element): boolean {
   ) !== 0;
 }
 
-function paragraphByText(snippet: string): Element {
-  const el = [...document.querySelectorAll('p')].find((p) =>
-    p.textContent?.includes(snippet),
-  );
-  if (!el) throw new Error(`找不到含该文本的 <p>：${snippet.slice(0, 20)}`);
-  return el;
-}
-
 /**
- * 全文相等的段落查找——总论那一条**只能**用它，不能用上面的子串版：
- * `PLAIN_SUMMARY_FRAME` 把 `summary` 原句嵌在白话总论里（实测
- * `plain_summary.includes(summary)` → true），子串查找会先命中前者的 <p>，
+ * 段落定位一律取全文相等，不留子串查找那条路：白话段与判语段各自就是一个 `<p>` 的
+ * `textContent`，整段比一次就把「渲染的是全文而不是首行」一并钉死；子串版要靠
+ * 「前 12 字在夹具里唯一」这条夹具事实才不错位，语料一改就可能配错 `<p>` 而静默变绿。
+ * 总论那一条更是只能用全文：`PLAIN_SUMMARY_FRAME` 把 `summary` 原句嵌在白话总论里
+ * （实测 `plain_summary.includes(summary)` → true），子串查找会先命中前者的 `<p>`，
  * 于是拿同一个元素和自己比 DOM 序，`compareDocumentPosition` 返回 0，断言必假红。
- * 复测：cd frontend && node -e "const c=require('./tests/fixtures/bazi-natal.json');
- * console.log(c.interpretation.plain_summary.includes(c.interpretation.summary))"
+ * 复测：`cd frontend && node -e "const c=require('./tests/fixtures/bazi-natal.json'); console.log(c.interpretation.plain_summary.includes(c.interpretation.summary))"`
  */
 function paragraphByExact(text: string): Element {
   const el = [...document.querySelectorAll('p')].find((p) => p.textContent === text);
@@ -54,8 +47,8 @@ describe('DimensionGrid 白话区块', () => {
     if (!reading) throw new Error('夹具缺 interpretation');
     render(<DimensionGrid reading={reading} />);
     for (const dimension of reading.six_dimensions) {
-      const plain = paragraphByText(dimension.plain.split('\n')[0]);
-      const narrative = paragraphByText(dimension.narrative.slice(0, 12));
+      const plain = paragraphByExact(dimension.plain);
+      const narrative = paragraphByExact(dimension.narrative);
       expect(precedes(plain, narrative)).toBe(true);
     }
   });
@@ -64,7 +57,8 @@ describe('DimensionGrid 白话区块', () => {
     if (!reading) throw new Error('夹具缺 interpretation');
     render(<DimensionGrid reading={reading} />);
     for (const dimension of reading.six_dimensions) {
-      const plain = paragraphByText(dimension.plain.split('\n')[0]);
+      const plain = paragraphByExact(dimension.plain);
+      // 全等定位失败只说"找不到 <p>"，逐行这条才点名缺的是哪一行。
       for (const line of dimension.plain.split('\n')) {
         expect(plain.textContent).toContain(line);
       }

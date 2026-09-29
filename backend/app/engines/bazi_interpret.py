@@ -1,8 +1,10 @@
 """Six-dimension readings: a pure map from earlier verdicts onto one ledger per axis.
 
-本模块不判命、不组句：命是 Task 5-8 的结论（旺衰、格局、喜忌、神煞、关系、合局），
-句子是 `content/bazi_dimensions` 的署名条目。这里只做三件事 —— 把结论收成
-`ChartSignals`、按 39 条命中条件挑出因子、把因子交给 `build_ledger`。
+本模块不判命、不组句：命是前序引擎的结论（旺衰、格局、喜忌、神煞、关系、合局），
+句子是 `content/bazi_dimensions` 的署名条目。这里只做四件事 —— 把结论收成
+`ChartSignals`、按 39 条（`DIMENSION_RULE_COUNT`）命中条件挑出因子、把因子交给
+`build_ledger`、给每个维度按同一批命中键拼白话段（`build_plain`）。白话与判语同属
+逐字搬运受控表（`content/bazi_plain` 与 `content/bazi_dimensions`），本模块不现编中文。
 所有阈值（`STAR_PRESENT` 等）都是模型参数，判语里凡涉喜忌之处一律署"本系统"。
 """
 

@@ -330,9 +330,7 @@ def test_the_almanac_is_passed_through_without_invention() -> None:
 def test_the_provenance_carries_twelve_tables_and_the_library_version() -> None:
     """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。
 
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from
-    datetime import date; from app.engines.bazi_liuri import liuri_provenance;
-    print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
     """
     from importlib.metadata import version
 

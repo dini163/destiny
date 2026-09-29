@@ -133,6 +133,9 @@ def test_marriage_dimension_is_omitted_without_gender() -> None:
         "事业", "财运", "健康", "学业", "人际",
     ]
     assert "婚姻" not in result.summary
+    for reading in result.six_dimensions:
+        assert len(reading.plain.split("\n")) >= 3
+    assert "婚姻" not in result.plain_summary
 
 
 def test_build_plain_is_an_ordered_concat_of_controlled_entries() -> None:
