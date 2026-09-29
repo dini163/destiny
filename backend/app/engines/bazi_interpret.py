@@ -13,6 +13,7 @@ from app.content.bazi_dimensions import DIMENSION_BASE, DIMENSION_ORDER, DIMENSI
 from app.content.bazi_plain import (
     DIMENSION_OPENERS,
     PLAIN_READINGS,
+    PLAIN_SUMMARY_FRAME,
     TIER_CLOSERS,
 )
 from app.content.bazi_relations import RELATION_TABLES
@@ -259,13 +260,15 @@ def _dimension_reading(s: ChartSignals, dimension: str) -> DimensionReading:
     ]
     total = min(100.0, max(0.0, DIMENSION_BASE + sum(factor.delta for factor in fired)))
     keys = [factor.rule for factor in fired]
+    tier = _tier(total)
     return DimensionReading(
         dimension=dimension,
-        score=build_ledger(base=DIMENSION_BASE, tier=_tier(total), contributions=fired,
+        score=build_ledger(base=DIMENSION_BASE, tier=tier, contributions=fired,
                            base_rule=_base_rule(dimension)),
         strengths=[dim_rule(key).label for key in keys if dim_rule(key).delta > 0],
         cautions=[dim_rule(key).label for key in keys if dim_rule(key).delta < 0],
         narrative="；".join(dim_rule(key).reading for key in keys) + "。",
+        plain=build_plain(dimension, keys, tier),
         source=MODEL_PARAM_SOURCE,
     )
 
@@ -286,7 +289,9 @@ def interpret_chart(
     )
     dimensions = [name for name in DIMENSION_ORDER if name != "婚姻" or gender is not None]
     readings = [_dimension_reading(signals, name) for name in dimensions]
+    summary = "、".join(f"{r.dimension}{r.score.tier}" for r in readings)
     return BaziInterpretation(
         six_dimensions=readings,
-        summary="、".join(f"{r.dimension}{r.score.tier}" for r in readings),
+        summary=summary,
+        plain_summary=PLAIN_SUMMARY_FRAME.replace("{summary}", summary),
     )

@@ -11,9 +11,15 @@ class DimensionReading(BaseModel):
     strengths: list[str] = Field(default_factory=list, description="正向因子的 label，按命中序。")
     cautions: list[str] = Field(default_factory=list, description="负向因子的 label，按命中序。")
     narrative: str = Field(description="命中因子 reading 的「；」拼接，末尾一个「。」，不现编句子。")
+    plain: str = Field(
+        description="白话长文：开篇句 + 命中因子逐条转述 + 档位收尾句，段间以换行分隔。"
+    )
     source: str
 
 
 class BaziInterpretation(BaseModel):
     six_dimensions: list[DimensionReading]
     summary: str = Field(description="六维档位复述（如「事业顺、财运平…」），不含额外判断。")
+    plain_summary: str = Field(
+        description="六维总论，由 `PLAIN_SUMMARY_FRAME` 套入 `summary` 而成，不含额外判断。"
+    )

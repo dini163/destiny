@@ -12,6 +12,7 @@ from importlib.metadata import version
 
 from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
 from app.content.bazi_hehun_rules import HEHUN_RULE_SOURCE
+from app.content.bazi_plain import PLAIN_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kabbalah import KABBALAH_SOURCE
@@ -45,6 +46,13 @@ CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_shensha", "《三命通会》《渊海子平》"),
     ("bazi_relations", "《三命通会》《渊海子平》《滴天髓》"),
     ("bazi_dimensions", f"引文为判语（健康维只署本系统） · {MODEL_PARAM_SOURCE}"),
+)
+
+#: 白话转述一张表。单列的理由同 `NAME_CONTENT_SOURCES`：六维详批只在本命盘产出
+#: （`interpret_chart` 的唯一调用点是 `engines/bazi.py`），流日/流时/岁运页不读它，
+#: 混进 `CONTENT_SOURCES` 等于让那些页声称引了自己没引的表。
+PLAIN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("bazi_plain", PLAIN_SOURCE),
 )
 
 #: 姓名学三表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:378`
