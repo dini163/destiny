@@ -23,6 +23,8 @@ anchors here are hand-derivable arithmetic, not engine read-backs:
   unchanged; `counted` is decided by whether *both* endpoints are personal points, not by
   which side is A.
 * **账本** — only `counted` rows enter the ledger; a non-counted aspect's rule is absent.
+* **白话层**（多系统白话 spec §6）— 逐行白话必须是「受控 frame + 两端受控点义」的填槽结果，
+  总论只重排命中的核心轴；四档收尾句的键集合等于 `SYNASTRY_TIERS` 的档名。
 
 Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
 .venv/Scripts/python.exe -m pytest tests/golden/test_synastry_golden.py -v`.
@@ -33,8 +35,18 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content import synastry_plain
+from app.content.synastry import SYNASTRY_TIERS
 from app.core.provenance import MODEL_PARAM_SOURCE
-from app.engines.synastry import _midpoint, _synastry_aspects, compute_synastry
+from app.engines.plain_compose import compose_template, reading
+from app.engines.plain_corpora import PLAIN_CORPORA, SYNASTRY
+from app.engines.synastry import (
+    _AXIS_ZH,
+    _midpoint,
+    _synastry_aspects,
+    compute_synastry,
+    synastry_plain_summary,
+)
 from app.engines.western import ASPECTS
 from app.schemas.synastry import SynastryPerson
 
@@ -304,3 +316,76 @@ def test_only_counted_aspects_enter_the_score_ledger() -> None:
     non_base_rules = {r for r in rules if r != "synastry.base"}
     assert non_base_rules == counted_rules
     assert not (non_base_rules & not_counted_rules)
+
+
+# ------------------------------------------------------- 白话层（多系统白话 spec §6）
+
+def test_synastry_corpus_is_the_one_the_registry_holds() -> None:
+    """工厂按 `PLAIN_CORPORA.values()` 参数化跑表，看不见键覆盖：两行同 `system` 时
+    Python 静默留最后一行，前一张表就此掉出闸外而两条形状断言照样绿。由消费方自证在场。"""
+    assert PLAIN_CORPORA["synastry"] is SYNASTRY
+
+
+def test_point_slots_cover_exactly_the_axes_the_engine_reads() -> None:
+    """`_synastry_universe()` 里 ASC/MC 是字面量（不能 import 本模块，那是循环），本条就是它的对账。
+
+    有人给合盘加第三根轴时，`_chart_points` 会多出点名、逐行白话那条测试当场 KeyError；
+    本条先一步说明真正的原因在两张表的名单不同，而不是白话表写错了句。
+    """
+    assert set(_AXIS_ZH) == {"ASC", "MC"}
+
+
+def test_every_aspect_carries_a_plain_line_made_of_two_slots_and_a_frame() -> None:
+    """56 行逐条对拍：每行白话 = 受控 frame + 两端受控点义，一个字的现编都没有。"""
+    chart = _chart()
+    assert len(chart.synastry_aspects) == 56
+    for aspect in chart.synastry_aspects:
+        assert aspect.plain == compose_template(
+            reading(SYNASTRY, synastry_plain.aspect_frame_key(aspect.type)),
+            {
+                "a": reading(SYNASTRY, synastry_plain.point_key(aspect.point_a)),
+                "b": reading(SYNASTRY, synastry_plain.point_key(aspect.point_b)),
+            },
+        )
+
+
+def test_aspect_frames_carry_no_verdict_words() -> None:
+    """G2 的机检半边：框架句里不许出现结论词，判断只能来自被填进来的点义与档位收尾句。
+
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+    from app.content.synastry_plain import SYNASTRY_ASPECT_FRAMES as F
+    print([(w, [k for k, t in F.items() if w in t]) for w in '吉凶宜忌'])"` → 四个空列表。
+    """
+    for key, frame in synastry_plain.SYNASTRY_ASPECT_FRAMES.items():
+        for word in ("吉", "凶", "宜", "忌"):
+            assert word not in frame, (key, word)
+
+
+def test_closers_cover_exactly_the_tiers_the_content_table_prints() -> None:
+    """G3（spec §5 规则 6）：收尾句键集合 == `SYNASTRY_TIERS` 的档名（裁定 R25 由本系统自钉）。
+
+    现账复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+    from app.content.synastry import SYNASTRY_TIERS
+    from app.content.synastry_plain import SYNASTRY_TIER_CLOSERS
+    print({label for _, label in SYNASTRY_TIERS} == set(SYNASTRY_TIER_CLOSERS))"` → True。
+    """
+    assert {label for _, label in SYNASTRY_TIERS} == set(SYNASTRY.closers)
+
+
+def test_plain_summary_relists_the_two_hit_core_axes_banded() -> None:
+    """真实盘总论逐字节钉住（2026-09-30 由本文件那对 A/B 实算，56 行里命中两条核心轴）。
+
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+    from app.engines.synastry import synastry_plain_summary
+    print(synastry_plain_summary(_chart().synastry_aspects, '中和可处'))"`
+    """
+    chart = _chart()
+    assert chart.score.tier == "中和可处"
+    assert chart.plain_summary == "\n".join(
+        [
+            "把账本里命中的核心羁绊合起来看，你这段关系最要紧的几条轴各落在顺的一侧还是费劲的一侧，下面按两侧重排一遍。",
+            "月金这一对是情绪与喜好叠在一处，你在这条轴上容易觉得被照顾，也容易把照顾与心动放进同一个口袋，两者的分别要一段时间才分得开。",
+            "金火这一对管的是被吸引与往前冲的那股劲，你在这条轴上感受最直接，来得也快，它给的是热度，把热度认成什么是后面的事。",
+            "你这一份相契度落在中和可处，表的措辞在这一档是平的，顺与费劲两边都读得进去，轻重由那几条相位自己说，不由这个档位替你定。",
+        ]
+    )

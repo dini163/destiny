@@ -15,6 +15,11 @@ charts and produces three things, all from Swiss Ephemeris (no mock):
   synastry aspects (``Σ factors[].delta == value``).
 
 The two natal charts are embedded verbatim as real :class:`WesternChart`s.
+
+Every aspect row additionally carries a ``plain`` line (one controlled aspect frame with the
+two controlled point meanings slotted into it), and the response carries ``plain_summary``,
+which relists only the core relationship bonds actually hit. Both are template compositions
+of curated sentences — see :mod:`app.content.synastry_plain`.
 """
 
 from datetime import date, time
@@ -82,6 +87,9 @@ class SynastryAspect(BaseModel):
     counted: bool = Field(
         description="Whether this aspect contributes to the score (both endpoints are personal points)."
     )
+    plain: str = Field(
+        description="本条相位的白话转述：受控框架句 + 两端受控点义逐字填槽，不新增判断。"
+    )
 
 
 class CompositeChart(BaseModel):
@@ -130,5 +138,8 @@ class SynastryChart(BaseModel):
     synastry_aspects: list[SynastryAspect] = Field(description="Person-to-person aspects, tightest first.")
     composite: CompositeChart
     score: ScoreValue = Field(description="相契度总分与逐条账本（Σ factors[].delta == value）。")
+    plain_summary: str = Field(
+        description="命中核心羁绊的白话总论：按赋分表的顺逆分带重排，末尾一句是相契度档位的收尾句。"
+    )
     provenance: SynastryProvenance
     engine: str = Field(default="pyswisseph")

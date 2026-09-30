@@ -29,6 +29,7 @@ from app.content.qimen import QIMEN_SOURCE
 from app.content.rune_futhark import RUNES_SOURCE
 from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
+from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
 from app.core.provenance import MODEL_PARAM_SOURCE
@@ -164,9 +165,10 @@ VEDIC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("vedic", VEDIC_SOURCE),
 )
 
-#: 西洋合盘一页真正读到的一张表：相契度赋分权重（相位基准分、核心羁绊强调、
-#: 容许度衰减与四档分界）。单列理由同 `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它，
-#: 且它是本系统模型参数而非古籍语料，出处串自己说清了这一点。
+#: 西洋合盘一页真正读到的两张表：相契度赋分权重（相位基准分、核心羁绊强调、
+#: 容许度衰减与四档分界），以及逐条转述它们的白话表。单列理由同 `ZIWEI_CONTENT_SOURCES`：
+#: 主八字盘不引用它们，且赋分是本系统模型参数而非古籍语料，出处串自己说清了这一点。
 SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("synastry_scoring", SYNASTRY_SOURCE),
+    ("synastry_plain", SYNASTRY_PLAIN_SOURCE),
 )

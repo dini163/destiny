@@ -19,7 +19,9 @@ score is a self-explaining ledger whose weights are curated in :mod:`app.content
 — every figure carries its own arithmetic, nothing is mocked.
 """
 
-from app.content import CONTENT_VERSION, SYNASTRY_CONTENT_SOURCES
+from collections.abc import Sequence
+
+from app.content import CONTENT_VERSION, SYNASTRY_CONTENT_SOURCES, synastry_plain
 from app.content.synastry import (
     SYNASTRY_ASPECT_DELTA,
     SYNASTRY_ASPECT_ZH,
@@ -32,6 +34,8 @@ from app.content.synastry import (
     SYNASTRY_SOURCE,
     synastry_tier,
 )
+from app.engines.plain_compose import compose, compose_template, dedupe, reading
+from app.engines.plain_corpora import SYNASTRY
 from app.engines.western import (  # shared, golden-tested astrology primitives
     ASPECTS,
     SIGNS,
@@ -114,6 +118,46 @@ def _chart_points(chart: WesternChart) -> list[tuple[str, str, str, float]]:
     return points
 
 
+def _aspect_plain(point_a: str, point_b: str, aspect_type: str) -> str:
+    """一条相位一句白话：受控 frame + 两端受控点义，逐字填槽，不现编任何连接词。
+
+    `{a}` 恒为甲方、`{b}` 恒为乙方——方向就是这一行的读法，前端那行也按同一次序排。
+    """
+    return compose_template(
+        reading(SYNASTRY, synastry_plain.aspect_frame_key(aspect_type)),
+        {
+            "a": reading(SYNASTRY, synastry_plain.point_key(point_a)),
+            "b": reading(SYNASTRY, synastry_plain.point_key(point_b)),
+        },
+    )
+
+
+def synastry_plain_summary(aspects: Sequence[SynastryAspect], tier: str) -> str:
+    """响应级总论：只重排已经命中的核心羁绊，顺逆次序由赋分表自己的基准分定。
+
+    同一组星名在两个方向上各检出一次是合盘的常态（`_synastry_aspects` 按 A×B **有序**遍历，
+    本页那对 Greenwich 实盘 56 行只对应 47 个无序对，复测：对 `_chart().synastry_aspects`
+    数一次 `len(rows)` 与 `len({tuple(sorted((p.point_a, p.point_b)))})` → `56 47`），
+    所以一条核心轴可能被命中两回。`dedupe` 留第一次，而 `aspects` 按容许度升序排过——
+    被留下的那次是更紧的那个相位（裁定 R12）。
+    """
+    return compose(
+        SYNASTRY,
+        "summary",
+        dedupe(
+            [
+                (
+                    synastry_plain.bond_key(aspect.point_a, aspect.point_b),
+                    SYNASTRY_ASPECT_DELTA[aspect.type],
+                )
+                for aspect in aspects
+                if aspect.core_bond
+            ]
+        ),
+        tier,
+    )
+
+
 def _synastry_aspects(
     points_a: list[tuple[str, str, str, float]],
     points_b: list[tuple[str, str, str, float]],
@@ -144,6 +188,7 @@ def _synastry_aspects(
                         core_bond=bond in SYNASTRY_CORE_BONDS,
                         counted=(name_a in SYNASTRY_PERSONAL_POINTS)
                         and (name_b in SYNASTRY_PERSONAL_POINTS),
+                        plain=_aspect_plain(name_a, name_b, aspect_name),
                     )
             if best is not None:
                 aspects.append(best)
@@ -322,6 +367,7 @@ def compute_synastry(
         synastry_aspects=aspects,
         composite=composite,
         score=score,
+        plain_summary=synastry_plain_summary(aspects, score.tier),
         provenance=SynastryProvenance(
             engine="pyswisseph", note=NOTE, method=SYNASTRY_METHOD, tables=tables
         ),

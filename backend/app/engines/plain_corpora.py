@@ -7,12 +7,19 @@
 
 from __future__ import annotations
 
-from app.content import name_plain
+from app.content import name_plain, synastry_plain
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.name_numerology import NUMBERS
 from app.content.name_sancai import SANCAI_RELATIONS
+from app.content.synastry import SYNASTRY_CORE_BONDS
 from app.engines.plain_compose import PlainCorpus
+
+# `plain_corpora → engines/western` 是 `engines → engines`，AGENTS.md §1 只禁 `engines → api`，
+# 这条合法。**不许**改成 `from app.engines.synastry import _AXIS_ZH`——`synastry.py` 反过来要
+# import 本模块取 `SYNASTRY`，那就是循环。两轴的字面量因此留在 `_synastry_universe()` 里，
+# 由本系统 golden 测的那条 `_AXIS_ZH` 对账条款守住它不漂。
+from app.engines.western import ASPECTS, PLANETS
 
 
 def _bazi_universe() -> set[str]:
@@ -63,8 +70,40 @@ NAME = PlainCorpus(
     universe=_name_universe,
 )
 
+
+def _synastry_universe() -> set[str]:
+    """合盘的键全集 = 12 点义 + 5 相位框架句 + 5 核心羁绊 = 22。
+
+    三个来源各自现算，不写第二份名单（spec §4 的「少建、多建同样红」）：十大行星取
+    `engines/western.PLANETS` 的第一元，五种相位取 `western.ASPECTS` 的第一元（合盘与
+    本命盘共用这张表——`engines/synastry.py` 是从 `engines.western` import 它，不复制），
+    五条轴取 `content/synastry.py` 的 `SYNASTRY_CORE_BONDS`。ASC/MC 是本函数里唯一的
+    字面量，理由见本文件上面的 import 注。
+    """
+    return (
+        {synastry_plain.point_key(name) for name, *_ in PLANETS}
+        | {synastry_plain.point_key(name) for name in ("ASC", "MC")}
+        | {synastry_plain.aspect_frame_key(name) for name, *_ in ASPECTS}
+        | {synastry_plain.bond_key(*pair) for pair in SYNASTRY_CORE_BONDS}
+    )
+
+
+SYNASTRY = PlainCorpus(
+    system="synastry",
+    entries=synastry_plain.SYNASTRY_READINGS,
+    openers={"summary": synastry_plain.SYNASTRY_SUMMARY_OPENER},
+    closers=synastry_plain.SYNASTRY_TIER_CLOSERS,
+    # 分带符号直接是赋分表自己的 `SYNASTRY_ASPECT_DELTA[type]`（1.5/2.0/3.0/-2.5/-2.0，
+    # 无一为 0，所以 band 分支的 0 值闸在这套数据上永不触发；真触发说明有人改了表）。
+    # 「顺的一侧在前」因此就是表说的「和谐在前、挑战在后」，白话层没有自己排过一次序（G2）。
+    grouping="band",
+    universe=_synastry_universe,
+    slot_prefixes=frozenset({"synastry.point."}),
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
     BAZI.system: BAZI,
     NAME.system: NAME,
+    SYNASTRY.system: SYNASTRY,
 }
