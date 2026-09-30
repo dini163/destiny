@@ -49,6 +49,8 @@ export interface NameGrid {
   pattern_name: string | null;
   verdict: string | null;
   source: string;
+  /** 该格白话段：开篇句 + 数理转述，两行以 `\n` 分隔（引擎装配，前端不拼句）。 */
+  plain: string;
 }
 
 export interface SancaiElements {
@@ -68,6 +70,7 @@ export interface Sancai {
   elements: SancaiElements;
   pairs: SancaiPair[];
   tier: string;
+  plain: string;
 }
 
 export interface CorpusProvenance {
@@ -96,6 +99,8 @@ export interface NameAnalysis {
   grids: NameGrid[];
   sancai: Sancai | null;
   score: ScoreValue | null;
+  /** 响应级白话总论：顺/注意两侧重排，末尾落综合档位（算不出分时不出档位句）。 */
+  plain_summary: string;
   warnings: string[];
   provenance: NameProvenance;
 }

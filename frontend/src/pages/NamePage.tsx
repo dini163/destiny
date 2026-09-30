@@ -7,6 +7,7 @@ import { NameSummaryScore } from '../components/name/NameSummaryScore';
 import { SancaiStrip } from '../components/name/SancaiStrip';
 import { Icon } from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
+import { PlainProse } from '../components/ui/PlainProse';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useNameAnalysis } from '../hooks/useNameAnalysis';
@@ -69,7 +70,15 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
       title: '五格剖象全景图谱',
       eyebrow: 'FIVE GRIDS',
       icon: 'compass',
-      body: <FiveGrids grids={analysis.grids} />,
+      body: (
+        <>
+          <FiveGrids grids={analysis.grids} />
+          <PlainProse
+            text={analysis.plain_summary}
+            className="rounded-card border border-rim bg-surface p-4"
+          />
+        </>
+      ),
     },
     analysis.sancai
       ? {

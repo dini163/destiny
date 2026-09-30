@@ -1,0 +1,151 @@
+{
+  "input": {
+    "surname": "张",
+    "given": "𠀋",
+    "resolved_traditional": "張𠀋",
+    "modality": "单姓单名",
+    "modality_formula": "天格=姓+1；人格=姓末+名首；地格=名+1；总格=全字笔画和；外格=总格−人格+1"
+  },
+  "chars": [
+    {
+      "char": "张",
+      "resolved": "張",
+      "simplified": [
+        "张"
+      ],
+      "kangxi_strokes": 11,
+      "radical_no": 57,
+      "residual_strokes": 8,
+      "radical_char": "弓",
+      "radical_strokes": 3,
+      "readings": [
+        {
+          "pinyin": "zhang",
+          "tone_number": 1,
+          "tone_name": "阴平"
+        }
+      ],
+      "stroke_source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）"
+    },
+    {
+      "char": "𠀋",
+      "resolved": "𠀋",
+      "simplified": [],
+      "kangxi_strokes": null,
+      "radical_no": null,
+      "residual_strokes": null,
+      "radical_char": null,
+      "radical_strokes": null,
+      "readings": [],
+      "stroke_source": null
+    }
+  ],
+  "grids": [
+    {
+      "key": "tian",
+      "label": "天格",
+      "formula": "11+1",
+      "value": 12,
+      "number": 12,
+      "fortune": "凶",
+      "yinyang": "阴",
+      "wuxing": "木",
+      "pattern_name": "掘井无泉",
+      "verdict": "无理之数，发展薄弱，虽生不足，难酬志向",
+      "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）·数理12·",
+      "plain": "天格看的是你与长辈、门第这一段的关系，它由姓的那一端算出来，是你出生时就带着的部分。\n掘井而无水，表的口径是根基薄、供给不足，你在这一格里付出的力气常常打不出泉水来，志愿大而来源小，落差比旁人更明显。"
+    },
+    {
+      "key": "ren",
+      "label": "人格",
+      "formula": "11+?",
+      "value": null,
+      "number": null,
+      "fortune": null,
+      "yinyang": null,
+      "wuxing": null,
+      "pattern_name": null,
+      "verdict": null,
+      "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）",
+      "plain": "人格是五格里最贴近当下你自己的那一格，你办事时别人感受到的，多半是这一格的数。\n这一格的笔画在本系统语料里没有核定，数理与吉凶因此都出不来，白话只能把空缺照实说给你，它不是凶格，是没有可转述的那一句。"
+    },
+    {
+      "key": "di",
+      "label": "地格",
+      "formula": "?+1",
+      "value": null,
+      "number": null,
+      "fortune": null,
+      "yinyang": null,
+      "wuxing": null,
+      "pattern_name": null,
+      "verdict": null,
+      "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）",
+      "plain": "地格由名的笔画合成，看的是你脚下一段的基础与早年的际遇，你从什么地方起步由它说。\n这一格的笔画在本系统语料里没有核定，数理与吉凶因此都出不来，白话只能把空缺照实说给你，它不是凶格，是没有可转述的那一句。"
+    },
+    {
+      "key": "wai",
+      "label": "外格",
+      "formula": "总格−人格+1",
+      "value": null,
+      "number": null,
+      "fortune": null,
+      "yinyang": null,
+      "wuxing": null,
+      "pattern_name": null,
+      "verdict": null,
+      "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）",
+      "plain": "外格算的是总格与人格之差再加一，你在自家圈子之外怎么被人接住，看的是这一格。\n这一格的笔画在本系统语料里没有核定，数理与吉凶因此都出不来，白话只能把空缺照实说给你，它不是凶格，是没有可转述的那一句。"
+    },
+    {
+      "key": "zong",
+      "label": "总格",
+      "formula": "11+?",
+      "value": null,
+      "number": null,
+      "fortune": null,
+      "yinyang": null,
+      "wuxing": null,
+      "pattern_name": null,
+      "verdict": null,
+      "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）",
+      "plain": "总格是全部笔画之和，你走完一圈之后落在什么气象上，五格里由它负责那个整体。\n这一格的笔画在本系统语料里没有核定，数理与吉凶因此都出不来，白话只能把空缺照实说给你，它不是凶格，是没有可转述的那一句。"
+    }
+  ],
+  "sancai": null,
+  "score": null,
+  "plain_summary": "把五格合起来看，你手上的顺与吃力就有了次序，这一段按两侧重排一遍已经说过的话。\n掘井而无水，表的口径是根基薄、供给不足，你在这一格里付出的力气常常打不出泉水来，志愿大而来源小，落差比旁人更明显。",
+  "warnings": [
+    "stroke_unresolved:𠀋"
+  ],
+  "provenance": {
+    "corpus": {
+      "unicode_version": "18.0.0",
+      "corpus_date": "2026-07-31",
+      "size": 30717,
+      "source": "《康熙字典》部首体系笔画，由 Unihan kRSUnicode + kTotalStrokes 推导（Unicode 18.0.0，30717 条）"
+    },
+    "tables": [
+      {
+        "name": "kangxi_strokes",
+        "version": "2026.09",
+        "source": "《康熙字典》部首体系笔画（Unihan kRSUnicode + kTotalStrokes 推导，非手抄）"
+      },
+      {
+        "name": "name_numerology",
+        "version": "2026.09",
+        "source": "熊崎氏姓名学八十一数理（通行表整理，非古籍）"
+      },
+      {
+        "name": "name_sancai",
+        "version": "2026.09",
+        "source": "三才配置生克关系（依五行生克图推导，措辞为通行姓名学整理，非古籍原文）"
+      },
+      {
+        "name": "name_plain",
+        "version": "2026.09",
+        "source": "本系统白话转述 · 逐条对应 name_numerology 数理与 name_sancai 三才关系"
+      }
+    ]
+  }
+}

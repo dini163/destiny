@@ -13,34 +13,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { DimensionGrid } from '../../../src/components/bazi/DimensionGrid';
 import type { BaziChart } from '../../../src/types/bazi';
+import { paragraphByExact, precedes } from '../../lib/prose';
 import { readFixture } from '../../lib/readFixture';
 
 const natal = readFixture('bazi-natal') as BaziChart;
 const reading = natal.interpretation;
 
 afterEach(cleanup);
-
-/** 文档序：a 在 b 之前为真。 */
-function precedes(a: Element, b: Element): boolean {
-  return (
-    a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
-  ) !== 0;
-}
-
-/**
- * 段落定位一律取全文相等，不留子串查找那条路：白话段与判语段各自就是一个 `<p>` 的
- * `textContent`，整段比一次就把「渲染的是全文而不是首行」一并钉死；子串版要靠
- * 「前 12 字在夹具里唯一」这条夹具事实才不错位，语料一改就可能配错 `<p>` 而静默变绿。
- * 总论那一条更是只能用全文：`PLAIN_SUMMARY_FRAME` 把 `summary` 原句嵌在白话总论里
- * （实测 `plain_summary.includes(summary)` → true），子串查找会先命中前者的 `<p>`，
- * 于是拿同一个元素和自己比 DOM 序，`compareDocumentPosition` 返回 0，断言必假红。
- * 复测：`cd frontend && node -e "const c=require('./tests/fixtures/bazi-natal.json'); console.log(c.interpretation.plain_summary.includes(c.interpretation.summary))"`
- */
-function paragraphByExact(text: string): Element {
-  const el = [...document.querySelectorAll('p')].find((p) => p.textContent === text);
-  if (!el) throw new Error(`找不到文本全等的 <p>：${text.slice(0, 20)}`);
-  return el;
-}
 
 describe('DimensionGrid 白话区块', () => {
   it('每一维的白话段排在专业判语之前', () => {

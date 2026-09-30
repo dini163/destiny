@@ -1,3 +1,4 @@
+import { PlainProse } from '../ui/PlainProse';
 import { SourceNote } from '../ui/SourceNote';
 import { wuxingBg, wuxingLabelEn, wuxingText } from '../../lib/wuxing';
 import type { NameGrid, Sancai } from '../../types/name';
@@ -9,6 +10,7 @@ const ORDER = ['tian', 'ren', 'di'] as const;
  *
  * 只报生/克/比关系与由此推导的档位——不引入 125 行手抄吉凶表（spec 决策四）。
  * 调用方保证 `sancai` 非空，整块缺失时由页面负责不渲染本区。
+ * 三才整块一段白话（`sancai.plain`）排在上方，逐对生克判语降为下方小字（spec §10 清单类）。
  */
 export function SancaiStrip({ sancai, grids }: { sancai: Sancai; grids: NameGrid[] }) {
   const valueOf = (key: (typeof ORDER)[number]): number | null =>
@@ -35,6 +37,8 @@ export function SancaiStrip({ sancai, grids }: { sancai: Sancai; grids: NameGrid
           );
         })}
       </div>
+
+      <PlainProse text={sancai.plain} />
 
       <ul className="flex flex-col gap-2">
         {sancai.pairs.map((pair) => (

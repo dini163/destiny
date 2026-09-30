@@ -1,3 +1,4 @@
+import { PlainProse } from '../ui/PlainProse';
 import { SourceNote } from '../ui/SourceNote';
 import { wuxingChip, wuxingLabelEn } from '../../lib/wuxing';
 import type { NameFortune, NameGrid } from '../../types/name';
@@ -15,6 +16,9 @@ const FORTUNE_TONE: Record<NameFortune, string> = {
  *
  * 卡片顺序与 `grids` 一致（后端固定 天→人→地→外→总），算式与结果并排显示，
  * 使"这一格怎么来的"在卡面上就能核对；缺笔画的卡只显算式里的 `?`，不显数字。
+ * 阅读顺序按 spec §10 的清单类版式就地嵌：每格白话（`grid.plain`）在上，专业判语
+ * （`grid.verdict`）降为下方小字。未核定那一格说什么由语料 `name.unresolved` 决定，
+ * 本件不现编文案——本件只决定顺序，不决定句子。
  */
 export function FiveGrids({ grids }: { grids: NameGrid[] }) {
   return (
@@ -58,9 +62,10 @@ export function FiveGrids({ grids }: { grids: NameGrid[] }) {
             <p className="font-display text-sm text-ink">{grid.pattern_name}</p>
           ) : null}
 
-          <p className="text-xs leading-relaxed text-ink-variant">
-            {grid.verdict ?? '笔画未核定，本格不出断语。'}
-          </p>
+          <PlainProse text={grid.plain} />
+          {grid.verdict ? (
+            <p className="text-xs leading-relaxed text-ink-variant">{grid.verdict}</p>
+          ) : null}
           <div className="mt-auto pt-1">
             <SourceNote source={grid.source} />
           </div>
