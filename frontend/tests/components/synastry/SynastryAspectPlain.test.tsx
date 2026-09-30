@@ -8,13 +8,17 @@
  * 看不出差别，所以这一条直接钉整句原文。
  *
  * 两处测法说明（都为了「字段为空时不许绿」）：长度钉一律取 40，而实测语料里最短的一句
- * 是 63 字（复测见下），所以 40 既能挡住 undefined/空串，又留了语料改短前的余量；
+ * 是 62 字（复测见下），所以 40 既能挡住 undefined/空串，又留了语料改短前的余量；
  * 整句定位用 `paragraphByExactIn`（全文相等、只在本行容器内找）而不是子串 `toContain`，
  * 因为这份语料里两行可以印出逐字相同的句子，子串查找会配到别处而静默变绿。
  *
- * 复测口径（2026-09-30 实算，同一对生辰）：56 行 / 计入 8 行 / 首行 冥王星 六合 天王星 0.05°
+ * 复测口径（2026-09-30 实算，同一对生辰；同日 fix 轮 1 文案改写后重取）：
+ * 56 行 / 计入 8 行 / 首行 冥王星 六合 天王星 0.05°
  *   cd frontend && npx vitest run tests/components/synastry/SynastryAspectPlain.test.tsx
- * 语料整句长度区间 63..77（Moon△ASC 那句 70 字）：
+ * 语料整句长度：720 个全组合 60..80，本盘这 56 行 62..79（Moon△ASC 那句 67 字）。
+ * 后两个数按行取，用上面那份重录后的夹具（仓库根，路径按根算）：
+ *   PYTHONIOENCODING=utf-8 backend/.venv/Scripts/python.exe -c "import json;d=json.load(open('frontend/tests/fixtures/synastry.json',encoding='utf-8'));a=d['synastry_aspects'];c=[x for x in a if x['counted']];print(min(len(x['plain']) for x in a),max(len(x['plain']) for x in a),len(c[0]['plain']))"
+ * 全组合那对数在 backend/ 下取：
  *   cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.synastry import _aspect_plain; from app.engines.plain_corpora import SYNASTRY; pts=[k.split('.')[-1] for k in SYNASTRY.entries if 'synastry.point' in k]; fr=[k.split('.')[-1] for k in SYNASTRY.entries if 'synastry.aspect' in k]; L=[len(_aspect_plain(a,b,f)) for a in pts for b in pts for f in fr]; print(min(L),max(L),len(_aspect_plain('Moon','ASC','trine')))"
  */
 import { cleanup, fireEvent, render, within } from '@testing-library/react';
@@ -51,7 +55,7 @@ describe('SynastryAspectList 的白话第二行（多系统白话 Task 6）', ()
       paragraphByExactIn(
         first,
         '你的情绪与安全感，与对方的待人接物的门面相隔一百二十度，气性本属一路，流过去不费力，' +
-          '你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。',
+          '你在这一段上很少遇到阻力，和谐是这一格自己的口径。',
       ),
     ).toBeInTheDocument();
   });

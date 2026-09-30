@@ -11,22 +11,23 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "cups-12",
-      "name": "Knight of Cups",
-      "name_zh": "圣杯骑士",
-      "arcana": "minor",
-      "number": 12,
-      "suit": "cups",
-      "rank": "Knight",
-      "element": "water",
+      "card_id": "major-05",
+      "name": "The Hierophant",
+      "name_zh": "教皇",
+      "arcana": "major",
+      "number": 5,
+      "suit": null,
+      "rank": null,
+      "element": null,
       "orientation": "upright",
       "keywords": [
-        "romance",
-        "charm",
-        "prince charming",
-        "following the heart"
+        "spiritual wisdom",
+        "tradition",
+        "conformity",
+        "institutions",
+        "mentorship"
       ],
-      "meaning": "The knight rides slowly, cup extended, a romantic idealist following the call of the heart."
+      "meaning": "The Hierophant transmits established wisdom and tradition, pointing to teachers, institutions and shared belief."
     },
     {
       "position_index": 1,
@@ -34,22 +35,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "cups-05",
-      "name": "Five of Cups",
-      "name_zh": "圣杯五",
+      "card_id": "pentacles-06",
+      "name": "Six of Pentacles",
+      "name_zh": "星币六",
       "arcana": "minor",
-      "number": 5,
-      "suit": "cups",
+      "number": 6,
+      "suit": "pentacles",
       "rank": null,
-      "element": "water",
-      "orientation": "reversed",
+      "element": "earth",
+      "orientation": "upright",
       "keywords": [
-        "personal setbacks",
-        "self-forgiveness",
-        "moving on",
-        "acceptance"
+        "giving",
+        "receiving",
+        "sharing wealth",
+        "generosity"
       ],
-      "meaning": "Reversed, grief softens into acceptance and the surviving cups are at last reclaimed."
+      "meaning": "A merchant pours coins to kneeling beggars, weighing generosity and the balance of give and take."
     },
     {
       "position_index": 2,
@@ -57,32 +58,32 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "wands-03",
-      "name": "Three of Wands",
-      "name_zh": "权杖三",
+      "card_id": "wands-14",
+      "name": "King of Wands",
+      "name_zh": "权杖国王",
       "arcana": "minor",
-      "number": 3,
+      "number": 14,
       "suit": "wands",
-      "rank": null,
+      "rank": "King",
       "element": "fire",
-      "orientation": "upright",
+      "orientation": "reversed",
       "keywords": [
-        "preparation",
-        "foresight",
-        "enterprise",
-        "expansion"
+        "impulsiveness",
+        "haste",
+        "ruthless",
+        "high expectations"
       ],
-      "meaning": "Ships sail home as the figure watches from a cliff, the first returns of ventures launched with foresight."
+      "meaning": "Reversed, leadership curdles into tyranny or impulsive overreach driven by unrealistic expectations."
     }
   ],
   "drawn_ids": [
-    "cups-12",
-    "cups-05",
-    "wands-03"
+    "major-05",
+    "pentacles-06",
+    "wands-14"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Knight of Cups (圣杯骑士) upright, highlighting romance, charm, prince charming. Present (现在) draws Five of Cups (圣杯五) reversed, highlighting personal setbacks, self-forgiveness, moving on. Future (未来) draws Three of Wands (权杖三) upright, highlighting preparation, foresight, enterprise. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
-  "major_arcana_count": 0,
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws The Hierophant (教皇) upright, highlighting spiritual wisdom, tradition, conformity. Present (现在) draws Six of Pentacles (星币六) upright, highlighting giving, receiving, sharing wealth. Future (未来) draws King of Wands (权杖国王) reversed, highlighting impulsiveness, haste, ruthless. 1 Major Arcana card(s) mark the significant, fated threads running through an otherwise everyday situation. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
+  "major_arcana_count": 1,
   "reversed_count": 1,
   "rng": "secrets",
   "engine": "content-library"
