@@ -11,23 +11,22 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "major-05",
-      "name": "The Hierophant",
-      "name_zh": "教皇",
-      "arcana": "major",
-      "number": 5,
-      "suit": null,
+      "card_id": "wands-09",
+      "name": "Nine of Wands",
+      "name_zh": "权杖九",
+      "arcana": "minor",
+      "number": 9,
+      "suit": "wands",
       "rank": null,
-      "element": null,
+      "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "spiritual wisdom",
-        "tradition",
-        "conformity",
-        "institutions",
-        "mentorship"
+        "courage",
+        "persistence",
+        "test of faith",
+        "resilience"
       ],
-      "meaning": "The Hierophant transmits established wisdom and tradition, pointing to teachers, institutions and shared belief."
+      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance."
     },
     {
       "position_index": 1,
@@ -35,22 +34,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "pentacles-06",
-      "name": "Six of Pentacles",
-      "name_zh": "星币六",
+      "card_id": "cups-03",
+      "name": "Three of Cups",
+      "name_zh": "圣杯三",
       "arcana": "minor",
-      "number": 6,
-      "suit": "pentacles",
+      "number": 3,
+      "suit": "cups",
       "rank": null,
-      "element": "earth",
+      "element": "water",
       "orientation": "upright",
       "keywords": [
-        "giving",
-        "receiving",
-        "sharing wealth",
-        "generosity"
+        "celebration",
+        "friendship",
+        "creativity",
+        "collaborations"
       ],
-      "meaning": "A merchant pours coins to kneeling beggars, weighing generosity and the balance of give and take."
+      "meaning": "Three women raise their cups in joyful dance, celebrating friendship, community and shared creativity."
     },
     {
       "position_index": 2,
@@ -58,33 +57,33 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "wands-14",
-      "name": "King of Wands",
-      "name_zh": "权杖国王",
+      "card_id": "swords-01",
+      "name": "Ace of Swords",
+      "name_zh": "宝剑王牌",
       "arcana": "minor",
-      "number": 14,
-      "suit": "wands",
-      "rank": "King",
-      "element": "fire",
-      "orientation": "reversed",
+      "number": 1,
+      "suit": "swords",
+      "rank": null,
+      "element": "air",
+      "orientation": "upright",
       "keywords": [
-        "impulsiveness",
-        "haste",
-        "ruthless",
-        "high expectations"
+        "raw power",
+        "victory",
+        "breakthroughs",
+        "mental clarity"
       ],
-      "meaning": "Reversed, leadership curdles into tyranny or impulsive overreach driven by unrealistic expectations."
+      "meaning": "A crowned hand raises a double-edged sword through cloud, the sharp clarity of a decisive breakthrough."
     }
   ],
   "drawn_ids": [
-    "major-05",
-    "pentacles-06",
-    "wands-14"
+    "wands-09",
+    "cups-03",
+    "swords-01"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws The Hierophant (教皇) upright, highlighting spiritual wisdom, tradition, conformity. Present (现在) draws Six of Pentacles (星币六) upright, highlighting giving, receiving, sharing wealth. Future (未来) draws King of Wands (权杖国王) reversed, highlighting impulsiveness, haste, ruthless. 1 Major Arcana card(s) mark the significant, fated threads running through an otherwise everyday situation. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
-  "major_arcana_count": 1,
-  "reversed_count": 1,
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Nine of Wands (权杖九) upright, highlighting courage, persistence, test of faith. Present (现在) draws Three of Cups (圣杯三) upright, highlighting celebration, friendship, creativity. Future (未来) draws Ace of Swords (宝剑王牌) upright, highlighting raw power, victory, breakthroughs. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. Every card fell upright, suggesting these energies express themselves clearly and without obstruction.",
+  "major_arcana_count": 0,
+  "reversed_count": 0,
   "rng": "secrets",
   "engine": "content-library"
 }

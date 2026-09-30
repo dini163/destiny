@@ -2,6 +2,7 @@
  * 梅花易数 (Plum Blossom Numerology) API types mirroring `backend/app/schemas/meihua.py`.
  * snake_case is preserved end-to-end.
  */
+import type { ProvenanceTable } from './common';
 
 /** How the hexagram is raised (起卦法). */
 export type MeihuaMethod = 'time' | 'number';
@@ -91,6 +92,15 @@ export interface ScoreFactor {
   delta: number;
 }
 
+/** 出处块：镜像 `schemas/meihua.py:MeihuaProvenance`。 */
+export interface MeihuaProvenance {
+  engine: string;
+  /** 起卦与卦气的算式口径原文，读者拿它能核对响应里的数。 */
+  method: string;
+  /** 本端点真读到的五张语料表，不多不少。 */
+  tables: ProvenanceTable[];
+}
+
 /** Complete 梅花易数 cast produced by the backend engine. */
 export interface MeihuaCast {
   method: MeihuaMethod;
@@ -119,6 +129,9 @@ export interface MeihuaCast {
   score_factors: ScoreFactor[];
   verdict: string;
   summary: string;
+  /** 白话总论：体用 + 两侧取象与卦气 + 档位收尾，行间以 \n 分段。 */
+  plain_summary: string;
+  provenance: MeihuaProvenance;
 
   engine: string;
 }

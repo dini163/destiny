@@ -1,6 +1,7 @@
 import type { MeihuaCast, TiYongParty } from '../../types/meihua';
 import { relationChip } from '../../lib/meihua';
 import { wuxingChip, wuxingText } from '../../lib/wuxing';
+import { PlainProse } from '../ui/PlainProse';
 
 interface TiYongPanelProps {
   /** The complete cast — supplies 体卦 / 用卦, the 生克 verdict and the 卦气 context. */
@@ -20,6 +21,9 @@ const ROLE_META: Record<string, { title: string; gloss: string }> = {
  * 卦气旺衰 state under the current 月令; the banner then states the primary
  * 生克 relation (用生体 / 比和 / 体克用 / 体生用 / 用克体) and its judgement. All
  * text is the engine's own; the panel only colours and arranges it.
+ *
+ * 阅读顺序按 spec §10 的裁定 R8 排：白话整段（`plain_summary`）在上，技术判语
+ * （`tiyong.text`）降为脚注一小行。面板自己一个字都不写，两段的字都来自引擎。
  */
 export function TiYongPanel({ cast }: TiYongPanelProps) {
   const { ti, yong, tiyong, wangshuai } = cast;
@@ -50,7 +54,8 @@ export function TiYongPanel({ cast }: TiYongPanelProps) {
             {tiyong.verdict}
           </span>
         </div>
-        <p className="font-display text-sm leading-relaxed text-ink-variant">{tiyong.text}</p>
+        <PlainProse text={cast.plain_summary} className="rounded-element border border-rim-soft bg-[#0e111a] p-3" />
+        <p className="text-xs leading-relaxed text-ink-muted">{tiyong.text}</p>
       </div>
     </div>
   );

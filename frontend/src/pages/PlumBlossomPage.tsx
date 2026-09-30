@@ -5,6 +5,7 @@ import { MeihuaControls } from '../components/meihua/MeihuaControls';
 import { MeihuaScoreLedger } from '../components/meihua/MeihuaScoreLedger';
 import { TiYongPanel } from '../components/meihua/TiYongPanel';
 import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useMeihua } from '../hooks/useMeihua';
 import { meihuaMethodLabel, movingPositionLabel } from '../lib/meihua';
@@ -204,7 +205,7 @@ function AnalysisBlock({ label, text }: { label: string; text: string }) {
   );
 }
 
-/** Methodology + provenance note anchored to the real cast engine. */
+/** 出处与免责：页面只印本地成立的两件事实，出处一律取后端的 `provenance` 块。 */
 function Provenance({ cast }: { cast: MeihuaCast }) {
   return (
     <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -214,10 +215,14 @@ function Provenance({ cast }: { cast: MeihuaCast }) {
           <span className="font-display text-base text-ink">起卦溯源与免责</span>
           <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
             本次以 <span className="text-gold-soft">{meihuaMethodLabel(cast.method)}</span> 起卦，由{' '}
-            <span className="text-gold-soft">{cast.engine}</span> 依邵雍《梅花易数》体用法真实推演：农历月日时辰与月令由{' '}
-            <span className="text-gold-soft">lunar-python</span> 定数，卦象卦辞取自策展《周易》数据，起卦纯为确定性运算。
+            <span className="text-gold-soft">{cast.engine}</span> 真实推演，起卦与体用的算式和它读过的每一张表都在下面这张清单里。
             梅花易数为传统象数自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。
           </p>
+          <ProvenancePanel
+            tables={cast.provenance.tables}
+            meta={[{ label: '历法引擎', value: cast.provenance.engine }]}
+            notes={[cast.provenance.method]}
+          />
         </div>
       </div>
       <span className="label-caps shrink-0 text-ink-muted">ENGINE · {cast.engine}</span>
