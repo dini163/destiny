@@ -1,6 +1,6 @@
 """轴 2 的机器侧：分层 import 方向、每系统后端四件、抽签引擎随机源、golden 覆盖齐备。
 
-判据文字见仓库根 `AGENTS.md`（第 1/2/5 条）；本模块只用 stdlib（ast + pathlib）读
+判据文字见仓库根 `AGENTS.md`（第 1/2/5 条）；本模块只用 stdlib（ast + sys + pathlib）读
 `app/**.py` 的源码文本，不 import 被测代码，故任何引擎崩了都影响不到这里。
 
 棘轮而非硬门：现状里已裁定的例外写进 BASELINE / 例外集合（附裁定理由与 ledger 行号），
@@ -10,6 +10,7 @@
 """
 
 import ast
+import sys
 from pathlib import Path
 
 import pytest
@@ -100,6 +101,45 @@ def test_draw_engines_use_csprng(engine: str) -> None:
     source = (APP / "engines" / f"{engine}.py").read_text(encoding="utf-8")
     assert "import secrets" in source, f"{engine}.py 必须用 secrets（PRD §4.1 抽签公平性）"
     assert "import random" not in source, f"{engine}.py 不得退回可预测的 random 模块"
+
+
+#: 白话装配器（多系统白话 spec §11）：它是被所有系统共用的公共层，所以它的 import 面
+#: 必须是「公共层该有的形状」。复测（2026-09-30 实测其 import 集）：
+#: `cd backend && grep -n "^from \|^import " app/engines/plain_compose.py` → `__future__`、
+#: `collections.abc`、`dataclasses`、`typing` 四条，全部 stdlib。
+PLAIN_COMPOSER = APP / "engines" / "plain_compose.py"
+
+
+def test_plain_composer_imports_only_stdlib_and_content() -> None:
+    """spec §11：`engines/plain_compose.py` 的 import 集只含 stdlib 与 `app.content.*`。
+
+    守的是装配器的中立性：它读的每一张账本都得由 `plain_corpora` 的登记表递进来，而不是自己伸手
+    去拿。**装配器一旦开始引某张账本，第四个系统就能从装配器里读到别人的模型参数**——那时
+    「一张表一条白话」的对应关系还在，输出却已经不再只由登记表决定，而登记表是这套东西唯一的
+    机检闸入口（AGENTS.md §2 的白话层分工）。
+
+    与 `_imports_of` 一样只看绝对 import（全仓无相对 import）。今天必绿；红的那一种形状是有人
+    往装配器里写了 `from app.engines.<sys> import …` 或 `from app.schemas.… import …`。
+    """
+    tree = ast.parse(PLAIN_COMPOSER.read_text(encoding="utf-8"))
+    tops: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module:
+                tops.add(node.module)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                tops.add(alias.name)
+    offenders = sorted(
+        name
+        for name in tops
+        if name.split(".")[0] not in sys.stdlib_module_names
+        and not name.startswith("app.content.")
+    )
+    assert not offenders, (
+        f"plain_compose.py 引入了账本之外的依赖: {offenders}；"
+        "公共装配器只准 import stdlib 与 app.content.*（多系统白话 spec §11）"
+    )
 
 
 #: `meta` 是平台级路由（health、城市检索），不是测算系统，不入七件套清单。

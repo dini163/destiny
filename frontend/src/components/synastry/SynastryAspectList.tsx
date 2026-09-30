@@ -22,8 +22,9 @@ interface SynastryAspectListProps {
  *
  * Each row reads "甲方 point — aspect — 乙方 point" with the exact orb, the standard
  * nature chip and a 核心 badge for the classic relationship axes, and under that line a
- * second, full-width row carrying the backend's plain reading for this aspect (裁定 R8：
- * 白话在上、逐行专业标注在下；`w-full` 靠 `<li>` 的 `flex-wrap` 把它顶到第二行). A toggle
+ * second, full-width row carrying the backend's plain reading for this aspect
+ * （裁定 R8：本行是 spec §10「条目卡片内白话在上」的唯一例外——整句白话排在逐行专业标注**之后**，
+ * `w-full` 靠 `<li>` 的 `flex-wrap` 把它顶到第二行）. A toggle
  * narrows the 56-ish detected pairs to just the counted ones (both endpoints personal — the
  * rows the score ledger pays for). Colours are presentation only; the type, orb, core and
  * counted flags all come straight from the backend's geometric detection (no-mock rule), and

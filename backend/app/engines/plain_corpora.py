@@ -100,7 +100,10 @@ def _synastry_universe() -> set[str]:
 SYNASTRY = PlainCorpus(
     system="synastry",
     entries=synastry_plain.SYNASTRY_READINGS,
-    openers={"summary": synastry_plain.SYNASTRY_SUMMARY_OPENER},
+    openers={
+        "summary": synastry_plain.SYNASTRY_SUMMARY_OPENER,
+        "summary_none": synastry_plain.SYNASTRY_SUMMARY_NONE_OPENER,
+    },
     closers=synastry_plain.SYNASTRY_TIER_CLOSERS,
     # 分带符号直接是赋分表自己的 `SYNASTRY_ASPECT_DELTA[type]`（1.5/2.0/3.0/-2.5/-2.0，
     # 无一为 0，所以 band 分支的 0 值闸在这套数据上永不触发；真触发说明有人改了表）。

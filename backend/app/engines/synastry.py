@@ -147,22 +147,20 @@ def synastry_plain_summary(aspects: Sequence[SynastryAspect], tier: str) -> str:
     数一次 `len(rows)` 与 `len({tuple(sorted((p.point_a, p.point_b)))})` → `56 47`），
     所以一条核心轴可能被命中两回。`dedupe` 留第一次，而 `aspects` 按容许度升序排过——
     被留下的那次是更紧的那个相位（裁定 R12）。
+
+    零命中的盘走 `openers["summary_none"]`（终审 C1）：不拿一句「下面按两侧重排一遍」去承诺一次空重排。
     """
-    return compose(
-        SYNASTRY,
-        "summary",
-        dedupe(
-            [
-                (
-                    synastry_plain.bond_key(aspect.point_a, aspect.point_b),
-                    SYNASTRY_ASPECT_DELTA[aspect.type],
-                )
-                for aspect in aspects
-                if aspect.core_bond and aspect.counted
-            ]
-        ),
-        tier,
+    bonds = dedupe(
+        [
+            (
+                synastry_plain.bond_key(aspect.point_a, aspect.point_b),
+                SYNASTRY_ASPECT_DELTA[aspect.type],
+            )
+            for aspect in aspects
+            if aspect.core_bond and aspect.counted
+        ]
     )
+    return compose(SYNASTRY, "summary" if bonds else "summary_none", bonds, tier)
 
 
 def _synastry_aspects(

@@ -95,6 +95,15 @@ SYNASTRY_BOND_READINGS: dict[str, str] = {
 #: 否则 56 行会重复 56 次同一句开场）。
 SYNASTRY_SUMMARY_OPENER = "把账本里命中的核心羁绊合起来看，你这段关系最要紧的几条轴各落在顺的一侧还是费劲的一侧，下面按两侧重排一遍。"
 
+#: 零核心羁绊支路的开篇句（终审 C1）。口径与 `name.unresolved` 同一条路：分支要说的话是语料表里的
+#: 一条，不是引擎现编——上面那条「下面按两侧重排一遍」在这条支路上是假话，因为 `items` 是空表。
+#: 复测命不中的盘（2026-09-30 终审扫 1,296 个日期对得 43 个，3.3%）不是本注释的口径，本条只钉一件事：
+#: 这一句只在 `core_bond and counted` 两条都为假的盘上出现，见 `tests/golden/test_synastry_golden.py`。
+SYNASTRY_SUMMARY_NONE_OPENER = (
+    "这一盘没有检到计入账本的核心羁绊，所以这一段不逐条重排，只把档位那一句给你，"
+    "两侧的相处仍按账本条目自己那句读。"
+)
+
 #: 相契度四档收尾句。键 = `content/synastry.SYNASTRY_TIERS` 的档名，一个不多一个不少。
 #: 措辞口径见 G14（裁定 R30）：相契度是逐条相位按「基准分 × 容许度权重 × 核心强调」累加后落阈值
 #: （`content/synastry.py:synastry_tier`），**不是**顺/费劲相位的计数，所以收尾句只说档与表的措辞，

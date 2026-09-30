@@ -1,11 +1,12 @@
 /**
  * 合盘相位行的白话第二行（多系统白话 spec §10 清单类版式，裁定 R8）。
  *
- * 三条腿：① 夹具里每一行都带非空 `plain`（旧夹具没这个字段，若哪次重录漏了，
+ * 四条腿：① 夹具里每一行都带非空 `plain`（旧夹具没这个字段，若哪次重录漏了，
  * 页面会安静地渲染出一排空行，所以这条按数据而不是按 DOM 断）；② 渲染出来的第二行
  * 逐字等于后端那句，不做任何截断与拼接；③ 甲方点义在前、乙方点义在后这个方向不许反——
  * 反了的话「你的情绪与安全感，与对方的待人接物的门面」会变成另一段意思，而 DOM 上
- * 看不出差别，所以这一条直接钉整句原文。
+ * 看不出差别，所以这一条直接钉整句原文。第四条守 R8 那条例外的 DOM 序：白话必须排在
+ * 逐行专业标注**之后**（它是 `<li>` 的最后一个子节点），版式若被反转，前三条腿照样全绿。
  *
  * 两处测法说明（都为了「字段为空时不许绿」）：长度钉一律取 40，而实测语料里最短的一句
  * 是 62 字（复测见下），所以 40 既能挡住 undefined/空串，又留了语料改短前的余量；
@@ -71,5 +72,13 @@ describe('SynastryAspectList 的白话第二行（多系统白话 Task 6）', ()
       expect(aspects[index].plain.length).toBeGreaterThan(40);
       expect(paragraphByExactIn(item, aspects[index].plain)).toBeInTheDocument();
     });
+  });
+
+  it('白话是这一行的最后一行（R8 例外的版式：专业标注在上、白话在行末）', () => {
+    const counted = aspects.filter((aspect) => aspect.counted);
+    const { container } = render(<SynastryAspectList aspects={counted} />);
+    const first = within(container).getAllByRole('listitem')[0];
+    expect(first.lastElementChild?.tagName).toBe('P');
+    expect(first.lastElementChild?.textContent).toBe(counted[0].plain);
   });
 });

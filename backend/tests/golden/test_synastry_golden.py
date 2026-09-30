@@ -392,3 +392,28 @@ def test_plain_summary_relists_the_two_hit_core_axes_banded() -> None:
             "你这一份相契度落在中和可处，表的措辞在这一档是平的，顺与费劲两边都读得进去，轻重由那几条相位自己说，不由这个档位替你定。",
         ]
     )
+
+
+def test_zero_counted_core_bond_summary_does_not_promise_a_reranking() -> None:
+    """一条核心羁绊都没计入时，开篇句必须是「不逐条重排」那一条（终审 C1）。
+
+    输入取 `_chart()` 真盘里那些 `not (core_bond and counted)` 的行：这条测的是装配器在空 `items`
+    上选哪条开篇句，与星历无关，但绝不用手搓的假 `SynastryAspect`（AGENTS.md §9）。
+    """
+    rows = [a for a in _chart().synastry_aspects if not (a.core_bond and a.counted)]
+    assert rows, "参考盘连一条不计入的行都没有，这条测就成了空转"
+    lines = synastry_plain_summary(rows, "和合互补").split("\n")
+    assert lines == [
+        synastry_plain.SYNASTRY_SUMMARY_NONE_OPENER,
+        synastry_plain.SYNASTRY_TIER_CLOSERS["和合互补"],
+    ]
+
+
+def test_counted_core_bonds_still_lead_with_the_reranking_opener() -> None:
+    """常见盘的三行形状（开篇 + 羁绊 + 档位）不许被 C1 改动。"""
+    rows = [a for a in _chart().synastry_aspects if a.core_bond and a.counted]
+    assert rows, "参考盘没有计入的核心羁绊，那 C1 的那条支路才是常态，本测的口径要重定"
+    lines = synastry_plain_summary(rows, "和合互补").split("\n")
+    assert lines[0] == synastry_plain.SYNASTRY_SUMMARY_OPENER
+    assert lines[-1] == synastry_plain.SYNASTRY_TIER_CLOSERS["和合互补"]
+    assert len(lines) > 2
