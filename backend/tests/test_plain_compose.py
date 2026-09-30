@@ -18,6 +18,7 @@ from app.engines.plain_compose import (
     overview,
     reading,
 )
+from app.schemas.kabbalah import GematriaReading
 
 BANDED = PlainCorpus(
     system="demo",
@@ -84,7 +85,8 @@ def test_compose_without_closer_declaration_refuses_a_tier() -> None:
 
 
 def test_compose_emits_no_tier_sentence_when_tier_is_none() -> None:
-    assert "顺的一侧" not in compose(BANDED, "demo", [("demo.a", 1)], None)
+    out = compose(BANDED, "demo", [("demo.a", 1)], None)
+    assert out == "\n".join([BANDED.openers["demo"], BANDED.entries["demo.a"]])
 
 
 @pytest.mark.parametrize("kwargs", [
@@ -131,7 +133,7 @@ KABBALAH_FRAME_REHEARSAL = (
 )
 
 
-def _kabbalah_parts(reading_obj) -> dict[str, str]:
+def _kabbalah_parts(reading_obj: GematriaReading) -> dict[str, str]:
     seph, path = reading_obj.sephirah, reading_obj.path
     return {
         "normalized": reading_obj.normalized,
@@ -167,7 +169,8 @@ def test_overview_reproduces_the_live_kabbalah_synthesis_byte_for_byte(word) -> 
     不是第二份生产文案。**卡巴拉正文若被改动，这条会红**——红了的意义是 Plan B 那张表必须
     跟着改，而不是本装配器坏了。
     """
-    assert KABBALAH_FRAME_REHEARSAL.format(**_kabbalah_parts(compute_gematria(word))) == compute_gematria(word).synthesis
+    result = compute_gematria(word)
+    assert overview(KABBALAH_FRAME_REHEARSAL, _kabbalah_parts(result)) == result.synthesis
 
 
 def test_is_slot_key_only_answers_for_the_declared_slot_vocabulary() -> None:
