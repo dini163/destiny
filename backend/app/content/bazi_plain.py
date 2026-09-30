@@ -3,8 +3,9 @@
 本表不判命、不组句：命中条件在 `engines/bazi_interpret.py`，专业判语与古籍出处在
 `content/bazi_dimensions.py`。这里只做一件事——给每个规则键配一句能读给人听的话。
 
-四条措辞铁律（第 2/3/4 条由 `tests/content/test_bazi_plain_corpus.py` 逐条机检，
-第 1 条的人称部分同进机检、"不给建议"半条归人审）：
+四条措辞铁律（第 2/3 条与第 1 条的人称部分逐条、第 4 条的键全集，今由
+`tests/test_plain_corpora.py` 的工厂机检；"不给建议"半条归人审。唯总论框架句的
+禁字工厂看不见，留在 `tests/content/test_bazi_plain_corpus.py`）：
 
 - 第二人称「你」，陈述倾向不预言，不给医疗/法律/财务建议（与页脚免责声明同口径）。
 - 整表不含「；」「（《」「』」：拼接残留与出处标记一律不进白话（同 spec §3 的机检集合）。
