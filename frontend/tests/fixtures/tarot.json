@@ -11,23 +11,22 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "wands-04",
-      "name": "Four of Wands",
-      "name_zh": "权杖四",
+      "card_id": "cups-12",
+      "name": "Knight of Cups",
+      "name_zh": "圣杯骑士",
       "arcana": "minor",
-      "number": 4,
-      "suit": "wands",
-      "rank": null,
-      "element": "fire",
+      "number": 12,
+      "suit": "cups",
+      "rank": "Knight",
+      "element": "water",
       "orientation": "upright",
       "keywords": [
-        "celebration",
-        "harmony",
-        "marriage",
-        "home",
-        "community"
+        "romance",
+        "charm",
+        "prince charming",
+        "following the heart"
       ],
-      "meaning": "Beneath a garlanded arch of four wands a community rejoices, marking stable homecoming and shared celebration."
+      "meaning": "The knight rides slowly, cup extended, a romantic idealist following the call of the heart."
     },
     {
       "position_index": 1,
@@ -35,22 +34,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "pentacles-02",
-      "name": "Two of Pentacles",
-      "name_zh": "星币二",
+      "card_id": "cups-05",
+      "name": "Five of Cups",
+      "name_zh": "圣杯五",
       "arcana": "minor",
-      "number": 2,
-      "suit": "pentacles",
+      "number": 5,
+      "suit": "cups",
       "rank": null,
-      "element": "earth",
+      "element": "water",
       "orientation": "reversed",
       "keywords": [
-        "over-committed",
-        "disorganization",
-        "overwhelmed",
-        "imbalance"
+        "personal setbacks",
+        "self-forgiveness",
+        "moving on",
+        "acceptance"
       ],
-      "meaning": "Reversed, the juggling fails as over-commitment tips into chaos."
+      "meaning": "Reversed, grief softens into acceptance and the surviving cups are at last reclaimed."
     },
     {
       "position_index": 2,
@@ -58,31 +57,31 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "cups-13",
-      "name": "Queen of Cups",
-      "name_zh": "圣杯王后",
+      "card_id": "wands-03",
+      "name": "Three of Wands",
+      "name_zh": "权杖三",
       "arcana": "minor",
-      "number": 13,
-      "suit": "cups",
-      "rank": "Queen",
-      "element": "water",
+      "number": 3,
+      "suit": "wands",
+      "rank": null,
+      "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "compassionate",
-        "caring",
-        "emotionally stable",
-        "intuitive"
+        "preparation",
+        "foresight",
+        "enterprise",
+        "expansion"
       ],
-      "meaning": "The queen gazes into her ornate cup by the sea, embodying deep compassion, calm and intuition."
+      "meaning": "Ships sail home as the figure watches from a cliff, the first returns of ventures launched with foresight."
     }
   ],
   "drawn_ids": [
-    "wands-04",
-    "pentacles-02",
-    "cups-13"
+    "cups-12",
+    "cups-05",
+    "wands-03"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Four of Wands (权杖四) upright, highlighting celebration, harmony, marriage. Present (现在) draws Two of Pentacles (星币二) reversed, highlighting over-committed, disorganization, overwhelmed. Future (未来) draws Queen of Cups (圣杯王后) upright, highlighting compassionate, caring, emotionally stable. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Knight of Cups (圣杯骑士) upright, highlighting romance, charm, prince charming. Present (现在) draws Five of Cups (圣杯五) reversed, highlighting personal setbacks, self-forgiveness, moving on. Future (未来) draws Three of Wands (权杖三) upright, highlighting preparation, foresight, enterprise. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. 1 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
   "major_arcana_count": 0,
   "reversed_count": 1,
   "rng": "secrets",

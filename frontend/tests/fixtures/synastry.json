@@ -946,7 +946,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的突变与独立的一面相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Uranus",
@@ -962,7 +963,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的扩张与机会之门成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Jupiter",
@@ -978,7 +980,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的突变与独立的一面落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Uranus",
@@ -994,7 +997,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的喜好与亲近方式叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Saturn",
@@ -1010,7 +1014,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的约束与责任之分，与对方的执念与翻覆的深处相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Jupiter",
@@ -1026,7 +1031,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的想象与含混的一面落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Moon",
@@ -1042,7 +1048,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的情绪与安全感，与对方的待人接物的门面相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Mars",
@@ -1058,7 +1065,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的行动与脾气，与对方的待人接物的门面成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Mars",
@@ -1074,7 +1082,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的行动与脾气，与对方的情绪与安全感落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Neptune",
@@ -1090,7 +1099,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的情绪与安全感成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Neptune",
@@ -1106,7 +1116,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的待人接物的门面落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Uranus",
@@ -1122,7 +1133,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的对外站立的方向相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Pluto",
@@ -1138,7 +1150,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的想象与含混的一面相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Venus",
@@ -1154,7 +1167,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的喜好与亲近方式，与对方的想象与含混的一面相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Neptune",
@@ -1170,7 +1184,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的突变与独立的一面叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Mars",
@@ -1186,7 +1201,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的行动与脾气，与对方的约束与责任之分相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Moon",
@@ -1202,7 +1218,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的情绪与安全感，与对方的突变与独立的一面相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Mars",
@@ -1218,7 +1235,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": true,
-      "counted": true
+      "counted": true,
+      "plain": "你的行动与脾气，与对方的喜好与亲近方式成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Pluto",
@@ -1234,7 +1252,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的约束与责任之分成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Mercury",
@@ -1250,7 +1269,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的言语与消息往来，与对方的扩张与机会之门相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Mars",
@@ -1266,7 +1286,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的行动与脾气，与对方的扩张与机会之门落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Saturn",
@@ -1282,7 +1303,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的约束与责任之分，与对方的行动与脾气落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Venus",
@@ -1298,7 +1320,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的喜好与亲近方式，与对方的突变与独立的一面相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Pluto",
@@ -1314,7 +1337,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的待人接物的门面相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Neptune",
@@ -1330,7 +1354,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的想象与含混的一面叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Moon",
@@ -1346,7 +1371,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的情绪与安全感，与对方的想象与含混的一面相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Jupiter",
@@ -1362,7 +1388,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的情绪与安全感成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Jupiter",
@@ -1378,7 +1405,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的待人接物的门面叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Moon",
@@ -1394,7 +1422,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的情绪与安全感，与对方的对外站立的方向叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Neptune",
@@ -1410,7 +1439,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的对外站立的方向相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Mercury",
@@ -1426,7 +1456,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的言语与消息往来，与对方的言语与消息往来落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Uranus",
@@ -1442,7 +1473,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的待人接物的门面落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Uranus",
@@ -1458,7 +1490,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的情绪与安全感成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Mercury",
@@ -1474,7 +1507,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的言语与消息往来，与对方的对外站立的方向成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Venus",
@@ -1490,7 +1524,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的喜好与亲近方式，与对方的执念与翻覆的深处落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Mars",
@@ -1506,7 +1541,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的行动与脾气，与对方的突变与独立的一面成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "ASC",
@@ -1522,7 +1558,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的待人接物的门面，与对方的执念与翻覆的深处成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Saturn",
@@ -1538,7 +1575,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的约束与责任之分，与对方的自我与生命方向相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Moon",
@@ -1554,7 +1592,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": true,
-      "counted": true
+      "counted": true,
+      "plain": "你的情绪与安全感，与对方的喜好与亲近方式相隔六十度，两不相抢也接得上手，这一段要有人先开口才走得动，你不去用它，它就一直停在原地等着。"
     },
     {
       "point_a": "Neptune",
@@ -1570,7 +1609,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的喜好与亲近方式叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "MC",
@@ -1586,7 +1626,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的对外站立的方向，与对方的喜好与亲近方式相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "ASC",
@@ -1602,7 +1643,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的待人接物的门面，与对方的约束与责任之分落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Neptune",
@@ -1618,7 +1660,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的想象与含混的一面，与对方的扩张与机会之门成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Pluto",
@@ -1634,7 +1677,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的对外站立的方向相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Venus",
@@ -1650,7 +1694,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的喜好与亲近方式，与对方的约束与责任之分成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "MC",
@@ -1666,7 +1711,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的对外站立的方向，与对方的行动与脾气成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Mars",
@@ -1682,7 +1728,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的行动与脾气，与对方的想象与含混的一面成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。"
     },
     {
       "point_a": "Jupiter",
@@ -1698,7 +1745,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的对外站立的方向相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Mercury",
@@ -1714,7 +1762,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的言语与消息往来，与对方的自我与生命方向落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Mercury",
@@ -1730,7 +1779,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": true
+      "counted": true,
+      "plain": "你的言语与消息往来，与对方的情绪与安全感相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Saturn",
@@ -1746,7 +1796,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的约束与责任之分，与对方的想象与含混的一面叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Jupiter",
@@ -1762,7 +1813,8 @@
       "nature": "challenging",
       "nature_zh": "挑战",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的喜好与亲近方式落在圆环的两头，隔着一百八十度对望，各是对方那一面的镜子，你在这一段上要来回对齐几趟才看得全。"
     },
     {
       "point_a": "Jupiter",
@@ -1778,7 +1830,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的扩张与机会之门，与对方的执念与翻覆的深处相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Uranus",
@@ -1794,7 +1847,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的突变与独立的一面，与对方的突变与独立的一面叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     },
     {
       "point_a": "Mercury",
@@ -1810,7 +1864,8 @@
       "nature": "harmonious",
       "nature_zh": "和谐",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的言语与消息往来，与对方的约束与责任之分相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，也因此最容易把它当成本来就有。"
     },
     {
       "point_a": "Pluto",
@@ -1826,7 +1881,8 @@
       "nature": "fusion",
       "nature_zh": "融合",
       "core_bond": false,
-      "counted": false
+      "counted": false,
+      "plain": "你的执念与翻覆的深处，与对方的执念与翻覆的深处叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，熟也是先熟在这里。"
     }
   ],
   "composite": {
@@ -2319,6 +2375,7 @@
       }
     ]
   },
+  "plain_summary": "把账本里命中的核心羁绊合起来看，你这段关系最要紧的几条轴各落在顺的一侧还是费劲的一侧，下面按两侧重排一遍。\n月金这一对是情绪与喜好叠在一处，你在这条轴上容易觉得被照顾，也容易把照顾与心动放进同一个口袋，两者的分别要一段时间才分得开。\n金火这一对管的是被吸引与往前冲的那股劲，你在这条轴上感受最直接，来得也快，它给的是热度，把热度认成什么是后面的事。\n你这一份相契度落在中和可处，表的措辞在这一档是平的，顺与费劲两边都读得进去，轻重由那几条相位自己说，不由这个档位替你定。",
   "provenance": {
     "engine": "pyswisseph",
     "note": "合盘（Synastry）取两造本命盘的每一个点（十大行星加上升、中天）两两相比，按经典容许度（合 8°/六合 6°/刑 7°/拱 8°/冲 8°）检测人对人相位，每对只留最紧的一个，并以合相=融合、六合与拱=和谐、刑与冲=挑战的标准属性归类；组合盘（Composite）取两造同名行星与十二宫头各自的「短弧中点」，纯几何、可复算，组合上升取两造上升中点、组合中天取两造中天中点，其余行星按中点黄经落入组合宫。行星黄经、四轴与宫头皆由瑞士星历实时计算，未作任何主观吉凶或个人运势的虚构演绎；相契度只由「人对人」的合盘相位按模型参数加权累加，账本逐条可核（口径详见 method）。",
@@ -2328,6 +2385,11 @@
         "name": "synastry_scoring",
         "version": "2026.09",
         "source": "模型参数（本系统加权，非古籍赋分）"
+      },
+      {
+        "name": "synastry_plain",
+        "version": "2026.09",
+        "source": "本系统白话转述 · 逐条对应 synastry_scoring 的相位轴与核心羁绊"
       }
     ]
   },

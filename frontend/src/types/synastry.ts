@@ -55,6 +55,8 @@ export interface SynastryAspect {
   core_bond: boolean;
   /** Contributes to the score (both endpoints are personal points). */
   counted: boolean;
+  /** 引擎拼好的本条白话（受控 frame + 两端点义），前端不产字。 */
+  plain: string;
 }
 
 /** The midpoint (composite) chart of the two natals. */
@@ -100,6 +102,8 @@ export interface SynastryChart {
   composite: CompositeChart;
   /** 相契度总分与逐条账本（Σ factors[].delta == value）。 */
   score: ScoreValue;
+  /** 命中核心羁绊的白话总论，多行文本（段间 \n）。 */
+  plain_summary: string;
   provenance: SynastryProvenance;
   engine: string;
 }

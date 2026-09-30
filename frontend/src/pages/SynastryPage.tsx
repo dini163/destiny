@@ -6,6 +6,7 @@ import { AstroWheel } from '../components/western/AstroWheel';
 import { ElementBalance } from '../components/western/ElementBalance';
 import { HouseTable } from '../components/western/HouseTable';
 import { Icon } from '../components/ui/Icon';
+import { PlainProse } from '../components/ui/PlainProse';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useSynastry } from '../hooks/useSynastry';
@@ -83,7 +84,13 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
         }
         elevated
       >
-        <SynastryScoreRing score={chart.score} />
+        <div className="flex flex-col gap-4">
+          <SynastryScoreRing score={chart.score} />
+          <PlainProse
+            text={chart.plain_summary}
+            className="rounded-card border border-rim bg-surface p-4"
+          />
+        </div>
       </ResultCard>
 
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
