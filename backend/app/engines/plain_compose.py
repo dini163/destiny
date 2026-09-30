@@ -90,15 +90,19 @@ def overview(frame: str, parts: Mapping[str, str]) -> str:
     return frame.format(**parts)
 
 
-def dedupe(items: Sequence[tuple[str, int]]) -> list[tuple[str, int]]:
+def dedupe(items: Sequence[tuple[str, int | float]]) -> list[tuple[str, int | float]]:
     """同键只留首次出现的那一条，符号与原序不动。
 
     压的是**重复**不是内容：两格同数（或两对同关系）时逐条搬运会让同一句在同一段里
     连说两三遍。键集合的完整性由机检工厂的 `set(entries) == universe()` 守（spec §4），
     本函数不参与其中任何一条判断。
+
+    符号类型与 `compose` 同宽（`int | float`）：合盘传的是 `SYNASTRY_ASPECT_DELTA` 的
+    1.5/2.0/3.0/-2.5/-2.0，标成 `int` 只是把这条例外写进了签名里（仓库不跑 mypy，
+    这条是防漂移，不是修 bug）。
     """
     seen: set[str] = set()
-    kept: list[tuple[str, int]] = []
+    kept: list[tuple[str, int | float]] = []
     for key, sign in items:
         if key not in seen:
             seen.add(key)

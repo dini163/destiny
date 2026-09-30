@@ -135,8 +135,15 @@ def _aspect_plain(point_a: str, point_b: str, aspect_type: str) -> str:
 def synastry_plain_summary(aspects: Sequence[SynastryAspect], tier: str) -> str:
     """响应级总论：只重排已经命中的核心羁绊，顺逆次序由赋分表自己的基准分定。
 
+    「命中」与开篇句的「账本里」是同一个口径：`core_bond` 且 `counted`（`counted` 即
+    两端皆为个人点、真的进了相契度账本，`_synastry_score` 的同一道门）。今天五对核心羁绊
+    两端全在 `SYNASTRY_PERSONAL_POINTS` 里，所以这两个条件给出同一批行、输出一字不变；
+    守的是万一——有人给 `SYNASTRY_CORE_BONDS` 添一条含外行星的轴时，账本不记它，白话也不得
+    替账本把它说进总论（开篇句那句「把账本里命中的核心羁绊合起来看」才不会变成假话）。
+
     同一组星名在两个方向上各检出一次是合盘的常态（`_synastry_aspects` 按 A×B **有序**遍历，
-    本页那对 Greenwich 实盘 56 行只对应 47 个无序对，复测：对 `_chart().synastry_aspects`
+    本页那对 Greenwich 实盘 56 行只对应 47 个无序对，复测：对
+    `tests/golden/test_synastry_golden.py::_chart` 的 `synastry_aspects`
     数一次 `len(rows)` 与 `len({tuple(sorted((p.point_a, p.point_b)))})` → `56 47`），
     所以一条核心轴可能被命中两回。`dedupe` 留第一次，而 `aspects` 按容许度升序排过——
     被留下的那次是更紧的那个相位（裁定 R12）。
@@ -151,7 +158,7 @@ def synastry_plain_summary(aspects: Sequence[SynastryAspect], tier: str) -> str:
                     SYNASTRY_ASPECT_DELTA[aspect.type],
                 )
                 for aspect in aspects
-                if aspect.core_bond
+                if aspect.core_bond and aspect.counted
             ]
         ),
         tier,

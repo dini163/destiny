@@ -375,17 +375,20 @@ def test_closers_cover_exactly_the_tiers_the_content_table_prints() -> None:
 def test_plain_summary_relists_the_two_hit_core_axes_banded() -> None:
     """真实盘总论逐字节钉住（2026-09-30 由本文件那对 A/B 实算，56 行里命中两条核心轴）。
 
-    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
-    from app.engines.synastry import synastry_plain_summary
-    print(synastry_plain_summary(_chart().synastry_aspects, '中和可处'))"`
+    命中的两条都 `counted`（`core_bond` 的行实测是 月金 六合 与 金火 刑，各一，无外行星端点），
+    所以 `synastry_plain_summary` 里那道 `and aspect.counted` 对本盘是空操作——本条因此同时钉住
+    「过滤条件改口径而输出不动」这件事。
+
+    复测（2026-09-30 改写：旧写法 `_chart()` 未定义就 `NameError`，现在整条命令自给自足）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import sys;sys.path.insert(0,'tests/golden');from test_synastry_golden import _chart;from app.engines.synastry import synastry_plain_summary;print(synastry_plain_summary(_chart().synastry_aspects,'中和可处'))"`
     """
     chart = _chart()
     assert chart.score.tier == "中和可处"
     assert chart.plain_summary == "\n".join(
         [
             "把账本里命中的核心羁绊合起来看，你这段关系最要紧的几条轴各落在顺的一侧还是费劲的一侧，下面按两侧重排一遍。",
-            "月金这一对是情绪与喜好叠在一处，你在这条轴上容易觉得被照顾，也容易把照顾与心动放进同一个口袋，两者的分别要一段时间才分得开。",
-            "金火这一对管的是被吸引与往前冲的那股劲，你在这条轴上感受最直接，来得也快，它给的是热度，把热度认成什么是后面的事。",
+            "月金这一对是情绪与喜好叠在一处，你在这条轴上容易觉得被照顾，也容易把照顾与心动放进同一个口袋，它们同在一格里却是两件事。",
+            "金火这一对管的是被吸引与往前冲的那股劲，你在这条轴上感受直接，它给的是热度，把热度认成什么，是这条轴不管的事。",
             "你这一份相契度落在中和可处，表的措辞在这一档是平的，顺与费劲两边都读得进去，轻重由那几条相位自己说，不由这个档位替你定。",
         ]
     )
