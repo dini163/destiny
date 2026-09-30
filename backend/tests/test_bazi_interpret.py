@@ -11,10 +11,12 @@ from app.content.bazi_dimensions import (
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
-from app.engines.bazi_interpret import build_plain, interpret_chart, plain_reading, ten_god_strength
+from app.engines.bazi_interpret import build_plain, interpret_chart, ten_god_strength
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import assess_strength, detect_geju, element_weight_scores
 from app.engines.bazi_yongshen import select_yongshen
+from app.engines.plain_compose import reading
+from app.engines.plain_corpora import BAZI
 from app.schemas.common import Gender
 
 CHART = compute_bazi_chart(  # 基准命 A：戊辰 甲寅 庚子 丁亥
@@ -166,8 +168,8 @@ def test_build_plain_with_no_fired_rule_yields_opener_and_closer_only() -> None:
 
 
 def test_plain_reading_rejects_an_unknown_key() -> None:
-    with pytest.raises(KeyError, match="未知白话规则键"):
-        plain_reading("career.does.not.exist")
+    with pytest.raises(KeyError, match="未知白话键"):
+        reading(BAZI, "career.does.not.exist")
 
 
 def test_every_dimension_carries_a_plain_section() -> None:

@@ -12,16 +12,13 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from app.content.bazi_dimensions import DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, dim_rule
-from app.content.bazi_plain import (
-    DIMENSION_OPENERS,
-    PLAIN_READINGS,
-    PLAIN_SUMMARY_FRAME,
-    TIER_CLOSERS,
-)
+from app.content.bazi_plain import PLAIN_SUMMARY_FRAME
 from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, CONTROLLED_BY, ELEMENT_ORDER, GENERATED_BY, GENERATES
 from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi_strength import StrengthAssessment, element_weight_scores, hidden_stem_weight
+from app.engines.plain_compose import compose, overview
+from app.engines.plain_corpora import BAZI
 from app.schemas.bazi import BaziPillar
 from app.schemas.bazi_interpret import BaziInterpretation, DimensionReading
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
@@ -228,24 +225,14 @@ def _tier(value: float) -> str:
     return "平" if value >= 45.0 else "滞"
 
 
-def plain_reading(key: str) -> str:
-    """白话转述按键取；未知键同 `dim_rule` 的口径，是编程错误而不是用户错误。"""
-    try:
-        return PLAIN_READINGS[key]
-    except KeyError as exc:
-        raise KeyError(f"未知白话规则键：{key}") from exc
-
-
 def build_plain(dimension: str, keys: Sequence[str], tier: str) -> str:
-    """命中键 → 白话长文：开篇句 + 正向逐条 + 注意逐条 + 档位收尾，段间以换行分隔。
+    """命中键 → 白话长文，装配住在 `engines/plain_compose.py`（多系统白话 spec §3）。
 
-    本函数不产中文句子，只做受控条目的有序拼接（白话 spec §4）；衔接由段落结构承担，
-    所以这里不出现任何自造的过渡短语。
+    本函数只干一件事：把「分带符号」算好交给 `compose`。第一期这里有一份和装配器
+    重复的正负分带逻辑，抽层之后它必须删掉——两处排同一件事的次序，就是两处会漂。
     """
     prefix = DIMENSION_RULES[dimension][0].key.split(".", maxsplit=1)[0]
-    strengths = [plain_reading(key) for key in keys if dim_rule(key).delta > 0]
-    cautions = [plain_reading(key) for key in keys if dim_rule(key).delta < 0]
-    return "\n".join([DIMENSION_OPENERS[prefix], *strengths, *cautions, TIER_CLOSERS[tier]])
+    return compose(BAZI, prefix, [(key, dim_rule(key).delta) for key in keys], tier)
 
 
 def _base_rule(dimension: str) -> str:
@@ -295,5 +282,5 @@ def interpret_chart(
     return BaziInterpretation(
         six_dimensions=readings,
         summary=summary,
-        plain_summary=PLAIN_SUMMARY_FRAME.replace("{summary}", summary),
+        plain_summary=overview(PLAIN_SUMMARY_FRAME, {"summary": summary}),
     )
