@@ -14,6 +14,7 @@ from app.engines.plain_compose import (
     PlainCorpus,
     compose,
     compose_template,
+    dedupe,
     is_slot_key,
     overview,
     reading,
@@ -120,6 +121,14 @@ def test_overview_substitutes_parts_verbatim_and_refuses_a_missing_slot() -> Non
     assert overview("甲{one}乙{two}丙。", {"one": "一", "two": "二"}) == "甲一乙二丙。"
     with pytest.raises(KeyError, match="two"):
         overview("甲{one}乙{two}丙。", {"one": "一"})
+
+
+def test_dedupe_keeps_the_first_occurrence_and_its_sign() -> None:
+    assert dedupe([("a.x", -1), ("a.y", 1), ("a.x", -1)]) == [("a.x", -1), ("a.y", 1)]
+
+
+def test_dedupe_does_not_lose_a_key_that_only_appears_later() -> None:
+    assert [key for key, _ in dedupe([("a.x", 1), ("a.z", -1), ("a.x", 1)])] == ["a.x", "a.z"]
 
 
 KABBALAH_FRAME_REHEARSAL = (

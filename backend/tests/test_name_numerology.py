@@ -133,12 +133,13 @@ def test_score_is_withheld_when_any_grid_is_missing() -> None:
     assert name_score({"tian": 17, "ren": 24, "di": None, "wai": 6, "zong": 29}) is None
 
 
-def test_provenance_lists_the_three_name_corpora() -> None:
+def test_provenance_lists_the_four_name_corpora() -> None:
     provenance = name_provenance()
     assert [table.name for table in provenance.tables] == [
         "kangxi_strokes",
         "name_numerology",
         "name_sancai",
+        "name_plain",
     ]
     assert {table.version for table in provenance.tables} == {CONTENT_VERSION}
     assert provenance.corpus.size > 30_000

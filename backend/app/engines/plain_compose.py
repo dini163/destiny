@@ -88,3 +88,19 @@ def compose_template(frame: str, slots: Mapping[str, str]) -> str:
 def overview(frame: str, parts: Mapping[str, str]) -> str:
     """总论：框架句 + 逐字搬运的部件。部件本身可以是别处已装配好的整段。"""
     return frame.format(**parts)
+
+
+def dedupe(items: Sequence[tuple[str, int]]) -> list[tuple[str, int]]:
+    """同键只留首次出现的那一条，符号与原序不动。
+
+    压的是**重复**不是内容：两格同数（或两对同关系）时逐条搬运会让同一句在同一段里
+    连说两三遍。键集合的完整性由机检工厂的 `set(entries) == universe()` 守（spec §4），
+    本函数不参与其中任何一条判断。
+    """
+    seen: set[str] = set()
+    kept: list[tuple[str, int]] = []
+    for key, sign in items:
+        if key not in seen:
+            seen.add(key)
+            kept.append((key, sign))
+    return kept

@@ -19,6 +19,7 @@ from app.content.kabbalah import KABBALAH_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.lenormand import LENORMAND_SOURCE
 from app.content.name_numerology import NUMEROLOGY_SOURCE
+from app.content.name_plain import NAME_PLAIN_SOURCE
 from app.content.name_sancai import SANCAI_SOURCE
 from app.content.numerology_cycles import CYCLES_SOURCE
 from app.content.numerology_loshu import LOSHU_SOURCE
@@ -60,12 +61,13 @@ CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_plain", PLAIN_SOURCE),
 )
 
-#: 姓名学三表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:355`
+#: 姓名学四表。单列一份是刻意的：`CONTENT_SOURCES` 会被 `app/engines/bazi.py:355`
 #: 整表回显进每一个八字响应，把姓名学语料混进去就是让八字声称自己引用了它没用的表。
 NAME_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kangxi_strokes", KANGXI_STROKE_SOURCE),
     ("name_numerology", NUMEROLOGY_SOURCE),
     ("name_sancai", SANCAI_SOURCE),
+    ("name_plain", NAME_PLAIN_SOURCE),
 )
 
 #: 岁运两张表。单列一份的理由同 `NAME_CONTENT_SOURCES`：主命盘不引用它们，

@@ -51,6 +51,9 @@ class NameGrid(BaseModel):
     pattern_name: str | None
     verdict: str | None
     source: str
+    plain: str = Field(
+        description="这一格的白话段：该格开篇句 + 数理转述，两行以换行分隔。未核定的一格搬「笔画未核定」那一条。"
+    )
 
 
 class SancaiElements(BaseModel):
@@ -70,6 +73,9 @@ class Sancai(BaseModel):
     elements: SancaiElements
     pairs: list[SancaiPair]
     tier: str
+    plain: str = Field(
+        description="三才整块一段白话：开篇 + 顺侧 + 注意侧 + 档位收尾。同关系多对只说一遍（去重不是丢条目）。"
+    )
 
 
 class CorpusProvenance(BaseModel):
@@ -90,6 +96,9 @@ class NameAnalysis(BaseModel):
     grids: list[NameGrid] = Field(description="固定序：天 → 人 → 地 → 外 → 总。")
     sancai: Sancai | None = Field(default=None, description="天/人/地任一缺笔画时整块不出。")
     score: ScoreValue | None
+    plain_summary: str = Field(
+        description="响应级白话总论：五格数理按顺/注意两侧重排，末尾落在综合指数档位上；算不出分时不出档位句（白话层不新增判断）。"
+    )
     warnings: list[str] = Field(default_factory=list, description="机器码，如 stroke_unresolved:玄。")
     provenance: NameProvenance
 

@@ -15,6 +15,7 @@ from dataclasses import dataclass
 
 from app.content import CONTENT_VERSION, NAME_CONTENT_SOURCES
 from app.content import name_numerology as numerology
+from app.content import name_plain
 from app.content import name_sancai as sancai
 from app.content.kangxi_strokes import (
     STROKE_SOURCE,
@@ -24,6 +25,8 @@ from app.content.kangxi_strokes import (
 )
 from app.core.errors import NameInputError
 from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, dedupe
+from app.engines.plain_corpora import NAME
 from app.schemas.common import ProvenanceTable
 from app.schemas.name import (
     CorpusProvenance,
@@ -71,6 +74,18 @@ GRID_WEIGHTS: dict[str, float] = {
 #: 等级 → 分值。分值与权重都是本系统参数，与语料等级两段出处一起署在账本行上。
 FORTUNE_SCORES: dict[str, float] = {"大吉": 100.0, "吉": 80.0, "半吉": 50.0, "凶": 0.0}
 SCORE_TIERS: tuple[tuple[float, str], ...] = ((85, "上等"), (70, "中上"), (50, "中"), (30, "中下"), (0, "下"))
+
+#: 白话分带符号读的是 `NameFortune` 自身的序，不是账本 delta（spec 裁定 R2）：
+#: delta = 权重 × `FORTUNE_SCORES`，而最低档「凶」是 0 分，所以 delta 恒 ≥ 0、命中凶格恰为 0，
+#: 按 delta 分带会成建制丢句。实测 张一 的四格 delta 全为 0.0，复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.name_numerology import analyze_name; print([f.delta for f in analyze_name('张','一').score.factors])"`
+FORTUNE_SIDE: dict[str, int] = {"大吉": 1, "吉": 1, "半吉": -1, "凶": -1}
+#: 三才分带复用引擎已有的 `HARMONIOUS_RELATIONS`：在其中为顺侧，不在其中为注意侧。
+SANCAI_HARMONIOUS_SIDE = 1
+SANCAI_CLASH_SIDE = -1
+#: 「笔画未核定」没有吉凶，也就没有对家可分：它所在的段落里只有它自己一条，
+#: 这个符号只用于通过 `compose` 的 band 闸（sign 0 → ValueError），不改变任何行的次序。
+UNRESOLVED_SIDE = 1
 
 #: 尾数定五行、奇偶定阴阳（spec §2.4：设计稿 5 个标签 5/5 命中，故不进语料表）。
 ELEMENT_BY_TAIL: dict[int, str] = {
@@ -208,6 +223,7 @@ def build_grid(term: GridTerm) -> NameGrid:
             pattern_name=None,
             verdict=None,
             source=STROKE_SOURCE,
+            plain=compose(NAME, term.key, [(name_plain.NAME_UNRESOLVED_KEY, UNRESOLVED_SIDE)]),
         )
     number = cycle_number(term.value)
     entry = numerology.numerology_entry(number)
@@ -223,6 +239,7 @@ def build_grid(term: GridTerm) -> NameGrid:
         pattern_name=entry.pattern_name,
         verdict=entry.verdict,
         source=entry.source,
+        plain=compose(NAME, term.key, [(name_plain.shuli_key(number), FORTUNE_SIDE[entry.fortune])]),
     )
 
 
@@ -245,10 +262,27 @@ def sancai_of(grids: dict[str, int | None]) -> Sancai | None:
             harmony += 1
 
     tier = next(name for threshold, name in SANCAI_TIERS if harmony >= threshold)
+    plain = compose(
+        NAME,
+        "sancai",
+        dedupe(
+            [
+                (
+                    name_plain.sancai_key(pair.relation),
+                    SANCAI_HARMONIOUS_SIDE
+                    if pair.relation in HARMONIOUS_RELATIONS
+                    else SANCAI_CLASH_SIDE,
+                )
+                for pair in pairs
+            ]
+        ),
+        tier,
+    )
     return Sancai(
         elements=SancaiElements(tian=elements["tian"], ren=elements["ren"], di=elements["di"]),
         pairs=pairs,
         tier=tier,
+        plain=plain,
     )
 
 
@@ -278,8 +312,26 @@ def name_score(grids: dict[str, int | None]) -> ScoreValue | None:
     return build_ledger(base=0.0, tier=tier, contributions=contributions, base_rule="score.base")
 
 
+def name_plain_summary(grids: Sequence[NameGrid], score: ScoreValue | None) -> str:
+    """响应级总论：把各格卡上已经说过的那一句按顺/注意两侧重排，末尾落综合档位。
+
+    算不出分（任一格缺笔画）时不带收尾句——白话层不新增判断（spec 规则 5），收尾句的键
+    必须是真实存在的 `SCORE_TIERS` 档位。全案未核定（每格都算不出数）时没有可分带的条目，
+    只搬「未核定」那一句：五张格卡各自说的正是同一句它。
+    """
+    items: list[tuple[str, int]] = []
+    for grid in grids:
+        if grid.number is None or grid.fortune is None:
+            continue
+        items.append((name_plain.shuli_key(grid.number), FORTUNE_SIDE[grid.fortune]))
+    if not items:
+        return compose(NAME, "summary", [(name_plain.NAME_UNRESOLVED_KEY, UNRESOLVED_SIDE)])
+    tier = None if score is None else score.tier
+    return compose(NAME, "summary", dedupe(items), tier)
+
+
 def name_provenance() -> NameProvenance:
-    """响应自带出处（spec §7）：语料版本 + 三张表，表列全部来自 `NAME_CONTENT_SOURCES`。"""
+    """响应自带出处（spec §7）：语料版本 + 四张表，表列全部来自 `NAME_CONTENT_SOURCES`。"""
     meta = corpus_meta()
     return NameProvenance(
         corpus=CorpusProvenance(
@@ -401,6 +453,9 @@ def analyze_name(
     grids = _as_mapping(terms)
     modality, modality_formula = modality_of(len(surname_chars), len(given_chars))
 
+    built = [build_grid(term) for term in terms]
+    score_value = name_score(grids)
+
     return NameAnalysis(
         input=NameInput(
             surname=surname,
@@ -413,9 +468,10 @@ def analyze_name(
             _char_entry(char, value)
             for char, value in zip(list(surname) + list(given), resolved, strict=True)
         ],
-        grids=[build_grid(term) for term in terms],
+        grids=built,
         sancai=sancai_of(grids),
-        score=name_score(grids),
+        score=score_value,
+        plain_summary=name_plain_summary(built, score_value),
         warnings=sorted(set(warnings)),
         provenance=name_provenance(),
     )

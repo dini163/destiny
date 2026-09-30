@@ -27,6 +27,7 @@ def test_common_name_returns_the_five_grids_in_order(client: TestClient) -> None
         "kangxi_strokes",
         "name_numerology",
         "name_sancai",
+        "name_plain",
     ]
 
 
