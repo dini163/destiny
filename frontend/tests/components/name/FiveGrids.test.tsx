@@ -36,6 +36,8 @@ describe('FiveGrids 白话区块', () => {
     const cards = cardsOf(full.grids);
     full.grids.forEach((grid, index) => {
       if (grid.verdict === null) throw new Error('李/明 五格应全部核定，夹具有变');
+      // 空白的 plain 也能被下面的定位满足，先按语料契约（每条 ≥40 字）钉住它说了话。
+      expect(grid.plain.length).toBeGreaterThan(40);
       const card = cards[index];
       expect(precedes(paragraphByExactIn(card, grid.plain), paragraphByExactIn(card, grid.verdict))).toBe(
         true,
@@ -48,6 +50,7 @@ describe('FiveGrids 白话区块', () => {
     expect(pending.length).toBe(4);
     const cards = cardsOf(degraded.grids);
     for (const { grid, index } of pending) {
+      expect(grid.plain.length).toBeGreaterThan(40);
       expect(paragraphByExactIn(cards[index], grid.plain).textContent).toBe(grid.plain);
       expect(document.body.textContent).not.toContain('笔画未核定，本格不出断语');
     }

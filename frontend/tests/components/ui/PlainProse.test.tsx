@@ -19,6 +19,8 @@ afterEach(cleanup);
 describe('PlainProse 呈现件', () => {
   it('整段白话逐行进 DOM，文本全等于引擎输出', () => {
     const text = name.grids[1].plain;
+    // 空串也能满足下面的相等断言，所以先钉「引擎确实说了话」：一句白话不短于 40 字是语料契约。
+    expect(text.length).toBeGreaterThan(40);
     const { container } = render(<PlainProse text={text} />);
     const paragraph = container.querySelector('p');
     if (!paragraph) throw new Error('PlainProse 必须渲染一个 <p>');
