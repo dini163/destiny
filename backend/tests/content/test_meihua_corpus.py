@@ -17,8 +17,7 @@
 `tests/golden/test_meihua_golden.py::test_provenance_lists_exactly_the_five_tables_the_cast_reads`，
 本模块仍只管表体（先天卦数、8×8 全覆盖、体用与卦气的 5×5 全组合），出处不重复钉。
 
-复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/content/test_meihua_corpus.py -o addopts=""` → 9 passed（2026-09-30 复测；旧写法带 `-q`，
+复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/content/test_meihua_corpus.py -o addopts=""` → 9 passed（2026-09-30 复测；旧写法带 `-q`，
 与本仓库 `pyproject.toml` 的 `addopts = "-q"` 叠成 `-qq`，统计行不打印，命令自证不了自己）。
 """
 

@@ -180,10 +180,10 @@ SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: （`zhouyi_hexagrams`）、先天卦数（`zhouyi_trigrams`）、页面上那句卦辞（`zhouyi_text`）。
 #: 不列的两张各有其因：`content/wuxing` 只提供生克关系这一结构运算、其文字不进任何响应
 #: （同 `CONTENT_SOURCES` 今天也不列 wuxing 的既有口径）；`lunar-python` 定农历数与月建，
-#: 它是**库**不是语料表（没有 `CONTENT_VERSION` 可填进 `ProvenanceTable.version`），已在
-#: `provenance.engine` 那一格按八字 `engines/bazi.py:352` 的短值口径认账，故它不进 tables
-#: 也不是漏账；被转述的外部文案才需要列进 tables，
-#: 那是 `ALMANAC_CONTENT_SOURCES` 把通书宜忌列出来的唯一原因。
+#: 它供给的是**计算事实**，没有被转述进响应的文案，故不进 tables 也不是漏账——它在
+#: `provenance.engine` 那一格按八字 `engines/bazi.py:352` 的短值口径认账。分界画在文案上、
+#: 不画在版本上：库的文案进了响应就得进表打版，本文件 `ALMANAC_CONTENT_SOURCES` 列通书
+#: 宜忌、`ALMANAC_CONTENT_VERSION` 给 lunar-python 打版，正是这一条的先例。
 #: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import MEIHUA_CONTENT_SOURCES; print(len(MEIHUA_CONTENT_SOURCES))"` → 5。
 MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("meihua", MEIHUA_SOURCE),

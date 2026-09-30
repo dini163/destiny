@@ -361,11 +361,8 @@ def test_meihua_endpoint(client: TestClient) -> None:
 # --- 白话整段与出处块（多系统白话计划 Task 7）------------------------------------
 
 #: 参考盘 报数[7,3] 于 2024-05-15 10:30（巳时）的白话整段：山火贲，体离火（旺）、用艮土（相），
-#: 体生用，指数 52 → 中平。七行逐字来自语料表，改动任一条即红（长度 61/56/92/52/90/54/55；
-#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "`
-#: `from app.engines.meihua import cast_meihua;from datetime import datetime;`
-#: `print([len(s) for s in cast_meihua(method='number',numbers=[7,3],question=None,`
-#: `cast_time=datetime(2024,5,15,10,30)).plain_summary.split(chr(10))])"`）。
+#: 体生用，指数 52 → 中平。七行逐字来自语料表，改动任一条即红。
+#: 长度 61/56/92/52/90/54/55，复测（2026-09-30 实录 `[61, 56, 92, 52, 90, 54, 55]`）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.meihua import cast_meihua;from datetime import datetime;print([len(s) for s in cast_meihua(method='number',numbers=[7,3],question=None,cast_time=datetime(2024,5,15,10,30)).plain_summary.split(chr(10))])"`
 PLAIN_MAIN_ANCHOR = [
     "把这一卦按体、用两侧各读一遍：先说体用之间的生克，再顺着你这一侧的取象与卦气，然后是对方那一侧的，两侧同为一卦时只说一遍。",
     "体卦去生用卦，你的力气是往外花在这件事上的，付出多而收回少，这一段是容易亏空的一格，进来与出去的数目常常不相称。",

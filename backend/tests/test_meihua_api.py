@@ -21,8 +21,7 @@
 * **时区偏移按墙钟读取**：与奇门同一条 finding，用单数法演示 —— 下卦与动爻都加时辰序，
   偏移一丢就是整盘换了卦。
 
-复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/test_meihua_api.py -o addopts=""` → 33 passed（2026-09-30 实录：域错误六条 + pydantic 六条
+复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/test_meihua_api.py -o addopts=""` → 33 passed（2026-09-30 实录：域错误六条 + pydantic 六条
 参数化 + 极值日期四条参数化，其余单条；出处块那条单列，故 32 加一）。
 """
 
