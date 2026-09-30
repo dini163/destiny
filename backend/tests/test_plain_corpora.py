@@ -55,7 +55,9 @@ def test_at_least_one_corpus_is_registered() -> None:
     # 真失败模式不是「数出两个同系统」而是**键覆盖**：登记形状是字典字面量里的
     # `X.system: X`，两行 system 相同时 Python 静默留最后一行，前一张表就此掉出闸外，
     # 而上一条「计数 == 去重计数」照样成立。故键必须逐个等于它所指向 corpus 的 system。
-    assert all(key == corpus.system for key, corpus in PLAIN_CORPORA.items())
+    assert all(
+        key == corpus.system for key, corpus in PLAIN_CORPORA.items()
+    ), "登记键与 corpus.system 不一致，被覆盖的那张表会静默掉出闸外"
 
 
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)
@@ -145,6 +147,7 @@ GATE_ENTRIES = {
     SLOT_PREFIX + "verdict": "自我与生命方向呈吉象",
     SLOT_PREFIX + "long": "自我与生命方向在这一段上呈现出的是一种缓慢而稳定的",
     SLOT_PREFIX + "sentence": "你在这一段上先感到的是顺。",
+    SLOT_PREFIX + "empty": "",
     "demo.plain.short": "你在这一段上面的顺很短。",
 }
 GATE_DEMO = PlainCorpus(
@@ -161,6 +164,13 @@ GATE_DEMO = PlainCorpus(
 def test_slot_caliber_passes_a_clean_noun_phrase() -> None:
     """R6 换口径要放过的正是这个形状：名词短语、无标点、无结论。"""
     assert wording_violations(GATE_DEMO, SLOT_PREFIX + "core") == []
+
+
+def test_slot_caliber_reports_an_empty_slot_entry() -> None:
+    """非空契约（R21 四条判据之一）：槽位文本被嵌在句子里，空词等于装配出一个残句。"""
+    text = GATE_DEMO.entries[SLOT_PREFIX + "empty"]
+    assert not text.strip(), "夹具本身非空才算在测闸，否则这条红了是在测字符串"
+    assert wording_violations(GATE_DEMO, SLOT_PREFIX + "empty") == ["槽位词条非空契约破"]
 
 
 def test_slot_caliber_reports_a_noun_phrase_that_carries_its_own_verdict() -> None:
