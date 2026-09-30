@@ -10,6 +10,15 @@ from __future__ import annotations
 from app.content import name_plain, synastry_plain
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
+from app.content.meihua import BAGUA_IMAGE, TIYONG_RELATIONS, WANGSHUAI_TEXT
+from app.content.meihua_plain import (
+    MEIHUA_READINGS,
+    MEIHUA_SUMMARY_OPENER,
+    MEIHUA_TIER_CLOSERS,
+    leixiang_key,
+    tiyong_key,
+    wangshuai_key,
+)
 from app.content.name_numerology import NUMBERS
 from app.content.name_sancai import SANCAI_RELATIONS
 from app.content.synastry import SYNASTRY_CORE_BONDS
@@ -101,9 +110,37 @@ SYNASTRY = PlainCorpus(
     slot_prefixes=frozenset({"synastry.point."}),
 )
 
+
+def _meihua_universe() -> set[str]:
+    """三张源表键的全集：5 体用 + 8 卦 + 5 状态 = 18。
+
+    不抄数、不写字面量清单：`TIYONG_RELATIONS` / `BAGUA_IMAGE` / `WANGSHUAI_TEXT`
+    加一格，本函数就跟着多一格，语料少写一条即红（工厂的 `set(entries) == universe()`）。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import MEIHUA; print(len(MEIHUA.universe()))"` → 18。
+    """
+    return (
+        {tiyong_key(key) for key in TIYONG_RELATIONS}
+        | {leixiang_key(key) for key in BAGUA_IMAGE}
+        | {wangshuai_key(state) for state in WANGSHUAI_TEXT}
+    )
+
+
+MEIHUA = PlainCorpus(
+    system="meihua",
+    entries=MEIHUA_READINGS,
+    openers={"summary": MEIHUA_SUMMARY_OPENER},
+    closers=MEIHUA_TIER_CLOSERS,
+    # 「休」的 delta 是 0（`engines/meihua.py` 的 `_wangshuai_delta`），八卦类象本就无吉凶符号：
+    # 按符号分带会让这两类条目两头都不进，句子无声消失（spec §6 给梅花选 keep 的全部理由，
+    # 钉在 `tests/golden/test_meihua_golden.py::test_the_zero_delta_gua_qi_row_still_gets_its_sentence`）。
+    grouping="keep",
+    universe=_meihua_universe,
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
     BAZI.system: BAZI,
     NAME.system: NAME,
     SYNASTRY.system: SYNASTRY,
+    MEIHUA.system: MEIHUA,
 }

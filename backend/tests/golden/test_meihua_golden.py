@@ -26,8 +26,11 @@ import pytest
 from fastapi.testclient import TestClient
 from lunar_python import Solar
 
+from app.content import CONTENT_VERSION
+from app.content.meihua_plain import wangshuai_key
 from app.core.errors import InvalidCastInputError
-from app.engines.meihua import cast_meihua
+from app.engines.meihua import _verdict_band, cast_meihua
+from app.engines.plain_corpora import PLAIN_CORPORA, MEIHUA
 
 CAST = datetime(2024, 5, 15, 10, 30)
 XU_CAST = datetime(2024, 5, 15, 20, 30)     # 同一日的戌时（时辰序 11）
@@ -353,3 +356,99 @@ def test_meihua_endpoint(client: TestClient) -> None:
     assert [f["delta"] for f in body["score_factors"]] == [-8, 8, -1, 3]
     assert body["score"] == 52
     assert body["engine"] == "meihua-tiyong"
+
+
+# --- 白话整段与出处块（多系统白话计划 Task 7）------------------------------------
+
+#: 参考盘 报数[7,3] 于 2024-05-15 10:30（巳时）的白话整段：山火贲，体离火（旺）、用艮土（相），
+#: 体生用，指数 52 → 中平。七行逐字来自语料表，改动任一条即红（长度 61/56/92/52/90/54/55；
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "`
+#: `from app.engines.meihua import cast_meihua;from datetime import datetime;`
+#: `print([len(s) for s in cast_meihua(method='number',numbers=[7,3],question=None,`
+#: `cast_time=datetime(2024,5,15,10,30)).plain_summary.split(chr(10))])"`）。
+PLAIN_MAIN_ANCHOR = [
+    "把这一卦按体、用两侧各读一遍：先说体用之间的生克，再顺着你这一侧的取象与卦气，然后是对方那一侧的，两侧同为一卦时只说一遍。",
+    "体卦去生用卦，你的力气是往外花在这件事上的，付出多而收回少，这一段是容易亏空的一格，进来与出去的数目常常不相称。",
+    "离取象为火，你在这一步见到的人是次女、读书人、军中之人与相貌出众的人，落在身上是目、心与血脉，方位在南，物上是火、书画、甲胄一类与文明相关的器物，性子是外面明亮、内里附丽，来得快也急。",
+    "这一卦的五行正当其时，你看到的是正盛的一股劲，好事遇上它加力，坏事遇上它也减几分，五档里数它的加力最多。",
+    "艮取象为山，你在这一步见到的人是少年男子、小孩子、住山的人与修行之人，落在身上是手、指、背与鼻，方位在东北，物上是山石、门阙、果实与床，性子是静止稳重，也固执，事情到它这里就停住。",
+    "这一卦被当令的五行所生，你看到的是正在长起来的一股劲，助力一点点变多，这件事有后续，不是一眼看得见底的那种。",
+    "合起来读，你这一卦落在中平，表的措辞在这一档不给你取向，顺与吃力都按条目自己那句读，这一档不替你判哪一边更重。",
+]
+
+
+def test_plain_summary_reads_the_body_side_then_the_use_side() -> None:
+    """五句正文 + 开篇 + 收尾，序即盘面序（`TiYongParty` 的字段序：取象在卦气之前）。"""
+    assert _cast(CASES[0]).plain_summary.split("\n") == PLAIN_MAIN_ANCHOR
+
+
+def test_a_pure_hexagram_says_the_shared_sentences_once() -> None:
+    """八纯卦（坤为地）体用同卦同气：类象与卦气各只说一遍，整段从七行收成五行。
+
+    这就是公共层 `dedupe()` 在梅花这一侧的存在理由：逐条搬运会让同一句在同一段里
+    连说两遍，而它今天有真实盘面能触发（报数[16,8] 与 [3,3] 两张锚卦都是八纯卦）。
+    """
+    result = cast_meihua(method="number", numbers=[16, 8], question=None, cast_time=CAST)
+    assert (result.ti.trigram.key, result.yong.trigram.key) == ("kun", "kun")
+    assert result.ti.wangshuai == result.yong.wangshuai
+    lines = result.plain_summary.split("\n")
+    assert len(lines) == 5
+    assert len(set(lines)) == 5, "同一段里出现了重复句"
+
+
+def test_the_zero_delta_gua_qi_row_still_gets_its_sentence() -> None:
+    """`grouping="keep"` 的实证：体卦处「休」时账本符号是 0，分带会当场拒装配（ValueError）。
+
+    报数[5,2] 用克体、体卦巽木在巳月处休，`_wangshuai_delta("休") == 0`
+    （`app/engines/meihua.py` 的 `_wangshuai_delta`）。走 band 分支这一格两头都不进，白话层要么崩要么丢句，
+    走 keep 它照旧成段——这就是 spec §6 给梅花选 keep 的全部理由，钉在真实盘上。
+    """
+    result = cast_meihua(method="number", numbers=[5, 2], question=None, cast_time=CAST)
+    assert result.ti.wangshuai == "休"
+    assert [factor.delta for factor in result.score_factors][1] == 0
+    assert MEIHUA.entries[wangshuai_key("休")] in result.plain_summary.split("\n")
+
+
+def test_closers_cover_exactly_the_bands_the_engine_prints() -> None:
+    """收尾句键集 == `_verdict_band` 的像集（G3：closers 的键必须恰是该系统的档位集合）。
+
+    逐档 label 由 `_verdict_band` 现算，15 张锚卦各自的末行也各钉一次，两半合起来
+    才是「引擎印得出的档，白话都有下文；白话写出的档，引擎都印得出」。
+    """
+    assert {_verdict_band(score) for score in range(0, 101)} == set(MEIHUA.closers)
+    assert {case.band for case in CASES} == set(MEIHUA.closers)      # 六档十五锚全覆盖
+    for case in CASES:
+        result = _cast(case)
+        assert result.plain_summary.split("\n")[-1] == MEIHUA.closers[case.band]
+
+
+def test_plain_summary_never_quotes_the_gua_ci() -> None:
+    """卦辞今译是丁组 `zhouyi_plain` 的活（spec §6 末段）：本表一条都不许带。
+
+    钉「不含原文」而不是钉「不含今译」：原文是表里就有的字符串，今译一旦并表，
+    同一句卦辞就有了两个转述版本，这条门是那次合并之前的最后一道闸。
+    """
+    for case in CASES:
+        result = _cast(case)
+        assert result.ben.gua_ci not in result.plain_summary
+
+
+def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
+    """出处清单：五张表一张不多一张不少，版本同 `CONTENT_VERSION`（AGENTS.md §7）。"""
+    provenance = _cast(CASES[0]).provenance
+    assert [table.name for table in provenance.tables] == [
+        "meihua", "meihua_plain", "zhouyi_trigrams", "zhouyi_hexagrams", "zhouyi_text",
+    ]
+    assert {table.version for table in provenance.tables} == {CONTENT_VERSION}
+    assert all(table.source for table in provenance.tables)
+    # 历法来源认账的是**库**，不是推导器名（AGENTS.md §6；顶层 engine 才是 meihua-tiyong）。
+    assert provenance.engine == "lunar-python"
+    # 口径句必须说得出算式与确定性这两件可核对的事，否则它只是一句广告。
+    assert "mod 8" in provenance.method and "无随机" in provenance.method
+
+
+def test_meihua_corpus_is_the_one_the_registry_holds() -> None:
+    """登记身份闸（裁定 R24，与姓名学/合盘同形）。工厂按 `PLAIN_CORPORA.values()` 跑表，
+    看不见键覆盖：两行同 `system` 时 Python 静默留最后一行，前一张表就此掉出闸外，
+    而工厂的两条形状断言照样绿。这一条由消费方自证在场，且它在 Step 5 就已经是绿的。"""
+    assert PLAIN_CORPORA["meihua"] is MEIHUA

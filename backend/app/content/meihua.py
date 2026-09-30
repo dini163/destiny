@@ -16,6 +16,9 @@ reference text and imagery, never a runtime computation.
 
 from dataclasses import dataclass
 
+#: 书级出处：体用与卦气的判词、八卦类象的六项对应皆出此二者（类象逐条出《说卦传》）。
+MEIHUA_SOURCE = "邵雍《梅花易数》· 八卦万物类象出《周易·说卦传》"
+
 
 @dataclass(frozen=True)
 class BaguaImage:

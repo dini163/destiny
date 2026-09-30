@@ -11,13 +11,15 @@
 那条索引若缺一格，某一组上下卦的盘会在 `_hexagram()` 里 KeyError，而那一格恰好不在十五张锚卦里）、
 **体用五行与卦气的 5×5 全组合**（引擎只按两行查表，表缺一格就有一类盘没有结论）。
 
-**一处语料诚实性缺口（记入本轮报告，不在测试里替它背书）**：`app/content/meihua.py` 的
-万物类象与体用判词没有登记进 `app/content/__init__.py` 的任何一份 `*_CONTENT_SOURCES`，
-`MeihuaCast` 响应也没有 `provenance` 字段——读者无法从响应里知道断语出自哪张表。本模块因此
-不钉「出处齐」这条门（钉了就是把缺陷写成契约）。
+**出处缺口已于 2026-09-30 闭合**（多系统白话计划 Task 7）：`MeihuaCast` 现有 `provenance`，
+`app/content/__init__.py` 现有 `MEIHUA_CONTENT_SOURCES`，万物类象与体用判词从此可查。
+清单的五张表（wuxing 不进，lunar-python 以 `provenance.engine` 短值认账而不进 tables）钉在
+`tests/golden/test_meihua_golden.py::test_provenance_lists_exactly_the_five_tables_the_cast_reads`，
+本模块仍只管表体（先天卦数、8×8 全覆盖、体用与卦气的 5×5 全组合），出处不重复钉。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/content/test_meihua_corpus.py -q` → 9 passed（2026-09-26 实录）。
+tests/content/test_meihua_corpus.py -o addopts=""` → 9 passed（2026-09-30 复测；旧写法带 `-q`，
+与本仓库 `pyproject.toml` 的 `addopts = "-q"` 叠成 `-qq`，统计行不打印，命令自证不了自己）。
 """
 
 import unicodedata

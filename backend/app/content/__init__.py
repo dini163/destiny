@@ -18,6 +18,8 @@ from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kabbalah import KABBALAH_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.lenormand import LENORMAND_SOURCE
+from app.content.meihua import MEIHUA_SOURCE
+from app.content.meihua_plain import MEIHUA_PLAIN_SOURCE
 from app.content.name_numerology import NUMEROLOGY_SOURCE
 from app.content.name_plain import NAME_PLAIN_SOURCE
 from app.content.name_sancai import SANCAI_SOURCE
@@ -171,4 +173,22 @@ VEDIC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("synastry_scoring", SYNASTRY_SOURCE),
     ("synastry_plain", SYNASTRY_PLAIN_SOURCE),
+)
+
+#: 梅花一页真正读到的五张表。单列理由同 `NAME_CONTENT_SOURCES`：混进 `CONTENT_SOURCES`
+#: 等于让八字声称引了它没用过的周易表。三张 `zhouyi_*` 是梅花**真的**在引——卦名卦画
+#: （`zhouyi_hexagrams`）、先天卦数（`zhouyi_trigrams`）、页面上那句卦辞（`zhouyi_text`）。
+#: 不列的两张各有其因：`content/wuxing` 只提供生克关系这一结构运算、其文字不进任何响应
+#: （同 `CONTENT_SOURCES` 今天也不列 wuxing 的既有口径）；`lunar-python` 定农历数与月建，
+#: 它是**库**不是语料表（没有 `CONTENT_VERSION` 可填进 `ProvenanceTable.version`），已在
+#: `provenance.engine` 那一格按八字 `engines/bazi.py:352` 的短值口径认账，故它不进 tables
+#: 也不是漏账；被转述的外部文案才需要列进 tables，
+#: 那是 `ALMANAC_CONTENT_SOURCES` 把通书宜忌列出来的唯一原因。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import MEIHUA_CONTENT_SOURCES; print(len(MEIHUA_CONTENT_SOURCES))"` → 5。
+MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("meihua", MEIHUA_SOURCE),
+    ("meihua_plain", MEIHUA_PLAIN_SOURCE),
+    ("zhouyi_trigrams", "八卦卦名、卦象与邵雍先天卦序"),
+    ("zhouyi_hexagrams", "《周易》通行本文王六十四卦卦序与卦画"),
+    ("zhouyi_text", "《周易》卦辞 · 通行本（王弼注本）公版原文"),
 )

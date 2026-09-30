@@ -14,14 +14,17 @@ then reads it through 体用生克 rather than 六爻纳甲:
 Calendar facts (lunar year/month/day, 时辰, 月建) come from ``lunar-python``; the
 hexagram structure and 卦辞 come from the shared Zhouyi content tables; the 五行
 cycles and the reference imagery/judgements come from :mod:`app.content`. The
-engine is pure: no HTTP, no I/O, and no randomness (梅花 raising is deterministic).
+``plain_summary`` paragraph is assembled by :func:`app.engines.plain_compose.compose`
+out of :mod:`app.content.meihua_plain` sentences moved verbatim — this module adds no
+prose of its own (多系统白话 spec §5). The engine is pure: no HTTP, no I/O, and no
+randomness (梅花 raising is deterministic).
 """
 
 from datetime import datetime
 
 from lunar_python import Solar
 
-from app.content import zhouyi_text
+from app.content import CONTENT_VERSION, MEIHUA_CONTENT_SOURCES, zhouyi_text
 from app.content.meihua import (
     SEASON_BY_MONTH_ZHI,
     TIYONG_RELATIONS,
@@ -29,6 +32,7 @@ from app.content.meihua import (
     leixiang_summary,
     wangshuai_state,
 )
+from app.content.meihua_plain import leixiang_key, tiyong_key, wangshuai_key
 from app.content.wuxing import CONTROLS, GENERATES, ZHI_ELEMENT
 from app.content.zhouyi_hexagrams import (
     HEXAGRAM_BY_TRIGRAMS,
@@ -38,11 +42,15 @@ from app.content.zhouyi_hexagrams import (
 )
 from app.content.zhouyi_trigrams import TRIGRAM_BY_KEY, TRIGRAM_BY_MEIHUA, Trigram
 from app.core.errors import InvalidCastInputError
+from app.engines.plain_compose import compose, dedupe
+from app.engines.plain_corpora import MEIHUA
+from app.schemas.common import ProvenanceTable
 from app.schemas.meihua import (
     MeihuaCast,
     MeihuaDerivation,
     MeihuaHexagram,
     MeihuaMethod,
+    MeihuaProvenance,
     MeihuaTrigram,
     ScoreFactor,
     TiYongParty,
@@ -52,6 +60,24 @@ from app.schemas.meihua import (
 
 _BRANCH_ORDER = "子丑寅卯辰巳午未申酉戌亥"
 _MAX_NUMBERS = 3
+
+#: 溯源两句话。**历法库这一格照八字写成一个短值**（`engines/bazi.py:352` 的
+#: `engine="lunar-python"`、`schemas/bazi_breakdown.py:34` 的「四柱来源引擎，恒为
+#: lunar-python」），不要学 `numerology.py:146` 那句整段散文——那是不读历法库的系统才
+#: 写得出的口径。梅花读 lunar-python（本模块 `cast_meihua` 里的 `Solar.fromDate(...).getLunar()`
+#: 与 `eight_char.getMonthZhi()`），不写它就是读了不认账（AGENTS.md §7）；写成整句则会与
+#: 前端 `meta` 行的短值版式相抵（BaziNatalPage.tsx:301 是 `{label: '排盘引擎', value: ...}`）。
+#: 释义归 `METHOD_STATEMENT`，它只重述算式与取数之界（历数 vs 节令月），不带断语。
+ENGINE_LUNAR = "lunar-python"
+METHOD_STATEMENT = (
+    "体用法出自邵雍《梅花易数》。时间法：上卦 = (年支序 + 农历月 + 农历日) mod 8、"
+    "下卦 = 再加时辰序 mod 8、动爻 = 下卦之和 mod 6；报数法：两数或以上以首数定上卦、"
+    "次数定下卦、诸数合计定动爻，单守则加时辰序。余零作除数本身；先天卦数 "
+    "1乾 2兑 3离 4震 5巽 6坎 7艮 8坤；互卦取二三四与三四五爻，变卦只改动爻；"
+    "无动爻之卦为体、有动爻之卦为用。卦气的月建取节气月（`getMonthZhi()`），"
+    "与起卦所用的农历年月日各自一届，立春与春节之间的日子两套历法各取其界。"
+    "起卦与体用推算是确定性运算，无随机。"
+)
 
 
 # --- 起卦: derive the two trigram numbers and the moving line ----------------
@@ -267,6 +293,7 @@ def cast_meihua(
     ]
     score = max(0, min(100, 50 + sum(factor.delta for factor in factors)))
     verdict = _verdict_band(score)
+    plain_summary = meihua_plain_summary(ti, yong, relation.key, verdict)
 
     summary = (
         f"{verdict}。本卦{ben.full_name_zh}，{ti_trigram.name_zh}{ti_trigram.nature_zh}为体、"
@@ -295,6 +322,8 @@ def cast_meihua(
         score_factors=factors,
         verdict=verdict,
         summary=summary,
+        plain_summary=plain_summary,
+        provenance=meihua_provenance(),
     )
 
 
@@ -323,6 +352,41 @@ def _bian_analysis(ben: Hexagram, bian: Hexagram, yong_position: str, ti_element
     clamped = max(-6, min(6, weight))
     text = f"用方由{origin.name_zh}{origin.element}变{changed.name_zh}{changed.element}，{rel}（结局{clamped:+d}）。"
     return text, clamped
+
+
+def meihua_plain_summary(ti: TiYongParty, yong: TiYongParty, relation_key: str, band: str) -> str:
+    """体用两侧的五句白话收成一段（八纯卦时用 `dedupe` 收成三句正文）。
+
+    符号一律传 0：`grouping="keep"` 不查符号，而类象两条与用侧卦气在账本里本就没有对应
+    行（`score_factors` 只有体卦的卦气），传真数会传进三个假数、传假数又要人分辨真假，
+    不如整列都是同一个占位符，把「本表不分带」这句话写在调用点上。
+    """
+    return compose(
+        MEIHUA,
+        "summary",
+        dedupe(
+            [
+                (tiyong_key(relation_key), 0),
+                (leixiang_key(ti.trigram.key), 0),
+                (wangshuai_key(ti.wangshuai), 0),
+                (leixiang_key(yong.trigram.key), 0),
+                (wangshuai_key(yong.wangshuai), 0),
+            ]
+        ),
+        band,
+    )
+
+
+def meihua_provenance() -> MeihuaProvenance:
+    """响应自带出处：历法库一个短值，五张表全取自 `MEIHUA_CONTENT_SOURCES`，本模块不再列第二遍表名。"""
+    return MeihuaProvenance(
+        engine=ENGINE_LUNAR,
+        method=METHOD_STATEMENT,
+        tables=[
+            ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+            for module, source in MEIHUA_CONTENT_SOURCES
+        ],
+    )
 
 
 def _wangshuai_delta(state: str) -> int:

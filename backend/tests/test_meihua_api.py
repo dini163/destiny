@@ -1,4 +1,4 @@
-"""梅花端点契约（Task 6 Step 4）：顶层与逐层键集**手写**、报数入参归引擎（400）、无出处块。
+"""梅花端点契约（Task 6 Step 4）：顶层与逐层键集**手写**、报数入参归引擎（400）、出处块五张表齐。
 
 卦象的**对错**测在 `tests/golden/test_meihua_golden.py`（十五张手推锚卦 + 报数护栏），
 表的**齐不齐**测在 `tests/content/test_meihua_corpus.py`；本模块只管 HTTP 这一层有没有把
@@ -11,11 +11,10 @@
   （`app/core/errors.py:10`），而报数护栏正是它的地盘 —— 「1 至 3 个正整数」坏的是
   `numbers` 与 `method` 之间的**关系**（`method="number"` 时才算必填），每个字段单看都合法，
   故归引擎不归 pydantic（AGENTS 第 4 条）。对照门是 `method="coin"` → 422 `enum`。
-* **响应里没有 `provenance` 块**（顶层键集钉死即把它钉成「缺席」）：`MeihuaCast` 与
-  `frontend/src/types/meihua.ts` 两边都没有这一格，`app/content/meihua.py` 的万物类象与体用判词
-  也没登记进 `app/content/__init__.py` 的任何一份 `*_CONTENT_SOURCES`。按 AGENTS 第 7 条，
-  读者应当能从响应里知道断语出自哪张表 —— 这是本轮的**出处缺口 finding**，不在测试里
-  替它立契（本模块只钉「两边抄本一致 + 键集如手写的」，将来补 provenance 是显式改动）。
+* **出处块自 2026-09-30 起在场**（多系统白话计划 Task 7）：`MeihuaCast.provenance` 与
+  `plain_summary` 是必填两格，`tables` 逐字来自 `MEIHUA_CONTENT_SOURCES` 的五张表。此前本
+  模块把「没有 provenance」钉成顶层键集的一部分并记为出处缺口 finding——缺口已闭合，
+  键集钉的是**在场且齐**：少一格、多一格、两份抄本不一致，三条都红。
 * **无随机**：AGENTS 第 5 条的 CSPRNG 铁律只管抽签类引擎（tarot/lenormand/runes/zhouyi），
   梅花是确定性算术（报数 ÷8、÷6 与农历数），所以这里钉的是「同入参两次逐字节相同 +
   换报数必换盘」，后者同时排除「端点其实回了一张常量盘」这种假绿。
@@ -23,8 +22,8 @@
   偏移一丢就是整盘换了卦。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/test_meihua_api.py -q` → 32 passed（2026-09-27 实录：域错误六条 + pydantic 六条
-参数化 + 极值日期四条参数化，其余单条）。
+tests/test_meihua_api.py -o addopts=""` → 33 passed（2026-09-30 实录：域错误六条 + pydantic 六条
+参数化 + 极值日期四条参数化，其余单条；出处块那条单列，故 32 加一）。
 """
 
 import re
@@ -51,6 +50,7 @@ TOP_LEVEL_KEYS = {
     "ti", "yong", "tiyong", "wangshuai",
     "hu_analysis", "bian_analysis",
     "score", "score_factors", "verdict", "summary", "engine",
+    "plain_summary", "provenance",
 }
 
 DERIVATION_KEYS = {"upper_number", "lower_number", "moving_position", "formula", "inputs"}
@@ -60,14 +60,17 @@ PARTY_KEYS = {"role", "trigram", "leixiang", "wangshuai", "wangshuai_text"}
 VERDICT_KEYS = {"relation", "relation_zh", "verdict", "grade", "text"}
 WANGSHUAI_KEYS = {"month_zhi", "season_zh", "commanding_element"}
 FACTOR_KEYS = {"label", "detail", "delta"}
+PROVENANCE_KEYS = {"engine", "method", "tables"}
+PROVENANCE_TABLE_KEYS = {"name", "version", "source"}   # 镜像 schemas/common.py:ProvenanceTable
 
 RELATION_KEYS = {"yong_sheng_ti", "bi_he", "ti_ke_yong", "ti_sheng_yong", "yong_ke_ti"}
 WANGSHUAI_STATES = {"旺", "相", "休", "囚", "死"}
 BANDS = {"上吉", "吉", "小吉", "中平", "小凶", "凶"}
 
 # ------------------------------------------------------------------ 前端声明（手抄）
-# 照 `frontend/src/types/meihua.ts` 的八个 interface 逐字重抄；不在后端测试里读前端树，
-# 两份各抄一次才有门（抄写约定同 `tests/test_ziwei_api.py:60-82`）。
+# 照 `frontend/src/types/meihua.ts` 的响应侧 interface 逐字重抄；不在后端测试里读前端树，
+# 两份各抄一次才有门（抄写约定同 `tests/test_ziwei_api.py:60-82`）。出处块那两层的本子照
+# 本模块 `MeihuaProvenance` 与 `schemas/common.py:ProvenanceTable` 的形状抄，前端落地时同名。
 
 FRONTEND_CAST_KEYS = {
     "method", "question", "cast_time", "derivation",
@@ -75,6 +78,7 @@ FRONTEND_CAST_KEYS = {
     "ti", "yong", "tiyong", "wangshuai",
     "hu_analysis", "bian_analysis",
     "score", "score_factors", "verdict", "summary", "engine",
+    "plain_summary", "provenance",
 }
 
 FRONTEND_DERIVATION_KEYS = {"upper_number", "lower_number", "moving_position", "formula", "inputs"}
@@ -86,6 +90,8 @@ FRONTEND_PARTY_KEYS = {"role", "trigram", "leixiang", "wangshuai", "wangshuai_te
 FRONTEND_VERDICT_KEYS = {"relation", "relation_zh", "verdict", "grade", "text"}
 FRONTEND_WANGSHUAI_KEYS = {"month_zhi", "season_zh", "commanding_element"}
 FRONTEND_FACTOR_KEYS = {"label", "detail", "delta"}
+FRONTEND_PROVENANCE_KEYS = {"engine", "method", "tables"}
+FRONTEND_PROVENANCE_TABLE_KEYS = {"name", "version", "source"}
 
 KEY_LAYERS: list[tuple[str, set[str], set[str]]] = [
     ("derivation", DERIVATION_KEYS, FRONTEND_DERIVATION_KEYS),
@@ -95,6 +101,7 @@ KEY_LAYERS: list[tuple[str, set[str], set[str]]] = [
     ("tiyong", VERDICT_KEYS, FRONTEND_VERDICT_KEYS),
     ("wangshuai", WANGSHUAI_KEYS, FRONTEND_WANGSHUAI_KEYS),
     ("score_factors[]", FACTOR_KEYS, FRONTEND_FACTOR_KEYS),
+    ("provenance", PROVENANCE_KEYS, FRONTEND_PROVENANCE_KEYS),
 ]
 
 
@@ -118,7 +125,7 @@ def test_the_cast_comes_back_with_exactly_the_hand_written_contract(client: Test
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 19  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
+    assert len(TOP_LEVEL_KEYS) == 21  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
     assert body["engine"] == "meihua-tiyong"
     assert body["method"] == "number"
     assert body["question"] is None
@@ -143,6 +150,18 @@ def test_nested_objects_carry_exactly_their_declared_keys(client: TestClient) ->
     assert set(body["wangshuai"]) == WANGSHUAI_KEYS
     for factor in body["score_factors"]:
         assert set(factor) == FACTOR_KEYS
+
+
+def test_the_provenance_block_and_each_table_row_carry_exactly_the_declared_keys(
+    client: TestClient
+) -> None:
+    """出处块三格与逐表三格的形状钉死；五张表的**名单**测在 golden，这里只管每格有什么。"""
+    body = _post(client).json()
+    assert set(body["provenance"]) == PROVENANCE_KEYS
+    assert body["provenance"]["engine"] == "lunar-python"
+    assert body["provenance"]["method"]
+    for table in body["provenance"]["tables"]:
+        assert set(table) == PROVENANCE_TABLE_KEYS
 
 
 def test_the_three_hexagrams_share_one_shape_and_a_six_line_alphabet(client: TestClient) -> None:
@@ -391,6 +410,7 @@ def test_the_openapi_contract_advertises_the_same_key_sets(client: TestClient) -
     assert set(schemas["TiYongVerdict"]["properties"]) == VERDICT_KEYS
     assert set(schemas["WangshuaiInfo"]["properties"]) == WANGSHUAI_KEYS
     assert set(schemas["app__schemas__meihua__ScoreFactor"]["properties"]) == FACTOR_KEYS
+    assert set(schemas["MeihuaProvenance"]["properties"]) == PROVENANCE_KEYS
     # 四个入参都有默认值：缺省即「此刻以年月日时起一卦」。
     assert "required" not in schemas["MeihuaCastRequest"]
     assert set(schemas["MeihuaCastRequest"]["properties"]) == {
@@ -419,6 +439,9 @@ def test_the_response_contains_no_field_the_frontend_never_declared(client: Test
         assert not set(party["trigram"]) - FRONTEND_TRIGRAM_KEYS
     for factor in body["score_factors"]:
         assert not set(factor) - FRONTEND_FACTOR_KEYS
+    assert not set(body["provenance"]) - FRONTEND_PROVENANCE_KEYS, "provenance"
+    for table in body["provenance"]["tables"]:
+        assert not set(table) - FRONTEND_PROVENANCE_TABLE_KEYS
 
 
 def test_the_frontend_declares_no_field_the_response_never_sends(client: TestClient) -> None:
@@ -433,6 +456,7 @@ def test_the_frontend_declares_no_field_the_response_never_sends(client: TestCli
         "tiyong": body["tiyong"],
         "wangshuai": body["wangshuai"],
         "score_factors[]": body["score_factors"][0],
+        "provenance": body["provenance"],
     }
     for path, _, frontend in KEY_LAYERS:
         node = samples[path]

@@ -13,6 +13,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class MeihuaMethod(str, Enum):
     """How the hexagram is raised (起卦法)."""
@@ -36,6 +38,22 @@ class MeihuaCastRequest(BaseModel):
     )
     question: str | None = Field(default=None, description="Optional question the divination addresses.")
     cast_time: datetime | None = Field(default=None, description="Cast moment; defaults to now.")
+
+
+class MeihuaProvenance(BaseModel):
+    """出处块：推导口径两句话 + 本端点真读到的五张语料表。
+
+    本块是 2026-09-30 多系统白话计划补上的：`tests/test_meihua_api.py` 与
+    `tests/content/test_meihua_corpus.py` 两处 docstring 曾把「响应里没有 provenance」
+    记成出处缺口 finding，白话语料表一建，这张表就必须可查（AGENTS.md §7）。
+    顶层 `MeihuaCast.engine`（恒为 `meihua-tiyong`）是**本端点的推导器名**，本块的
+    `engine` 是**历法事实来自哪个库**——两个键同名不同职，形状照
+    `schemas/bazi_breakdown.py:32-35` 的 `Provenance(engine, tables)` 抄。
+    """
+
+    engine: str = Field(description="历法来源引擎，恒为 lunar-python。")
+    method: str = Field(description="起卦与卦气的算式口径原文，读者拿它能核对响应里的数。")
+    tables: list[ProvenanceTable] = Field(description="本页真正读到的五张表，来自 MEIHUA_CONTENT_SOURCES。")
 
 
 class MeihuaDerivation(BaseModel):
@@ -138,5 +156,9 @@ class MeihuaCast(BaseModel):
     score_factors: list[ScoreFactor] = Field(description="The factors that produced the index.")
     verdict: str = Field(description="综合吉凶 verdict label.")
     summary: str = Field(description="综合断语 synthesising 体用/卦气/互变.")
+    plain_summary: str = Field(
+        description="白话总论：体用生克 + 两侧取象与卦气 + 档位收尾，逐字来自 meihua_plain。"
+    )
+    provenance: MeihuaProvenance
 
     engine: str = Field(default="meihua-tiyong", description="Derivation engine name.")
