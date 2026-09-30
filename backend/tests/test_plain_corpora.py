@@ -21,19 +21,10 @@ import pytest
 
 from app.engines.plain_compose import PlainCorpus, is_slot_key
 from app.engines.plain_corpora import PLAIN_CORPORA
+from tests.plain_wording import FORBIDDEN, SLOT_FORBIDDEN
 
 CORPORA = list(PLAIN_CORPORA.values())
 SYSTEMS = [corpus.system for corpus in CORPORA]
-
-#: 机检禁字集逐字取自第一期 spec §3 第 2 条：「（《」与「』」是出处引用标记，「；」是
-#: 拼接残留。「则」「之」同条只列为**风格**要求，不进机检——单字黑名单会连带打死
-#: 「规则」「之前」，红得一派无辜（第一期控制器裁定 R3，本表沿用同一口径）。
-FORBIDDEN = ("；", "（《", "』")
-
-#: 槽位词条是名词短语，不许自带结论（spec §5 规则 5：判断只能来自词条自身之外的
-#: 档位收尾句，而槽位词条不参与收尾）。「。」同禁：槽位文本是被嵌在句子中间的，
-#: 自带句号会把一句白话劈成两句，正好破坏装配器唯一的标点契约。
-SLOT_FORBIDDEN = (*FORBIDDEN, "吉", "凶", "宜", "忌", "你", "{", "}", "\n", "。")
 
 _PLACEHOLDER = re.compile(r"\{[a-z][a-z0-9_]*\}")
 
