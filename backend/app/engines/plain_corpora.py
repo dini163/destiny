@@ -56,7 +56,7 @@ NAME = PlainCorpus(
         "summary": name_plain.NAME_SUMMARY_OPENER,
     },
     closers={**name_plain.NAME_SCORE_CLOSERS, **name_plain.NAME_SANCAI_CLOSERS},
-    # 分带符号取自 NameFortune 与 HARMONIOUS_RELATIONS 的既有次序，不取 delta：
+    # 分带符号取自 NameFortune 的顺/注两侧 + HARMONIOUS_RELATIONS 的归属，不取 delta：
     # FORTUNE_SCORES 的最低档「凶」是 0 分，delta = 权重 × 分值 恒 ≥ 0，按 delta 分带会
     # 成建制地丢句（spec 裁定 R2）。符号由 Task 5 的引擎算好传入，装配器不认识 NameFortune。
     grouping="band",
