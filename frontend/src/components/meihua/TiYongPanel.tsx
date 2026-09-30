@@ -22,8 +22,8 @@ const ROLE_META: Record<string, { title: string; gloss: string }> = {
  * 生克 relation (用生体 / 比和 / 体克用 / 体生用 / 用克体) and its judgement. All
  * text is the engine's own; the panel only colours and arranges it.
  *
- * 阅读顺序按 spec §10 的裁定 R8 排：白话整段（`plain_summary`）在上，技术判语
- * （`tiyong.text`）降为脚注一小行。面板自己一个字都不写，两段的字都来自引擎。
+ * 阅读顺序按 spec §10 第一条 bullet「清单类就地嵌」排：白话整段（`plain_summary`）在上，
+ * 技术判语（`tiyong.text`）降为小字脚注。面板自己一个字都不写，两段的字都来自引擎。
  */
 export function TiYongPanel({ cast }: TiYongPanelProps) {
   const { ti, yong, tiyong, wangshuai } = cast;

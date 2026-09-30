@@ -75,7 +75,7 @@ export function MeihuaControls({
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              随感随应、物象心机。以年月日时或报数起卦，定体用、察互变、衡卦气旺衰，依体用生克直断吉凶。起卦纯为确定性推算，同数同刻必得同卦。
+              随感随应、物象心机。以年月日时或报数起卦，定体用、察互变、衡卦气旺衰，依体用生克直断吉凶。同数同刻必得同卦。
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export function MeihuaControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          农历月日、时辰与月令由 <span className="text-gold-soft">lunar-python</span> 真实推算；卦象、卦辞取自策展《周易》数据，未作运行时虚构。
+          起卦之后，本页会把这一次读过的每一张表、历法引擎与算式口径逐条列在盘下，出处由引擎署名，控制台不代它声明。
         </span>
       </div>
     </form>
