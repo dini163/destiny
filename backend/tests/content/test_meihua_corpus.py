@@ -125,8 +125,7 @@ def test_hexagram_names_and_glyphs_do_not_repeat() -> None:
 
     卦符按 Unicode 区块（U+4DC0 起）就是文王序，这一条相当于拿 Unicode 字符数据库外部核对
     了一遍序号（同 `tests/content/test_rune_corpora.py` 用 `unicodedata.name()` 核字形的做法）。
-    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "`
-    `import unicodedata;print([unicodedata.name(chr(0x4DC0+i)) for i in (0,21,63)])"`
+    复测（2026-09-30 实录，一行可贴）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import unicodedata;print([unicodedata.name(chr(0x4DC0+i)) for i in (0,21,63)])"` → ['HEXAGRAM FOR THE CREATIVE HEAVEN', 'HEXAGRAM FOR GRACE', 'HEXAGRAM FOR BEFORE COMPLETION']
     """
     assert len({h.name_zh for h in HEXAGRAMS}) == 64
     assert len({h.full_name_zh for h in HEXAGRAMS}) == 64

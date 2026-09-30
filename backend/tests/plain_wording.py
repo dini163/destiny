@@ -6,11 +6,11 @@
 `from tests.plain_wording import …` 引（同 `tests/content/name_radical_fixture.py` 的引法，
 无需 `__init__.py`，也无需动 `conftest.py`）。
 
-复测两个口径仍各在其位：cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/test_plain_corpora.py tests/content/test_bazi_plain_corpus.py -o addopts="" → 226 + 4 passed（2026-09-30 实录，复测前基线）。
+复测两个口径仍各在其位（条数随登记表增长，数以命令输出为准，本注释不钉数）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/test_plain_corpora.py -o addopts=""` 与 `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/content/test_bazi_plain_corpus.py -o addopts=""`。
 """
 
 #: 机检禁字集逐字取自第一期 spec §3 第 2 条：「（《」与「』」是出处引用标记，「；」是
-#: 拼接残留。「则」「之」同条只列为**风格**要求，不进机检——单字黑名单会连带打死
+#: 拼接残留。「则」「之」同条只列为**风格**要求（白话不得有文言句式），不进机检——单字黑名单会连带打死
 #: 「规则」「之前」，红得一派无辜（第一期控制器裁定 R3，本表沿用同一口径）。
 FORBIDDEN = ("；", "（《", "』")
 

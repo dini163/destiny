@@ -340,11 +340,7 @@ def test_a_lunar_input_reproduces_the_same_board_as_its_solar_equivalent(client:
 #: 好让回显的农历串就是断言对象；日期本身另在
 #: `tests/golden/test_ziwei_golden.py::SWEPT_BIRTHS` 有引擎层的扫盘锚。
 #: 农历串取权威库复核（AGENTS.md 第 6 条：不自算历法）—— 年取 `getYearInGanZhi()`、
-#: 月日取 `getMonthInChinese()/getDayInChinese()`，与本断言同形。复测：
-#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "`
-#: `from lunar_python import Solar;l=Solar.fromYmdHms(1900,1,1,12,0,0).getLunar();`
-#: `print(l.getYearInGanZhi()+'年'+l.getMonthInChinese()+'月'+l.getDayInChinese())"`
-#: → 己亥年腊月初一（把日期换成 2100,12,31 → 庚申年腊月初一）。
+#: 月日取 `getMonthInChinese()/getDayInChinese()`，与本断言同形。复测（2026-09-30 实录 → 己亥年腊月初一；把日期换成 2100,12,31 → 庚申年腊月初一）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from lunar_python import Solar;l=Solar.fromYmdHms(1900,1,1,12,0,0).getLunar();print(l.getYearInGanZhi()+'年'+l.getMonthInChinese()+'月'+l.getDayInChinese())"`
 DATE_ENDPOINTS: list[tuple[str, str, str, str, str]] = [
     ("1900-01-01", "己亥年腊月初一", "土五局", "逆行", "未"),
     ("2100-12-31", "庚申年腊月初一", "木三局", "顺行", "未"),

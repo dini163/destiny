@@ -178,6 +178,8 @@ SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: 梅花一页真正读到的五张表。单列理由同 `NAME_CONTENT_SOURCES`：混进 `CONTENT_SOURCES`
 #: 等于让八字声称引了它没用过的周易表。三张 `zhouyi_*` 是梅花**真的**在引——卦名卦画
 #: （`zhouyi_hexagrams`）、先天卦数（`zhouyi_trigrams`）、页面上那句卦辞（`zhouyi_text`）。
+#: `zhouyi_text` 是聚合面，它印进响应的卦辞正文住在 `content/zhouyi_guaci.py` 的 `GUA_CI`
+#: （复测：`cd backend && grep -n "GUA_CI" app/content/zhouyi_text.py`）。
 #: 不列的两张各有其因：`content/wuxing` 只提供生克关系这一结构运算、其文字不进任何响应
 #: （同 `CONTENT_SOURCES` 今天也不列 wuxing 的既有口径）；`lunar-python` 定农历数与月建，
 #: 它供给的是**计算事实**，没有被转述进响应的文案，故不进 tables 也不是漏账——它在
