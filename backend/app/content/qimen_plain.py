@@ -21,7 +21,7 @@ import engines/schemas）。
 
 QIMEN_PLAIN_SOURCE = (
     "本系统白话转述 · 逐条对应 content/qimen.py 的九星·八门·八神类象（nature），"
-    "并转述其五行与本位洛书数，取向字（吉凶中平）不在白话内，仍归源表与盘面"
+    "并转述其五行与本位洛书数，取向字（`luck` 字段那一类判词）不在白话内，仍归源表与盘面"
 )
 
 
