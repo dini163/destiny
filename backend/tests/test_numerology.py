@@ -935,7 +935,13 @@ def test_summary_does_not_quote_any_advice_sentence() -> None:
     """
     chart = compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15))
     summary = chart.plain_summary
-    for item in [*(p.meaning for p in chart.pinnacles), *(c.meaning for c in chart.challenges)]:
+    cycles = chart.personal_cycles
+    for item in [
+        *(p.meaning for p in chart.pinnacles),
+        *(c.meaning for c in chart.challenges),
+        *(cycles.previous_year.meaning, cycles.year.meaning, cycles.next_year.meaning,
+          cycles.month.meaning, cycles.day.meaning),
+    ]:
         assert item not in summary
     for plane in chart.loshu_grid.planes:
         assert plane.text not in summary
