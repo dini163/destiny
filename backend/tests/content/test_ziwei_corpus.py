@@ -25,6 +25,7 @@
 
 import pytest
 
+from app.content import ZIWEI_CONTENT_SOURCES
 from app.content.ziwei import (
     GAN,
     GAN_INDEX,
@@ -48,6 +49,7 @@ from app.content.ziwei import (
     ZIWEI_SERIES,
     ZIWEI_SOURCE,
 )
+from app.content.ziwei_plain import ZIWEI_PLAIN_SOURCE
 
 # ---------------------------------------------------------------- 独立抄写的锚
 # 以下每一份都是**照安星手册重抄**的常量，故意不从 `app.content.ziwei` 派生。
@@ -554,3 +556,19 @@ def test_source_line_names_the_book_and_the_school() -> None:
     """出处串必须点名《紫微斗数全书》并声明四化派别 —— 派别不说，读者无从复核。"""
     assert "紫微斗数全书" in ZIWEI_SOURCE
     assert "四化" in ZIWEI_SOURCE and "全书" in ZIWEI_SOURCE
+
+
+def test_the_page_registers_exactly_its_two_tables_in_order() -> None:
+    """紫微一页的登记逐字钉死：两张表、正表在前、白话表在后。
+
+    为什么这条必须住在登记侧而不是 api 测里：`engines/ziwei.py` 的 `_tables()` 直接遍历
+    这份元组生成响应，于是 `tests/test_ziwei_api.py` 那句「有序名单 + 逐行 source/version」
+    量的是**引擎如实复现登记**——登记表自己加一行、删一行或改表名，被测物与期望值同动，
+    那条测照绿（终审 I-1 实测：调换两行 → 142 全绿）。行名与行序本身的门只能在登记常量的
+    逐字钉上，形状同 `test_qimen_corpus.py` 的 `test_the_corpus_is_registered_under_its_two_tables`
+    与 `test_rune_corpora.py` 那一条。
+    """
+    assert ZIWEI_CONTENT_SOURCES == (
+        ("ziwei", ZIWEI_SOURCE),
+        ("ziwei_plain", ZIWEI_PLAIN_SOURCE),
+    )

@@ -10,7 +10,8 @@
    必须正好一行（`\n` 不出现），T8 的行数等式 `cards + 1` 就是按行切的。
 """
 
-from app.content.lenormand import CARDS, POLARITY_LABEL, SPREADS
+from app.content import LENORMAND_CONTENT_SOURCES
+from app.content.lenormand import CARDS, LENORMAND_SOURCE, POLARITY_LABEL, SPREADS
 from app.content.lenormand_plain import (
     LENORMAND_PLAIN_SOURCE,
     LENORMAND_READINGS,
@@ -34,6 +35,20 @@ def test_lenormand_corpus_is_the_row_the_factory_iterates() -> None:
     # `ValueError`（`plain_compose.py:65-67`）。见下面那条 keep 判据。
     assert LENORMAND.grouping == "keep"
     assert LENORMAND.slot_prefixes == frozenset()
+
+
+def test_the_page_registers_exactly_its_two_tables_in_order() -> None:
+    """雷诺曼一页的登记逐字钉死：两张表、牌义正表在前、白话表在后。
+
+    同住登记侧的理由同 `test_ziwei_corpus.py` 那条同名测（终审 I-1）：`engines/lenormand.py`
+    的 `_tables()` 遍历这份元组生成响应，api 测那句因此只量得到「引擎如实复现登记」，
+    量不到登记表自己加行/删行/改名——两行调换实测 54 全绿。本文件是雷诺曼内容侧唯一的
+    corpus 测，故门落在这里；形状与 `test_qimen_corpus.py`、`test_rune_corpora.py` 一致。
+    """
+    assert LENORMAND_CONTENT_SOURCES == (
+        ("lenormand", LENORMAND_SOURCE),
+        ("lenormand_plain", LENORMAND_PLAIN_SOURCE),
+    )
 
 
 def test_universe_is_the_thirty_six_card_ids_verbatim() -> None:
