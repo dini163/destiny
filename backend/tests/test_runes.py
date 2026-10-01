@@ -385,6 +385,33 @@ def test_synthesis_has_no_nested_colon_and_no_keyword_restatement(spread_id: str
             assert clause.count("：") <= 1, clause
 
 
+#: 空白句的确定性填充符：全是字形对称的符文，`_orientation_for` 对它们连熵源都不问，
+#: 所以整句逐字可预期 —— 不必靠循环抽 400 次碰运气（`fixed_rng` 在本文件就是这个用途）。
+_WYRD_FILLER_KEYS = ["gebo", "hagalaz", "isa", "jera"]
+
+
+@pytest.mark.parametrize("spread_id", SPREAD_IDS)
+def test_wyrd_clause_has_no_nested_colon(spread_id: str, fixed_rng) -> None:
+    """上面那条冒号闸用默认口径抽（`include_wyrd=False`），空白符一行都走不到；
+    而 API 明明把这个开关下发给了读者（`schemas/runes.py:52`、`api/v1/runes.py:32`），
+    故那条分支今天无人守 —— 这里补上。
+
+    空白句在语料释义之前自己又打了一个冒号（「……非古传统：石面上什么也没刻：……」），
+    正是本任务要清除的嵌套冒号在同一条「。」句里的第二个。语料那句的冒号动不得（G2），
+    所以能动的只有框架句那一个分隔符。
+    """
+    size = SPREADS[spread_id].size
+    fixed_rng(["wyrd", *_WYRD_FILLER_KEYS[: size - 1]], orientation="upright")
+    result = draw(spread_id=spread_id, include_wyrd=True)
+
+    assert "wyrd" in result.drawn_keys
+    wyrd_stone = next(stone for stone in result.stones if stone.is_wyrd)
+    # 先证分支真被走到：语料释义逐字在句内，否则下面的闸是空跑。
+    assert wyrd_stone.meaning in result.synthesis
+    for clause in result.synthesis.split("。"):
+        assert clause.count("：") <= 1, clause
+
+
 @pytest.mark.parametrize("spread_id", SPREAD_IDS)
 def test_synthesis_keeps_every_latin_run_parenthesised(spread_id: str) -> None:
     """英文只准待在括注里：`（Perthro` 可以，`落得Perthro` 不行。

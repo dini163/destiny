@@ -261,7 +261,11 @@ RUNES_OPENING_UNASKED = "以{name_zh}（{name}）铸石，未附所问。"
 #: 逐枚句。中文牌名在前、英文在括注，连接符用 `——` 而不是第二层冒号；
 #: 位次只剩中文（英文位次名仍在 `stones[].position_label` 里下发，同一句不重说）。
 RUNES_STONE_LINE = "{position}落得{name_zh}（{name}，{orientation}）——{meaning}"
-RUNES_WYRD_LINE = "{position}落得空白符（Wyrd）——现代增补，非古传统：{meaning}"
+#: 空白符那句用「。」而不是第二个「：」收束：语料自己的释义就以冒号开头
+#: （「石面上什么也没刻：……」，`rune_futhark.py` 的 WYRD），框架句再垫一个冒号就是
+#: 同一句里的两层冒号 —— 正是本模块要清除的那个病症。「现代增补，非古传统」这半句留在
+#: 原处，因为它复述的就是空白符自己的 `source` 凭据（它不据 Kylver、不据 Unicode）。
+RUNES_WYRD_LINE = "{position}落得空白符（Wyrd）——现代增补，非古传统。{meaning}"
 
 
 def _synthesis(
