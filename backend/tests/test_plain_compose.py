@@ -2,7 +2,9 @@
 
 本文件不测任何系统的语料内容，只测装配器的分支与异常。两张表是**测试自造的
 最小 corpus**（不是假命盘、不是假响应，不违反 AGENTS.md §9 的无 mock 铁律）。
-卡巴拉的逐字节判据原先寄在这里，Plan B Task 3 把它迁进了生产侧（见文件末注）。
+卡巴拉的逐字节判据原先寄在这里，Plan B Task 3 把它迁进了生产侧；那条指路注释不在文件末
+（文件末是一条测，不是注），住在本文件 :134。
+复测：`cd backend && grep -n "^# 卡巴拉的逐字节判据住在生产侧" tests/test_plain_compose.py` → `134:` 那一行。
 """
 
 from collections import OrderedDict
