@@ -233,7 +233,7 @@ def _tables() -> list[ProvenanceTable]:
     """`QIMEN_CONTENT_SOURCES` 的第一次被消费（G19）。
 
     复测（当前树）：`cd backend && grep -rn QIMEN_CONTENT_SOURCES app/ tests/ --include=*.py` →
-    定义处 `content/__init__.py:151`、本模块 import `:25` 与消费处 `:242`、`tests/content/
+    定义处 `content/__init__.py:152`、本模块 import `:25` 与消费处 `:242`、`tests/content/
     test_qimen_corpus.py:299` 那条只钉形状的断言——改前只剩定义处与那条断言，是死登记。
     表名只这一处来源，引擎不再抄一份书名（同 `engines/ziwei.py:239-249` 的写法）。
     """

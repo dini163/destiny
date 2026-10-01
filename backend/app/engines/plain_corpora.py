@@ -254,7 +254,7 @@ LENORMAND = PlainCorpus(
     # 五阵开篇句。键 = `SPREADS` 的 id，覆盖面由
     # `test_lenormand_plain_corpus.py::test_openers_are_exactly_the_five_spread_ids` 钉。
     openers=lenormand_plain.LENORMAND_SPREAD_OPENERS,
-    # 综合判读由 `synthesis` 承担（`engines/lenormand.py:95`），白话不再补档位结论。
+    # 综合判读由 `synthesis` 承担（`engines/lenormand.py:98`），白话不再补档位结论。
     closers=None,
     # 极性三档里有 0（28 男人 / 29 女人两张指示牌），`band` 分支遇 0 值符号直接
     # `ValueError`；而牌阵的读序本来就是位序（第 1 张 → 第 n 张），`keep` 正是它。

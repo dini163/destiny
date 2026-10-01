@@ -27,7 +27,7 @@ from tests.plain_wording import advice_hits
 
 def test_lenormand_corpus_is_the_row_the_factory_iterates() -> None:
     assert PLAIN_CORPORA["lenormand"] is LENORMAND
-    # G3：综合判读已经由 `synthesis` 承担（`engines/lenormand.py:95`），白话不再补一句
+    # G3：综合判读已经由 `synthesis` 承担（`engines/lenormand.py:98`），白话不再补一句
     # 档位结论——两处同时下判就是重复，且第二处没有分数可依。
     assert LENORMAND.closers is None
     # 偏差表第 1 行的同款：极性三档里有 0（两张指示牌），`band` 分支遇 0 直接
@@ -74,7 +74,7 @@ def test_each_retelling_carries_its_cards_name_and_noun_core() -> None:
     """G14 的落点：`name_zh` 与 `essence` 逐字进句子。
 
     只钉这两样，因为它们是**可核对的两端**：牌名（盘上印的字）与名词核心
-    （组合直读的主词，`_combine()` 用的就是它，`engines/lenormand.py:127`）。`meaning`
+    （组合直读的主词，`_combine()` 用的就是它，`engines/lenormand.py:154`）。`meaning`
     与 `keywords` 不钉——钉住等于要求白话把源表短句逐字抄回来，而它确实没抄：复测
     （2026-10-01 实跑，命令：`cd backend && PYTHONIOENCODING=utf-8
     .venv/Scripts/python.exe -c "from app.content.lenormand import CARDS as C;

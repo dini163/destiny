@@ -174,7 +174,7 @@ def test_the_significator_mapping_and_the_card_names_are_the_same_fact() -> None
 
     本测只钉三同族字段里的第一件（编号映射 ↔ 表内按牌名回查）；全库仅这两枚中性
     （`polarity == 0`）与「指示牌」关键词由下一条测 :func:`test_the_two_significator_cards_are_the_only_neutral_ones`
-    （同文件 `:185`，跑它用 `-k only_neutral`）钉住。
+    （同文件 `:186`，跑它用 `-k only_neutral`）钉住。
     复测：`pytest tests/golden/test_lenormand_golden.py -k significator_mapping_and_the_card_names`。
     """
     assert SIGNIFICATOR_BY_GENDER == {"male": 28, "female": 29}

@@ -43,7 +43,7 @@ LENORMAND_SPREAD_OPENERS: dict[str, str] = {
 #: 不是牌本身（G18：不给建议）。
 #: 28 男人与 29 女人是指示牌（`polarity = 0`），句子写成「盘上指向的那位…」，
 #: 不假设问卜者的性别由谁指定（引擎只在请求带 `significator` 时标记，
-#: `engines/lenormand.py:64,83`）。
+#: `engines/lenormand.py:67,86`）。
 LENORMAND_CARD_MEANINGS: dict[str, str] = {
     "lenormand-01": "骑士是消息与来客的象，讲的是迅速到来的音讯，你在这一格读到的是事情启动、有人在赶过来的那段。",
     "lenormand-02": "三叶草讲的是转瞬的小幸运，主的是撞上门来的那份机遇，你在这一格碰到的是窗口开着但不会太久的一段。",

@@ -16,7 +16,7 @@ import 引擎函数 —— 只 import 一个正则与 ``TestClient``。与 ``tes
   （``types/lenormand.ts:52``）—— 于是下面那条 SEAT_KEY 格式断言钉的是**契约面**（键名在
   传输中丢失或改名即坏），不是「页面的 key」。席位表本身的形状归 golden 判据 ⑨，这里只验
   「传输层没把它弄丢或改名」—— 于是断言的是键存在、类型是 ``int``、36 席的 key 互不相同。
-* **两种 422 不是一种**：``question`` 的 ``max_length=120``（``schemas/lenormand.py:23``）
+* **两种 422 不是一种**：``question`` 的 ``max_length=120``（``schemas/lenormand.py:25``）
   坏在字段自身，走 FastAPI 默认 ``detail`` 形状；``spread_id`` 未知坏在引擎前提，走
   ``{error: {code}}`` 信封（后者已由既有 ``test_lenormand_endpoint_rejects_unknown_spread``
   钉住，本模块不重念）。AGENTS §4 的分工。
@@ -125,7 +125,7 @@ def test_question_is_a_pydantic_length_bound_not_a_domain_error(client: TestClie
     """判据 ⑫ 的边界半边：121 字 → 422 且响应体是 ``detail`` 形状，不是 ``{error}`` 信封。
 
     AGENTS §4 的分工写在这里最典型：``LenormandRequest.question`` 的
-    ``max_length=120``（``schemas/lenormand.py:23``）是字段自身的约束，FastAPI 的默认校验
+    ``max_length=120``（``schemas/lenormand.py:25``）是字段自身的约束，FastAPI 的默认校验
     就够，引擎根本不会被调用；「这个问句与本局无关」那种前提性错误才归引擎抛 ``DestinyError``
     子类并带机器码。前端读的是 ``error.code``，把这一类也塞进信封就等于发一个不存在的码。
     实测（2026-09-27）：121 字 → ``{"detail": [{"type": "string_too_long", ...}]}``，
@@ -147,8 +147,8 @@ def test_question_is_a_pydantic_length_bound_not_a_domain_error(client: TestClie
 def test_an_unlisted_significator_downgrades_silently_to_seven_pairs(client: TestClient) -> None:
     """判据 ⑬：**钉现状** —— 非法 `significator` 不报错，静默降级为首行线读（7 条组合）。
 
-    今天的行为链是：``schemas/lenormand.py:24`` 把 ``significator`` 声明成自由 ``str | None``
-    （无枚举校验），``engines/lenormand.py:64`` 再 ``SIGNIFICATOR_BY_GENDER.get(significator
+    今天的行为链是：``schemas/lenormand.py:26`` 把 ``significator`` 声明成自由 ``str | None``
+    （无枚举校验），``engines/lenormand.py:67`` 再 ``SIGNIFICATOR_BY_GENDER.get(significator
     or "")`` —— 未命中得 ``None``，于是 ``_tableau_combinations`` 走无指示牌分支，
     ``significator`` 字段为 ``null``，``combinations`` 退回首行 8 席的 7 对。
 
