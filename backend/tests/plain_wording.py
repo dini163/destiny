@@ -34,6 +34,9 @@ VERDICT_TOKENS: tuple[str, ...] = ("宜", "忌", "吉", "凶")
 #: 必须具名才能抹的词形。新抹一个词形要在用它的系统里写一句理由。
 #: `("对应","反应")` 两条来自数字命理（数2 essence、数5 talent）；
 #: 「适应」是 Task 1 把整表扫扩到 `keywords` 时新撞上的数5 关键词。
+#: 「对应」的第二个消费者是奇门九星：`nature` 的前半就是一个星名
+#: （「天蓬·贪狼」），转述只能写成「在表里对应贪狼」，命中 9 条（复测见
+#: `tests/content/test_qimen_plain_corpus.py::test_no_retelling_borrows_the_source_tables_orientation_word`）。
 NON_ADVICE_FORMS: tuple[str, ...] = ("对应", "反应", "适应")
 
 

@@ -7,7 +7,7 @@
 
 from __future__ import annotations
 
-from app.content import kabbalah_plain, name_plain, synastry_plain, ziwei_plain
+from app.content import kabbalah_plain, name_plain, qimen_plain, synastry_plain, ziwei_plain
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.kabbalah import DAATH, PATHS, SEPHIROTH
@@ -22,6 +22,7 @@ from app.content.meihua_plain import (
 )
 from app.content.name_numerology import NUMBERS
 from app.content.name_sancai import SANCAI_RELATIONS
+from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, LUOSHU, NINE_STARS
 from app.content.synastry import SYNASTRY_CORE_BONDS
 from app.content.ziwei import MAJOR_STARS, MINOR_STARS, SIHUA_LABELS
 from app.engines.plain_compose import PlainCorpus
@@ -199,6 +200,35 @@ ZIWEI = PlainCorpus(
     universe=_ziwei_universe,
 )
 
+
+def _qimen_universe() -> set[str]:
+    """奇门的键全集 = 9 星 + 8 门 + 8 神 = 25。
+
+    九宫不在这里：宫的一句是小节开篇句不是条目（G22）。天禽在盘上落两次（本宫不坐、
+    寄在坤二那一枚才进段），但键只有一个——`universe()` 按名字取，不按落宫次数取。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import QIMEN; print(len(QIMEN.universe()))"` → 25。
+    """
+    return (
+        {qimen_plain.star_key(star.name) for star in NINE_STARS}
+        | {qimen_plain.door_key(door.name) for door in EIGHT_DOORS}
+        | {qimen_plain.god_key(god) for god in EIGHT_GODS}
+    )
+
+
+QIMEN = PlainCorpus(
+    system="qimen",
+    entries=qimen_plain.QIMEN_READINGS,
+    # 九宫开篇句。键 = `LUOSHU[*].gua` 逐字（含中宫的 `中`），覆盖面由
+    # `test_qimen_plain_corpus.py::test_openers_are_exactly_the_nine_luoshu_gua` 钉。
+    openers=qimen_plain.QIMEN_PALACE_OPENERS,
+    # 盘面不打分、不判档位（spec §13）：白话逐宫说话，不补一句综合吉凶。
+    closers=None,
+    # 偏差表第 1 行：`LUOSHU` 没有 luck 字段、`EIGHT_DOORS` 两条「中平」，`band` 分支
+    # 遇 0 值符号直接 `ValueError`——所以 `keep`，次序 = 引擎的读盘序「星→门→神」。
+    grouping="keep",
+    universe=_qimen_universe,
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
@@ -208,4 +238,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     MEIHUA.system: MEIHUA,
     KABBALAH.system: KABBALAH,
     ZIWEI.system: ZIWEI,
+    QIMEN.system: QIMEN,
 }
