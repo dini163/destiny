@@ -33,7 +33,8 @@ URL = "/api/v1/lenormand/draw"
 TOP_LEVEL_KEYS = {
     "spread_id", "spread_name_zh", "spread_name_en", "layout", "description", "question",
     "cards", "drawn_ids", "combinations", "significator", "synthesis",
-    "positive_count", "neutral_count", "negative_count", "rng", "engine", "provenance",
+    "positive_count", "neutral_count", "negative_count", "plain_summary",
+    "rng", "engine", "provenance",
 }
 
 #: 一席的全部字段。`row`/`col`/`position_key` 是前端网格的输入（AGENTS §3：snake_case 端到端，
@@ -44,7 +45,7 @@ CARD_KEYS = {
     "essence", "meaning", "as_modifier", "is_significator",
 }
 
-PROVENANCE_KEYS = {"engine", "content_version", "source", "note"}
+PROVENANCE_KEYS = {"engine", "content_version", "source", "note", "tables"}
 
 #: 全仓约定的反面对手：任何 camelCase / PascalCase 键都意味着有人在前端做了重命名。
 SNAKE_CASE = re.compile(r"^[a-z0-9]+(_[a-z0-9]+)*$")
@@ -187,3 +188,29 @@ def test_an_unlisted_significator_downgrades_silently_to_seven_pairs(client: Tes
     flagged = [card for card in known.json()["cards"] if card["is_significator"]]
     assert len(flagged) == 1 and (flagged[0]["row"], flagged[0]["col"]) == (sig["row"], sig["col"])
     assert len(known.json()["combinations"]) in {2, 3, 4}, "四正邻位按落席贴边程度取值，永不是 7"
+
+
+def test_the_reading_lists_both_lenormand_tables_in_provenance(client: TestClient) -> None:
+    """读了就列（AGENTS §7 / G19）：白话表进响应清单。
+
+    名单逐字写死而不从 `LENORMAND_CONTENT_SOURCES` 取：`tables` 整表由那份登记常量生成
+    （`engines/lenormand.py` 的 `_tables()`），常量少一行、多一行或改了表名都会让这一条
+    红；反过来照常量自抄一份，等于让断言跟着被测物一起改（取舍同 `test_qimen_api.py`
+    的 `test_the_board_lists_both_qimen_tables_in_provenance`）。
+    """
+    response = client.post(URL, json={"spread_id": "three_card", "question": "这一季的安排怎么走"})
+    body = response.json()
+    assert {row["name"] for row in body["provenance"]["tables"]} == {"lenormand", "lenormand_plain"}
+    assert all(row["version"] for row in body["provenance"]["tables"])
+    assert all(row["source"] for row in body["provenance"]["tables"])
+
+
+def test_plain_summary_is_a_non_empty_paragraph_distinct_from_synthesis(client: TestClient) -> None:
+    """交付面只钉「必填非空 + 首行成句 + 不与 `synthesis` 同文 + 行数 = 席位 + 1」；逐行对账归 golden。"""
+    response = client.post(URL, json={"spread_id": "nine_card"})
+    body = response.json()
+    plain = body["plain_summary"]
+    assert plain
+    assert plain.split("\n")[0].endswith("。")
+    assert plain != body["synthesis"]
+    assert len(plain.split("\n")) == len(body["cards"]) + 1

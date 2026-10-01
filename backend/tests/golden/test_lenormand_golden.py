@@ -29,6 +29,7 @@ from fastapi.testclient import TestClient
 from app.content.lenormand import CARDS, SIGNIFICATOR_BY_GENDER, SPREADS
 from app.core.errors import UnsupportedMethodError
 from app.engines.lenormand import _box_combinations, _tableau_combinations, draw_lenormand
+from app.engines.plain_corpora import LENORMAND
 from app.schemas.lenormand import Combination, DrawnCard
 
 SPREAD_SIZES = {"single": 1, "three_card": 3, "five_card": 5, "nine_card": 9, "grand_tableau": 36}
@@ -451,4 +452,59 @@ def test_a_combination_phrase_qualifies_the_subject_with_the_modifier(tableau_ca
         assert combo.phrase != reversed_, combo.context
     assert "as_modifier" not in combos[0].left.model_dump(), (
         "CardRef 一旦补上 as_modifier（F-A2-17 修法①），本测应改为响应内自证")
+
+
+# --- 白话段（多系统白话计划 Task 8）：随机源之下的自洽对账 ------------------------------
+
+@pytest.mark.parametrize("spread_id", sorted(SPREAD_SIZES))
+def test_plain_summary_is_the_opener_plus_one_line_per_drawn_card(spread_id: str) -> None:
+    """G27 的雷诺曼版等式：行数 == 牌位数 + 1（开篇句），且逐行按位序对得上。
+
+    `SPREAD_SIZES[spread_id]`（`:35`）是本文件既有的牌位数表，与 `LENORMAND.openers`
+    一起把「五阵都能出段」钉死：任何一阵少了开篇句或丢了一张牌，等式立刻掉。
+    """
+    reading = draw_lenormand(spread_id=spread_id)
+    lines = reading.plain_summary.split("\n")
+    assert len(lines) == SPREAD_SIZES[spread_id] + 1, spread_id
+    assert lines[0] == LENORMAND.openers[spread_id], spread_id
+    assert lines[1:] == [LENORMAND.entries[card.card_id] for card in reading.cards]
+
+
+@pytest.mark.parametrize("spread_id", sorted(SPREAD_SIZES))
+def test_every_plain_line_comes_out_of_the_corpus_and_nowhere_else(spread_id: str) -> None:
+    """段里的每一行都是语料表里的某一句（装配器不产新句子，spec §5）。"""
+    lines = draw_lenormand(spread_id=spread_id).plain_summary.split("\n")
+    corpus_lines = set(LENORMAND.entries.values()) | set(LENORMAND.openers.values())
+    assert all(line in corpus_lines for line in lines)
+
+
+def test_the_grand_tableau_retells_all_thirty_six_cards_exactly_once() -> None:
+    """大桌是全 36 张：白话段必须正好覆盖全集，一张不多一张不少。
+
+    这是「宁崩不漏」在雷诺曼侧的整盘版——`_RNG.sample` 无放回发满 36 位
+    （`engines/lenormand.py:65`），所以这一条不依赖随机结果。
+    """
+    lines = draw_lenormand(spread_id="grand_tableau").plain_summary.split("\n")
+    assert len(lines) == 37
+    assert sorted(lines[1:]) == sorted(LENORMAND.entries.values())
+
+
+def test_the_two_significator_cards_still_get_a_sentence() -> None:
+    """0 极性的两张指示牌（28 男人 / 29 女人）在白话里照旧有句子。
+
+    `grouping="keep"` 的实证：把它们交给 `band` 会当场 `ValueError`（符号为 0），
+    而「按极性分带但跳过 0」这种写法会让这两张牌在整盘里静默掉句——这条测就是为
+    了让第二种写法也红（偏差表第 1 行的雷诺曼半边，G21）。
+    """
+    lines = draw_lenormand(spread_id="grand_tableau").plain_summary.split("\n")
+    for card in CARDS:
+        if card.polarity == 0:
+            assert LENORMAND.entries[card.id] in lines, card.number
+
+
+def test_the_plain_summary_and_the_synthesis_are_two_different_texts() -> None:
+    """白话不是 `synthesis` 的副本：两处并存、互不覆盖（spec §8 丙组的呈现前提）。"""
+    reading = draw_lenormand(spread_id="three_card")
+    assert reading.synthesis
+    assert reading.plain_summary != reading.synthesis
 

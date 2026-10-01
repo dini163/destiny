@@ -19,6 +19,7 @@ from app.content.kabbalah import KABBALAH_SOURCE
 from app.content.kabbalah_plain import KABBALAH_PLAIN_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.lenormand import LENORMAND_SOURCE
+from app.content.lenormand_plain import LENORMAND_PLAIN_SOURCE
 from app.content.meihua import MEIHUA_SOURCE
 from app.content.meihua_plain import MEIHUA_PLAIN_SOURCE
 from app.content.name_numerology import NUMEROLOGY_SOURCE
@@ -153,10 +154,12 @@ QIMEN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("qimen_plain", QIMEN_PLAIN_SOURCE),
 )
 
-#: 雷诺曼一页真正读到的一张表：36 张牌义（编号、中英文名、吉凶极性、关键词、
-#: 组合直读之名词核心与修饰词）与五种牌阵位次。单列理由同 `ZIWEI_CONTENT_SOURCES`。
+#: 雷诺曼一页真正读到的两张表：36 张牌义（编号、中英文名、吉凶极性、关键词、
+#: 组合直读之名词核心与修饰词）与五种牌阵位次，以及逐条转述它们的白话表。单列理由同
+#: `ZIWEI_CONTENT_SOURCES`。
 LENORMAND_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("lenormand", LENORMAND_SOURCE),
+    ("lenormand_plain", LENORMAND_PLAIN_SOURCE),
 )
 
 #: 卡巴拉一页真正读到的两张表：十原质（三柱四界、行星守护、王徽色、大天使与神名）、

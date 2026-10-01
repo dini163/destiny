@@ -14,7 +14,7 @@ Lenormand differs from tarot in two ways this engine honours:
 
 import secrets
 
-from app.content import CONTENT_VERSION
+from app.content import CONTENT_VERSION, LENORMAND_CONTENT_SOURCES
 from app.content.lenormand import (
     CARDS,
     LENORMAND_SOURCE,
@@ -25,6 +25,9 @@ from app.content.lenormand import (
     get_spread,
 )
 from app.core.errors import UnsupportedMethodError
+from app.engines.plain_compose import compose
+from app.engines.plain_corpora import LENORMAND
+from app.schemas.common import ProvenanceTable
 from app.schemas.lenormand import (
     CardRef,
     Combination,
@@ -109,13 +112,37 @@ def draw_lenormand(
         positive_count=positive,
         neutral_count=neutral,
         negative_count=negative,
+        # 白话段：阵的开篇句 + 按位序逐张牌义。本表不分带（G21 / 偏差表第 1 行）：
+        # 28 男人、29 女人的极性是 0，`band` 分支遇 0 值符号直接 `ValueError`，
+        # 而牌阵的读序本来就是位序。此处不可能同键（偏差表第 8 行：`_RNG.sample`
+        # 无放回发牌，一张牌在一个阵里只落一个位次），所以不调 `dedupe()`。
+        plain_summary=compose(
+            LENORMAND,
+            spread.id,
+            [(card.card_id, 0) for card in cards],
+        ),
         provenance=LenormandProvenance(
             engine="lenormand-combination",
             content_version=CONTENT_VERSION,
             source=LENORMAND_SOURCE,
             note=NOTE,
+            tables=_tables(),
         ),
     )
+
+
+def _tables() -> list[ProvenanceTable]:
+    """`LENORMAND_CONTENT_SOURCES` 的第一次被消费（G19）。
+
+    复测（改前 = BASE `f1f42e0`，2026-10-01 实跑）：`git grep -n LENORMAND_CONTENT_SOURCES
+    f1f42e0 -- backend` → 只有 `app/content/__init__.py:158` 的定义处一条，登记了却无人读。
+    `source=LENORMAND_SOURCE` 那行本来就是引常量而不是手抄串，本任务不动它；表名也只这一处
+    来源，引擎不再抄一份书名（同 `engines/qimen.py:232-243` 的写法）。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in LENORMAND_CONTENT_SOURCES
+    ]
 
 
 def _ref(card: DrawnCard) -> CardRef:

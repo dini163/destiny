@@ -9,6 +9,8 @@ library, never invented at runtime.
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class LenormandRequest(BaseModel):
     """Input for a Lenormand draw.
@@ -85,6 +87,9 @@ class LenormandProvenance(BaseModel):
     content_version: str
     source: str
     note: str = Field(description="抽牌/组合直读/不逆位口径说明。")
+    tables: list[ProvenanceTable] = Field(
+        description="本响应真正读过的语料表（AGENTS §7：读了就列，宁缺勿多）。"
+    )
 
 
 class LenormandReading(BaseModel):
@@ -106,6 +111,7 @@ class LenormandReading(BaseModel):
     positive_count: int = Field(description="How many drawn cards are 积极.")
     neutral_count: int = Field(description="How many drawn cards are 中性.")
     negative_count: int = Field(description="How many drawn cards are 消极.")
+    plain_summary: str = Field(description="整阵白话：牌阵开篇句 + 按位序逐张牌义，行以 \\n 分隔。")
 
     rng: str = Field(default="secrets", description="Randomness source: Python secrets (CSPRNG).")
     engine: str = Field(default="lenormand-combination")
