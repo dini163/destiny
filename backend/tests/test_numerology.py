@@ -964,19 +964,74 @@ def test_summary_merges_every_available_core_meaning_once() -> None:
 #: 头注那条复测命令用的是同一组字面量，两处都要改才算改了口径。
 ADVICE_TOKENS: tuple[str, ...] = ("宜", "忌", "需", "应", "吉", "凶")
 
+#: 整表扫（下面那两条）绕不开的两个词形：「应」在数2 的 essence「对应之数」与数5 的
+#: talent「反应快、涉猎广…」里是名相，不是「应当」。扫之前先抹掉它们，否则红的是一句
+#: 「靠协调、耐心与配合成事」——口径同 `tests/plain_wording.py:12-14` 的 R3（单字黑名单会
+#: 连带打死「规则」「之前」，所以那张机检表只收不会误伤的字面量）。抹的只有这两个词形：
+#: 数2 的 essence 哪天被改写成「应当…」，「应」照样命中，段侧与表侧同过 `_advice_hits`。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+#: from app.content.numerology_meanings import CORE_MEANINGS as C
+#: w=('宜','忌','需','应','吉','凶'); f=('essence','talent','challenge')
+#: print([(k, n, t) for k, v in sorted(C.items()) for n in f for t in w if t in getattr(v, n)])
+#: print([(k, n, t) for k, v in sorted(C.items()) for n in f for t in w if t in getattr(v, n).replace('对应', '').replace('反应', '')])"`
+#: → `[(2, 'essence', '应'), (5, 'talent', '应')]` 与 `[]`（2026-10-01 实跑）。
+NON_ADVICE_FORMS: tuple[str, ...] = ("对应", "反应")
+
+
+def _advice_hits(text: str) -> list[str]:
+    """`text` 里真正给建议或下结论的字面量；「对应」「反应」里的「应」不算。"""
+    masked = text
+    for form in NON_ADVICE_FORMS:
+        masked = masked.replace(form, "")
+    return [token for token in ADVICE_TOKENS if token in masked]
+
 
 def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     """框架句自己一个字都不许下判断（G2）；成品段同查，因为段里含框架句的每个字。
 
     这条不是 `test_summary_does_not_quote_any_advice_sentence` 的重复：那条查「不引别人的
-    判断」，这条查「不自建判断」。核心数释义今天 0/6 条含这六个字（实测见框架句头注），
-    所以一旦语料侧新增一句带「宜」的释义，红的是这条而不是被引句那条。
+    判断」，这条查「不自建判断」。成品段逐字搬进来的语料只有 `{essence}` 一路
+    （`_essence_lines()` 抄的是 `core[].meaning`，其余四路只报数与位），所以「不自建判断」
+    的覆盖面 = 框架句 + 由输入实算出的成品段；语料侧那一半在
+    `test_no_quotable_source_sentence_carries_an_advice_or_verdict_word`，两条合起来才钉得住。
+    盘侧从 2026-10-01 起在原来那一盘之外再按 `NAMES` 矩阵逐名扫（矩阵里会落到数2 的
+    「对应之数」，所以段侧与表侧同一把尺：都过 `_advice_hits`，见 `NON_ADVICE_FORMS` 头注）。
     """
     for token in ADVICE_TOKENS:
         assert token not in NUMEROLOGY_SUMMARY_FRAME, token
-    chart = compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15))
-    for token in ADVICE_TOKENS:
-        assert token not in chart.plain_summary, token
+    for label, chart in [
+        (
+            "Liam Alexander Carter",
+            compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15)),
+        ),
+        *(
+            (name, compute_chart(full_name=name, birth_date=BIRTH, reference_date=REFERENCE))
+            for name in NAMES
+        ),
+    ]:
+        assert not _advice_hits(chart.plain_summary), (label, _advice_hits(chart.plain_summary))
+
+
+def test_no_quotable_source_sentence_carries_an_advice_or_verdict_word() -> None:
+    """整表扫而不是整盘扫：`{essence}` 落在哪几格由输入决定，只扫一盘等于只扫那几格。
+
+    2026-10-01 评审 finding 的那句「一旦语料侧新增一句带「宜」的释义，红的是这条」原来
+    不成立——Liam 那盘没走到的数，它的新释义就永远不进这条。这里把 `CORE_MEANINGS`
+    全表逐格扫过，且扫 essence/talent/challenge 三个本文字段：后两个今天不进总论，
+    但装配口径一旦改成搬 `talent`，这条立刻红，而不是等页面上印出「宜…」才发现。
+    命中即报 `(表, 键, 字段, 命中的字)`，读者不用二次定位就知道是哪张表长出了判断词。
+
+    **顶峰/挑战/周期/洛书那四张表刻意不进这条**：它们是建议句库（条数实测见
+    `engines/numerology.py` 里 `NUMEROLOGY_SUMMARY_FRAME` 的头注：那 16 句里 13 句含
+    「宜/忌/需/应」），G18 裁定「事实句合并」的理由正是它们条条带建议，所以总论一个字
+    都不引它们。它们的防线是 `test_summary_does_not_quote_any_advice_sentence`，
+    在这四条上再断言「表内无建议词」是把设计断成反面。
+    """
+    for number, meaning in sorted(CORE_MEANINGS.items()):
+        for field in ("essence", "talent", "challenge"):
+            text = getattr(meaning, field)
+            hits = _advice_hits(text)
+            assert not hits, (f"CORE_MEANINGS[{number}].{field}", hits, text)
 
 
 def test_summary_essence_openers_are_never_empty_so_no_branch_sentence_is_due() -> None:
