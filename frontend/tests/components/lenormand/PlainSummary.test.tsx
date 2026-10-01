@@ -1,17 +1,20 @@
 /**
  * 雷诺曼整阵白话的呈现（多系统白话 spec §10 / G25「就地嵌」那一支）。
  *
- * 三种凭据，别把它们当同一种读：
- * 「全文进 DOM / 在专业层之前 / 不顶掉 synthesis」是**渲染凭据**——只 render 透镜件。
- * 逐行与牌位的对账在后端 golden（T8），前端不重复钉，否则同一件事两份口径。
- * G17：`synthesis` 是受控引擎文案，一个字不改，所以这里钉的是「白话没有顶掉它」。
- * 「页面挂在哪、件内排在哪」是**源码扫凭据**——整页渲染要走 hook + HTTP，本仓零 mock
- * （AGENTS §9），形状同 `tests/components/numerology/PlainSummary.test.tsx`。钉的时候
- * **每一项都钉**：两处 JSX 挂载各一条、白话块标题一条、页面次序与件内次序的两半各一条。
- * 陷阱：`indexOf` 在字符串缺席时返回 -1，而 -1 小于任何正数——只钉次序、不钉存在性，删掉那行
- * JSX 照样绿（T9 的 I-1 就是这么漏的，口径记在 ledger 的 `6379a74` 那条）。
- * 「两张表」那条是**夹具内容凭据**：`tables` 的行序就是页面上的展示契约。
- * **查不到**：段落在页面上的实际位置与视觉——那要人工走查。
+ * 三种凭据各管各的，读的时候别混：
+ * **渲染凭据**管结构——整段全文进 DOM（行数 = 牌位 + 1，等式由测自己钉）、白话块是透镜件的第一个
+ * 子元素、标题在正文之前且与正文同块、白话排在「组合直读」专业层之前、`synthesis` 不被白话顶掉
+ * （G17：那是受控引擎文案，一个字不改）。逐行与牌位的对账在后端 golden（T8），前端不重复钉，
+ * 否则同一件事两份口径。
+ * **源码扫凭据**管挂点——整页渲染要走 hook + HTTP，本仓零 mock（AGENTS §9），形状同
+ * `tests/components/numerology/PlainSummary.test.tsx`。这里踩过两个坑，都记在测里：① `indexOf`
+ * 在字符串缺席时返回 -1，而 -1 小于任何正数——只钉次序不先钉存在性，删掉那行 JSX 照样绿
+ * （T9 的 I-1，口径记在 ledger 的 `6379a74` 那条）；② 源码扫只看得到字面、看不到结构——往白话块
+ * 前面插一个兄弟、或把标题搬出外层 div，源码里那两串字面还原样在，所以位置与「同块」归渲染管，
+ * 源码扫只钉透镜件的字面形状与页面挂点的次序两半。锚点挑看得见的字而不挑 className：Tailwind
+ * 类名是纯样式，改一次配色就该绿的钉会假红。
+ * **夹具内容凭据**：`tables` 的行序就是页面上的展示契约。
+ * **查不到**：段落在页面上的视觉（间距、字有没有被折行）——那要人工走查。
  * 复测：cd frontend && npx vitest run tests/components/lenormand/PlainSummary.test.tsx
  */
 import { readFileSync } from 'node:fs';
@@ -72,23 +75,34 @@ describe('雷诺曼整阵白话', () => {
     expect(page.indexOf('<CombinationLens reading={reading} />')).toBeLessThan(
       page.indexOf('{reading.synthesis}'),
     );
-    // Step 5 的挂点规则是「在 chips 行之前」，锚点自己的存在也得钉，否则锚点改名就变成空跑。
-    const chips = page.indexOf('flex flex-wrap items-center gap-x-4');
+    // Step 5 的挂点规则是「在出处块里、在那排 chips 之前」。锚点用**看得见的字**（块的标题与
+    // `ENGINE ·` 那条 chip），不用 className：Tailwind 类名是纯样式，改一次配色就该绿的钉会假红，
+    // 而「表清单被挪出出处块」这条真漂移反倒没人看（复审 trial i 量的正是这个假红）。
+    const title = page.indexOf('抽牌溯源与口径');
+    const chips = page.indexOf('ENGINE · ');
+    expect(title).toBeGreaterThan(-1);
     expect(chips).toBeGreaterThan(-1);
-    expect(page.indexOf('<ProvenancePanel tables=')).toBeLessThan(chips);
+    const panel = page.indexOf('<ProvenancePanel tables=');
+    expect(panel).toBeGreaterThan(title);
+    expect(panel).toBeLessThan(chips);
   });
 
-  it('白话块是透镜件的第一个子元素，标题与正文同住', () => {
+  it('透镜件源码里白话块的字面形状与标题', () => {
     const lens = readFileSync(fileURLToPath(new URL(LENS, import.meta.url)), 'utf8');
-    // 属性顺序逐字如此：这一串是「件递白话」的唯一凭据，改写它就该红。
+    // 属性顺序逐字如此：这一串是「件递白话」的字面凭据，改写它就该红（G25 的「不折」由
+    // `PlainProse` 的 `whitespace-pre-line` 兜着，那条另有自己的测）。
     expect(lens).toContain('<PlainProse text={reading.plain_summary} />');
     expect(lens).toContain('整阵白话 · IN PLAIN WORDS');
-    // `<PolarityBar` 带左尖括号：件内那行 `function PolarityBar` 定义不匹配，命中的只有 JSX 挂载点。
-    // 极性条若被整块删掉，indexOf 变 -1，这条同样会红——那正是「白话必须在极性条之前」的字面意思，
-    // 不是意外。
-    expect(lens.indexOf('<PlainProse text={reading.plain_summary} />')).toBeLessThan(
-      lens.indexOf('<PolarityBar'),
-    );
+  });
+
+  it('白话块是渲染出来的第一个子元素，标题在正文之前且与正文同块', () => {
+    const { container } = render(<CombinationLens reading={reading} />);
+    // 「第一个子元素」「标题与正文同住」只有渲染出来的结构量得到，源码扫量不到：往块前面再插
+    // 一个兄弟、把标题挪到正文后面、把标题搬出外层 div，那两串字面在源码里都还原样在
+    // （复审的 trial f/g/h 就是靠这三下抓出「钉了一半」）。
+    const block = container.firstElementChild?.firstElementChild;
+    expect(block?.firstElementChild?.textContent).toBe('整阵白话 · IN PLAIN WORDS');
+    expect(block?.textContent).toContain(reading.plain_summary);
   });
 
   it('出处把两张读过的表都递出', () => {
