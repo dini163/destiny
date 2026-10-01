@@ -52,9 +52,15 @@ it('the page wires the palaces into the block and the tables into the panel', ()
    */
   const specifier = '../../../src/pages/ZiweiPage.tsx';
   const src = readFileSync(fileURLToPath(new URL(specifier, import.meta.url)), 'utf8');
-  expect(src).toContain('title: palace.name, text: palace.plain');
+  expect(src).toContain('sections={chart.palaces.map(');
+  expect(src).toContain('title: palace.name');
+  expect(src).toContain('text: palace.plain');
+  expect(src).toContain('title="十二宫白话"');
   expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+  /** Step 3 的挂点规则是两句：「在盘面卡之后」且「在 `<Provenance>` 之前」，两句都钉。
+   *  `<Provenance chart={chart} />` 写全是为了不和 `<ProvenancePanel …>` 的前缀相撞。 */
   expect(src.indexOf('<ZiweiChartGrid chart={chart} />')).toBeLessThan(src.indexOf('<PlainSectionList'));
+  expect(src.indexOf('<PlainSectionList')).toBeLessThan(src.indexOf('<Provenance chart={chart} />'));
 });
 
 it('the provenance block lists both tables the endpoint read', () => {
