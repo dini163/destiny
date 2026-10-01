@@ -1,3 +1,4 @@
+import { PlainProse } from '../ui/PlainProse';
 import type { CardRef, LenormandReading, SignificatorInfo } from '../../types/lenormand';
 
 /**
@@ -13,6 +14,15 @@ export function CombinationLens({ reading }: { reading: LenormandReading }) {
 
   return (
     <div className="flex flex-col gap-5">
+      {/* 整阵白话排在最前：spec §10 的「白话在上、专业判语在下」在这一张卡里的形状。
+          段落的字全部由后端装配（T8：阵开篇句 + 按位序逐张牌义），本件一个字都不组、
+          一行都不折——`PlainProse` 的 `whitespace-pre-line` 就是「不折」的机器保证。
+          这里不引 T9 的 `PlainSectionList`：那是「一格一段」的列表件，整阵只有一段。 */}
+      <div className="flex flex-col gap-2">
+        <span className="label-caps">整阵白话 · IN PLAIN WORDS</span>
+        <PlainProse text={reading.plain_summary} />
+      </div>
+
       <PolarityBar positive={positive_count} neutral={neutral_count} negative={negative_count} />
 
       {significator ? <SignificatorPanel significator={significator} /> : null}

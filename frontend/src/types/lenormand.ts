@@ -4,6 +4,8 @@
  * reverses a card, so there is no `orientation` field (unlike tarot).
  */
 
+import type { ProvenanceTable } from './common';
+
 /** Spread layout families. */
 export type LenormandLayout = 'line' | 'box' | 'tableau';
 
@@ -76,6 +78,7 @@ export interface LenormandProvenance {
   content_version: string;
   source: string;
   note: string;
+  tables: ProvenanceTable[];
 }
 
 /** Complete Lenormand reading produced by the backend engine. */
@@ -96,6 +99,9 @@ export interface LenormandReading {
   positive_count: number;
   neutral_count: number;
   negative_count: number;
+
+  /** 整阵白话：牌阵开篇句 + 按位序逐张牌义，行以 \n 分隔（与 `synthesis` 是两份文字）。 */
+  plain_summary: string;
 
   rng: string;
   engine: string;

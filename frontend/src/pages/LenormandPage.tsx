@@ -5,6 +5,7 @@ import { LenormandBoard } from '../components/lenormand/LenormandBoard';
 import { LenormandCard } from '../components/lenormand/LenormandCard';
 import { LenormandControls } from '../components/lenormand/LenormandControls';
 import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useLenormand } from '../hooks/useLenormand';
 import { polarityChip, significatorRequestValue, spreadLabel } from '../lib/lenormand';
@@ -197,6 +198,7 @@ function Provenance({ reading }: { reading: LenormandReading }) {
           <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{note}</p>
         </div>
       </div>
+      <ProvenancePanel tables={reading.provenance.tables} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
         <span className="label-caps">ENGINE · {engine}</span>
         <span className="label-caps">RNG · {reading.rng}</span>
