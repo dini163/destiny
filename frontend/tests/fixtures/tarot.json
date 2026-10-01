@@ -11,22 +11,22 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "wands-09",
-      "name": "Nine of Wands",
-      "name_zh": "权杖九",
+      "card_id": "wands-10",
+      "name": "Ten of Wands",
+      "name_zh": "权杖十",
       "arcana": "minor",
-      "number": 9,
+      "number": 10,
       "suit": "wands",
       "rank": null,
       "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "courage",
-        "persistence",
-        "test of faith",
-        "resilience"
+        "burden",
+        "extra responsibility",
+        "hard work",
+        "stress"
       ],
-      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance."
+      "meaning": "A figure strains beneath ten heavy wands toward a distant home, carrying more than necessary."
     },
     {
       "position_index": 1,
@@ -34,22 +34,22 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "cups-03",
-      "name": "Three of Cups",
-      "name_zh": "圣杯三",
+      "card_id": "swords-12",
+      "name": "Knight of Swords",
+      "name_zh": "宝剑骑士",
       "arcana": "minor",
-      "number": 3,
-      "suit": "cups",
-      "rank": null,
-      "element": "water",
-      "orientation": "upright",
+      "number": 12,
+      "suit": "swords",
+      "rank": "Knight",
+      "element": "air",
+      "orientation": "reversed",
       "keywords": [
-        "celebration",
-        "friendship",
-        "creativity",
-        "collaborations"
+        "aggression",
+        "impulsiveness",
+        "haste",
+        "scattered thought"
       ],
-      "meaning": "Three women raise their cups in joyful dance, celebrating friendship, community and shared creativity."
+      "meaning": "Reversed, fearless drive becomes reckless aggression and scattered, blunt force."
     },
     {
       "position_index": 2,
@@ -57,33 +57,33 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "swords-01",
-      "name": "Ace of Swords",
-      "name_zh": "宝剑王牌",
+      "card_id": "wands-13",
+      "name": "Queen of Wands",
+      "name_zh": "权杖王后",
       "arcana": "minor",
-      "number": 1,
-      "suit": "swords",
-      "rank": null,
-      "element": "air",
-      "orientation": "upright",
+      "number": 13,
+      "suit": "wands",
+      "rank": "Queen",
+      "element": "fire",
+      "orientation": "reversed",
       "keywords": [
-        "raw power",
-        "victory",
-        "breakthroughs",
-        "mental clarity"
+        "self-respect",
+        "introverted",
+        "re-establish",
+        "jealousy"
       ],
-      "meaning": "A crowned hand raises a double-edged sword through cloud, the sharp clarity of a decisive breakthrough."
+      "meaning": "Reversed, confidence wavers into jealousy or self-doubt; reclaim your self-respect."
     }
   ],
   "drawn_ids": [
-    "wands-09",
-    "cups-03",
-    "swords-01"
+    "wands-10",
+    "swords-12",
+    "wands-13"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Nine of Wands (权杖九) upright, highlighting courage, persistence, test of faith. Present (现在) draws Three of Cups (圣杯三) upright, highlighting celebration, friendship, creativity. Future (未来) draws Ace of Swords (宝剑王牌) upright, highlighting raw power, victory, breakthroughs. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. Every card fell upright, suggesting these energies express themselves clearly and without obstruction.",
+  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Ten of Wands (权杖十) upright, highlighting burden, extra responsibility, hard work. Present (现在) draws Knight of Swords (宝剑骑士) reversed, highlighting aggression, impulsiveness, haste. Future (未来) draws Queen of Wands (权杖王后) reversed, highlighting self-respect, introverted, re-establish. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. 2 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
   "major_arcana_count": 0,
-  "reversed_count": 0,
+  "reversed_count": 2,
   "rng": "secrets",
   "engine": "content-library"
 }
