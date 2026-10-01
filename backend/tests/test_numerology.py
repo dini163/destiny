@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from datetime import date, timedelta
 
 import pytest
@@ -25,7 +26,12 @@ from app.content.numerology_cycles import (
     cycles_source,
 )
 from app.content.numerology_loshu import LOSHU_SQUARE, PLANES, loshu_source
-from app.content.numerology_meanings import CORE_MEANINGS, KARMIC_LESSONS, meanings_source
+from app.content.numerology_meanings import (
+    CORE_MEANINGS,
+    KARMIC_LESSONS,
+    CoreMeaning,
+    meanings_source,
+)
 from app.content.numerology_pythagorean import (
     KARMIC_DEBT_NUMBERS,
     LETTER_VALUES,
@@ -53,7 +59,7 @@ from app.engines.numerology import (
     split_letters,
 )
 from app.schemas.numerology import CoreNumber, PersonalCycle, PersonalCycles
-from tests.plain_wording import FORBIDDEN
+from tests.plain_wording import ADVICE_TOKENS, FORBIDDEN, NON_ADVICE_FORMS, advice_hits
 
 #: 覆盖各种边界：空格、连字符、撇号、含 Y、无元音、无辅音、单字母、全小写。
 NAMES: tuple[str, ...] = (
@@ -959,33 +965,9 @@ def test_summary_merges_every_available_core_meaning_once() -> None:
         assert sum(1 for line in lines if meaning in line) == 1
 
 
-#: G2/G18 的第二套口径：**建议词与结论词**（`plain_wording.py` 那张表管的是拼接残留与
-#: 引用标记，另一回事，所以这里不引它也不覆写它）。词表与 `NUMEROLOGY_SUMMARY_FRAME`
-#: 头注那条复测命令用的是同一组字面量，两处都要改才算改了口径。
-ADVICE_TOKENS: tuple[str, ...] = ("宜", "忌", "需", "应", "吉", "凶")
-
-#: 整表扫（下面那两条）绕不开的两个词形：「应」在数2 的 essence「对应之数」与数5 的
-#: talent「反应快、涉猎广…」里是名相，不是「应当」。扫之前先抹掉它们，否则红的是一句
-#: 「靠协调、耐心与配合成事」——口径同 `tests/plain_wording.py:12-14` 的 R3（单字黑名单会
-#: 连带打死「规则」「之前」，所以那张机检表只收不会误伤的字面量）。抹的只有这两个词形：
-#: 数2 的 essence 哪天被改写成「应当…」，「应」照样命中，段侧与表侧同过 `_advice_hits`。
-#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
-#: from app.content.numerology_meanings import CORE_MEANINGS as C
-#: w=('宜','忌','需','应','吉','凶'); f=('essence','talent','challenge')
-#: print([(k, n, t) for k, v in sorted(C.items()) for n in f for t in w if t in getattr(v, n)])
-#: print([(k, n, t) for k, v in sorted(C.items()) for n in f for t in w if t in getattr(v, n).replace('对应', '').replace('反应', '')])"`
-#: → `[(2, 'essence', '应'), (5, 'talent', '应')]` 与 `[]`（2026-10-01 实跑）。
-NON_ADVICE_FORMS: tuple[str, ...] = ("对应", "反应")
-
-
-def _advice_hits(text: str) -> list[str]:
-    """`text` 里真正给建议或下结论的字面量；「对应」「反应」里的「应」不算。"""
-    masked = text
-    for form in NON_ADVICE_FORMS:
-        masked = masked.replace(form, "")
-    return [token for token in ADVICE_TOKENS if token in masked]
-
-
+#: G2/G18 的第二套口径：**建议词与结论词**——六字表、四字表、抹词形表与 `advice_hits`
+#: 的唯一正主已搬到 `tests/plain_wording.py`（Plan C Task 1 合并，本文件只 import 不另立），
+#: 抹词形 `("对应","反应")` 的实测理由与复测命令见该模块 `NON_ADVICE_FORMS` 头注。
 def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     """框架句自己一个字都不许下判断（G2）；成品段同查，因为段里含框架句的每个字。
 
@@ -995,7 +977,8 @@ def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     的覆盖面 = 框架句 + 由输入实算出的成品段；语料侧那一半在
     `test_no_quotable_source_sentence_carries_an_advice_or_verdict_word`，两条合起来才钉得住。
     盘侧从 2026-10-01 起在原来那一盘之外再按 `NAMES` 矩阵逐名扫（矩阵里会落到数2 的
-    「对应之数」，所以段侧与表侧同一把尺：都过 `_advice_hits`，见 `NON_ADVICE_FORMS` 头注）。
+    「对应之数」，所以段侧与表侧同一把尺：都过 `advice_hits`，见 `plain_wording.py` 的
+    `NON_ADVICE_FORMS` 头注）。
     """
     for token in ADVICE_TOKENS:
         assert token not in NUMEROLOGY_SUMMARY_FRAME, token
@@ -1009,7 +992,25 @@ def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
             for name in NAMES
         ),
     ]:
-        assert not _advice_hits(chart.plain_summary), (label, _advice_hits(chart.plain_summary))
+        assert not advice_hits(chart.plain_summary), (label, advice_hits(chart.plain_summary))
+
+
+#: `source` 不进口径：它是出处串，不是会被印进白话段的正文（同
+#: `test_kabbalah_plain_corpus.py` 源表扫只扫 `.meaning` 一个字的理由）。
+#: `keywords` 里数5 带「适应」，`master_title` 三条是「MASTER … · 灵性直觉者」这类名相。
+#: 复测（2026-10-01 实跑）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+#: from app.content.numerology_meanings import CORE_MEANINGS as C
+#: w=('宜','忌','需','应','吉','凶')
+#: print([(k,'keywords',t) for k,v in sorted(C.items()) for t in w if t in '/'.join(v.keywords).replace('对应','').replace('反应','').replace('适应','')])
+#: print([(k,'keywords',t) for k,v in sorted(C.items()) for t in w if t in '/'.join(v.keywords)])"`
+#: → `[]` 与 `[(5, 'keywords', '应')]`：新词形「适应」是抹得住的唯一命中。
+ADVICE_SWEEP_FIELDS: tuple[tuple[str, Callable[[CoreMeaning], str]], ...] = (
+    ("essence", lambda meaning: meaning.essence),
+    ("talent", lambda meaning: meaning.talent),
+    ("challenge", lambda meaning: meaning.challenge),
+    ("keywords", lambda meaning: "/".join(meaning.keywords)),
+    ("master_title", lambda meaning: meaning.master_title or ""),
+)
 
 
 def test_no_quotable_source_sentence_carries_an_advice_or_verdict_word() -> None:
@@ -1017,8 +1018,10 @@ def test_no_quotable_source_sentence_carries_an_advice_or_verdict_word() -> None
 
     2026-10-01 评审 finding 的那句「一旦语料侧新增一句带「宜」的释义，红的是这条」原来
     不成立——Liam 那盘没走到的数，它的新释义就永远不进这条。这里把 `CORE_MEANINGS`
-    全表逐格扫过，且扫 essence/talent/challenge 三个本文字段：后两个今天不进总论，
-    但装配口径一旦改成搬 `talent`，这条立刻红，而不是等页面上印出「宜…」才发现。
+    全表逐格扫过，字段按 `ADVICE_SWEEP_FIELDS` 表选取（essence/talent/challenge 三个
+    纯文本字段 + keywords/master_title 两个 2026-10-01 随口径合并补进来的字段）：
+    后四个今天不进总论，但装配口径一旦改成搬它们，这条立刻红，而不是等页面上印出
+    「宜…」才发现。
     命中即报 `(表, 键, 字段, 命中的字)`，读者不用二次定位就知道是哪张表长出了判断词。
 
     **顶峰/挑战/周期/洛书那四张表刻意不进这条**：它们是建议句库（条数实测见
@@ -1028,9 +1031,9 @@ def test_no_quotable_source_sentence_carries_an_advice_or_verdict_word() -> None
     在这四条上再断言「表内无建议词」是把设计断成反面。
     """
     for number, meaning in sorted(CORE_MEANINGS.items()):
-        for field in ("essence", "talent", "challenge"):
-            text = getattr(meaning, field)
-            hits = _advice_hits(text)
+        for field, get in ADVICE_SWEEP_FIELDS:
+            text = get(meaning)
+            hits = advice_hits(text)
             assert not hits, (f"CORE_MEANINGS[{number}].{field}", hits, text)
 
 

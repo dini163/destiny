@@ -49,6 +49,7 @@ from app.engines.synastry import (
 )
 from app.engines.western import ASPECTS
 from app.schemas.synastry import SynastryPerson
+from tests.plain_wording import VERDICT_TOKENS
 
 #: Conjunction's maximum orb, shared across the three aspect tables (`western.py:61`).
 #: Recount: `python -c "from app.engines.western import ASPECTS; print(ASPECTS)"`.
@@ -352,12 +353,14 @@ def test_every_aspect_carries_a_plain_line_made_of_two_slots_and_a_frame() -> No
 def test_aspect_frames_carry_no_verdict_words() -> None:
     """G2 的机检半边：框架句里不许出现结论词，判断只能来自被填进来的点义与档位收尾句。
 
+    口径唯一正主在 `tests/plain_wording.py::VERDICT_TOKENS`（四字表），本条直接扫它。
     复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
     from app.content.synastry_plain import SYNASTRY_ASPECT_FRAMES as F
-    print([(w, [k for k, t in F.items() if w in t]) for w in '吉凶宜忌'])"` → 四个空列表。
+    print([(w, [k for k, t in F.items() if w in t]) for w in '吉凶宜忌'])"` → 四个空列表
+    （'吉凶宜忌' 即 `VERDICT_TOKENS` 那四字，复测命令不引 tests 侧，故留字面量）。
     """
     for key, frame in synastry_plain.SYNASTRY_ASPECT_FRAMES.items():
-        for word in ("吉", "凶", "宜", "忌"):
+        for word in VERDICT_TOKENS:
             assert word not in frame, (key, word)
 
 
