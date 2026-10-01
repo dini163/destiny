@@ -58,6 +58,7 @@ it('the page wires the nine palaces into the block and the tables into the panel
   const specifier = '../../../src/pages/QimenPage.tsx';
   const src = readFileSync(fileURLToPath(new URL(specifier, import.meta.url)), 'utf8');
   expect(src).toContain('title: `${palace.gua}${palace.number}宫 · ${palace.direction}`,');
+  expect(src).toContain('text: palace.plain,');
   expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
   expect(src.indexOf('<QimenBoard chart={chart} />')).toBeLessThan(src.indexOf('<PlainSectionList'));
 });
