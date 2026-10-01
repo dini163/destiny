@@ -3,9 +3,9 @@
  *
  * 三种凭据各管各的，读的时候别混：
  * **渲染凭据**管结构——整段全文进 DOM（行数 = 牌位 + 1，等式由测自己钉）、白话块是透镜件的第一个
- * 子元素、标题在正文之前且与正文同块、白话排在「组合直读」专业层之前、`synthesis` 不被白话顶掉
- * （G17：那是受控引擎文案，一个字不改）。逐行与牌位的对账在后端 golden（T8），前端不重复钉，
- * 否则同一件事两份口径。
+ * 子元素、标题在正文之前且与正文同块、紧接其下的是极性条、白话排在「组合直读」专业层之前、
+ * `synthesis` 不被白话顶掉（G17：那是受控引擎文案，一个字不改）。逐行与牌位的对账在后端
+ * golden（T8），前端不重复钉，否则同一件事两份口径。
  * **源码扫凭据**管挂点——整页渲染要走 hook + HTTP，本仓零 mock（AGENTS §9），形状同
  * `tests/components/numerology/PlainSummary.test.tsx`。这里踩过两个坑，都记在测里：① `indexOf`
  * 在字符串缺席时返回 -1，而 -1 小于任何正数——只钉次序不先钉存在性，删掉那行 JSX 照样绿
@@ -103,6 +103,15 @@ describe('雷诺曼整阵白话', () => {
     const block = container.firstElementChild?.firstElementChild;
     expect(block?.firstElementChild?.textContent).toBe('整阵白话 · IN PLAIN WORDS');
     expect(block?.textContent).toContain(reading.plain_summary);
+  });
+
+  it('白话块紧接其下的是极性条，专业判语留在下面', () => {
+    const { container } = render(<CombinationLens reading={reading} />);
+    // Step 4 的原话是极性条「一个位置都不动」，它的位置就在白话块正下方；这条钉的是**相邻的两件**，
+    // 所以把极性条整块删掉会红。上一版用源码扫（`PlainProse` 的字符早于 `<PolarityBar`）顺带兜着
+    // 这件事，换成渲染凭据之后不补这一条就把那道顺带的保护丢了（pass 2 的 P2-1）。
+    const block = container.firstElementChild?.firstElementChild;
+    expect(block?.nextElementSibling?.textContent).toContain('吉凶极性 · POLARITY');
   });
 
   it('出处把两张读过的表都递出', () => {
