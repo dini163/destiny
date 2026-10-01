@@ -4,10 +4,11 @@ import type { CardRef, LenormandReading, SignificatorInfo } from '../../types/le
 /**
  * The 组合直读透镜 — Lenormand's core reading surface.
  *
- * It shows the polarity balance, the combination pairs the engine derived for this
- * layout (each read as `subject × modifier → phrase`), and — when a 指示牌 was set —
- * where the querent sits with the cards behind / ahead / above / below. Every phrase
- * and card comes straight from the response; nothing is invented here.
+ * It opens with the whole-spread plain retelling, then shows the polarity balance,
+ * the combination pairs the engine derived for this layout (each read as
+ * `subject × modifier → phrase`), and — when a 指示牌 was set — where the querent
+ * sits with the cards behind / ahead / above / below. Every phrase, paragraph and
+ * card comes straight from the response; nothing is invented here.
  */
 export function CombinationLens({ reading }: { reading: LenormandReading }) {
   const { combinations, significator, positive_count, neutral_count, negative_count } = reading;
