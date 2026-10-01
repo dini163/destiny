@@ -11,71 +11,13 @@
       "position_label": "Urðr · What Has Become",
       "position_label_zh": "乌尔德 · 源起",
       "position_meaning": "已经织成的那一段：事情从何而来，哪些已成定局、不可再改。Urðr 之名出自古埃达《女先知之歌》第 20 节，本义近「已发生之事」；但把它当牌阵位次读作「过去」，是现代占卜的类比。",
-      "order": 14,
-      "key": "perthro",
-      "glyph": "ᛈ",
-      "name": "Perthro",
-      "name_zh": "佩尔索",
-      "transliteration": "p",
-      "name_meaning": "词源不详（构拟 *perþō 一说为「签筒、骰盅」，无定论）",
-      "name_meaning_uncertain": true,
-      "aett": "heimdall",
-      "aett_zh": "海姆达尔之族",
-      "reversible": true,
-      "is_wyrd": false,
-      "orientation": "upright",
-      "keywords": [
-        "未知",
-        "机运",
-        "签筒",
-        "秘密",
-        "一掷"
-      ],
-      "meaning": "签筒里摇出来的是什么，掷之前谁也不知道：机运、隐秘与尚未揭晓的一段。宜留一手，也宜认命数。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Perthro（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
-    },
-    {
-      "position_index": 1,
-      "position_key": "verdandi",
-      "position_label": "Verðandi · What Is Becoming",
-      "position_label_zh": "薇尔丹蒂 · 显相",
-      "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
-      "order": 15,
-      "key": "algiz",
-      "glyph": "ᛉ",
-      "name": "Algiz",
-      "name_zh": "阿尔吉兹",
-      "transliteration": "z",
-      "name_meaning": "原始日耳曼语 *algiz「驼鹿」—— 一说与「保护」同源，另解作「莎草」",
-      "name_meaning_uncertain": false,
-      "aett": "heimdall",
-      "aett_zh": "海姆达尔之族",
-      "reversible": true,
-      "is_wyrd": false,
-      "orientation": "upright",
-      "keywords": [
-        "护持",
-        "警戒",
-        "求援",
-        "庇荫",
-        "界限"
-      ],
-      "meaning": "张开的手与警界的角：保护、警戒与可以求援的通道。宜守住界限，也宜及早呼救。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Algiz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
-    },
-    {
-      "position_index": 2,
-      "position_key": "skuld",
-      "position_label": "Skuld · What Shall Be",
-      "position_label_zh": "诗蔻蒂 · 必然",
-      "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
-      "order": 20,
-      "key": "mannaz",
-      "glyph": "ᛗ",
-      "name": "Mannaz",
-      "name_zh": "曼纳兹",
-      "transliteration": "m",
-      "name_meaning": "原始日耳曼语 *mannaz「人、人类」",
+      "order": 18,
+      "key": "berkana",
+      "glyph": "ᛒ",
+      "name": "Berkana",
+      "name_zh": "贝尔卡纳",
+      "transliteration": "b",
+      "name_meaning": "原始日耳曼语 *berkanō「桦树」—— 新生与哺育之木",
       "name_meaning_uncertain": false,
       "aett": "tyr",
       "aett_zh": "提尔之族",
@@ -83,20 +25,78 @@
       "is_wyrd": false,
       "orientation": "upright",
       "keywords": [
-        "自我",
-        "他人",
-        "社群",
-        "本分",
-        "相待"
+        "新生",
+        "孕育",
+        "哺育",
+        "成长",
+        "家事"
       ],
-      "meaning": "人与人相对而立：自己、他人与所处的社群。宜先认清自己那一份，再谈与人怎么处。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Mannaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "桦树的新芽与哺乳的母亲：孕育、生长与家中事。宜养、宜护，让新起的慢慢长成。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Berkana（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+    },
+    {
+      "position_index": 1,
+      "position_key": "verdandi",
+      "position_label": "Verðandi · What Is Becoming",
+      "position_label_zh": "薇尔丹蒂 · 显相",
+      "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
+      "order": 9,
+      "key": "hagalaz",
+      "glyph": "ᚺ",
+      "name": "Hagalaz",
+      "name_zh": "哈加拉兹",
+      "transliteration": "h",
+      "name_meaning": "原始日耳曼语 *haglaz「冰雹」—— 从天而降、不由人定",
+      "name_meaning_uncertain": false,
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
+      "reversible": false,
+      "is_wyrd": false,
+      "orientation": "upright",
+      "keywords": [
+        "天灾",
+        "突变",
+        "不由人",
+        "破而后立",
+        "考验"
+      ],
+      "meaning": "从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Hagalaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+    },
+    {
+      "position_index": 2,
+      "position_key": "skuld",
+      "position_label": "Skuld · What Shall Be",
+      "position_label_zh": "诗蔻蒂 · 必然",
+      "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
+      "order": 17,
+      "key": "tiwaz",
+      "glyph": "ᛏ",
+      "name": "Tiwaz",
+      "name_zh": "提瓦兹",
+      "transliteration": "t",
+      "name_meaning": "原始日耳曼语 *tīwaz「战神提尔」—— 与拉丁语 deus、希腊语 Zeus 同源于 *dyeus",
+      "name_meaning_uncertain": false,
+      "aett": "tyr",
+      "aett_zh": "提尔之族",
+      "reversible": true,
+      "is_wyrd": false,
+      "orientation": "upright",
+      "keywords": [
+        "公断",
+        "荣誉",
+        "决断",
+        "牺牲",
+        "法治"
+      ],
+      "meaning": "提尔断腕立约的那把矛：公义、荣誉与必要的牺牲。宜依理裁断、认下代价，不徇私。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Tiwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     }
   ],
   "drawn_keys": [
-    "perthro",
-    "algiz",
-    "mannaz"
+    "berkana",
+    "hagalaz",
+    "tiwaz"
   ],
   "allow_reversed": true,
   "include_wyrd": false,
@@ -111,13 +111,13 @@
       "key": "heimdall",
       "name": "Heimdall's Aett",
       "name_zh": "海姆达尔之族",
-      "count": 2
+      "count": 1
     },
     {
       "key": "tyr",
       "name": "Tyr's Aett",
       "name_zh": "提尔之族",
-      "count": 1
+      "count": 2
     },
     {
       "key": "wyrd",
@@ -126,57 +126,40 @@
       "count": 0
     }
   ],
-  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起（Urðr · What Has Become）落得Perthro（佩尔索，正位），要点为未知、机运、签筒：签筒里摇出来的是什么，掷之前谁也不知道：机运、隐秘与尚未揭晓的一段。宜留一手，也宜认命数。薇尔丹蒂 · 显相（Verðandi · What Is Becoming）落得Algiz（阿尔吉兹，正位），要点为护持、警戒、求援：张开的手与警界的角：保护、警戒与可以求援的通道。宜守住界限，也宜及早呼救。诗蔻蒂 · 必然（Skuld · What Shall Be）落得Mannaz（曼纳兹，正位），要点为自我、他人、社群：人与人相对而立：自己、他人与所处的社群。宜先认清自己那一份，再谈与人怎么处。三组配比（本次共 3 枚）：弗蕾亚之族 0 枚、海姆达尔之族 2 枚、提尔之族 1 枚。其中 海姆达尔之族 占 2 枚，现代解读作「磨砺、秩序与觉醒」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 3 枚可逆符文全为正位。",
+  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起落得贝尔卡纳（Berkana，正位）——桦树的新芽与哺乳的母亲：孕育、生长与家中事。宜养、宜护，让新起的慢慢长成。薇尔丹蒂 · 显相落得哈加拉兹（Hagalaz，正位）——从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。诗蔻蒂 · 必然落得提瓦兹（Tiwaz，正位）——提尔断腕立约的那把矛：公义、荣誉与必要的牺牲。宜依理裁断、认下代价，不徇私。三组配比（本次共 3 枚）：弗蕾亚之族 0 枚、海姆达尔之族 1 枚、提尔之族 2 枚。其中 提尔之族 占 2 枚，现代解读作「超越、律法与宿命」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 2 枚可逆符文全为正位。",
   "shadow_counsel": [
     {
-      "key": "perthro",
-      "name": "Perthro",
-      "name_zh": "佩尔索",
-      "glyph": "ᛈ",
+      "key": "berkana",
+      "name": "Berkana",
+      "name_zh": "贝尔卡纳",
+      "glyph": "ᛒ",
       "position_key": "urd",
       "position_label_zh": "乌尔德 · 源起",
       "drawn_orientation": "upright",
       "shadow_keywords": [
-        "坏签",
-        "隐情败露",
-        "误赌",
-        "不肯认命"
+        "生长受阻",
+        "家事不宁",
+        "不孕",
+        "过度保护"
       ],
-      "shadow_meaning": "摇出来的不是想要的那一支：意外走漏、赌错了，或被自己不肯认的那部分反噬。",
+      "shadow_meaning": "长不动或护过了头：新生受阻、家宅不宁，或以照顾之名把人捆住。",
       "note": "本次为正位；此条是它的反面参照（逆位释义），不是本次结果。"
     },
     {
-      "key": "algiz",
-      "name": "Algiz",
-      "name_zh": "阿尔吉兹",
-      "glyph": "ᛉ",
-      "position_key": "verdandi",
-      "position_label_zh": "薇尔丹蒂 · 显相",
-      "drawn_orientation": "upright",
-      "shadow_keywords": [
-        "失去庇荫",
-        "警戒失效",
-        "被利用",
-        "孤立"
-      ],
-      "shadow_meaning": "护持不在了或没起作用：孤立无援、警戒失灵，或被人拿善意当缺口。",
-      "note": "本次为正位；此条是它的反面参照（逆位释义），不是本次结果。"
-    },
-    {
-      "key": "mannaz",
-      "name": "Mannaz",
-      "name_zh": "曼纳兹",
-      "glyph": "ᛗ",
+      "key": "tiwaz",
+      "name": "Tiwaz",
+      "name_zh": "提瓦兹",
+      "glyph": "ᛏ",
       "position_key": "skuld",
       "position_label_zh": "诗蔻蒂 · 必然",
       "drawn_orientation": "upright",
       "shadow_keywords": [
-        "孤立",
-        "自欺",
-        "与人失和",
-        "推诿"
+        "失义",
+        "决断失误",
+        "争讼不利",
+        "白费的牺牲"
       ],
-      "shadow_meaning": "与人断了线或与自己打了架：孤立、自欺、把责任推给别人。",
+      "shadow_meaning": "理不直或断错了：争讼不利、誓言失效，或付出了却没换来该换来的。",
       "note": "本次为正位；此条是它的反面参照（逆位释义），不是本次结果。"
     }
   ],

@@ -47,6 +47,7 @@ from app.content.rune_futhark import (
 )
 from app.content.rune_spreads import SPREADS, Spread, SpreadPosition, get_spread
 from app.core.errors import UnsupportedMethodError
+from app.engines.plain_compose import overview
 from app.schemas.common import ProvenanceTable
 from app.schemas.runes import (
     AettCount,
@@ -250,6 +251,19 @@ def _shadow_counsel(stones: list[DrawnRune]) -> list[ShadowNote] | None:
     return notes or None
 
 
+#: 直读的三件框架句（多系统白话 spec §7 表行 2）。句子本身不是语料：它只把
+#: 位次名、牌名、正逆与**语料的释义**串起来，所以本期零新语料、`RUNE_CONTENT_SOURCES`
+#: 不加条目（G16 / spec §9）。三条病症的修法写在 T6 的表里，逐字复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.runes import draw; print(draw(spread_id='three').synthesis)"`
+RUNES_SYNTHESIS_FRAME = "{opening}{stones}{balance}"
+RUNES_OPENING_ASKED = "以{name_zh}（{name}）铸石，所问：{question}。"
+RUNES_OPENING_UNASKED = "以{name_zh}（{name}）铸石，未附所问。"
+#: 逐枚句。中文牌名在前、英文在括注，连接符用 `——` 而不是第二层冒号；
+#: 位次只剩中文（英文位次名仍在 `stones[].position_label` 里下发，同一句不重说）。
+RUNES_STONE_LINE = "{position}落得{name_zh}（{name}，{orientation}）——{meaning}"
+RUNES_WYRD_LINE = "{position}落得空白符（Wyrd）——现代增补，非古传统：{meaning}"
+
+
 def _synthesis(
     spread: Spread,
     stones: list[DrawnRune],
@@ -263,31 +277,39 @@ def _synthesis(
     word, a corpus meaning, or a count of what actually fell. No adjective is
     introduced that the corpus does not already carry, and no rune is named that
     was not drawn -- both are asserted by the engine tests.
+
+    The three frame sentences are named constants so the wording can be audited
+    in one place; the 25 meanings themselves are untouched (G2).
     """
-    parts: list[str] = []
-
     if question and question.strip():
-        parts.append(f"以{spread.name_zh}（{spread.name}）铸石，所问：{question.strip()}。")
+        opening = RUNES_OPENING_ASKED.format(
+            name_zh=spread.name_zh, name=spread.name, question=question.strip()
+        )
     else:
-        parts.append(f"以{spread.name_zh}（{spread.name}）铸石，未附所问。")
+        opening = RUNES_OPENING_UNASKED.format(name_zh=spread.name_zh, name=spread.name)
 
+    lines: list[str] = []
     for stone in stones:
         orientation_zh = "逆位" if stone.orientation == "reversed" else "正位"
-        lead = "、".join(stone.keywords[:3]) if stone.keywords else stone.name
         if stone.is_wyrd:
-            parts.append(
-                f"{stone.position_label_zh}（{stone.position_label}）落得空白符 Wyrd"
-                f"——现代增补，非古传统：{stone.meaning}"
+            lines.append(
+                RUNES_WYRD_LINE.format(position=stone.position_label_zh, meaning=stone.meaning)
             )
         else:
-            parts.append(
-                f"{stone.position_label_zh}（{stone.position_label}）落得"
-                f"{stone.name}（{stone.name_zh}，{orientation_zh}），要点为{lead}：{stone.meaning}"
+            lines.append(
+                RUNES_STONE_LINE.format(
+                    position=stone.position_label_zh,
+                    name_zh=stone.name_zh,
+                    name=stone.name,
+                    orientation=orientation_zh,
+                    meaning=stone.meaning,
+                )
             )
 
-    parts.append(_balance_sentence(stones, balance, allow_reversed))
-
-    return "".join(parts)
+    return overview(
+        RUNES_SYNTHESIS_FRAME,
+        {"opening": opening, "stones": "".join(lines), "balance": _balance_sentence(stones, balance, allow_reversed)},
+    )
 
 
 def _balance_sentence(

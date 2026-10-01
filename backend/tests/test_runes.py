@@ -338,7 +338,7 @@ def test_synthesis_says_so_when_no_question_is_given() -> None:
 def test_synthesis_states_the_orientation_of_each_stone() -> None:
     """直读里必须逐枚说清正逆，否则读者无从知道卡面读的是哪一面。
 
-    按引擎的句式逐字核（「…落得{name}（{name_zh}，{正位|逆位}）」），
+    按引擎的句式逐字核（「…落得{name_zh}（{name}，{正位|逆位}）」），
     而不是只数一下全文里有没有「逆位」两个字 —— 后者即使漏读了某一枚也会通过。
     """
     for _ in range(CASTS_FOR_STRUCTURE):
@@ -347,8 +347,57 @@ def test_synthesis_states_the_orientation_of_each_stone() -> None:
             if stone.is_wyrd:
                 continue  # 空白符无正逆之分，句式也不同
             orientation_zh = "逆位" if stone.orientation == "reversed" else "正位"
-            expected = f"{stone.name}（{stone.name_zh}，{orientation_zh}）"
+            expected = f"{stone.name_zh}（{stone.name}，{orientation_zh}）"
             assert expected in result.synthesis, expected
+
+
+@pytest.mark.parametrize("spread_id", SPREAD_IDS)
+def test_synthesis_leads_with_the_chinese_name_of_every_stone(spread_id: str) -> None:
+    """中文牌名为主、英文名为括注（spec §7：英文牌名裸夹中文是这条直读的主要病灶）。
+
+    按引擎的新句式逐字核「…落得{name_zh}（{name}，{正位|逆位}）」，
+    而不是数全文里有没有中文牌名——后者即使漏改一枚也会通过。
+    """
+    for _ in range(CASTS_FOR_STRUCTURE):
+        result = draw(spread_id=spread_id, allow_reversed=True)
+        for stone in result.stones:
+            if stone.is_wyrd:
+                continue  # 空白符无正逆之分，句式另有一条
+            orientation_zh = "逆位" if stone.orientation == "reversed" else "正位"
+            expected = f"{stone.name_zh}（{stone.name}，{orientation_zh}）"
+            assert expected in result.synthesis, expected
+
+
+@pytest.mark.parametrize("spread_id", SPREAD_IDS)
+def test_synthesis_has_no_nested_colon_and_no_keyword_restatement(spread_id: str) -> None:
+    """两层冒号与关键词复述同源于「要点为…」那半句，删掉它就同时治了两条（spec §7）。
+
+    上限是 1 而不是 0：语料自己的释义每句里就带一个冒号（「可动之财与原始动力：钱、物、
+    精力与手上已有的资源。…」，复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "from app.content.rune_futhark import DECK_25; print(max(s.count('：') for r in DECK_25 for s in ((r.upright_meaning or '') + '|' + (r.reversed_meaning or '')).split('。')))"` → 1），
+    判语一字不许改（G2），所以只能要求「一层」。今天这条必红：旧句式在同一个语料句之前
+    又加了 `要点为{keywords}：`，那一节里有两个冒号。
+    """
+    for _ in range(CASTS_FOR_STRUCTURE):
+        result = draw(spread_id=spread_id)
+        assert "要点为" not in result.synthesis
+        for clause in result.synthesis.split("。"):
+            assert clause.count("：") <= 1, clause
+
+
+@pytest.mark.parametrize("spread_id", SPREAD_IDS)
+def test_synthesis_keeps_every_latin_run_parenthesised(spread_id: str) -> None:
+    """英文只准待在括注里：`（Perthro` 可以，`落得Perthro` 不行。
+
+    把成对括注整段摘掉之后，正文里不该再出现任何一枚牌的名字——牌阵名、位次名、牌名
+    三种英文今天全部收在 `（…）` 内，摘完还剩下的就是裸夹。位次英文名随「括注去重」
+    一起从这句里消失，但它仍随 `stones[].position_label` 下发，信息没少一条。
+    """
+    for _ in range(CASTS_FOR_STRUCTURE):
+        result = draw(spread_id=spread_id)
+        stripped = re.sub(r"（[^（）]*）", "", result.synthesis)
+        for rune in DECK_25:
+            assert not rune_name_pattern(rune.name).search(stripped), rune.name
 
 
 def test_synthesis_marks_the_aett_theme_as_a_modern_reading() -> None:
