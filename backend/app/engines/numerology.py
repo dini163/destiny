@@ -53,6 +53,7 @@ from app.content.numerology_pythagorean import (
     letter_value,
 )
 from app.core.errors import NumerologyInputError
+from app.engines.plain_compose import overview
 from app.schemas.common import ProvenanceTable
 from app.schemas.numerology import (
     Challenge,
@@ -782,6 +783,88 @@ def numerology_provenance(reference: date) -> NumerologyProvenance:
     )
 
 
+#: 响应级总论框架句（spec §7 表行 1「全页无总论」的补法）。**本期零新语料**：
+#: `{essence}` 逐字搬运 `core[].meaning`，其余三条只报数与位。
+#:
+#: 为什么不引顶峰/挑战/周期/洛书的原文（G18，用户 2026-10-01 裁定「事实句合并」）：那四类
+#: 是建议句，搬进白话块就撞上 spec §5 规则 7「不给建议」，也与页脚免责声明相冲。
+#: 实测条数（2026-10-01 实跑，`Liam Alexander Carter` / 1990-05-15）：**16 句**
+#: （4 顶峰 + 4 挑战 + 8 洛书平面）里 **13 句**含「宜/忌/需/应」（「宜」9、「需」10，
+#: 「忌」「应」各 0）；本段真正会报出的**流年/流月/流日 3 句全含**；六个核心数释义
+#: **0/6 含**，所以只有它们能逐字进 `{essence}`。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.numerology import compute_chart;from datetime import date;c=compute_chart(full_name='Liam Alexander Carter',birth_date=date(1990,5,15));w=('宜','忌','需','应');s=[*(p.meaning for p in c.pinnacles),*(x.meaning for x in c.challenges),*(p.text for p in c.loshu_grid.planes),*(c.personal_cycles.year.meaning,c.personal_cycles.month.meaning,c.personal_cycles.day.meaning),*(x.meaning for x in c.core if x.meaning)];print(sum(1 for t in s[:16] if any(k in t for k in w)),'/',len(s[:16]));print(sum(1 for t in s[16:19] if any(k in t for k in w)),'/',3);print(sum(1 for t in s[19:] if any(k in t for k in w)),'/',len(s[19:]))"`
+#: → `13 / 16`、`3 / 3`、`0 / 6`。
+#:
+#: 盘面形状复测（同一条输入）：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.numerology import compute_chart;from datetime import date; c=compute_chart(full_name='Liam Alexander Carter', birth_date=date(1990,5,15)); print(len(c.core), len(c.pinnacles), len(c.challenges), len(c.loshu_grid.planes), sum(1 for p in c.loshu_grid.planes if p.complete), [x.digit for x in c.loshu_grid.missing])"`
+#: → `6 4 4 8 1 [2, 3, 4, 6, 7, 8]`。计划草稿写过「17 条」，实测推翻为 16 句 / 13 含建议词。
+#:
+#: 段落框架句不住 `content/`（G16）：spec §9 明写本期 `NUMEROLOGY_CONTENT_SOURCES` 不加条目，
+#: 而新建一个只装框架句的 content 模块就是「读了新表」。
+NUMEROLOGY_SUMMARY_FRAME = (
+    "合起来读这一段：\n{essence}\n"
+    "顶峰四段的数依次是{pinnacles}。\n"
+    "流年与流月、流日的数依次是{cycles}。\n"
+    "洛书八条线齐备{loshu}条，缺的数位是{missing}。"
+    "这一段只是把上面各栏已经写过的释义与数字重排一遍，没有新增判断，也不替你决定要做什么。"
+)
+
+
+def _essence_lines(core: Sequence[CoreNumber]) -> str:
+    """六个核心数逐字搬运，同释义只说一次（R12）；`meaning is None` 的格跳过。
+
+    跳过而不是兜一句：那一格的 `unavailable_reason` 已经写在卡上，白话块再讲一遍就是
+    第二处说话的地方。生命灵数恒可算（由生日得），所以 `{essence}` 永不为空，无需 G15
+    那条支路句——形状同卡巴拉的 33 格全覆盖。前提由
+    `tests/test_numerology.py::test_summary_essence_openers_are_never_empty_so_no_branch_sentence_is_due`
+    按名字矩阵逐条钉住，不靠本注释自证。
+    """
+    seen: dict[str, list[str]] = {}
+    order: list[str] = []
+    for card in core:
+        if card.meaning is None:
+            continue
+        if card.meaning not in seen:
+            seen[card.meaning] = []
+            order.append(card.meaning)
+        seen[card.meaning].append(f"{card.label} {card.value}")
+    return "\n".join(f"{'、'.join(seen[meaning])}——{meaning}" for meaning in order)
+
+
+def numerology_plain_summary(core: Sequence[CoreNumber], pinnacles: Sequence[Pinnacle],
+                             cycles: PersonalCycles, loshu: LoshuGrid) -> str:
+    """总论 = `overview(frame, parts)`。部件只含「已经印在别处的释义」与可数的事实。
+
+    三处只报事实的取数口径：顶峰取 `value`（主数原样，11 不折成 2，与
+    `schemas/numerology.py:103` 的 `CoreNumber.value` 同一条约定）；周期取 `previous_year`
+    之外真正面向读者的三条（year/month/day）及其 `period` 与 `value`；洛书取 `complete`
+    计数与 `missing` 的数位。为什么不写「当前落在第几顶峰」：
+    `current_pinnacle()`(:541) 在周岁未知或年龄轴未覆盖时返回 `None`，那句话有一条空支路，
+    而页面上的 `PinnacleLadder` 已经用 `is_current` 高亮了同一件事（G15 宁缺勿造）。
+    """
+    return overview(
+        NUMEROLOGY_SUMMARY_FRAME,
+        {
+            "essence": _essence_lines(core),
+            "pinnacles": "、".join(f"第 {item.index} 段 {item.value}" for item in pinnacles),
+            "cycles": "、".join(
+                # 三条事实必须是**序列**而不是一串拼好的文本：`"、".join(单个 f-string)`
+                # 会把那个字符串逐字符切开，印出来的是一行乱码。
+                (
+                    f"{cycles.year.period} 年 {cycles.year.value}",
+                    f"{cycles.month.period} 月 {cycles.month.value}",
+                    f"{cycles.day.period} 日 {cycles.day.value}",
+                )
+            ),
+            "loshu": str(sum(1 for plane in loshu.planes if plane.complete)),
+            # 生日恒为 8 个数字字符，洛书数 1..9 共 9 格，抽屉原理保证缺至少一格，
+            # 所以这里不需要「全齐」那条支路句（G15）。含 0 的生日只会缺得更多，
+            # 因为洛书无 0 格（`loshu_grid()` 把 0 记进 `zero_count` 而不进九宫）。
+            "missing": "、".join(str(item.digit) for item in loshu.missing),
+        },
+    )
+
+
 def compute_chart(
     *,
     full_name: str,
@@ -794,13 +877,17 @@ def compute_chart(
 
     本函数里没有任何算术，也没有任何分支（`reference_date or date.today()` 只是个缺省）：
     六段各自独立可测，这里只负责把它们摆进一个响应。一旦它开始长逻辑，就说明那段逻辑
-    该挪回上面某个函数。
+    该挪回上面某个函数。顶峰与周期提成局部再传两遍（一次进响应、一次进白话装配器）不是
+    分支也不是第二处计算 —— 白话块吃的必须是同一份 `pinnacles`/`personal_cycles` 产物，
+    在构造调用里各写一遍才是两处口径。
     """
     reference = reference_date or date.today()
     result = core_numbers(full_name, birth_date, y_as_vowel=y_as_vowel)
     letters = result.letters
     name_panel = name_grid(letters)
     loshu_panel = loshu_grid(birth_date)
+    pinnacle_panel = list(pinnacles(birth_date, reference_date=reference))
+    cycle_panel = personal_cycles(birth_date, reference_date=reference)
     return NumerologyChart(
         input=NumerologyInput(
             full_name=full_name,
@@ -825,10 +912,13 @@ def compute_chart(
         ],
         core=list(result.core),
         karmic_debts=list(result.karmic_debts),
-        pinnacles=list(pinnacles(birth_date, reference_date=reference)),
+        pinnacles=pinnacle_panel,
         challenges=list(challenges(birth_date)),
-        personal_cycles=personal_cycles(birth_date, reference_date=reference),
+        personal_cycles=cycle_panel,
         name_grid=name_panel,
         loshu_grid=loshu_panel,
+        plain_summary=numerology_plain_summary(
+            result.core, pinnacle_panel, cycle_panel, loshu_panel
+        ),
         provenance=numerology_provenance(reference),
     )

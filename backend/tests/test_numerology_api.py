@@ -68,6 +68,9 @@ def test_the_chart_comes_back_whole_and_in_the_documented_order(
         "personal_cycles",
         "name_grid",
         "loshu_grid",
+        # 白话总论是必填字段（G5：缺白话即视为伪造响应），所以它进的是**契约面键集**，
+        # 而不是可选字段名单；`set(body)` 相等 = 少一格与多一格同样红。
+        "plain_summary",
         "provenance",
     }
     assert [item["key"] for item in body["core"]] == CORE_ORDER

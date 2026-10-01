@@ -23,7 +23,7 @@ from datetime import date
 
 import pytest
 
-from app.engines.numerology import compute_chart, life_path
+from app.engines.numerology import compute_chart, life_path, numerology_plain_summary
 
 #: 主角基准日。显式给出，免得个人年/月/日随「今天」漂移（决策 11）。
 REFERENCE = date(2026, 9, 24)
@@ -309,3 +309,46 @@ def test_protagonist_personal_year_2026_keeps_the_master_number(chart) -> None:
     assert cycles.next_year.steps[-1].expression == "5+5+11"
     assert cycles.month.period == "2026-09" and cycles.day.period == "2026-09-24"
     assert all(c.meaning and c.source for c in (cycles.month, cycles.day))
+
+
+# ------------------------------------------------- 主角：白话总论（多系统白话 spec §7）
+
+
+#: 主角那盘的总论逐行值（2026-10-01 实跑 `compute_chart(PROTAGONIST, PROTAGONIST_BIRTH,
+#: name_zh="陆青玄", reference_date=REFERENCE).plain_summary`）。逐字节锚点是本模块的立身
+#: 规矩：`== numerology_plain_summary(...)` 那条只证明「响应里的确是装配器的产物」，
+#: 装配器自己排错序（例如把三条周期事实当成字符串逐字符 join）它照样绿。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.numerology import compute_chart;from datetime import date;print('\\n'.join(compute_chart(full_name='LU QINGXUAN',birth_date=date(1994,5,14),name_zh='陆青玄',reference_date=date(2026,9,24)).plain_summary.split(chr(10))))"`
+PLAIN_PROTAGONIST: list[str] = [
+    "合起来读这一段：",
+    "生命灵数 Life Path 6——照护之数：以责任与情感维系周遭，天然的调和者。",
+    "表达数 Expression 5、生日数 Birthday 5——变动之数：以经历与冒险拓展边界，抗拒被固定下来。",
+    "灵魂冲动数 Soul Urge 7、人格面具数 Personality 7——探究之数：向内向深处走，以分析与直觉求真。",
+    "成熟数 Maturity 11——高阶之二：直觉与启示之数，感受先于逻辑抵达。",
+    "顶峰四段的数依次是第 1 段 1、第 2 段 1、第 3 段 2、第 4 段 1。",
+    "流年与流月、流日的数依次是2026 年 11、2026-09 月 11、2026-09-24 日 8。",
+    "洛书八条线齐备1条，缺的数位是2、3、6、7、8。这一段只是把上面各栏已经写过的释义与"
+    "数字重排一遍，没有新增判断，也不替你决定要做什么。",
+]
+
+
+def test_plain_summary_is_exactly_the_assembler_output(chart) -> None:
+    """抽象判据的正向一半（G13 的灵数形状）：`plain_summary` == `overview(frame, parts)`，一字不差。"""
+    assert chart.plain_summary == numerology_plain_summary(
+        chart.core, chart.pinnacles, chart.personal_cycles, chart.loshu_grid
+    )
+
+
+def test_plain_summary_carries_five_lines_and_no_dropped_core_meaning(chart) -> None:
+    """防「只出一行」的退化（同第一期段内行数那条）：框架 5 行 + 六核心数的释义全部在内。"""
+    lines = chart.plain_summary.split("\n")
+    assert len(lines) >= 5
+    assert lines[0] == "合起来读这一段："
+    for card in chart.core:
+        if card.meaning:
+            assert any(card.meaning in line for line in lines), card.key
+
+
+def test_plain_summary_is_the_byte_exact_protagonist_anchor(chart) -> None:
+    """逐字节锚：八行一字不差，顺序与「同释义只说一次」的合并都在判据里。"""
+    assert chart.plain_summary.split("\n") == PLAIN_PROTAGONIST

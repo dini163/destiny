@@ -303,4 +303,7 @@ class NumerologyChart(BaseModel):
     personal_cycles: PersonalCycles
     name_grid: NumberGrid
     loshu_grid: LoshuGrid
+    plain_summary: str = Field(
+        description="响应级白话总论：逐字搬运六个核心数的释义 + 只报事实的顶峰/周期/洛书半句（spec §7、G18）。必填。"
+    )
     provenance: NumerologyProvenance

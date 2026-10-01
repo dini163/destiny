@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date, timedelta
 
 import pytest
@@ -35,6 +36,7 @@ from app.core.errors import NumerologyInputError
 from app.engines.numerology import (
     CHALLENGE_KEYS,
     CORE_KEYS,
+    NUMEROLOGY_SUMMARY_FRAME,
     PINNACLE_KEYS,
     CoreResult,
     age_at,
@@ -44,12 +46,14 @@ from app.engines.numerology import (
     current_pinnacle,
     loshu_grid,
     name_grid,
+    numerology_plain_summary,
     personal_cycles,
     pinnacles,
     reduce_number,
     split_letters,
 )
 from app.schemas.numerology import CoreNumber, PersonalCycle, PersonalCycles
+from tests.plain_wording import FORBIDDEN
 
 #: 覆盖各种边界：空格、连字符、撇号、含 Y、无元音、无辅音、单字母、全小写。
 NAMES: tuple[str, ...] = (
@@ -905,3 +909,100 @@ def test_entry_level_sources_are_composed_by_the_content_helpers() -> None:
     # 六处的角标（第一个「（」之前）都必须把条目名留在里面，否则前端印出来全是书名。
     for item in (pinnacle, challenge, year, lesson, missing, debt):
         assert "·" in item.source.split("（")[0], item.source
+
+
+# --------------------------------------------------- 白话总论（多系统白话 spec §7、G18）
+
+
+def test_summary_frame_carries_exactly_the_named_slots_and_no_joiner_residue() -> None:
+    """R26：段落框架句不进参数化工厂（工厂只遍历 `PLAIN_CORPORA`，灵数没有表），口径由本测自守。
+
+    禁字表唯一正主在 `tests/plain_wording.py`，这里只 import 不另立。槽位必须具名
+    （裁定 R11）：卡巴拉那条例子说明穿插式的引用只有 `frame.format(**parts)` 装得下。
+    """
+    slots = set(re.findall(r"\{([a-z][a-z0-9_]*)\}", NUMEROLOGY_SUMMARY_FRAME))
+    assert slots == {"essence", "pinnacles", "cycles", "loshu", "missing"}
+    for token in FORBIDDEN:
+        assert token not in NUMEROLOGY_SUMMARY_FRAME, token
+
+
+def test_summary_does_not_quote_any_advice_sentence() -> None:
+    """G18 的机器化形态：总论只搬核心数释义 + 报事实，一个建议句都不引。
+
+    判据不是数禁字，而是**逐条对账**——顶峰/挑战/周期/洛书八平面的原句都不许出现在
+    总论里；那四类今天几乎条条带「宜」「需」（条数复测见 `engines/numerology.py` 里
+    `NUMEROLOGY_SUMMARY_FRAME` 的头注）。
+    """
+    chart = compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15))
+    summary = chart.plain_summary
+    for item in [*(p.meaning for p in chart.pinnacles), *(c.meaning for c in chart.challenges)]:
+        assert item not in summary
+    for plane in chart.loshu_grid.planes:
+        assert plane.text not in summary
+    for token in ("宜", "忌"):
+        assert token not in summary, token
+
+
+def test_summary_merges_every_available_core_meaning_once() -> None:
+    """R12：同释义的两格（生命灵数与人格面具常同号）只说一遍，但不许把谁整个丢掉。"""
+    chart = compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15))
+    lines = chart.plain_summary.split("\n")
+    meanings = {card.meaning for card in chart.core if card.meaning}
+    assert all(any(m in line for line in lines) for m in meanings)
+    for meaning in meanings:
+        assert sum(1 for line in lines if meaning in line) == 1
+
+
+#: G2/G18 的第二套口径：**建议词与结论词**（`plain_wording.py` 那张表管的是拼接残留与
+#: 引用标记，另一回事，所以这里不引它也不覆写它）。词表与 `NUMEROLOGY_SUMMARY_FRAME`
+#: 头注那条复测命令用的是同一组字面量，两处都要改才算改了口径。
+ADVICE_TOKENS: tuple[str, ...] = ("宜", "忌", "需", "应", "吉", "凶")
+
+
+def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
+    """框架句自己一个字都不许下判断（G2）；成品段同查，因为段里含框架句的每个字。
+
+    这条不是 `test_summary_does_not_quote_any_advice_sentence` 的重复：那条查「不引别人的
+    判断」，这条查「不自建判断」。核心数释义今天 0/6 条含这六个字（实测见框架句头注），
+    所以一旦语料侧新增一句带「宜」的释义，红的是这条而不是被引句那条。
+    """
+    for token in ADVICE_TOKENS:
+        assert token not in NUMEROLOGY_SUMMARY_FRAME, token
+    chart = compute_chart(full_name="Liam Alexander Carter", birth_date=date(1990, 5, 15))
+    for token in ADVICE_TOKENS:
+        assert token not in chart.plain_summary, token
+
+
+def test_summary_essence_openers_are_never_empty_so_no_branch_sentence_is_due() -> None:
+    """G15 的例外要登记在明处：`{essence}` 没有「一条都没有」那条支路句，因为不可能为空。
+
+    生命灵数由生日得（`life_path()` 不吃姓名），恒有释义，于是六个核心数里至少两格
+    （生命灵数、生日数）永远带句子上桌，`meaning is None` 只会出现在灵魂冲动数/人格面具数。
+    这里按名字矩阵逐条钉「第二段非空且含生命灵数释义」，即钉住那条支路句的前提；
+    真要为空，装配器会先在这里红，而不是等到线上印出一句凭空编的开场白。
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/test_numerology.py -o addopts="" -k essence`
+    """
+    for name in NAMES:
+        chart = compute_chart(full_name=name, birth_date=BIRTH, reference_date=REFERENCE)
+        life_path_card = next(card for card in chart.core if card.key == "life_path")
+        assert life_path_card.meaning
+        lines = chart.plain_summary.split("\n")
+        assert lines[1].strip(), name
+        assert any(life_path_card.meaning in line for line in lines), name
+
+
+def test_summary_skips_a_core_card_that_has_no_meaning() -> None:
+    """`meaning is None` 的那一格在总论里一个字都不出现——它的 `unavailable_reason` 已在卡上说过。
+
+    白话块只有一处说话的地方（`_essence_lines`），缺数解释若在这里再讲一遍就是第二处。
+    反向半边：同盘其他格仍照搬，生命灵数那句恒在。
+    """
+    chart = compute_chart(full_name="Lynn", birth_date=BIRTH, reference_date=REFERENCE)
+    blanks = [card for card in chart.core if card.meaning is None]
+    assert blanks and all(card.unavailable_reason for card in blanks)
+    summary = chart.plain_summary
+    for card in blanks:
+        assert card.label not in summary, card.key
+    assert any(
+        card.meaning in summary for card in chart.core if card.key != blanks[0].key and card.meaning
+    )

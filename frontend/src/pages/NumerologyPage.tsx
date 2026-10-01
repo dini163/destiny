@@ -8,6 +8,7 @@ import { NumerologyConsole } from '../components/numerology/NumerologyConsole';
 import { PersonalCyclePanel } from '../components/numerology/PersonalCyclePanel';
 import { PinnacleLadder } from '../components/numerology/PinnacleLadder';
 import { Icon } from '../components/ui/Icon';
+import { PlainProse } from '../components/ui/PlainProse';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SourceNote } from '../components/ui/SourceNote';
@@ -32,6 +33,9 @@ const CONTEXT_LABEL: Record<string, string> = { field: '出错字段' };
  * → 溯源。设计稿右上那四个按钮一个都不渲染（spec §4.2）：存档属 Stage 9、导出 PDF 与
  * 合参比对属 Stage 10，而"重新测算"就是重新提交上面那张表单 —— 放一个假按钮或一个
  * 「即将上线」的占位，都是在页面上写一句系统兑现不了的话。
+ *
+ * 这一列之前先有一段白话总论（多系统白话 spec §10）：它是全页唯一的合并叙述，文本住在
+ * `engines/numerology.py`，本页只递 `chart.plain_summary`，不自己拼句。
  *
  * 两个页内局部组件（{@link ChartSummary} / {@link KarmicDebtStrip}）刻意不升成
  * `components/numerology/` 下的第十、第十一个文件：spec §8 点名的是九个组件，多出的文件
@@ -79,6 +83,14 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
 
   return (
     <>
+      {/* 白话总论在全页最前（spec §10「白话在上、专业判语在下」的整页版）：这一家原本是
+          全站唯一有六张结果卡却一句总论都没有的，补的正是那一句合并叙述。文本由引擎装配，
+          本页不组句、不折行、不补连接词（`PlainProse` 只固定「怎么读」）。 */}
+      <div className="panel flex flex-col gap-2 p-5">
+        <span className="label-caps text-ink-muted">白话总论</span>
+        <PlainProse text={chart.plain_summary} />
+      </div>
+
       <ChartSummary chart={chart} />
 
       <ResultCard

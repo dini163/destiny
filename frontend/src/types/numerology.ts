@@ -309,6 +309,8 @@ export interface NumerologyChart {
   personal_cycles: PersonalCycles;
   name_grid: NumberGrid;
   loshu_grid: LoshuGrid;
+  /** 响应级白话总论，必填（spec §9：缺白话即视为伪造响应）。 */
+  plain_summary: string;
   provenance: NumerologyProvenance;
 }
 
