@@ -2,13 +2,24 @@
 
 分工与第一期一致：节点本体与全部对应住在 `content/kabbalah.py`（十原质 + 隐藏的 Daath +
 22 路径），这里只给每个 `id` 配一句能读给人听的话。四条措辞铁律由
-`tests/test_plain_corpora.py` 的工厂逐条机检，「不给建议」半条归人审。
+`tests/test_plain_corpora.py` 的工厂逐条机检；「不给建议」那一半如今也有机检半边——混在正文里的
+结论词（宜/忌/吉/凶）由 `tests/content/test_kabbalah_plain_corpus.py::
+test_plain_entries_add_no_orientation_the_source_table_lacks` 整表扫，句式上「不替你决定」仍归人审。
 
 原表是文学体长散文，含三处半文言（「万物未分之纯有」「有其位而无其质」「破而后立」），
 本表把这三处换成日常句式而**不换内容**：spec §5 规则 8 要的是读者能懂，不是辞藻。
 卡巴拉语料本身不判吉凶；33 条里唯一带取向色彩的词是 `path-21` 的「顺势」，它照搬源表
 自己的意象（`content/kabbalah.py:260`「把握时机者顺势而上」），不是本表新加的判断——
 「不新增判断」在这一家的具体形状就是「原表没有的严重程度不许被形容词补出来」。
+「唯一」二字按取向词表扫（词表 = 顺势/逆势/有利/不利/吉/凶/宜/忌/好运/厄运；「守住那条
+界线**所需**的那份勇气」里的「需」不进口径，那是名词性用法，口径理由见
+`tests/content/test_kabbalah_plain_corpus.py` 的 `VERDICT_WORDS` 头注）。复测（2026-10-01 实跑）：
+`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
+from app.content.kabbalah_plain import KABBALAH_READINGS as R
+w=('顺势','逆势','有利','不利','吉','凶','宜','忌','好运','厄运')
+print([(k, t) for k, v in sorted(R.items()) for t in w if t in v])"` → `[('path-21', '顺势')]`。
+机检半边（源表与白话表两头扫）住 `tests/content/test_kabbalah_plain_corpus.py::
+test_plain_entries_add_no_orientation_the_source_table_lacks`。
 
 33 = 10 + 1 + 22（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
 "from app.content.kabbalah import SEPHIROTH, DAATH, PATHS; print(len(SEPHIROTH), len(PATHS))"` → `10 22`；
