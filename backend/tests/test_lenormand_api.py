@@ -3,8 +3,9 @@
 
 几何与组合算术在 ``tests/golden/test_lenormand_golden.py``（判据 ⑧-⑪ 在那里锚表侧列、席位
 表与邻位算术）；本模块只管「HTTP 这一层有没有把引擎装配好的东西原样递到浏览器」，因此不
-import 引擎函数 —— 只 import 一个正则与 ``TestClient``。与 ``test_runes_api.py`` 同一取舍：
-字段清单手写而不从 ``LenormandReading.model_fields`` 取，因为「从模型取」对「悄悄少了一个
+import 引擎函数 —— 只 import 一个正则、``TestClient`` 与出处对账用的 ``app.content``
+登记常量（后者是清单数据，不是被测逻辑，用法同 ``test_runes_api.py``）。字段清单手写而不从
+``LenormandReading.model_fields`` 取，因为「从模型取」对「悄悄少了一个
 字段」毫无感觉，而锁死契约面正是它的用途。
 
 三条值得单说：
@@ -26,6 +27,8 @@ import 引擎函数 —— 只 import 一个正则与 ``TestClient``。与 ``tes
 import re
 
 from fastapi.testclient import TestClient
+
+from app.content import CONTENT_VERSION, LENORMAND_CONTENT_SOURCES
 
 URL = "/api/v1/lenormand/draw"
 
@@ -191,18 +194,22 @@ def test_an_unlisted_significator_downgrades_silently_to_seven_pairs(client: Tes
 
 
 def test_the_reading_lists_both_lenormand_tables_in_provenance(client: TestClient) -> None:
-    """读了就列（AGENTS §7 / G19）：白话表进响应清单。
+    """读了就列（AGENTS §7 / G19）：白话表进响应清单，且清单逐行按序复刻登记常量。
 
-    名单逐字写死而不从 `LENORMAND_CONTENT_SOURCES` 取：`tables` 整表由那份登记常量生成
-    （`engines/lenormand.py` 的 `_tables()`），常量少一行、多一行或改了表名都会让这一条
-    红；反过来照常量自抄一份，等于让断言跟着被测物一起改（取舍同 `test_qimen_api.py`
-    的 `test_the_board_lists_both_qimen_tables_in_provenance`）。
+    名单从 `LENORMAND_CONTENT_SOURCES` 取而不逐字手写（本批推翻旧口径）：登记表才是
+    「这一页读了哪几张表」的唯一事实源（AGENTS §7），字面名单是逼着人手同步的第二份
+    清单，登记表演进时它只会变成待还的债；对账的钉力落在引擎侧——活响应脱离登记表
+    （少一列、重一列、改名、换行序）都红，`zip(strict=True)` 连长度漂移一起钉。
+    行序另有离线门：`frontend/tests/fixtures/lenormand.json` 快照 +
+    `PlainSummary.test.tsx` 的字面序钉。对账形状同 `test_runes_api.py` 的溯源条。
     """
     response = client.post(URL, json={"spread_id": "three_card", "question": "这一季的安排怎么走"})
     body = response.json()
-    assert {row["name"] for row in body["provenance"]["tables"]} == {"lenormand", "lenormand_plain"}
-    assert all(row["version"] for row in body["provenance"]["tables"])
-    assert all(row["source"] for row in body["provenance"]["tables"])
+    tables = body["provenance"]["tables"]
+    assert [table["name"] for table in tables] == [module for module, _ in LENORMAND_CONTENT_SOURCES]
+    for table, (_, source) in zip(tables, LENORMAND_CONTENT_SOURCES, strict=True):
+        assert table["source"] == source
+        assert table["version"] == CONTENT_VERSION
 
 
 def test_plain_summary_is_a_non_empty_paragraph_distinct_from_synthesis(client: TestClient) -> None:

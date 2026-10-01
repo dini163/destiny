@@ -23,6 +23,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content import CONTENT_VERSION, ZIWEI_CONTENT_SOURCES
+
 URL = "/api/v1/ziwei/chart"
 
 #: 只给最少的必填项 + 显式经度，真太阳时关掉，好让历法事实与参考盘逐字对齐。
@@ -411,11 +413,21 @@ def test_provenance_names_the_book_and_discloses_the_two_divergences(client: Tes
 
 
 def test_the_chart_lists_both_ziwei_tables_in_provenance(client: TestClient) -> None:
-    """读了就列（AGENTS §7 / G19）：白话表进响应清单，且清单就是登记常量本身。"""
+    """读了就列（AGENTS §7 / G19）：白话表进响应清单，且清单逐行按序复刻登记常量。
+
+    `tables` 由 `engines/ziwei.py` 的 `_tables()` 按 `ZIWEI_CONTENT_SOURCES` 的行序生成；
+    这条把名单、逐行 `source`、逐行 `version` 一次对账，钉的是「活响应逐行按序复刻登记表」
+    ——引擎侧少一列、重一列、改名或换了行序都红（`zip(strict=True)` 连长度漂移一起钉）。
+    不从响应里另抄一份字面名单：登记表才是「读了哪几张表」的唯一事实源（AGENTS §7）。
+    行序另有一道离线门：`frontend/tests/fixtures/ziwei.json` 快照 + `ZiweiPlainSections.test.tsx`
+    的字面序钉。对账形状同 `test_runes_api.py` 与 `test_numerology_api.py` 的溯源条。
+    """
     body = _post(client).json()
-    assert {row["name"] for row in body["provenance"]["tables"]} == {"ziwei", "ziwei_plain"}
-    assert all(row["version"] for row in body["provenance"]["tables"])
-    assert all(row["source"] for row in body["provenance"]["tables"])
+    tables = body["provenance"]["tables"]
+    assert [table["name"] for table in tables] == [module for module, _ in ZIWEI_CONTENT_SOURCES]
+    for table, (_, source) in zip(tables, ZIWEI_CONTENT_SOURCES, strict=True):
+        assert table["source"] == source
+        assert table["version"] == CONTENT_VERSION
 
 
 def test_every_palace_carries_a_non_empty_plain_paragraph(client: TestClient) -> None:
