@@ -1,15 +1,14 @@
 """公共装配器的行为契约（白话 spec §3、§11）。
 
 本文件不测任何系统的语料内容，只测装配器的分支与异常。两张表是**测试自造的
-最小 corpus**（不是假命盘、不是假响应，不违反 AGENTS.md §9 的无 mock 铁律），
-第三张表用真实生产对象：卡巴拉的 `_synthesize` 逐字节判据。
+最小 corpus**（不是假命盘、不是假响应，不违反 AGENTS.md §9 的无 mock 铁律）。
+卡巴拉的逐字节判据原先寄在这里，Plan B Task 3 把它迁进了生产侧（见文件末注）。
 """
 
 from collections import OrderedDict
 
 import pytest
 
-from app.engines.kabbalah import compute_gematria
 from app.engines.plain_compose import (
     PlainCorpus,
     compose,
@@ -19,7 +18,6 @@ from app.engines.plain_compose import (
     overview,
     reading,
 )
-from app.schemas.kabbalah import GematriaReading
 
 BANDED = PlainCorpus(
     system="demo",
@@ -131,55 +129,8 @@ def test_dedupe_does_not_lose_a_key_that_only_appears_later() -> None:
     assert [key for key, _ in dedupe([("a.x", 1), ("a.z", -1), ("a.x", 1)])] == ["a.x", "a.z"]
 
 
-KABBALAH_FRAME_REHEARSAL = (
-    "「{normalized}」的英文 ordinal 数值为 {ordinal}（reduction {reduction}，数根 {root}）。"
-    "折入生命之树，它相应于第 {sephirah_number} 原质【{sephirah_name_zh} {sephirah_name_hebrew} · "
-    "{sephirah_pillar_name_zh} · {sephirah_sphere}】——{sephirah_meaning}"
-    "又连于第 {path_number} 路径【{path_letter_zh} {path_letter}（{path_letter_value}）· "
-    "{path_tarot_zh} {path_tarot_numeral} · {path_correspondence}】——{path_meaning}"
-    "两相参详：此名之数理落点，提示由「{path_from_name_zh}」经「{path_tarot_zh}」之路，"
-    "趋近「{sephirah_name_zh}」之境的功课。"
-)
-
-
-def _kabbalah_parts(reading_obj: GematriaReading) -> dict[str, str]:
-    seph, path = reading_obj.sephirah, reading_obj.path
-    return {
-        "normalized": reading_obj.normalized,
-        "ordinal": str(reading_obj.english_ordinal),
-        "reduction": str(reading_obj.english_reduction),
-        "root": str(reading_obj.digital_root),
-        "sephirah_number": str(seph.number),
-        "sephirah_name_zh": seph.name_zh,
-        "sephirah_name_hebrew": seph.name_hebrew,
-        "sephirah_pillar_name_zh": seph.pillar_name_zh,
-        "sephirah_sphere": seph.sphere,
-        "sephirah_meaning": seph.meaning,
-        "path_number": str(path.number),
-        "path_letter_zh": path.letter_zh,
-        "path_letter": path.letter,
-        "path_letter_value": str(path.letter_value),
-        "path_tarot_zh": path.tarot_zh,
-        "path_tarot_numeral": path.tarot_numeral,
-        "path_correspondence": path.correspondence,
-        "path_meaning": path.meaning,
-        "path_from_name_zh": path.from_name_zh,
-    }
-
-
-@pytest.mark.parametrize("word", ["Sol", "LILITH", "abracadabra", "Q", "destiny"])
-def test_overview_reproduces_the_live_kabbalah_synthesis_byte_for_byte(word) -> None:
-    """G13 的第二道「装得下」判据（spec §3、§11 抽象判据行的卡巴拉半边）。
-
-    `engines/kabbalah.py:184-192` 的 `_synthesize` 把原质与路径的字段**穿插**在同一句里
-    （`tarot_zh` 与 `name_zh` 各出现两次），所以只有「具名槽位 + 逐字搬运」的形态装得下它，
-    部件列表拼接装不下——这正是裁定 R11 把 `overview` 定成 `frame.format(**parts)` 的原因。
-    这里不迁卡巴拉（那是 Plan B 的收编任务），只钉住形状：frame 是 Plan B 的表要抄的模板，
-    不是第二份生产文案。**卡巴拉正文若被改动，这条会红**——红了的意义是 Plan B 那张表必须
-    跟着改，而不是本装配器坏了。
-    """
-    result = compute_gematria(word)
-    assert overview(KABBALAH_FRAME_REHEARSAL, _kabbalah_parts(result)) == result.synthesis
+# 卡巴拉的逐字节判据住在生产侧：`tests/golden/test_kabbalah_golden.py::test_gematria_synthesis_text_is_pinned_before_the_overview_migration`。
+# 本文件不再持有任何系统的具体文案（frame 已进 `engines/kabbalah.py`，两处定义必漂）。
 
 
 def test_is_slot_key_only_answers_for_the_declared_slot_vocabulary() -> None:

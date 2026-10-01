@@ -16,6 +16,7 @@ from app.content.bazi_plain import PLAIN_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.kabbalah import KABBALAH_SOURCE
+from app.content.kabbalah_plain import KABBALAH_PLAIN_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
 from app.content.lenormand import LENORMAND_SOURCE
 from app.content.meihua import MEIHUA_SOURCE
@@ -153,11 +154,12 @@ LENORMAND_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("lenormand", LENORMAND_SOURCE),
 )
 
-#: 卡巴拉一页真正读到的一张表：十原质（三柱四界、行星守护、王徽色、大天使与神名）、
-#: 隐藏的 Daath 与 22 路径（希伯来字母 / 塔罗大阿卡纳 / 行星星座元素）之黄金黎明对应。
-#: 单列理由同 `ZIWEI_CONTENT_SOURCES`。
+#: 卡巴拉一页真正读到的两张表：十原质（三柱四界、行星守护、王徽色、大天使与神名）、
+#: 隐藏的 Daath 与 22 路径（希伯来字母 / 塔罗大阿卡纳 / 行星星座元素）之黄金黎明对应，
+#: 以及逐条转述它们的白话表。单列理由同 `ZIWEI_CONTENT_SOURCES`。
 KABBALAH_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kabbalah", KABBALAH_SOURCE),
+    ("kabbalah_plain", KABBALAH_PLAIN_SOURCE),
 )
 
 #: 吠陀占星一页真正读到的一张表：恒星黄道十二星座、九曜（Navagraha）、27 宿

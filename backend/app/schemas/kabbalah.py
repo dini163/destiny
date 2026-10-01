@@ -10,6 +10,8 @@ curated content, never invented at runtime.
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class PillarInfo(BaseModel):
     """One of the three columns of the Tree (慈悲 / 严厉 / 平衡)."""
@@ -30,6 +32,9 @@ class SephirahNode(BaseModel):
     name: str
     name_zh: str
     meaning: str
+    plain_meaning: str = Field(
+        description="逐条对应 `meaning` 的白话转述（`content/kabbalah_plain.py`），必填：缺白话即视为伪造响应（spec §9）。"
+    )
     keywords: list[str]
     pillar: str
     pillar_name_zh: str
@@ -62,6 +67,9 @@ class PathNode(BaseModel):
     tarot_numeral: str = Field(description="Golden Dawn numeral (力量 VIII / 正义 XI).")
     correspondence: str = Field(description="Planet / sign / element, e.g. 狮子座 Leo.")
     meaning: str
+    plain_meaning: str = Field(
+        description="逐条对应 `meaning` 的白话转述（`content/kabbalah_plain.py`），必填：缺白话即视为伪造响应（spec §9）。"
+    )
 
 
 class KabbalahProvenance(BaseModel):
@@ -71,6 +79,9 @@ class KabbalahProvenance(BaseModel):
     content_version: str
     source: str
     note: str
+    tables: list[ProvenanceTable] = Field(
+        description="本响应真读到的语料表：原表 `kabbalah` 与其白话转述表 `kabbalah_plain`（G19：读了就列）。"
+    )
 
 
 class KabbalahTree(BaseModel):

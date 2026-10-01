@@ -14,7 +14,7 @@ owns the "gematria is defined on the Latin alphabet" premise, exactly as
 :class:`NumerologyInputError` does for 数字命理).
 """
 
-from app.content import CONTENT_VERSION
+from app.content import CONTENT_VERSION, KABBALAH_CONTENT_SOURCES
 from app.content.kabbalah import (
     DAATH,
     KABBALAH_SOURCE,
@@ -28,6 +28,10 @@ from app.content.kabbalah import (
     get_sephirah,
 )
 from app.core.errors import GematriaInputError
+# 同层 engines 互引合规，见 `app/engines/synastry.py`、`app/engines/meihua.py` 的既有做法。
+from app.engines.plain_compose import overview, reading
+from app.engines.plain_corpora import KABBALAH
+from app.schemas.common import ProvenanceTable
 from app.schemas.kabbalah import (
     GematriaReading,
     KabbalahProvenance,
@@ -53,6 +57,19 @@ GEMATRIA_NOTE = (
 )
 
 
+def _tables() -> list[ProvenanceTable]:
+    """`KABBALAH_CONTENT_SOURCES` 的第一次被消费（G19）。
+
+    这张登记常量在仓里已经躺了几十天而无人读它（迁移前实测 2026-10-01：
+    `grep -rn KABBALAH_CONTENT_SOURCES app/ tests/` → 只命中定义处 `content/__init__.py`），
+    本期真读了白话表，就照其它系统的形状把它递进响应，不在引擎里另列一份表名。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in KABBALAH_CONTENT_SOURCES
+    ]
+
+
 def _sephirah_node(s: Sephirah) -> SephirahNode:
     pillar = PILLARS[s.pillar]
     return SephirahNode(
@@ -62,6 +79,7 @@ def _sephirah_node(s: Sephirah) -> SephirahNode:
         name=s.name,
         name_zh=s.name_zh,
         meaning=s.meaning,
+        plain_meaning=reading(KABBALAH, s.id),
         keywords=list(s.keywords),
         pillar=s.pillar,
         pillar_name_zh=pillar.name_zh,
@@ -94,6 +112,7 @@ def _path_node(p: Path) -> PathNode:
         tarot_numeral=p.tarot_numeral,
         correspondence=p.correspondence,
         meaning=p.meaning,
+        plain_meaning=reading(KABBALAH, p.id),
     )
 
 
@@ -116,6 +135,7 @@ def build_tree() -> KabbalahTree:
             content_version=CONTENT_VERSION,
             source=KABBALAH_SOURCE,
             note=TREE_NOTE,
+            tables=_tables(),
         ),
     )
 
@@ -168,8 +188,25 @@ def compute_gematria(text: str) -> GematriaReading:
             content_version=CONTENT_VERSION,
             source=KABBALAH_SOURCE,
             note=GEMATRIA_NOTE,
+            tables=_tables(),
         ),
     )
+
+
+#: 命名单值总论的框架句（spec §7 的「形状收编」）。**内容一字未改**：这张 frame 是
+#: `_synthesize` 原来那串 f-string 逐字改名而来，`G13` 的字面 golden 钉住输出。
+#: 之所以必须是有具名槽位的 `overview` 而不是部件列表拼接：`tarot_zh` 与 `name_zh`
+#: 在同一句里各出现两次，只有 `frame.format(**parts)` 装得下（裁定 R11）。
+#: 白话不进这里（裁定 R4 / G17）：`synthesis` 保持原形状，白话走节点的 `plain_meaning`。
+KABBALAH_SYNTHESIS_FRAME = (
+    "「{normalized}」的英文 ordinal 数值为 {ordinal}（reduction {reduction}，数根 {root}）。"
+    "折入生命之树，它相应于第 {sephirah_number} 原质【{sephirah_name_zh} {sephirah_name_hebrew} · "
+    "{sephirah_pillar_name_zh} · {sephirah_sphere}】——{sephirah_meaning}"
+    "又连于第 {path_number} 路径【{path_letter_zh} {path_letter}（{path_letter_value}）· "
+    "{path_tarot_zh} {path_tarot_numeral} · {path_correspondence}】——{path_meaning}"
+    "两相参详：此名之数理落点，提示由「{path_from_name_zh}」经「{path_tarot_zh}」之路，"
+    "趋近「{sephirah_name_zh}」之境的功课。"
+)
 
 
 def _synthesize(
@@ -181,12 +218,27 @@ def _synthesize(
     path: PathNode,
 ) -> str:
     """Compose a reading from the matched Sephirah/Path's real meanings (no fabrication)."""
-    return (
-        f"「{normalized}」的英文 ordinal 数值为 {ordinal}（reduction {reduction}，数根 {root}）。"
-        f"折入生命之树，它相应于第 {sephirah.number} 原质【{sephirah.name_zh} {sephirah.name_hebrew} · "
-        f"{sephirah.pillar_name_zh} · {sephirah.sphere}】——{sephirah.meaning}"
-        f"又连于第 {path.number} 路径【{path.letter_zh} {path.letter}（{path.letter_value}）· "
-        f"{path.tarot_zh} {path.tarot_numeral} · {path.correspondence}】——{path.meaning}"
-        f"两相参详：此名之数理落点，提示由「{path.from_name_zh}」经「{path.tarot_zh}」之路，"
-        f"趋近「{sephirah.name_zh}」之境的功课。"
+    return overview(
+        KABBALAH_SYNTHESIS_FRAME,
+        {
+            "normalized": normalized,
+            "ordinal": str(ordinal),
+            "reduction": str(reduction),
+            "root": str(root),
+            "sephirah_number": str(sephirah.number),
+            "sephirah_name_zh": sephirah.name_zh,
+            "sephirah_name_hebrew": sephirah.name_hebrew,
+            "sephirah_pillar_name_zh": sephirah.pillar_name_zh,
+            "sephirah_sphere": sephirah.sphere,
+            "sephirah_meaning": sephirah.meaning,
+            "path_number": str(path.number),
+            "path_letter_zh": path.letter_zh,
+            "path_letter": path.letter,
+            "path_letter_value": str(path.letter_value),
+            "path_tarot_zh": path.tarot_zh,
+            "path_tarot_numeral": path.tarot_numeral,
+            "path_correspondence": path.correspondence,
+            "path_meaning": path.meaning,
+            "path_from_name_zh": path.from_name_zh,
+        },
     )

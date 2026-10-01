@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 
 from app.core.errors import GematriaInputError
 from app.engines.kabbalah import build_tree, compute_gematria
+from app.engines.plain_corpora import KABBALAH
 
 
 def test_tree_has_the_canonical_structure() -> None:
@@ -408,3 +409,47 @@ def test_a_word_without_latin_letters_raises_instead_of_weighing_zero() -> None:
     assert excinfo.value.code == "gematria_no_latin_letters"
     assert excinfo.value.status_code == 422
     assert excinfo.value.message
+
+
+def test_gematria_synthesis_text_is_pinned_before_the_overview_migration() -> None:
+    """G13 第二道「装得下」判据（spec §3、§11 的卡巴拉半边）。
+
+    这两句字面串是迁移**前**从 `compute_gematria()` 真实输出里抄的（2026-10-01 实抄）：
+    `overview(frame, parts)` 收编之后仍然逐字节等于它们，才算公共层装得下卡巴拉。
+    为什么不用「`overview(引擎的 frame, parts) == result.synthesis`」那种写法：frame 进了生产
+    之后它就是唯一正主，拿它自己拼再跟自己比是恒等式，什么也没钉（Plan A 留在
+    `tests/test_plain_compose.py` 的那份 `KABBALAH_FRAME_REHEARSAL` 副本因此同步删除，见 Step 4）。
+    复测取句：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "from app.engines.kabbalah import compute_gematria; print(compute_gematria('CHAI').synthesis)"`。
+    """
+    assert compute_gematria("CHAI").synthesis == (
+        "「CHAI」的英文 ordinal 数值为 21（reduction 21，数根 3）。"
+        "折入生命之树，它相应于第 1 原质【王冠 כתר · 中柱·平衡 · 原始涌动 · Primum Mobile】——万物未分之纯有，创造的第一点，超越一切名相的至高源头。"
+        "又连于第 31 路径【辛 ש（300）· 审判 XX · 火元素 Fire】——思想召唤最终的觉醒，审判号角响起，旧我死去而复活受召。"
+        "两相参详：此名之数理落点，提示由「荣耀」经「审判」之路，趋近「王冠」之境的功课。"
+    )
+    assert compute_gematria("destiny").synthesis == (
+        "「DESTINY」的英文 ordinal 数值为 96（reduction 33，数根 6）。"
+        "折入生命之树，它相应于第 6 原质【美 תפארת · 中柱·平衡 · 太阳 Sun】——慈悲与严厉调和之核心，自我、和谐与救赎的中心，人格的太阳。"
+        "又连于第 18 路径【海特 ח（8）· 战车 VII · 巨蟹座 Cancer】——形式驾驭相反之力前行，战车以坚定意志凯旋，护持内在柔软。"
+        "两相参详：此名之数理落点，提示由「理解」经「战车」之路，趋近「美」之境的功课。"
+    )
+
+
+def test_every_tree_node_carries_a_plain_retelling() -> None:
+    """必填字段齐不齐，只有真响应能证明：树响应是 10 + 1 + 22 共 33 个节点对象的唯一来源。"""
+    tree = build_tree()
+    assert tree.daath is not None, "Daath 缺席：`schemas/kabbalah.py:93` 是 Optional，先把它变成一条会说的失败"
+    nodes = [*tree.sephiroth, tree.daath, *tree.paths]
+    assert len(nodes) == 33
+    for node in nodes:
+        assert node.plain_meaning and node.plain_meaning != node.meaning
+        assert node.plain_meaning.endswith("。")
+    assert {n.id for n in nodes} == KABBALAH.universe()
+
+
+def test_both_endpoints_list_both_tables() -> None:
+    """读了就列（G19）：两个端点各带同一份清单，且清单就是登记常量，不在引擎里另列一遍。"""
+    expected = {"kabbalah", "kabbalah_plain"}
+    assert {row.name for row in build_tree().provenance.tables} == expected
+    assert {row.name for row in compute_gematria("CHAI").provenance.tables} == expected
