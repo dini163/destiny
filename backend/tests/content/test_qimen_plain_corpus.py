@@ -42,7 +42,7 @@ def test_qimen_corpus_is_the_row_the_factory_iterates() -> None:
     # G3：奇门只逐宫说话，盘面没有分数，收尾结论不许由合成器补。
     assert QIMEN.closers is None
     # 偏差表第 1 行：`LUOSHU` 九宫没有 luck 字段，`EIGHT_DOORS` 两条是「中平」，
-    # `band` 分支遇 0 值直接 `ValueError`（`plain_compose.py:88-90`）→ 只准 `keep`。
+    # `band` 分支遇 0 值直接 `ValueError`（`plain_compose.py:65-67`）→ 只准 `keep`。
     assert QIMEN.grouping == "keep"
     assert QIMEN.slot_prefixes == frozenset()
 
