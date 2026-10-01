@@ -6,6 +6,7 @@ import { afterEach, expect, it } from 'vitest';
 
 import { ZiweiChartGrid } from '../../../src/components/ziwei/ZiweiChartGrid';
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { ZiweiChart } from '../../../src/types/ziwei';
 
@@ -58,9 +59,11 @@ it('the page wires the palaces into the block and the tables into the panel', ()
   expect(src).toContain('title="十二宫白话"');
   expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
   /** Step 3 的挂点规则是两句：「在盘面卡之后」且「在 `<Provenance>` 之前」，两句都钉。
+   *  存在性钉不在此处手写——次序钉经 `tests/lib/sourcePin.ts` 的 `pinLiteralOrder` 下，
+   *  它先把每个锚点各自钉一遍存在性再逐对比次序（裸 `indexOf` 比较在锚点被整行删掉后
+   *  因 -1 照样绿，终审 I-1 记的就是这个坑）。
    *  `<Provenance chart={chart} />` 写全是为了不和 `<ProvenancePanel …>` 的前缀相撞。 */
-  expect(src.indexOf('<ZiweiChartGrid chart={chart} />')).toBeLessThan(src.indexOf('<PlainSectionList'));
-  expect(src.indexOf('<PlainSectionList')).toBeLessThan(src.indexOf('<Provenance chart={chart} />'));
+  pinLiteralOrder(src, ['<ZiweiChartGrid chart={chart} />', '<PlainSectionList', '<Provenance chart={chart} />']);
 });
 
 it('the provenance block lists both tables the endpoint read', () => {

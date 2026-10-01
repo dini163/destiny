@@ -6,6 +6,7 @@ import { afterEach, expect, it } from 'vitest';
 
 import { QimenBoard } from '../../../src/components/qimen/QimenBoard';
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { QimenChart } from '../../../src/types/qimen';
 
@@ -62,9 +63,10 @@ it('the page wires the nine palaces into the block and the tables into the panel
   expect(src).toContain('text: palace.plain');
   expect(src).toContain('title="九宫白话"');
   expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
-  /** 同紫微那条：「盘面卡之后」与「`<Provenance>` 之前」两句都钉。 */
-  expect(src.indexOf('<QimenBoard chart={chart} />')).toBeLessThan(src.indexOf('<PlainSectionList'));
-  expect(src.indexOf('<PlainSectionList')).toBeLessThan(src.indexOf('<Provenance chart={chart} />'));
+  /** 同紫微那条：「盘面卡之后」与「`<Provenance>` 之前」两句都钉。
+   *  存在性钉不在此处手写——`pinLiteralOrder`（`tests/lib/sourcePin.ts`）先钉存在性再比次序，
+   *  裸 `indexOf` 比较那种「锚点被删后因 -1 照样绿」的空钉形状是终审 I-1 收掉的东西。 */
+  pinLiteralOrder(src, ['<QimenBoard chart={chart} />', '<PlainSectionList', '<Provenance chart={chart} />']);
 });
 
 it('the provenance block lists both tables the endpoint read', () => {

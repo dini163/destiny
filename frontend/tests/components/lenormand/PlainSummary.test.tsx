@@ -9,7 +9,9 @@
  * **源码扫凭据**管挂点——整页渲染要走 hook + HTTP，本仓零 mock（AGENTS §9），形状同
  * `tests/components/numerology/PlainSummary.test.tsx`。这里踩过两个坑，都记在测里：① `indexOf`
  * 在字符串缺席时返回 -1，而 -1 小于任何正数——只钉次序不先钉存在性，删掉那行 JSX 照样绿
- * （T9 的 I-1，口径记在 ledger 的 `6379a74` 那条）；② 源码扫只看得到字面、看不到结构——往白话块
+ * （T9 的 I-1，口径记在 ledger 的 `6379a74` 那条）；这个形状已收进 `tests/lib/sourcePin.ts` 的
+ * `pinLiteralOrder`——次序钉自带存在性钉，本页两处次序一律经它下，不再手写 `indexOf` 比较；
+ * ② 源码扫只看得到字面、看不到结构——往白话块
  * 前面插一个兄弟、或把标题搬出外层 div，源码里那两串字面还原样在，所以位置与「同块」归渲染管，
  * 源码扫只钉透镜件的字面形状与页面挂点的次序两半。锚点挑看得见的字而不挑 className：Tailwind
  * 类名是纯样式，改一次配色就该绿的钉会假红。
@@ -26,6 +28,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { CombinationLens } from '../../../src/components/lenormand/CombinationLens';
 import type { LenormandReading } from '../../../src/types/lenormand';
 import { paragraphByExact, precedes } from '../../lib/prose';
+import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 
 // 路径必须先拼成变量再交给 `new URL`：本文件走 jsdom 环境的客户端资源改写，字面量形式会在
@@ -66,25 +69,18 @@ describe('雷诺曼整阵白话', () => {
 
   it('页面把白话挂在透镜件里、把表清单挂在出处块，两处次序都在', () => {
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
-    // 存在性先钉（`indexOf` 的 -1 会把下面的次序钉变成空跑）。
+    // 整串字面钉：出处面板那一串比 `pinLiteralOrder` 的前缀锚点更严（改属性写法就该红），
+    // 存在性另由 `pinLiteralOrder` 对每个锚点各自再钉一遍（`indexOf` 的 -1 空钉坑见其头注）。
     expect(page).toContain('<CombinationLens reading={reading} />');
     expect(page).toContain('{reading.synthesis}');
     expect(page).toContain('<ProvenancePanel tables={reading.provenance.tables} />');
     // 页面不自己组白话：它只把整份 reading 交给透镜件。
     expect(page).not.toContain('plain_summary');
-    expect(page.indexOf('<CombinationLens reading={reading} />')).toBeLessThan(
-      page.indexOf('{reading.synthesis}'),
-    );
+    pinLiteralOrder(page, ['<CombinationLens reading={reading} />', '{reading.synthesis}']);
     // Step 5 的挂点规则是「在出处块里、在那排 chips 之前」。锚点用**看得见的字**（块的标题与
     // `ENGINE ·` 那条 chip），不用 className：Tailwind 类名是纯样式，改一次配色就该绿的钉会假红，
     // 而「表清单被挪出出处块」这条真漂移反倒没人看（复审 trial i 量的正是这个假红）。
-    const title = page.indexOf('抽牌溯源与口径');
-    const chips = page.indexOf('ENGINE · ');
-    expect(title).toBeGreaterThan(-1);
-    expect(chips).toBeGreaterThan(-1);
-    const panel = page.indexOf('<ProvenancePanel tables=');
-    expect(panel).toBeGreaterThan(title);
-    expect(panel).toBeLessThan(chips);
+    pinLiteralOrder(page, ['抽牌溯源与口径', '<ProvenancePanel tables=', 'ENGINE · ']);
   });
 
   it('透镜件源码里白话块的字面形状与标题', () => {
