@@ -15,12 +15,20 @@ from app.engines.plain_corpora import KABBALAH, PLAIN_CORPORA
 
 def test_kabbalah_corpus_is_the_row_the_factory_iterates() -> None:
     assert PLAIN_CORPORA["kabbalah"] is KABBALAH
+    # G3：卡巴拉无分数，白话不许补一句总吉凶——工厂今天两种形状都收，只有这条钉着 None。
+    assert KABBALAH.closers is None
 
 
 def test_universe_is_ten_sephiroth_plus_daath_plus_twenty_two_paths() -> None:
     nodes = [*SEPHIROTH, DAATH]
     assert len(nodes) == 11 and len(PATHS) == 22
-    assert KABBALAH.universe() == {node.id for node in nodes} | {node.id for node in PATHS}
+    # 期望集从源表原始字段独立重建：`_kabbalah_universe()` 抄的是节点的 `.id`，
+    # 照抄它的构造式就抓不到 id 格式被改（只抓得到选取变化）。
+    assert KABBALAH.universe() == (
+        {f"sephirah-{s.number}" for s in SEPHIROTH}
+        | {"daath"}
+        | {f"path-{p.number}" for p in PATHS}
+    )
     # Daath 不在 `SEPHIROTH` 里：若有人把它塞进那个元组，键集会重复而条数不变，所以数一下。
     assert len({node.id for node in nodes}) == 11
 

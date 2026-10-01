@@ -169,7 +169,8 @@ KABBALAH = PlainCorpus(
     universe=_kabbalah_universe,
 )
 
-#: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改。
+#: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
+#: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
     BAZI.system: BAZI,
     NAME.system: NAME,
