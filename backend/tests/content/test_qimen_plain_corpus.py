@@ -1,7 +1,9 @@
 """奇门白话转述表：工厂看不到的那六件事（多系统白话 spec §8 丙组、§11）。
 
 ① 登记身份（R24）；② `universe()` 的构成 9+8+8=25，且星/门/神三批名字互不相同
-   （撞名会撞键，条数照旧 25，工厂照样绿——紫微侧同一条测的先例）；③ 小节覆盖面
+   （奇门三家用不同前缀入键，跨批撞名撞不掉一格——真会撞的是同批之内重名，那由条数 25
+   与工厂的 `set(entries) == universe()` 兜住；紫微才是跨批同键的病根，那里主星与乙级
+   共用 `star_key`）；③ 小节覆盖面
    `set(openers) == {LUOSHU[n].gua}`（R31：漏一宫就少一段开篇句）；④ 转述对账（G14）：
    `nature` 逐字 + `element`（星/门）+ `home` 的汉字序数；⑤ 取向词反向对账（G24）：
    源表的 `luck` 值（吉/凶/中平）不得出现在白话里——奇门是三家里唯一「源表字段本身
@@ -9,7 +11,9 @@
    的上游凭据（`SCHOOL_NOTE`，G14 不许白话替学派新增前提）。
 """
 
-from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, GOD_NATURE, LUOSHU, NINE_STARS
+import pytest
+
+from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, GOD_LUCK, GOD_NATURE, LUOSHU, NINE_STARS
 from app.content.qimen_plain import (
     QIMEN_PALACE_OPENERS,
     QIMEN_PLAIN_SOURCE,
@@ -55,7 +59,9 @@ def test_universe_is_nine_stars_plus_eight_doors_plus_eight_gods() -> None:
         | {god_key(god) for god in EIGHT_GODS}
     )
     assert len(QIMEN.universe()) == 25
-    # 三批名字互不相同：撞名会撞掉一个键而条数不变（紫微侧同病同治）。
+    # 三批名字互不相同。奇门用三个前缀入键，跨批撞名撞不掉格；真正会撞的是同批之内重名，
+    # 那由上面的条数 25 与工厂的 `set(entries) == universe()` 兜住。这条仍保留：读者要能
+    # 分清「值符」的两义（八神之名 vs 盘上的值符星角色旗标），前提就是这三批各有各的名。
     names = [{star.name for star in NINE_STARS}, {d.name for d in EIGHT_DOORS}, set(EIGHT_GODS)]
     for i in range(3):
         for j in range(i + 1, 3):
@@ -93,8 +99,14 @@ def test_the_center_palace_opener_declares_the_ji_gong_rule() -> None:
 
 
 def test_every_star_door_and_god_key_resolves_through_the_assembler() -> None:
+    # 登记的是这张表**本身**而不是复制品：`reading()` 就是 `corpus.entries[key]`
+    # （`plain_compose.py:44-49`），所以不钉这一条，下面的循环只在查字典自身。
+    assert QIMEN.entries is QIMEN_READINGS
     for key in sorted(QIMEN.universe()):
         assert reading(QIMEN, key) == QIMEN_READINGS[key]
+    # 表外的键必须炸在这里，而不是被装配器悄悄兜住（G1「宁崩不漏」的最低一层）。
+    with pytest.raises(KeyError):
+        reading(QIMEN, "qimen.star.天上一颗星")
 
 
 def test_every_retelling_carries_its_rows_nature_element_and_home() -> None:
@@ -118,11 +130,17 @@ def test_every_retelling_carries_its_rows_nature_element_and_home() -> None:
 
 
 def test_no_retelling_borrows_the_source_tables_orientation_word() -> None:
-    """G24 的反向半边：源表的 `luck` 值一个字都不进白话（页面照旧在 tooltip 里印它）。
+    """G24 的反向半边：源表的 `luck` 值一个字都不进白话。
+
+    页面照旧印着它——星与门的 `luck` 是盘面格子里的明文，神的 `luck` 今天只做色别，
+    所以白话再重复一遍就是替源表下判（`qimen_plain.py` 头注同一口径：星门印字、神用色别）。
 
     复测（2026-10-01 草稿全表实跑）：25 条抹 `tests.plain_wording.NON_ADVICE_FORMS`
     （本测走 `advice_hits` 的默认抹词形）后命中 `[]`，
     而九星句里那个「应」字全部来自「对应」这一具名词形；不抹时命中 9 条 `应`。
+
+    神那一层单独查 `GOD_LUCK` 的字面命中：今天八神只有「吉/凶」两值，`advice_hits`
+    顺带就挡得住，将来若给神表补上「中平」，只有这一条还挡得住。
     """
     for star in NINE_STARS:
         text = QIMEN_READINGS[star_key(star.name)]
@@ -134,6 +152,7 @@ def test_no_retelling_borrows_the_source_tables_orientation_word() -> None:
         assert advice_hits(text) == [], door.name
     for god in EIGHT_GODS:
         text = QIMEN_READINGS[god_key(god)]
+        assert GOD_LUCK[god] not in text, (god, GOD_LUCK[god])
         assert advice_hits(text) == [], (god, advice_hits(text))
     for gua, text in sorted(QIMEN_PALACE_OPENERS.items()):
         assert advice_hits(text) == [], (gua, advice_hits(text))

@@ -204,8 +204,9 @@ ZIWEI = PlainCorpus(
 def _qimen_universe() -> set[str]:
     """奇门的键全集 = 9 星 + 8 门 + 8 神 = 25。
 
-    九宫不在这里：宫的一句是小节开篇句不是条目（G22）。天禽在盘上落两次（本宫不坐、
-    寄在坤二那一枚才进段），但键只有一个——`universe()` 按名字取，不按落宫次数取。
+    九宫不在这里：宫的一句是小节开篇句不是条目（G22）。天禽本宫不坐，只随「寄坤二」那一枚
+    入段（`engines/qimen.py:148-165`），全盘落一次；就算它落两次，键也仍然只有一个——
+    `universe()` 按名字取，不按落宫次数取。
     条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import QIMEN; print(len(QIMEN.universe()))"` → 25。
     """
     return (
