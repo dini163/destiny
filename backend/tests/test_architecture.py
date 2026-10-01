@@ -110,6 +110,51 @@ def test_draw_engines_use_csprng(engine: str) -> None:
 PLAIN_COMPOSER = APP / "engines" / "plain_compose.py"
 
 
+def _import_tops(src: str) -> set[str]:
+    """一份源码的绝对顶层 import 集合（与 `_imports_of` 同口径：全仓无相对 import）。"""
+    tops: set[str] = set()
+    for node in ast.walk(ast.parse(src)):
+        if isinstance(node, ast.ImportFrom):
+            if node.module:
+                tops.add(node.module)
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                tops.add(alias.name)
+    return tops
+
+
+def _plain_composer_offenders(tops: set[str]) -> list[str]:
+    """装配器不许引的东西。口径是 spec §11 那句「stdlib 与 `app.content.*`」。
+
+    `app.content` 本身也算合规：`from app.content import X` 的 `node.module` 是
+    `app.content`，不带尾点，所以旧谓词把它判成违例（2026-10-01 实测：四种形状的 import
+    集合喂进去，`['app.content']` 被报出，而 spec §11 明写这一类是准的）。
+    """
+    return sorted(
+        name
+        for name in tops
+        if name.split(".")[0] not in sys.stdlib_module_names
+        and name not in ("app.content",)
+        and not name.startswith("app.content.")
+    )
+
+
+def test_plain_composer_gate_sees_the_four_import_shapes() -> None:
+    """闸自己也要被测过：谓词漏掉 `from app.content import X` 这种形状，红的是别人的任务。
+
+    四条样例喂的是「该放的」与「该拦的」各两种写法，不是生产源码——闸的输入样例，
+    与 `tests/test_plain_compose.py` 自造 corpus 同一条路子（AGENTS.md §9 不拦这个）。
+    """
+    src = (
+        "import json\n"
+        "from app.content import kabbalah_plain\n"
+        "from app.content.bazi_plain import PLAIN_READINGS\n"
+        "from app.engines.western import ASPECTS\n"
+    )
+    assert _import_tops(src) == {"json", "app.content", "app.content.bazi_plain", "app.engines.western"}
+    assert _plain_composer_offenders(_import_tops(src)) == ["app.engines.western"]
+
+
 def test_plain_composer_imports_only_stdlib_and_content() -> None:
     """spec §11：`engines/plain_compose.py` 的 import 集只含 stdlib 与 `app.content.*`。
 
@@ -121,20 +166,8 @@ def test_plain_composer_imports_only_stdlib_and_content() -> None:
     与 `_imports_of` 一样只看绝对 import（全仓无相对 import）。今天必绿；红的那一种形状是有人
     往装配器里写了 `from app.engines.<sys> import …` 或 `from app.schemas.… import …`。
     """
-    tree = ast.parse(PLAIN_COMPOSER.read_text(encoding="utf-8"))
-    tops: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom):
-            if node.module:
-                tops.add(node.module)
-        elif isinstance(node, ast.Import):
-            for alias in node.names:
-                tops.add(alias.name)
-    offenders = sorted(
-        name
-        for name in tops
-        if name.split(".")[0] not in sys.stdlib_module_names
-        and not name.startswith("app.content.")
+    offenders = _plain_composer_offenders(
+        _import_tops(PLAIN_COMPOSER.read_text(encoding="utf-8"))
     )
     assert not offenders, (
         f"plain_compose.py 引入了账本之外的依赖: {offenders}；"
