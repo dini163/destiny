@@ -11,7 +11,7 @@ import engines/schemas）。
 `polarity_label` 与 `synthesis` 里说话，白话只讲这张牌是什么象、讲什么。
 
 键 = `card.id` 逐字（`lenormand-01` … `lenormand-36`）。**本表不设 `card_key()` 构造
-函数**：源表已经给了 id 字段（`content/lenormand.py:41-58` 的 `_card()` 负责拼形状，
+函数**：源表已经给了 id 字段（`content/lenormand.py:41-61` 的 `_card()` 负责拼形状，
 id 在 :53 落成 `lenormand-{number:02d}`），引擎手里也正好是 `DrawnCard.card_id`，
 再包一层就是把同一份映射写两遍（紫微/奇门需要构造函数是因为那边只有中文裸名，没有现成 id）。
 
@@ -38,8 +38,9 @@ LENORMAND_SPREAD_OPENERS: dict[str, str] = {
     "grand_tableau": "大桌把三十六张牌全铺开，以你的指示牌为中心，看它同行前后与同列上下，读的是整张盘的俯瞰。",
 }
 
-#: 36 张牌义。键 = `card.id`；句末一律落回一个「你读到/碰到/看到的是什么」的分句，
-#: 因为雷诺曼读的是位置，不是牌本身（G18：不给建议）。
+#: 36 张牌义。键 = `card.id`；句子都收在「你在这一格读到/碰到/看到什么」那一分句上
+#: （只有 14 狐狸把「也指工作与雇佣那头」挂在它之后），因为雷诺曼读的是位置，
+#: 不是牌本身（G18：不给建议）。
 #: 28 男人与 29 女人是指示牌（`polarity = 0`），句子写成「盘上指向的那位…」，
 #: 不假设问卜者的性别由谁指定（引擎只在请求带 `significator` 时标记，
 #: `engines/lenormand.py:64,83`）。
