@@ -29,6 +29,7 @@ from app.content.numerology_loshu import LOSHU_SOURCE
 from app.content.numerology_meanings import MEANINGS_SOURCE
 from app.content.numerology_pythagorean import PYTHAGOREAN_SOURCE
 from app.content.qimen import QIMEN_SOURCE
+from app.content.qimen_plain import QIMEN_PLAIN_SOURCE
 from app.content.rune_futhark import RUNES_SOURCE
 from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
@@ -144,10 +145,12 @@ ZIWEI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("ziwei_plain", ZIWEI_PLAIN_SOURCE),
 )
 
-#: 奇门遁甲一页真正读到的一张表：洛书九宫、九星八门八神、三奇六仪甲遁、
-#: 阳遁/阴遁 节气局数表、三元符头与旬空驿马。单列理由同 `ZIWEI_CONTENT_SOURCES`。
+#: 奇门遁甲一页真正读到的两张表：安盘正表（洛书九宫、九星八门八神、三奇六仪甲遁、
+#: 阳遁/阴遁 节气局数表、三元符头与旬空驿马），以及逐条转述它们的白话表。单列理由同
+#: `ZIWEI_CONTENT_SOURCES`。
 QIMEN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("qimen", QIMEN_SOURCE),
+    ("qimen_plain", QIMEN_PLAIN_SOURCE),
 )
 
 #: 雷诺曼一页真正读到的一张表：36 张牌义（编号、中英文名、吉凶极性、关键词、

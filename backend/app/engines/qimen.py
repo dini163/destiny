@@ -22,7 +22,7 @@ from datetime import datetime
 
 from lunar_python import Solar
 
-from app.content import CONTENT_VERSION
+from app.content import CONTENT_VERSION, QIMEN_CONTENT_SOURCES
 from app.content.qimen import (
     DOOR_BY_HOME,
     EIGHT_GODS,
@@ -46,6 +46,10 @@ from app.content.qimen import (
     ZHI,
     DIPAN_SEQUENCE,
 )
+from app.content.qimen_plain import door_key, god_key, star_key
+from app.engines.plain_compose import compose
+from app.engines.plain_corpora import QIMEN
+from app.schemas.common import ProvenanceTable
 from app.schemas.qimen import (
     DoorInfo,
     GodInfo,
@@ -152,6 +156,8 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
                     zhi="", row=meta.row, col=meta.col, is_center=True,
                     dipan_gan=dipan[5], tianpan_gan=[], stars=[], door=None, god=None,
                     kong=False, ma=False, is_zhifu_palace=False, is_zhishi_palace=False,
+                    # 中宫条目为零：`compose()` 的 `items=[]` 分支只递开篇句（G27 的 1 行段）。
+                    plain=compose(QIMEN, meta.gua, []),
                 )
             )
             continue
@@ -171,6 +177,14 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
         god_name = EIGHT_GODS[god_index]
         god = GodInfo(name=god_name, luck=GOD_LUCK[god_name], nature=GOD_NATURE[god_name])
 
+        # 本表不分带（G21 / 偏差表第 1 行）：奇门没有任何符号可传，符号位一律 0 由
+        # `grouping="keep"` 忽略。次序 = 读盘序「星→门→神」；此处不可能同键（偏差表第 8 行：
+        # 一环之星互不相同、门环与神环各自双射），所以不调 `dedupe()`。
+        # （寄坤二那一格带天芮·天禽两枚星，也是两个不同星名各走一次 `star_key`，键仍不撞。）
+        items: list[tuple[str, int]] = [(star_key(star.name), 0) for star in stars]
+        items.append((door_key(door.name), 0))
+        items.append((god_key(god_name), 0))
+
         palaces.append(
             QimenPalace(
                 number=number, gua=meta.gua, direction=meta.direction, element=meta.element,
@@ -179,6 +193,7 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
                 kong=kong, ma=ma,
                 is_zhifu_palace=number == zhifu_dest_palace,
                 is_zhishi_palace=number == zhishi_dest_palace,
+                plain=compose(QIMEN, meta.gua, items),
             )
         )
 
@@ -209,8 +224,23 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
             content_version=CONTENT_VERSION,
             source=QIMEN_SOURCE,
             school_note=SCHOOL_NOTE,
+            tables=_tables(),
         ),
     )
+
+
+def _tables() -> list[ProvenanceTable]:
+    """`QIMEN_CONTENT_SOURCES` 的第一次被消费（G19）。
+
+    复测（改前）：`cd backend && grep -rn QIMEN_CONTENT_SOURCES app/ tests/ --include=*.py` →
+    只有 `app/content/__init__.py:149` 的定义处与 `tests/content/test_qimen_corpus.py:300`
+    那条只钉登记表形状的断言；改后响应里真的带两行清单。引擎不在此另列一份表名，
+    免得书名分家（同 `engines/ziwei.py:239-249`、`engines/kabbalah.py:60-70` 的写法）。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in QIMEN_CONTENT_SOURCES
+    ]
 
 
 def _star_info(home: int, zhifu_name: str, at_zhifu_palace: bool) -> StarInfo:

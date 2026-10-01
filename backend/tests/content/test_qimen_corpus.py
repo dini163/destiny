@@ -20,7 +20,8 @@
    是什么」写死成事实，不裁决该用哪一个（裁决记在 findings F-A1-6）。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/content/test_qimen_corpus.py -q` → 17 passed（2026-09-26 实录，含驿马四条参数化）。
+tests/content/test_qimen_corpus.py -q` → 19 passed（2026-10-01 实测，含驿马四条参数化；
+本期只改写登记表那条测，未增删测数）。
 """
 
 import math
@@ -60,6 +61,7 @@ from app.content.qimen import (
     ZHI,
     gan_kind,
 )
+from app.content.qimen_plain import QIMEN_PLAIN_SOURCE
 from app.content.wuxing import ELEMENT_ORDER
 
 GAN = "甲乙丙丁戊己庚辛壬癸"
@@ -286,19 +288,17 @@ def test_the_eight_gods_are_named_luck_bearing_and_nature_bearing() -> None:
     assert Counter(GOD_LUCK.values()) == {"吉": 5, "凶": 3}
 
 
-def test_the_corpus_is_registered_under_one_book_level_source() -> None:
-    """奇门语料只登一张表、署名即 `QIMEN_SOURCE`；**这是登记表自身的形状，不是 §7 已合规**。
+def test_the_corpus_is_registered_under_its_two_tables() -> None:
+    """奇门一页登记两张表：安盘正表 + 本期的白话转述表。
 
-    AGENTS 第 7 条要的是「响应里披露实际读过的表」，而这条清单目前**没有消费者**：
-    `grep -rn QIMEN_CONTENT_SOURCES app/` 只命中 `app/content/__init__.py:128` 的定义处（13 张
-    清单里 8 张被引擎读了并渲染进响应的 `provenance.tables`，`QIMEN_`/`ZIWEI_`/`KABBALAH_`/
-    `LENORMAND_`/`VEDIC_` 五张是零引用的死登记），`QimenProvenance` 也还没有 `tables` 字段
-    （`app/schemas/qimen.py`）。所以本测钉的是「登记了什么、登记得对不对」（多登、漏登、署名
-    漂移都会红），别把它读成出处已经到用户手上 —— 那半步记为 findings F-A2-9，梅花的全缺是
-    同一条机制的另一半。
+    这条从「只钉登记形状」升级成「登记的清单就是响应里的清单」：`engines/qimen.py`
+    的 `_tables()` 现在真的消费它（Plan B 终审随附的那半步已走完，不再是 findings
+    F-A2-9 里那句「别把它读成出处已经到用户手上」）。响应那一侧的兑现由
+    `tests/test_qimen_api.py` 的 tables 断言钉，两边不重复（AGENTS §2）。
     """
-    assert QIMEN_CONTENT_SOURCES == (("qimen", QIMEN_SOURCE),)
+    assert QIMEN_CONTENT_SOURCES == (("qimen", QIMEN_SOURCE), ("qimen_plain", QIMEN_PLAIN_SOURCE))
     assert "烟波钓叟歌" in QIMEN_SOURCE
+    assert QIMEN_PLAIN_SOURCE.startswith("本系统白话转述")
 
 
 def test_dipan_sequence_is_six_yi_followed_by_three_qi_and_never_jia() -> None:

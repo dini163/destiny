@@ -23,7 +23,7 @@
   `tests/test_ziwei_api.py` 对 F-A1-3 的处理法：条文落地时连同契约一起重定，不是改断言）。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/test_qimen_api.py -q` → 21 passed（2026-09-26 实录，含「坏时间戳两条 + 日期区间四条」参数化）。
+tests/test_qimen_api.py -q` → 23 passed（2026-10-01 实录，含「坏时间戳两条 + 日期区间四条」参数化）。
 """
 
 import re
@@ -57,13 +57,13 @@ TOP_LEVEL_KEYS = {
 PALACE_KEYS = {
     "number", "gua", "direction", "element", "zhi", "row", "col", "is_center",
     "dipan_gan", "tianpan_gan", "stars", "door", "god", "kong", "ma",
-    "is_zhifu_palace", "is_zhishi_palace",
+    "is_zhifu_palace", "is_zhishi_palace", "plain",
 }
 
 STAR_KEYS = {"name", "element", "luck", "nature", "is_zhifu"}
 DOOR_KEYS = {"name", "element", "luck", "nature", "is_zhishi"}
 GOD_KEYS = {"name", "luck", "nature"}
-PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note"}
+PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note", "tables"}
 
 # ------------------------------------------------------------------ 前端声明（手抄）
 # 照 `frontend/src/types/qimen.ts` 的六个 interface 逐字重抄；不在后端测试里读前端树，
@@ -81,13 +81,13 @@ FRONTEND_CHART_KEYS = {
 FRONTEND_PALACE_KEYS = {
     "number", "gua", "direction", "element", "zhi", "row", "col", "is_center",
     "dipan_gan", "tianpan_gan", "stars", "door", "god", "kong", "ma",
-    "is_zhifu_palace", "is_zhishi_palace",
+    "is_zhifu_palace", "is_zhishi_palace", "plain",
 }
 
 FRONTEND_STAR_KEYS = {"name", "element", "luck", "nature", "is_zhifu"}
 FRONTEND_DOOR_KEYS = {"name", "element", "luck", "nature", "is_zhishi"}
 FRONTEND_GOD_KEYS = {"name", "luck", "nature"}
-FRONTEND_PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note"}
+FRONTEND_PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note", "tables"}
 
 KEY_LAYERS: list[tuple[str, set[str], set[str]]] = [
     ("palaces[]", PALACE_KEYS, FRONTEND_PALACE_KEYS),
@@ -377,3 +377,20 @@ def test_the_frontend_declares_no_field_the_response_never_sends(client: TestCli
     for path, declared, frontend in KEY_LAYERS:
         assert declared == frontend, f"{path} 的手写契约与前端抄本不同"
     assert TOP_LEVEL_KEYS == FRONTEND_CHART_KEYS
+
+
+def test_the_board_lists_both_qimen_tables_in_provenance(client: TestClient) -> None:
+    """读了就列（AGENTS §7 / G19）：白话表进响应清单，且清单就是登记常量本身。"""
+    body = _post(client).json()
+    assert {row["name"] for row in body["provenance"]["tables"]} == {"qimen", "qimen_plain"}
+    assert all(row["version"] for row in body["provenance"]["tables"])
+    assert all(row["source"] for row in body["provenance"]["tables"])
+
+
+def test_every_palace_carries_a_non_empty_plain_paragraph(client: TestClient) -> None:
+    """交付面只钉「必填非空 + 首行成句」：逐字对账归 golden，两边不重复断言（AGENTS §2）。"""
+    body = _post(client).json()
+    assert len(body["palaces"]) == 9
+    for palace in body["palaces"]:
+        assert palace["plain"], palace["gua"]
+        assert palace["plain"].split("\n")[0].endswith("。")

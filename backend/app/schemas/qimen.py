@@ -11,6 +11,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class QimenRequest(BaseModel):
     """Input for a 奇门遁甲 起局.
@@ -72,6 +74,7 @@ class QimenPalace(BaseModel):
     ma: bool = Field(description="此宫地支落驿马。")
     is_zhifu_palace: bool = Field(description="值符星落此宫。")
     is_zhishi_palace: bool = Field(description="值使门落此宫。")
+    plain: str = Field(description="本宫白话：卦位开篇句 + 逐星 + 门 + 神，段内以 \\n 分行；中宫只有开篇句。")
 
 
 class QimenProvenance(BaseModel):
@@ -81,6 +84,7 @@ class QimenProvenance(BaseModel):
     content_version: str
     source: str
     school_note: str = Field(description="起局/排盘/寄宫/八神口径说明，诚实标注派别分歧。")
+    tables: list[ProvenanceTable] = Field(description="本响应真正读过的语料表（AGENTS §7：读了就列，宁缺勿多）。")
 
 
 class QimenChart(BaseModel):
