@@ -1,12 +1,13 @@
-"""雷诺曼白话转述表：工厂看不到的那五件事（多系统白话 spec §8 丙组、§11）。
+"""雷诺曼白话转述表：工厂看不到的那六件事（多系统白话 spec §8 丙组、§11）。
 
 ① 登记身份（R24）；② `universe()` 就是 36 张牌的 `id`，且 id 形状由源表负责
    （本表不另造键——见 `LENORMAND_READINGS` 的头注）；③ 小节覆盖面 `set(openers)
    == set(SPREADS)`（R31：漏一阵就少一句开篇，而那一阵的段仍然完整可读，工厂抓不到）；
 ④ 转述对账（G14）：`name_zh` 与 `essence` 两个字段逐字进句子——牌义表是策展文本，
    转述只能围着这两个词写，不能改成另一种占卜的说法；⑤ 取向词反向对账（G24）：
-   源表自己有 6 处带取向字（4 条 `meaning` + 2 条 `as_modifier`，命中的牌与字段
-   就地写在测里），白话一句都不引，同时极性 `polarity` 也不进句子。
+   源表自己有 6 处带取向字（4 条 `meaning` + 2 条 `as_modifier`，命中牌号由测自己断言，
+   不止写在注释里），白话一句都不引，同时极性 `polarity` 也不进句子；⑥ 一条牌义
+   必须正好一行（`\n` 不出现），T8 的行数等式 `cards + 1` 就是按行切的。
 """
 
 from app.content.lenormand import CARDS, POLARITY_LABEL, SPREADS
@@ -20,7 +21,8 @@ from app.engines.plain_corpora import LENORMAND, PLAIN_CORPORA
 from tests.plain_wording import advice_hits
 
 #: 六字表在 `plain_wording.ADVICE_TOKENS`，这里不复制一份（T1 的合并债就是为此）。
-#: 但反向对账要知道**源表**哪几格自带取向词，所以命中位置写死在下面两条测里。
+#: 反向对账要知道**源表**哪几格自带取向词：那六处既写在本文件与语料表的注释里，
+#: 也由 `test_no_retelling_borrows_the_source_tables_orientation_words` 逐格断言。
 
 
 def test_lenormand_corpus_is_the_row_the_factory_iterates() -> None:
@@ -39,15 +41,15 @@ def test_universe_is_the_thirty_six_card_ids_verbatim() -> None:
     assert LENORMAND.universe() == {card.id for card in CARDS}
     assert set(LENORMAND_READINGS) == LENORMAND.universe()
     # 键就是源表的 id，不做二次转写：`lenormand-01` 这种形状由 `_card()` 保证
-    # （`content/lenormand.py:41-58`，id 在 :53 拼成），本表若自拼一份，改编号宽度时会漂。
+    # （`content/lenormand.py:41-61`，id 在 :53 拼成），本表若自拼一份，改编号宽度时会漂。
     assert all(key.startswith("lenormand-") for key in LENORMAND.universe())
 
 
 def test_openers_are_exactly_the_five_spread_ids() -> None:
     """R31：小节名单 = 五阵 id。`single` 那阵只有一张牌，缺开篇句就只剩一句牌义。"""
     assert set(LENORMAND_SPREAD_OPENERS) == set(SPREADS)
-    assert set(LENORMAND.openers) == set(SPREADS)
-    assert len(LENORMAND.openers) == 5
+    # 登记的是同一份 dict，不是复制品——复制品会让「改了表却没改登记」变成静默的。
+    assert LENORMAND.openers is LENORMAND_SPREAD_OPENERS
 
 
 def test_each_opener_states_how_that_spread_is_read() -> None:
@@ -63,6 +65,7 @@ def test_each_opener_states_how_that_spread_is_read() -> None:
 
 
 def test_every_card_key_resolves_through_the_assembler() -> None:
+    assert LENORMAND.entries is LENORMAND_READINGS
     for key in sorted(LENORMAND.universe()):
         assert reading(LENORMAND, key) == LENORMAND_READINGS[key]
 
@@ -85,6 +88,8 @@ def test_each_retelling_carries_its_cards_name_and_noun_core() -> None:
         text = LENORMAND_READINGS[card.id]
         assert card.name_zh in text, (card.number, "name_zh")
         assert card.essence in text, (card.number, "essence")
+        # T8 的行数等式（`len(lines) == len(cards) + 1`）拿 `"\n"` 分行，一条牌义必须是**一行**。
+        assert "\n" not in text, card.number
 
 
 def test_no_retelling_borrows_the_source_tables_orientation_words() -> None:
@@ -103,12 +108,17 @@ def test_no_retelling_borrows_the_source_tables_orientation_words() -> None:
     """
     neutral = [card.number for card in CARDS if card.polarity == 0]
     assert sorted(neutral) == [28, 29], "两张指示牌是极性零，正是 `keep` 而非 `band` 的原因"
+    # 上面那段注释里写的六处不是叙述，是断言：源表若改写这两列，注释当场红（而不是悄悄失真）。
+    words = ("宜", "忌", "需", "应", "吉", "凶")
+    assert [c.number for c in CARDS if any(t in c.meaning for t in words)] == [2, 21, 31, 33]
+    assert [c.number for c in CARDS if any(t in c.as_modifier for t in words)] == [11, 26]
     for card in CARDS:
         text = LENORMAND_READINGS[card.id]
         assert advice_hits(text) == [], (card.number, advice_hits(text))
         assert POLARITY_LABEL[card.polarity] not in text, card.number
     for spread_id, text in sorted(LENORMAND_SPREAD_OPENERS.items()):
         assert advice_hits(text) == [], (spread_id, advice_hits(text))
+        assert "\n" not in text, spread_id
 
 
 def test_source_line_declares_which_fields_the_retelling_uses() -> None:
