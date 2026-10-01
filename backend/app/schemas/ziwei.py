@@ -9,7 +9,7 @@ walked from the 安星 tables in :mod:`app.content.ziwei`.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import BirthInput, Gender
+from app.schemas.common import BirthInput, Gender, ProvenanceTable
 
 
 class ZiweiRequest(BirthInput):
@@ -51,6 +51,9 @@ class Palace(BaseModel):
     is_shen: bool = Field(description="This palace is the 身宫.")
     dayun: str | None = Field(default=None, description="大限 age range seated here, e.g. 3-12.")
     stars: list[StarPlacement] = Field(description="Stars seated in this palace.")
+    plain: str = Field(
+        description="本宫白话：开篇句 + 逐星（带四化则紧跟其后），段内以 \\n 分行。必填：缺白话即视为伪造响应（spec §9）。"
+    )
 
 
 class SiHuaInfo(BaseModel):
@@ -64,12 +67,15 @@ class SiHuaInfo(BaseModel):
 
 
 class ZiweiProvenance(BaseModel):
-    """Chart provenance — engine, corpus version and the 四化 school note."""
+    """Chart provenance — engine, corpus version, source, the tables actually read and the 四化 school note."""
 
     engine: str
     content_version: str
     source: str
     school_note: str = Field(description="四化派别与安星口径说明，诚实标注分歧点。")
+    tables: list[ProvenanceTable] = Field(
+        description="本响应真读到的语料表：安星表 `ziwei` 与其白话转述表 `ziwei_plain`（AGENTS §7 / G19：读了就列，宁缺勿多）。"
+    )
 
 
 class ZiweiChart(BaseModel):

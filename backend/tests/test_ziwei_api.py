@@ -48,14 +48,14 @@ TOP_LEVEL_KEYS = {
 }
 
 PALACE_KEYS = {
-    "index", "zhi", "gan", "ganzhi", "name", "is_ming", "is_shen", "dayun", "stars",
+    "index", "zhi", "gan", "ganzhi", "name", "is_ming", "is_shen", "dayun", "stars", "plain",
 }
 
 STAR_KEYS = {"name", "kind", "element", "yin_yang", "group", "nature", "sihua"}
 
 SIHUA_KEYS = {"year_gan", "lu", "quan", "ke", "ji"}
 
-PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note"}
+PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note", "tables"}
 
 # ------------------------------------------------------------------ 前端声明（手抄）
 # 下面五份是照 `frontend/src/types/ziwei.ts` 的五个 interface **逐字重抄**的字段名，
@@ -72,14 +72,14 @@ FRONTEND_CHART_KEYS = {
 }
 
 FRONTEND_PALACE_KEYS = {
-    "index", "zhi", "gan", "ganzhi", "name", "is_ming", "is_shen", "dayun", "stars",
+    "index", "zhi", "gan", "ganzhi", "name", "is_ming", "is_shen", "dayun", "stars", "plain",
 }
 
 FRONTEND_STAR_KEYS = {"name", "kind", "element", "yin_yang", "group", "nature", "sihua"}
 
 FRONTEND_SIHUA_KEYS = {"year_gan", "lu", "quan", "ke", "ji"}
 
-FRONTEND_PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note"}
+FRONTEND_PROVENANCE_KEYS = {"engine", "content_version", "source", "school_note", "tables"}
 
 #: 三层键集的对照表，一次扫完（少一个字段/多一个字段都会被点名）。
 KEY_LAYERS: list[tuple[str, set[str], set[str]]] = [
@@ -408,3 +408,23 @@ def test_provenance_names_the_book_and_discloses_the_two_divergences(client: Tes
     assert "四化" in note and "全书" in note
     assert "闰月" in note
     assert "阳男阴女顺行" in note and "阴男阳女逆行" in note
+
+
+def test_the_chart_lists_both_ziwei_tables_in_provenance(client: TestClient) -> None:
+    """读了就列（AGENTS §7 / G19）：白话表进响应清单，且清单就是登记常量本身。"""
+    body = _post(client).json()
+    assert {row["name"] for row in body["provenance"]["tables"]} == {"ziwei", "ziwei_plain"}
+    assert all(row["version"] for row in body["provenance"]["tables"])
+    assert all(row["source"] for row in body["provenance"]["tables"])
+
+
+def test_every_palace_carries_a_non_empty_plain_paragraph(client: TestClient) -> None:
+    """交付面只钉「必填非空 + 末句成句」：`Palace.plain` 是 `str` 无默认，缺一次就 500。
+
+    逐字对账归 golden（Step 1 已钉 `lines[0] == ZIWEI.openers[palace.name]`），两边不重复
+    断言同一件事（AGENTS §2 的同一口径）。
+    """
+    body = _post(client).json()
+    for palace in body["palaces"]:
+        assert palace["plain"], palace["name"]
+        assert palace["plain"].split("\n")[-1].endswith("。")

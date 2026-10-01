@@ -35,6 +35,7 @@ from app.content.synastry import SYNASTRY_SOURCE
 from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
+from app.content.ziwei_plain import ZIWEI_PLAIN_SOURCE
 from app.core.provenance import MODEL_PARAM_SOURCE
 
 CONTENT_VERSION = "2026.09"
@@ -135,11 +136,12 @@ RUNE_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("rune_spreads", SPREADS_SOURCE),
 )
 
-#: 紫微斗数一页真正读到的一张表：十四主星与乙级星之五行/星系、生年干四化、
-#: 命主身主、纳音五行局与十二宫序。单列理由同 `NAME_CONTENT_SOURCES`：混进
-#: `CONTENT_SOURCES` 等于让八字声称引了它没用过的斗数安星表。
+#: 紫微斗数一页真正读到的两张表：十四主星与乙级星之五行/星系、生年干四化、
+#: 命主身主、纳音五行局与十二宫序，以及逐条转述它们的白话表。单列理由同
+#: `NAME_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的斗数安星表。
 ZIWEI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("ziwei", ZIWEI_SOURCE),
+    ("ziwei_plain", ZIWEI_PLAIN_SOURCE),
 )
 
 #: 奇门遁甲一页真正读到的一张表：洛书九宫、九星八门八神、三奇六仪甲遁、

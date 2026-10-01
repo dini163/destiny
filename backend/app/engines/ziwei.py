@@ -14,7 +14,7 @@ algorithms reproduce the published 安紫微诀 tables (e.g. 火六局 初一→
 
 from datetime import date, time
 
-from app.content import CONTENT_VERSION
+from app.content import CONTENT_VERSION, ZIWEI_CONTENT_SOURCES, ZIWEI_SOURCE, ziwei_plain
 from app.content.bazi_nayin import nayin_meaning
 from app.content.ziwei import (
     GAN,
@@ -38,7 +38,9 @@ from app.content.ziwei import (
     ZIWEI_SERIES,
 )
 from app.engines.bazi_moment import resolve_natal_moment
-from app.schemas.common import CalendarType, Gender
+from app.engines.plain_compose import compose
+from app.engines.plain_corpora import ZIWEI
+from app.schemas.common import CalendarType, Gender, ProvenanceTable
 from app.schemas.ziwei import (
     Palace,
     SiHuaInfo,
@@ -162,17 +164,27 @@ def compute_ziwei_chart(
             for star_name in STAR_ORDER
             if placements[star_name] == zhi_index
         ]
+        palace = palace_name(zhi_index)
+        # 本表不分带（G21）：斗数没有任何符号可传，符号位一律 0 由 `grouping="keep"` 忽略。
+        # 此处不可能同键（偏差表第 8 行）：`STAR_ORDER` 逐星放置，一宫之内星名唯一，
+        # 宫内至多一枚四化，所以不调 `dedupe()`。
+        items: list[tuple[str, int]] = []
+        for star in stars:
+            items.append((ziwei_plain.star_key(star.name), 0))
+            if star.sihua is not None:
+                items.append((ziwei_plain.sihua_key(star.sihua), 0))
         palaces.append(
             Palace(
                 index=zhi_index,
                 zhi=ZHI[zhi_index],
                 gan=gan,
                 ganzhi=gan + ZHI[zhi_index],
-                name=palace_name(zhi_index),
+                name=palace,
                 is_ming=zhi_index == ming_index,
                 is_shen=zhi_index == shen_index,
                 dayun=dayun_by_index[zhi_index],
                 stars=stars,
+                plain=compose(ZIWEI, palace, items),
             )
         )
 
@@ -216,10 +228,24 @@ def compute_ziwei_chart(
         provenance=ZiweiProvenance(
             engine="ziwei-deterministic",
             content_version=CONTENT_VERSION,
-            source="《紫微斗数全书》通行安星法",
+            source=ZIWEI_SOURCE,
             school_note=SCHOOL_NOTE,
+            tables=_tables(),
         ),
     )
+
+
+def _tables() -> list[ProvenanceTable]:
+    """`ZIWEI_CONTENT_SOURCES` 的第一次被消费（G19）。
+
+    复测（改前）：`cd backend && grep -rn ZIWEI_CONTENT_SOURCES app/ tests/ --include=*.py` →
+    只有 `app/content/__init__.py:141` 的定义处。引擎不在此另列一份表名，
+    免得书名分家（同 `engines/kabbalah.py:60-69` 的写法）。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in ZIWEI_CONTENT_SOURCES
+    ]
 
 
 def _ziwei_index(day: int, ju: int) -> int:

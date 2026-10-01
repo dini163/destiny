@@ -14,6 +14,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.content.ziwei import MAJOR_STARS, MINOR_STARS
+from app.content.ziwei_plain import sihua_key, star_key
+from app.engines.plain_corpora import ZIWEI
 from app.engines.ziwei import compute_ziwei_chart
 from app.schemas.common import CalendarType, Gender
 
@@ -472,3 +474,58 @@ def test_the_shen_palace_lands_where_the_hour_says(birth: str, hour: str, sex: G
     assert len(shen) == 1, f"身宫标记应当只有一宫: {[(p.zhi, p.is_shen) for p in chart.palaces]}"
     assert shen[0].zhi == chart.shen_gong_zhi
     assert shen[0].name == chart.shen_gong_name == CLASSICAL_SHEN_GONG[chart.time_zhi]
+
+
+# ------------------------------------------------- 白话转述（多系统白话 spec §8 丙组 · 紫微行）
+
+
+def test_every_palace_carries_its_opener_plus_its_own_stars() -> None:
+    """行数等式（G27）：一段的行数 == 1（宫开篇句）+ 传入 compose 的条目数。
+
+    spec §11 那句「段内行数 ≥3」在这里不成立：无主星之宫（借对宫那格，页面上
+    `ZiweiChartGrid.tsx:73` 已经在印「（无主星·借对宫）」）只有开篇句一行。凑够三行就是编句子。
+    """
+    chart = _chart()
+    for palace in chart.palaces:
+        lines = palace.plain.split("\n")
+        marks = sum(1 for star in palace.stars if star.sihua is not None)
+        assert len(lines) == 1 + len(palace.stars) + marks, (palace.name, lines)
+        assert lines[0] == ZIWEI.openers[palace.name]
+        # 每一行都逐字来自语料：装配器不现编短语，页面也不组句（G1）。
+        assert all(line in ZIWEI.entries.values() or line in ZIWEI.openers.values() for line in lines)
+
+
+def test_the_sihua_mark_follows_its_star_inside_the_paragraph() -> None:
+    """G23 的拼接形状：标记句紧跟在它所属星那句之后，于是「武曲化权」= 武曲句 + 化权句。
+
+    次序由 `STAR_ORDER` 的安星序决定，白话层没有排过一次序（G2）。
+    """
+    chart = _chart()
+    for palace in chart.palaces:
+        lines = palace.plain.split("\n")
+        for star in palace.stars:
+            assert ZIWEI.entries[star_key(star.name)] in lines, (palace.name, star.name)
+            if star.sihua is not None:
+                index = lines.index(ZIWEI.entries[star_key(star.name)])
+                assert lines[index + 1] == ZIWEI.entries[sihua_key(star.sihua)], (palace.name, star.name)
+
+
+def test_the_whole_chart_prints_twelve_openers_twenty_eight_stars_four_marks() -> None:
+    """全盘等式：十二宫恒 12 段，28 颗星各落一宫，生年四化恒 4 枚 → 总行数恒 44。
+
+    这是「宁崩不漏」在紫微侧的整盘版：任何一格丢句都会让这个数掉下来，而它不依赖
+    具体盘面（换 `LEAP_BIRTH` 那张锚盘同样成立，因为 28+4 是安星表的恒等式）。
+    """
+    for chart in (_chart(), _chart(Gender.FEMALE)):
+        assert sum(len(p.plain.split("\n")) for p in chart.palaces) == 44
+
+
+def test_no_palace_paragraph_says_a_star_that_is_not_in_that_palace() -> None:
+    """反向对账：段里出现的星句，必须真是这一宫的星（借对宫、逐宫漏装都会在这里红）。"""
+    chart = _chart()
+    for palace in chart.palaces:
+        seated = {star_key(star.name) for star in palace.stars} | {
+            sihua_key(star.sihua) for star in palace.stars if star.sihua is not None
+        }
+        printed = {key for key, text in ZIWEI.entries.items() if text in palace.plain.split("\n")}
+        assert printed == seated, (palace.name, printed ^ seated)
