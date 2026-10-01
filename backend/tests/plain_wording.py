@@ -52,6 +52,7 @@ def advice_hits(
 
 def test_advice_hits_masks_named_word_forms() -> None:
     assert advice_hits("对应之数与反应快都不算。") == []
+    assert advice_hits("适应变动不算。") == []
     assert advice_hits("适应变动不算，应当算。") == ["应"]
     assert advice_hits("化忌是四化名相本身。", masks=("化禄", "化权", "化科", "化忌")) == []
     assert advice_hits("此格忌反复争执。") == ["忌"]
