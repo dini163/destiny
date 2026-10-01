@@ -7,7 +7,14 @@
 
 from __future__ import annotations
 
-from app.content import kabbalah_plain, lenormand_plain, name_plain, qimen_plain, synastry_plain, ziwei_plain
+from app.content import (
+    kabbalah_plain,
+    lenormand_plain,
+    name_plain,
+    qimen_plain,
+    synastry_plain,
+    ziwei_plain,
+)
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.kabbalah import DAATH, PATHS, SEPHIROTH
