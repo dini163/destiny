@@ -419,8 +419,11 @@ def test_the_chart_lists_both_ziwei_tables_in_provenance(client: TestClient) -> 
     这条把名单、逐行 `source`、逐行 `version` 一次对账，钉的是「活响应逐行按序复刻登记表」
     ——引擎侧少一列、重一列、改名或换了行序都红（`zip(strict=True)` 连长度漂移一起钉）。
     不从响应里另抄一份字面名单：登记表才是「读了哪几张表」的唯一事实源（AGENTS §7）。
-    行序另有一道离线门：`frontend/tests/fixtures/ziwei.json` 快照 + `ZiweiPlainSections.test.tsx`
-    的字面序钉。对账形状同 `test_runes_api.py` 与 `test_numerology_api.py` 的溯源条。
+    登记表自身那一半不在本条的门内——`_tables()` 与本条读同一份元组，登记加行、删行或改名时
+    两边同动（实测：调换两行 → 本条照绿）。那一半住在
+    `tests/content/test_ziwei_corpus.py::test_the_page_registers_exactly_its_two_tables_in_order`
+    （逐字钉登记常量），页面上的展示序另有一份离线门：`ZiweiPlainSections.test.tsx` 对
+    `ziwei.json` 快照钉字面序。对账形状同 `test_runes_api.py` 与 `test_numerology_api.py` 的溯源条。
     """
     body = _post(client).json()
     tables = body["provenance"]["tables"]

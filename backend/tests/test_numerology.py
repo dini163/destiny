@@ -967,7 +967,7 @@ def test_summary_merges_every_available_core_meaning_once() -> None:
 
 #: G2/G18 的第二套口径：**建议词与结论词**——六字表、四字表、抹词形表与 `advice_hits`
 #: 的唯一正主已搬到 `tests/plain_wording.py`（Plan C Task 1 合并，本文件只 import 不另立），
-#: 抹词形 `("对应","反应")` 的实测理由与复测命令见 `tests.plain_wording.NON_ADVICE_FORMS` 头注。
+#: 抹词形名单的实测理由与复测命令见 `tests.plain_wording.NON_ADVICE_FORMS` 头注——名单不在此复写。
 def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     """框架句自己一个字都不许下判断（G2）；成品段同查，因为段里含框架句的每个字。
 

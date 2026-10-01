@@ -240,8 +240,10 @@ def _tables() -> list[ProvenanceTable]:
     """`ZIWEI_CONTENT_SOURCES` 的第一次被消费（G19）。
 
     复测（当前树）：`cd backend && grep -rn ZIWEI_CONTENT_SOURCES app/ tests/ --include=*.py` → 定义
-    `content/__init__.py:144`、本模块 import `:17` 与消费 `:248`，另有 `tests/test_ziwei_api.py`
-    的逐行对账。引擎不在此另列表名、不抄书名（同 `engines/kabbalah.py:60-69` 的写法）。
+    `content/__init__.py:144`、本模块 import `:17` 与消费 `:248`（行号随本注一起改，改动常量后重跑
+    这条命令即得），测侧两处：`tests/content/test_ziwei_corpus.py:571` 逐字钉登记常量本身，
+    `tests/test_ziwei_api.py:430-431` 拿活响应逐行对账。引擎不在此另列表名、不抄书名
+    （同 `engines/kabbalah.py:60-70` 的写法）。
     """
     return [
         ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)

@@ -200,8 +200,11 @@ def test_the_reading_lists_both_lenormand_tables_in_provenance(client: TestClien
     「这一页读了哪几张表」的唯一事实源（AGENTS §7），字面名单是逼着人手同步的第二份
     清单，登记表演进时它只会变成待还的债；对账的钉力落在引擎侧——活响应脱离登记表
     （少一列、重一列、改名、换行序）都红，`zip(strict=True)` 连长度漂移一起钉。
-    行序另有离线门：`frontend/tests/fixtures/lenormand.json` 快照 +
-    `PlainSummary.test.tsx` 的字面序钉。对账形状同 `test_runes_api.py` 的溯源条。
+    登记表自身那一半不在本条的门内——`_tables()` 与本条读同一份元组，登记加行、删行或改名时
+    两边同动（实测：调换两行 → 本条照绿）。那一半住在
+    `tests/content/test_lenormand_plain_corpus.py::test_the_page_registers_exactly_its_two_tables_in_order`
+    （逐字钉登记常量），页面上的展示序另有一份离线门：`PlainSummary.test.tsx` 对
+    `lenormand.json` 快照钉字面序。对账形状同 `test_runes_api.py` 的溯源条。
     """
     response = client.post(URL, json={"spread_id": "three_card", "question": "这一季的安排怎么走"})
     body = response.json()
