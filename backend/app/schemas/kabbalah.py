@@ -73,7 +73,7 @@ class PathNode(BaseModel):
 
 
 class KabbalahProvenance(BaseModel):
-    """Provenance — engine, corpus version, source and the method note."""
+    """Provenance — engine, corpus version, source, the tables actually read, and the method note."""
 
     engine: str
     content_version: str

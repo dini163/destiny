@@ -14,7 +14,7 @@
   （``sephirah_count``/``path_count`` 与两个长度）。路由器哪天漏装一块 —— ``worlds``、
   ``daath``、节点上的 ``color`` —— 页面就少画一片，而那条测照样绿。
 * **`synthesis` 含三个数字字面量**：「响应自己印的字面 ⊆ 响应自己给的数据」那一族在
-  HTTP 层的落点，防 ``engines/kabbalah.py`` 里那串 f-string 与字段脱钩。
+  HTTP 层的落点，防 ``engines/kabbalah.py`` 里 ``KABBALAH_SYNTHESIS_FRAME`` 的槽位与字段脱钩。
 * **两种 422 不是一种**：``GematriaRequest.text`` 的 `min_length=1, max_length=64`
   （``schemas/kabbalah.py``）坏在字段自身，走 FastAPI 默认 ``detail`` 形状；一个拉丁
   字母也没有坏在引擎前提，走 ``{error: {code, message}}`` 信封（AGENTS §4 的分工）。
