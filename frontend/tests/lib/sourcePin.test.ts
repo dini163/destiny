@@ -18,10 +18,12 @@ describe('pinLiteralOrder', () => {
     expect(() => pinLiteralOrder(SRC, ['<Board />', '<Plain />', '<Provenance />'])).not.toThrow();
   });
 
-  it('中间锚点缺席：必须抛——这就是「本件不是空钉」的证明', () => {
-    // 把中间那段整块删掉：只钉次序的话 `<Board />`(-1 之前) 与 `<Provenance />` 的
-    // indexOf 比较照样升序，空钉会绿；存在性钉必须先红。
-    const mutated = '<Board /><Provenance />';
+  it('首锚点缺席：必须抛——这就是「本件不是空钉」的证明', () => {
+    // 缺席的锚点必须挑**第一个**，这条才有鉴别力。挖掉存在性循环的 helper 只剩
+    // `indexOf` 递增比较：中间或末尾的锚点缺席时它的 `indexOf` 是 -1，正好处在序列
+    // 半路、比较照样失败，所以「删中间那段」在真件与空壳上都红——它钉不到存在性那一半。
+    // 只有首锚点缺席是分水岭：空壳会算出 `-1 < 0`（永真）而绿，真件必须红。
+    const mutated = '<Plain /><Provenance />';
     expect(() => pinLiteralOrder(mutated, ['<Board />', '<Plain />', '<Provenance />'])).toThrow();
   });
 
