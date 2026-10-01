@@ -382,40 +382,44 @@ def test_qimen_endpoint_defaults_cast_time_to_now(client: TestClient) -> None:
 # ------------------------------------------------- 白话转述（多系统白话 spec §8 丙组 · 奇门行）
 
 
-def test_the_center_palace_is_the_opener_alone() -> None:
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_the_center_palace_is_the_opener_alone(anchor: Anchor) -> None:
     """中五宫不坐星不配门不配神（`engines/qimen.py:152-163` 的支路），段里就只有开篇句。
 
     `:302-317` 已钉中宫的 `stars/door/god` 皆空；这里钉的是**那一格的白话只剩一句**，
     是同一个事实的另一半（`compose()` 的 `items=[]` 分支）。有人给中宫塞了条目即红。
     """
-    center = next(p for p in _chart().palaces if p.number == 5)
+    center = next(p for p in _chart(anchor.cast).palaces if p.number == 5)
     assert center.plain == QIMEN.openers["中"]
     assert len(center.plain.split("\n")) == 1
 
 
-def test_each_palace_line_count_equals_one_opener_plus_its_own_seats() -> None:
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_each_palace_line_count_equals_one_opener_plus_its_own_seats(anchor: Anchor) -> None:
     """G27 的奇门版等式：行数 == 1 + 星数 + 有无门 + 有无神。
 
     spec §11 原写「段内行数 ≥3」，中宫只有 1 行（偏差表第 4 行），等式才两头都成立。
     """
-    for palace in _chart().palaces:
+    for palace in _chart(anchor.cast).palaces:
         lines = palace.plain.split("\n")
         seats = len(palace.stars) + (1 if palace.door else 0) + (1 if palace.god else 0)
         assert len(lines) == 1 + seats, (palace.number, palace.gua, len(lines), seats)
         assert lines[0] == QIMEN.openers[palace.gua], palace.gua
 
 
-def test_the_board_prints_nine_openers_nine_stars_eight_doors_eight_gods() -> None:
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_the_board_prints_nine_openers_nine_stars_eight_doors_eight_gods(anchor: Anchor) -> None:
     """整盘等式 9 + 9 + 8 + 8 = 34 行：开篇句九句、九星九枚（天禽随天芮那一枚亦落段）、
-    八门八位、八神八位。`:320-334` 已钉三盘各不重不漏，所以这个数在任何时刻都成立，
-    换锚点（B/C/D 四盘）不必换断言——白话侧新增的丢句只有这一条兜得住。
+    八门八位、八神八位。`:320-334` 钉的是三盘各不重不漏，本条钉的是段里真的各落一行——
+    白话侧新增的丢句只有这一条兜得住，所以四张锚盘各跑一遍而不是只跑 A。
     """
-    assert sum(len(p.plain.split("\n")) for p in _chart().palaces) == 34
+    assert sum(len(p.plain.split("\n")) for p in _chart(anchor.cast).palaces) == 34
 
 
-def test_each_palace_says_only_the_stars_door_and_god_seated_there() -> None:
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_each_palace_says_only_the_stars_door_and_god_seated_there(anchor: Anchor) -> None:
     """反向对账：段里出现的条目键，必须真是这一宫的星/门/神（借宫、漏装都在此红）。"""
-    for palace in _chart().palaces:
+    for palace in _chart(anchor.cast).palaces:
         expected = {star_key(star.name) for star in palace.stars}
         if palace.door:
             expected.add(door_key(palace.door.name))
@@ -425,7 +429,8 @@ def test_each_palace_says_only_the_stars_door_and_god_seated_there() -> None:
         assert printed == expected, (palace.number, printed ^ expected)
 
 
-def test_palace_lines_follow_the_gua_opener_then_star_door_god() -> None:
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_palace_lines_follow_the_gua_opener_then_star_door_god(anchor: Anchor) -> None:
     """`keep` 的两条次序（G21）：宫与宫按装配序 1→9（`:305` 钉的是集合，这里钉的是**次序**），
     段内按读盘序「星→门→神」。段内每一行的对账都环无关——它拿的是这一宫自己报出的
     星/门/神，不预设它们该落哪一宫（F-A1-6 的留白一寸没踩）。
@@ -434,7 +439,7 @@ def test_palace_lines_follow_the_gua_opener_then_star_door_god() -> None:
     定死的 `-3` 偏移会把那一格写成「最后一枚星 = 第一枚星」而当场红；这里逐枚对账整段，
     单子星的八宫照旧被钉住，双星那一格多钉的一行是白送的力量。
     """
-    chart = _chart()
+    chart = _chart(anchor.cast)
     assert [p.number for p in chart.palaces] == [1, 2, 3, 4, 5, 6, 7, 8, 9]
     for palace in chart.palaces:
         if palace.door is None or palace.god is None or not palace.stars:
