@@ -7,10 +7,11 @@
 
 from __future__ import annotations
 
-from app.content import kabbalah_plain, name_plain, qimen_plain, synastry_plain, ziwei_plain
+from app.content import kabbalah_plain, lenormand_plain, name_plain, qimen_plain, synastry_plain, ziwei_plain
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.kabbalah import DAATH, PATHS, SEPHIROTH
+from app.content.lenormand import CARDS
 from app.content.meihua import BAGUA_IMAGE, TIYONG_RELATIONS, WANGSHUAI_TEXT
 from app.content.meihua_plain import (
     MEIHUA_READINGS,
@@ -230,6 +231,30 @@ QIMEN = PlainCorpus(
     universe=_qimen_universe,
 )
 
+
+def _lenormand_universe() -> set[str]:
+    """雷诺曼的键全集 = 36 张牌的 `id`（源表现成的字段，不二次转写）。
+
+    五阵 id 不在这里：阵的一句是小节开篇句不是条目（G22）。条数复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import LENORMAND; print(len(LENORMAND.universe()))"` → 36。
+    """
+    return {card.id for card in CARDS}
+
+
+LENORMAND = PlainCorpus(
+    system="lenormand",
+    entries=lenormand_plain.LENORMAND_READINGS,
+    # 五阵开篇句。键 = `SPREADS` 的 id，覆盖面由
+    # `test_lenormand_plain_corpus.py::test_openers_are_exactly_the_five_spread_ids` 钉。
+    openers=lenormand_plain.LENORMAND_SPREAD_OPENERS,
+    # 综合判读由 `synthesis` 承担（`engines/lenormand.py:95`），白话不再补档位结论。
+    closers=None,
+    # 极性三档里有 0（28 男人 / 29 女人两张指示牌），`band` 分支遇 0 值符号直接
+    # `ValueError`；而牌阵的读序本来就是位序（第 1 张 → 第 n 张），`keep` 正是它。
+    grouping="keep",
+    universe=_lenormand_universe,
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
@@ -240,4 +265,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     KABBALAH.system: KABBALAH,
     ZIWEI.system: ZIWEI,
     QIMEN.system: QIMEN,
+    LENORMAND.system: LENORMAND,
 }
