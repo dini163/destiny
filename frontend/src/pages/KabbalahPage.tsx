@@ -18,6 +18,10 @@ import type { KabbalahTree } from '../types/kabbalah';
  * explores it by clicking a Sephirah or Path (or the chip index) to read its full
  * Golden Dawn correspondence. An optional gematria console weighs a word and folds
  * it onto the same map. Every value comes from the engine (PRD no-mock rule).
+ *
+ * 每一格先读白话：`NodeInspector` 把节点的 `plain_meaning`（多系统白话 spec §7，文本住在
+ * `content/kabbalah_plain.py`，由引擎逐格挂进响应）排在最前，专业释义 `meaning` 降级在其下
+ * —— 这一上一下不许调换，也不许在前端补一句领起：白话在上就是那一层存在的全部理由。
  */
 export function KabbalahPage() {
   const tree = useKabbalahTree();
