@@ -166,8 +166,9 @@ def compute_ziwei_chart(
         ]
         palace = palace_name(zhi_index)
         # 本表不分带（G21）：斗数没有任何符号可传，符号位一律 0 由 `grouping="keep"` 忽略。
-        # 此处不可能同键（偏差表第 8 行）：`STAR_ORDER` 逐星放置，一宫之内星名唯一，
-        # 宫内至多一枚四化，所以不调 `dedupe()`。
+        # 此处不可能同键（偏差表第 8 行）：`STAR_ORDER` 逐星放置，一宫之内星名唯一；四化句
+        # 按标记词（化禄/化权/化科/化忌）入键，而一星至多带一枚标记，所以一格一标记、键不撞，
+        # 不调 `dedupe()`。（一宫可以有两枚以上的四化——它们各自入键，仍然不撞。）
         items: list[tuple[str, int]] = []
         for star in stars:
             items.append((ziwei_plain.star_key(star.name), 0))

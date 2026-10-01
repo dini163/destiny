@@ -1,4 +1,4 @@
-"""紫微白话转述表：工厂看不到的那五件事（多系统白话 spec §8 丙组、§11）。
+"""紫微白话转述表：工厂看不到的那六件事（多系统白话 spec §8 丙组、§11）。
 
 ① 登记身份（R24：`PLAIN_CORPORA` 是同键字面量字典，两行 `ziwei` 会静默留后一条，
    前一张表就此掉出机检闸外）；② `universe()` 由三张源表现算的构成（工厂只验它
@@ -6,7 +6,7 @@
    == set(PALACE_NAMES)`（R31：工厂只验 openers 非空，漏一个宫就有一宫只剩星句）；
 ④ 转述对账（G14）：主星句必须把 `nature` 的字逐个搬进来、把 `element`/`yin_yang`/
    `group` 三样写实；⑤ 结论词整表扫（G24：白话比卡巴拉口径更严，六字全禁，
-   只准抹具名的四化名相）。
+   只准抹具名的四化名相）；⑥ 44 句两两互异——工厂按键查覆盖，撞句它看不见。
 """
 
 from app.content.ziwei import MAJOR_STARS, MINOR_STARS, PALACE_NAMES, SIHUA_LABELS
@@ -66,6 +66,16 @@ def test_openers_are_exactly_the_twelve_palace_names() -> None:
     """R31：小节名单就是 `PALACE_NAMES`，一个不多一个不少（漏一个宫=那一宫只剩星句）。"""
     assert set(ZIWEI_PALACE_OPENERS) == set(PALACE_NAMES)
     assert set(ZIWEI.openers) == set(PALACE_NAMES)
+
+
+def test_all_forty_four_sentences_are_mutually_distinct() -> None:
+    """44 句（32 转述 + 12 开篇）必须两两不同：golden 的两处位置断言
+    （`lines.index(...)` 找星句、段内文本反查回键）都以「一句只对应一个键」为前提，
+    而工厂只按**键**查覆盖，撞句它看不见——两句同文只是两个宫说了同一句话，条数照旧。
+    """
+    texts = [*ZIWEI_READINGS.values(), *ZIWEI_PALACE_OPENERS.values()]
+    assert len(texts) == 44
+    assert len(set(texts)) == 44
 
 
 def test_every_star_and_sihua_key_resolves_through_the_assembler() -> None:

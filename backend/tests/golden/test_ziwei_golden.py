@@ -516,7 +516,7 @@ def test_the_whole_chart_prints_twelve_openers_twenty_eight_stars_four_marks() -
     这是「宁崩不漏」在紫微侧的整盘版：任何一格丢句都会让这个数掉下来，而它不依赖
     具体盘面（换 `LEAP_BIRTH` 那张锚盘同样成立，因为 28+4 是安星表的恒等式）。
     """
-    for chart in (_chart(), _chart(Gender.FEMALE)):
+    for chart in (_chart(), _chart(Gender.FEMALE), _leap_chart()):
         assert sum(len(p.plain.split("\n")) for p in chart.palaces) == 44
 
 
