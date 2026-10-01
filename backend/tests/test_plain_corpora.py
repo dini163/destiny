@@ -62,11 +62,25 @@ def test_universe_is_reproducible_and_non_empty(corpus) -> None:
     assert corpus.universe(), f"{corpus.system} 的键全集算出来是空表，多半是源表改名了"
 
 
+#: 无小节系统名单：白话挂在条目自身、页面上不存在段落容器，因此刻意没有开篇句。
+#: 例外必须登记（机制同 `test_architecture.py::CONTENT_STEM_ALIAS` / `BASELINE`：
+#: 「例外要写得出名字」才是接口，「放松断言」不是）。名单内要求 `openers == {}`，
+#: 两个方向都钉——今天多写一句开篇句也红，因为没人会去渲染它。
+#: 复测：`cd backend && grep -n "SECTIONLESS" tests/test_plain_corpora.py`。
+SECTIONLESS = {"kabbalah"}
+
+
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)
 def test_openers_are_non_empty_and_never_slot_keys(corpus) -> None:
-    """名字即判据：这条只钉「有开篇句」与「开篇句的键不落在槽位词表上」，不查覆盖面。
-    「覆盖面」在这里无从查起——小节名单由各系统的装配测试钉（spec §4 第 3 条）。"""
-    assert corpus.openers, f"{corpus.system} 没有开篇句"
+    """名字即判据：这条只钉「有小节的公司有开篇句」与「开篇句的键不落在槽位词表上」，不查覆盖面。
+
+    「覆盖面」在这里无从查起——小节名单由各系统的装配测试钉（spec §4 第 3 条）。
+    卡巴拉是唯一无小节的一家（T2 裁定，见计划 G19 表行 7）。
+    """
+    if corpus.system in SECTIONLESS:
+        assert corpus.openers == {}, f"{corpus.system} 登记为无小节却不空"
+    else:
+        assert corpus.openers, f"{corpus.system} 没有开篇句"
     for section in corpus.openers:
         assert not is_slot_key(corpus, section)
 

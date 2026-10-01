@@ -7,9 +7,10 @@
 
 from __future__ import annotations
 
-from app.content import name_plain, synastry_plain
+from app.content import kabbalah_plain, name_plain, synastry_plain
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
+from app.content.kabbalah import DAATH, PATHS, SEPHIROTH
 from app.content.meihua import BAGUA_IMAGE, TIYONG_RELATIONS, WANGSHUAI_TEXT
 from app.content.meihua_plain import (
     MEIHUA_READINGS,
@@ -140,10 +141,39 @@ MEIHUA = PlainCorpus(
     universe=_meihua_universe,
 )
 
+
+def _kabbalah_universe() -> set[str]:
+    """卡巴拉的键全集 = 10 原质 + 隐藏 Daath + 22 路径 = 33，全部照节点自己的 `id`。
+
+    不写第二份名单：`content/kabbalah.py:98,223` 是 `id` 的唯一构造处，源表加一格而表少一句
+    即红（工厂的 `set(entries) == universe()`）。条数复测：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "from app.engines.plain_corpora import KABBALAH; print(len(KABBALAH.universe()))"` → 33。
+    """
+    return {node.id for node in (*SEPHIROTH, DAATH)} | {node.id for node in PATHS}
+
+
+KABBALAH = PlainCorpus(
+    system="kabbalah",
+    entries=kabbalah_plain.KABBALAH_READINGS,
+    # 卡巴拉的白话挂在**节点自身**（`SephirahNode.plain_meaning` / `PathNode.plain_meaning`），
+    # 页面上一次只看一个节点，没有段落容器，所以没有开篇句可用——硬造一句就是
+    # 一句永远不会被印出来的死字（spec §13「漂到引擎永远不触发的键上」）。
+    # 工厂对这一形状显式登记例外，见 `tests/test_plain_corpora.py::SECTIONLESS`。
+    openers={},
+    # 生命之树无分数、无档位（spec §7 只要求转述表），收尾句因此为 None，
+    # 装配器不许替它补一句总吉凶（G2）。
+    closers=None,
+    # 33 条里没有任何吉凶符号可分带：`grouping` 取 keep，未来若接入 T3 之外的整段装配，
+    # 次序由调用方决定，不由白话层排序。
+    grouping="keep",
+    universe=_kabbalah_universe,
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
     BAZI.system: BAZI,
     NAME.system: NAME,
     SYNASTRY.system: SYNASTRY,
     MEIHUA.system: MEIHUA,
+    KABBALAH.system: KABBALAH,
 }
