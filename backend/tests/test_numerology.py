@@ -59,7 +59,7 @@ from app.engines.numerology import (
     split_letters,
 )
 from app.schemas.numerology import CoreNumber, PersonalCycle, PersonalCycles
-from tests.plain_wording import ADVICE_TOKENS, FORBIDDEN, NON_ADVICE_FORMS, advice_hits
+from tests.plain_wording import ADVICE_TOKENS, FORBIDDEN, advice_hits
 
 #: 覆盖各种边界：空格、连字符、撇号、含 Y、无元音、无辅音、单字母、全小写。
 NAMES: tuple[str, ...] = (
@@ -967,7 +967,7 @@ def test_summary_merges_every_available_core_meaning_once() -> None:
 
 #: G2/G18 的第二套口径：**建议词与结论词**——六字表、四字表、抹词形表与 `advice_hits`
 #: 的唯一正主已搬到 `tests/plain_wording.py`（Plan C Task 1 合并，本文件只 import 不另立），
-#: 抹词形 `("对应","反应")` 的实测理由与复测命令见该模块 `NON_ADVICE_FORMS` 头注。
+#: 抹词形 `("对应","反应")` 的实测理由与复测命令见 `tests.plain_wording.NON_ADVICE_FORMS` 头注。
 def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     """框架句自己一个字都不许下判断（G2）；成品段同查，因为段里含框架句的每个字。
 
@@ -977,8 +977,8 @@ def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
     的覆盖面 = 框架句 + 由输入实算出的成品段；语料侧那一半在
     `test_no_quotable_source_sentence_carries_an_advice_or_verdict_word`，两条合起来才钉得住。
     盘侧从 2026-10-01 起在原来那一盘之外再按 `NAMES` 矩阵逐名扫（矩阵里会落到数2 的
-    「对应之数」，所以段侧与表侧同一把尺：都过 `advice_hits`，见 `plain_wording.py` 的
-    `NON_ADVICE_FORMS` 头注）。
+    「对应之数」，所以段侧与表侧同一把尺：都过 `advice_hits`，见
+    `tests.plain_wording.NON_ADVICE_FORMS` 头注）。
     """
     for token in ADVICE_TOKENS:
         assert token not in NUMEROLOGY_SUMMARY_FRAME, token
@@ -997,7 +997,9 @@ def test_frame_and_summary_carry_no_advice_or_verdict_word() -> None:
 
 #: `source` 不进口径：它是出处串，不是会被印进白话段的正文（同
 #: `test_kabbalah_plain_corpus.py` 源表扫只扫 `.meaning` 一个字的理由）。
-#: `keywords` 里数5 带「适应」，`master_title` 三条是「MASTER … · 灵性直觉者」这类名相。
+#: `keywords` 里数5 带「适应」，`master_title` 三条是「MASTER … · 灵性直觉者」这类名相
+#: （复测 2026-10-02 实跑：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+#: "from app.content.numerology_meanings import CORE_MEANINGS as C; print([v.master_title for v in C.values() if v.master_title])"` → 长度 3）。
 #: 复测（2026-10-01 实跑）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
 #: from app.content.numerology_meanings import CORE_MEANINGS as C
 #: w=('宜','忌','需','应','吉','凶')
