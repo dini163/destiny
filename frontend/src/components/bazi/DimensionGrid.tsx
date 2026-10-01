@@ -1,3 +1,4 @@
+import { PlainProse } from '../ui/PlainProse';
 import { ScoreLedger } from '../ui/ScoreLedger';
 import { SourceNote } from '../ui/SourceNote';
 import type { BaziInterpretation, DimensionReading } from '../../types/bazi';
@@ -16,9 +17,13 @@ export function DimensionGrid({ reading }: { reading: BaziInterpretation }) {
           <DimensionCard key={dimension.dimension} dimension={dimension} />
         ))}
       </div>
-      <p className="whitespace-pre-line rounded-card border border-rim bg-surface p-4 font-display text-sm leading-relaxed text-ink">
-        {reading.plain_summary}
-      </p>
+      {/* R7 收编（白话 spec §10）：`PlainProse` 缺省串与原 `<p>` 类集相同、只是顺序不同；
+       *  这里判据安全是一条实测事实——`tests/components/bazi/DimensionGrid.test.tsx:4` 头注
+       *  自述刻意不按 class 断言，段落一律 `paragraphByExact` 全文相等 + `precedes` 钉 DOM 序。 */}
+      <PlainProse
+        text={reading.plain_summary}
+        className="rounded-card border border-rim bg-surface p-4"
+      />
       <p className="text-sm text-ink-variant">{reading.summary}</p>
     </div>
   );
@@ -35,9 +40,7 @@ function DimensionCard({ dimension }: { dimension: DimensionReading }) {
       {dimension.cautions.length > 0 ? (
         <LineList tone="cautions" items={dimension.cautions} />
       ) : null}
-      <p className="whitespace-pre-line font-display text-sm leading-relaxed text-ink">
-        {dimension.plain}
-      </p>
+      <PlainProse text={dimension.plain} />
       <p className="text-xs leading-relaxed text-ink-variant">{dimension.narrative}</p>
       <span className="self-end">
         <SourceNote source={dimension.source} />

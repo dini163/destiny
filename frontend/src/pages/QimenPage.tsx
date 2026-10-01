@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { QimenBoard } from '../components/qimen/QimenBoard';
 import { QimenControls } from '../components/qimen/QimenControls';
 import { Icon } from '../components/ui/Icon';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useQimen } from '../hooks/useQimen';
 import type { QimenChart, QimenRequest } from '../types/qimen';
@@ -81,6 +83,15 @@ function QimenResults({ chart }: { chart: QimenChart }) {
         }
       >
         <QimenBoard chart={chart} />
+      </ResultCard>
+
+      <ResultCard title="九宫白话" eyebrow="PLAIN READING · 9 PALACES" icon="sparkle" elevated>
+        <PlainSectionList
+          sections={chart.palaces.map((palace) => ({
+            title: `${palace.gua}${palace.number}宫 · ${palace.direction}`,
+            text: palace.plain,
+          }))}
+        />
       </ResultCard>
 
       <Provenance chart={chart} />
@@ -164,6 +175,7 @@ function Provenance({ chart }: { chart: QimenChart }) {
           <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{school_note}</p>
         </div>
       </div>
+      <ProvenancePanel tables={chart.provenance.tables} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
         <span className="label-caps">ENGINE · {engine}</span>
         <span className="label-caps">CONTENT · {content_version}</span>

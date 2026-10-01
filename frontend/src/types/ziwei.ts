@@ -3,7 +3,7 @@
  * snake_case is preserved end-to-end.
  */
 
-import type { BirthInput, Gender } from './common';
+import type { BirthInput, Gender, ProvenanceTable } from './common';
 
 /** Input for a 紫微斗数 chart; `gender` is required (fixes the 大限 direction). */
 export interface ZiweiRequest extends BirthInput {
@@ -40,6 +40,7 @@ export interface Palace {
   /** 大限 age range seated here, e.g. `3-12`. */
   dayun?: string | null;
   stars: StarPlacement[];
+  plain: string;
 }
 
 /** The 生年干 四化 assignments. */
@@ -57,6 +58,7 @@ export interface ZiweiProvenance {
   content_version: string;
   source: string;
   school_note: string;
+  tables: ProvenanceTable[];
 }
 
 /** Complete 紫微斗数 chart produced by the backend engine. */

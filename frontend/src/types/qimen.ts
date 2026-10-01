@@ -5,6 +5,8 @@
  * 天盘九星 / 人盘八门 / 神盘八神 are rotated into the 洛书九宫.
  */
 
+import type { ProvenanceTable } from './common';
+
 /** Input for a 奇门遁甲 起局. */
 export interface QimenRequest {
   /** 用事时刻, ISO `yyyy-mm-ddTHH:mm:ss`; defaults to now when omitted. */
@@ -76,6 +78,7 @@ export interface QimenPalace {
   is_zhifu_palace: boolean;
   /** 值使门落此宫。 */
   is_zhishi_palace: boolean;
+  plain: string;
 }
 
 /** Chart provenance — engine, corpus version and the school notes. */
@@ -84,6 +87,7 @@ export interface QimenProvenance {
   content_version: string;
   source: string;
   school_note: string;
+  tables: ProvenanceTable[];
 }
 
 /** Complete 奇门遁甲 局 produced by the backend engine. */

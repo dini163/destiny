@@ -5,6 +5,8 @@ import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useZiwei } from '../hooks/useZiwei';
@@ -108,6 +110,12 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
         <ZiweiChartGrid chart={chart} />
       </ResultCard>
 
+      <ResultCard title="十二宫白话" eyebrow="PLAIN READING · 12 PALACES" icon="sparkle" elevated>
+        <PlainSectionList
+          sections={chart.palaces.map((palace) => ({ title: palace.name, text: palace.plain }))}
+        />
+      </ResultCard>
+
       <Provenance chart={chart} />
     </>
   );
@@ -205,6 +213,7 @@ function Provenance({ chart }: { chart: ZiweiChart }) {
           </p>
         </div>
       </div>
+      <ProvenancePanel tables={chart.provenance.tables} />
       <div className="flex flex-wrap gap-x-6 gap-y-1 border-t border-rim-soft pt-3 text-[11px] text-ink-muted">
         <span>
           ENGINE · <span className="numeric text-gold-soft">{provenance.engine}</span>
