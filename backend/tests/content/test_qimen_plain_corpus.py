@@ -21,7 +21,7 @@ from app.content.qimen_plain import (
 from app.engines.plain_corpora import PLAIN_CORPORA, QIMEN
 from app.engines.qimen import SCHOOL_NOTE
 from app.engines.plain_compose import reading
-from tests.plain_wording import NON_ADVICE_FORMS, advice_hits
+from tests.plain_wording import advice_hits
 
 #: 源表用汉字序数写本位（`本位居一` / `本位在一宫`），汉字表就是 `engines/qimen.py:236`
 #: 的 `_CN`（1-9），此处独立写死是因为测试不许反向 import 引擎的私物。
@@ -120,7 +120,8 @@ def test_every_retelling_carries_its_rows_nature_element_and_home() -> None:
 def test_no_retelling_borrows_the_source_tables_orientation_word() -> None:
     """G24 的反向半边：源表的 `luck` 值一个字都不进白话（页面照旧在 tooltip 里印它）。
 
-    复测（2026-10-01 草稿全表实跑）：25 条抹 `NON_ADVICE_FORMS` 后命中 `[]`，
+    复测（2026-10-01 草稿全表实跑）：25 条抹 `tests.plain_wording.NON_ADVICE_FORMS`
+    （本测走 `advice_hits` 的默认抹词形）后命中 `[]`，
     而九星句里那个「应」字全部来自「对应」这一具名词形；不抹时命中 9 条 `应`。
     """
     for star in NINE_STARS:

@@ -22,7 +22,7 @@ from app.content.meihua_plain import (
 )
 from app.content.name_numerology import NUMBERS
 from app.content.name_sancai import SANCAI_RELATIONS
-from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, LUOSHU, NINE_STARS
+from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, NINE_STARS
 from app.content.synastry import SYNASTRY_CORE_BONDS
 from app.content.ziwei import MAJOR_STARS, MINOR_STARS, SIHUA_LABELS
 from app.engines.plain_compose import PlainCorpus
