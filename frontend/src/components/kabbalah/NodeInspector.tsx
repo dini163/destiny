@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { PathNode, SephirahNode } from '../../types/kabbalah';
 import { pillarAccent } from '../../lib/kabbalah';
 import { Icon } from '../ui/Icon';
+import { PlainProse } from '../ui/PlainProse';
 
 /** The resolved selection handed to the inspector. */
 export type Resolved =
@@ -57,7 +58,9 @@ function SephirahDetail({ node }: { node: SephirahNode }) {
         </div>
       </div>
 
-      <p className="font-display text-sm leading-relaxed text-ink-variant">{node.meaning}</p>
+      <PlainProse text={node.plain_meaning} />
+
+      <p className="text-xs leading-relaxed text-ink-muted">{node.meaning}</p>
 
       <div className="flex flex-wrap gap-1.5">
         {node.keywords.map((keyword) => (
@@ -114,7 +117,9 @@ function PathDetail({ node }: { node: PathNode }) {
         <span className="ml-auto text-xs text-ink-muted">{node.correspondence}</span>
       </div>
 
-      <p className="font-display text-sm leading-relaxed text-ink-variant">{node.meaning}</p>
+      <PlainProse text={node.plain_meaning} />
+
+      <p className="text-xs leading-relaxed text-ink-muted">{node.meaning}</p>
 
       <div className="gold-rule" />
 

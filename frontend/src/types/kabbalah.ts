@@ -6,6 +6,8 @@
  * returns the whole Tree; `POST /kabbalah/gematria` folds an optional word onto it.
  */
 
+import type { ProvenanceTable } from './common';
+
 /** One of the three columns of the Tree (慈悲 / 严厉 / 平衡). */
 export interface PillarInfo {
   id: string;
@@ -25,6 +27,8 @@ export interface SephirahNode {
   name: string;
   name_zh: string;
   meaning: string;
+  /** 逐条对应 `meaning` 的白话转述，必填（spec §9：缺白话即视为伪造响应）。 */
+  plain_meaning: string;
   keywords: string[];
   pillar: string;
   pillar_name_zh: string;
@@ -62,6 +66,8 @@ export interface PathNode {
   tarot_numeral: string;
   correspondence: string;
   meaning: string;
+  /** 逐条对应 `meaning` 的白话转述，必填（spec §9：缺白话即视为伪造响应）。 */
+  plain_meaning: string;
 }
 
 /** Provenance — engine, corpus version, source and the method note. */
@@ -70,6 +76,7 @@ export interface KabbalahProvenance {
   content_version: string;
   source: string;
   note: string;
+  tables: ProvenanceTable[];
 }
 
 /** The complete Tree of Life, served by `GET /kabbalah/tree`. */

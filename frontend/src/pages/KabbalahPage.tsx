@@ -4,6 +4,7 @@ import { GematriaConsole, GematriaResult } from '../components/kabbalah/Gematria
 import { NodeInspector } from '../components/kabbalah/NodeInspector';
 import { TreeOfLife } from '../components/kabbalah/TreeOfLife';
 import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useGematria } from '../hooks/useGematria';
 import { useKabbalahTree } from '../hooks/useKabbalahTree';
@@ -191,6 +192,7 @@ function Provenance({ tree }: { tree: KabbalahTree }) {
           </span>
         ))}
       </div>
+      <ProvenancePanel tables={tree.provenance.tables} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
         <span className="label-caps">ENGINE · {engine}</span>
         <span className="label-caps">CONTENT · {content_version}</span>
