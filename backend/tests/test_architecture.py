@@ -127,8 +127,8 @@ def _plain_composer_offenders(tops: set[str]) -> list[str]:
     """装配器不许引的东西。口径是 spec §11 那句「stdlib 与 `app.content.*`」。
 
     `app.content` 本身也算合规：`from app.content import X` 的 `node.module` 是
-    `app.content`，不带尾点，所以旧谓词把它判成违例（2026-10-01 实测：四种形状的 import
-    集合喂进去，`['app.content']` 被报出，而 spec §11 明写这一类是准的）。
+    `app.content`，不带尾点，旧谓词判它违例——自检 `test_plain_composer_gate_sees_the_four_import_shapes`
+    那组形状喂进旧谓词报 `['app.content', 'app.engines.western']`，真违例只有一条。
     """
     return sorted(
         name
