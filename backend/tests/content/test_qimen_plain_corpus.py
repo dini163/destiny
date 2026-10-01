@@ -27,7 +27,7 @@ from app.engines.qimen import SCHOOL_NOTE
 from app.engines.plain_compose import reading
 from tests.plain_wording import advice_hits
 
-#: 源表用汉字序数写本位（`本位居一` / `本位在一宫`），汉字表就是 `engines/qimen.py:236`
+#: 源表用汉字序数写本位（`本位居一` / `本位在一宫`），汉字表就是 `engines/qimen.py:266`
 #: 的 `_CN`（1-9），此处独立写死是因为测试不许反向 import 引擎的私物。
 _CN = "一二三四五六七八九"
 

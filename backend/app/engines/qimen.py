@@ -232,10 +232,10 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
 def _tables() -> list[ProvenanceTable]:
     """`QIMEN_CONTENT_SOURCES` 的第一次被消费（G19）。
 
-    复测（改前）：`cd backend && grep -rn QIMEN_CONTENT_SOURCES app/ tests/ --include=*.py` →
-    只有 `app/content/__init__.py:149` 的定义处与 `tests/content/test_qimen_corpus.py:300`
-    那条只钉登记表形状的断言；改后响应里真的带两行清单。引擎不在此另列一份表名，
-    免得书名分家（同 `engines/ziwei.py:239-249`、`engines/kabbalah.py:60-70` 的写法）。
+    复测（当前树）：`cd backend && grep -rn QIMEN_CONTENT_SOURCES app/ tests/ --include=*.py` →
+    定义处 `content/__init__.py:151`、本模块 import `:25` 与消费处 `:242`、`tests/content/
+    test_qimen_corpus.py:299` 那条只钉形状的断言——改前只剩定义处与那条断言，是死登记。
+    表名只这一处来源，引擎不再抄一份书名（同 `engines/ziwei.py:239-249` 的写法）。
     """
     return [
         ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)

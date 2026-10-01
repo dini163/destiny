@@ -347,7 +347,7 @@ def test_zhishi_landing_stays_unpinned_until_the_ring_ruling_lands() -> None:
 
     手推杜门（本宫四）顺行五个时辰（己巳在甲子旬第六位，旬首甲子数起 n=5）：沿洛书数序且
     中五计一宫 → 离九；沿八宫环（去中五）→ 坎一。引擎取后者（`content/qimen.py:55` 的
-    ``RING8`` 是洛书数升序去中五，`engines/qimen.py:132` 依它走宫），故本盘两派候选为 {9, 1}
+    ``RING8`` 是洛书数升序去中五，`engines/qimen.py:136` 依它走宫），故本盘两派候选为 {9, 1}
     而确实不同宫；钉任何一边都是替口径裁定做主。这里只钉「落在两派候选之内」，盘面自洽由
     :func:`test_zhishi_door_stands_in_the_palace_the_chart_reports` 管；值符落宫一侧两派一致
     （时干己落中五 → 寄坤二），故钉死。

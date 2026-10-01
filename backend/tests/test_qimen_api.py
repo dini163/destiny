@@ -13,7 +13,7 @@
 * **`door`/`god` 的 null 只在洛书五宫**：schema 声明的是 `DoorInfo | None`，前端 `PalaceCell`
   按「中宫无门无神」画空格。若引擎哪天把中宫也填满，JSON 形状照样合规，页面却会多出两格
   没有出处的门神。
-* **奇门没有可达的域错误路径**：`app/engines/qimen.py` 唯一的 `raise` 是第 91-92 行那句
+* **奇门没有可达的域错误路径**：`app/engines/qimen.py` 唯一的 `raise` 是第 95-96 行那句
   `ValueError("未识别的节气…")`，它不在 `DestinyError` 家族里，真发生就是 500 而非
   `{error:{code,message}}` 信封。它不可达**靠的是局数表覆盖 lunar-python 的 24 节气**，
   那条证明住在语料测里，所以这里钉的是「合法时间戳一律 200，永不出信封」。
@@ -259,7 +259,7 @@ def test_every_parsable_datetime_returns_a_full_board_never_an_envelope(
 
     PRD §4.1 的支持区间是 1900-2100（端点两条），区间外的两条同样按盘给出——lunar-python
     的历法在这个区间仍然算得出干支与节气，所以「越界」在这里不是错误而是如实计算。
-    真会失败的那条路（`engines/qimen.py:91` 的 `ValueError`）要的是「局数表缺一个节气」，
+    真会失败的那条路（`engines/qimen.py:95-96` 的 `ValueError`）要的是「局数表缺一个节气」，
     而那由 `tests/content/test_qimen_corpus.py::test_the_two_dun_together_cover_all_twenty_four_jieqi`
     堵住；它一旦被触发就是 500，不是 `{error:{code}}` 信封——这是本端点契约的已知边界。
     """

@@ -11,9 +11,9 @@
 1. **局数表逐字对拍《烟波钓叟歌》阳遁/阴遁起局歌诀**（歌诀本文抄在测试里）。一格数字被改动，
    盘面照样是一张九宫格、照样「不重不漏」，golden 那侧只钉住了四个锚点时辰，其余时辰的
    局数错了没人红——只有回到歌诀才钉得住。
-2. **24 节气齐、阴阳遁各 12 且不相交**：`app/engines/qimen.py:88` 取
+2. **24 节气齐、阴阳遁各 12 且不相交**：`app/engines/qimen.py:92` 取
    `lunar.getPrevJieQi().getName()`，其定义域正是 lunar-python 给的 24 个节气名（AGENTS 第 6 条：
-   历法不自算）。这一条同时是 `engines/qimen.py:91-92` 那个 `ValueError`（500，非信封）的
+   历法不自算）。这一条同时是 `engines/qimen.py:95-96` 那个 `ValueError`（500，非信封）的
    可达性证明：**表全 = 分支不可达**，表缺一格它就真的会发生。
 3. **八门本宫沿洛书方位恰为顺时针一周**（休北1→生东北8→伤东3→杜东南4→景南9→死西南2→
    惊西7→开西北6），而 `RING8` 是洛书数升序去中五——两者是不同的置换。本模块只把「两个环都
@@ -155,7 +155,7 @@ def test_ju_tables_are_word_for_word_the_yanbo_diaosou_song() -> None:
 def test_the_two_dun_together_cover_all_twenty_four_jieqi() -> None:
     """阴阳遁各 12 节气、逐名点到，合起来恰是 lunar-python 的 24 节气名，一格不缺不多。
 
-    这条同时是 `engines/qimen.py:91-92` 那个 `raise ValueError`（未映射到信封，会成 500）的
+    这条同时是 `engines/qimen.py:95-96` 那个 `raise ValueError`（未映射到信封，会成 500）的
     可达性证明：`getPrevJieQi().getName()` 的值域就是这张 24 名的表，表全则分支永不可达。
     覆盖必须**逐名**断言而不是只数到 24 —— 数数放行的是「少一个节气、另一个节气多一格」这类
     错位，而那正是让引擎走进裸 `ValueError` 的形状。
