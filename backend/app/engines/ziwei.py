@@ -239,9 +239,9 @@ def compute_ziwei_chart(
 def _tables() -> list[ProvenanceTable]:
     """`ZIWEI_CONTENT_SOURCES` 的第一次被消费（G19）。
 
-    复测（改前）：`cd backend && grep -rn ZIWEI_CONTENT_SOURCES app/ tests/ --include=*.py` →
-    只有 `app/content/__init__.py:141` 的定义处。引擎不在此另列一份表名，
-    免得书名分家（同 `engines/kabbalah.py:60-69` 的写法）。
+    复测（当前树）：`cd backend && grep -rn ZIWEI_CONTENT_SOURCES app/ tests/ --include=*.py` → 定义
+    `content/__init__.py:144`、本模块 import `:17` 与消费 `:248`，另有 `tests/test_ziwei_api.py`
+    的逐行对账。引擎不在此另列表名、不抄书名（同 `engines/kabbalah.py:60-69` 的写法）。
     """
     return [
         ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
