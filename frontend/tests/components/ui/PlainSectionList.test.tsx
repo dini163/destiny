@@ -5,10 +5,8 @@ import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
 import { paragraphByExact } from '../../lib/prose';
 
 // `vitest.config.ts` 没有开 `globals`，所以 `it`/`expect` 一律显式 import，`cleanup`
-// 走 `afterEach`——复测（2026-10-01）：`cd frontend && find tests -name '*.test.ts*' | wc -l`
-// → 25 个测文件全部显式 import；其中 16 个用 `afterEach(cleanup)`
-// （`grep -rl 'afterEach(cleanup)' tests --include='*.test.ts*' | wc -l`）。
-// 写法凭据：`tests/components/numerology/PlainSummary.test.tsx:15`。
+// 走 `afterEach`。写法凭据（不是计数）：`tests/components/numerology/PlainSummary.test.tsx:15`
+// ——计数不写在这里，因为本文件自己就是会让它漂的那一笔（先例裁定见 `6d4c5ec`）。
 afterEach(cleanup);
 
 const SECTIONS = [

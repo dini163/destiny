@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 
@@ -20,17 +23,38 @@ it('the plain block carries all twelve palaces, board order, byte for byte', () 
   expect(paragraphs).toEqual(chart.palaces.map((p) => p.plain));
 });
 
-it('the board grid renders no plain paragraph at all', () => {
+it('the board grid renders no plain text at all', () => {
   /** spec §10 的分工：盘面那一格只报星情与格局，白话住在页尾那一段。
    *  这条测的反面是「有人把 `palace.plain` 塞进 `ZiweiChartGrid`」——盘面 12 格各贴一段
    *  长文，页面上那块 4×4 就不再是盘了。门要能在改动发生的当天红，所以钉的是「不出现」，
-   *  不是「出现了别的」。复测：`cd frontend && grep -n "plain" src/components/ziwei/*.tsx` → 零命中。
+   *  不是「出现了别的」。
+   *
+   *  断的是整棵子树的文本而不是 `<p>`：这块盘今天一个 `<p>` 都不产（复测：
+   *  `cd frontend && grep -o "<p[ >]" src/components/ziwei/ZiweiChartGrid.tsx | wc -l` → 0），
+   *  按标签收文本的话 `texts` 恒为 `[]`，这条就成了一条永远绿的测——而格子里现有的写法
+   *  全是 `span`/`div`，正是白话最自然的退化形态。
+   *  源码面另有那条 grep 兜着：`grep -n "plain" src/components/ziwei/*.tsx` → 零命中。
    */
   const { container } = render(<ZiweiChartGrid chart={chart} />);
-  const texts = [...container.querySelectorAll('p')].map((p) => p.textContent ?? '');
+  const boardText = container.textContent ?? '';
   for (const palace of chart.palaces) {
-    expect(texts).not.toContain(palace.plain);
+    expect(boardText).not.toContain(palace.plain);
   }
+});
+
+it('the page wires the palaces into the block and the tables into the panel', () => {
+  /** 上面两条只证「件怎么排」；页面有没有把 `.plain` 喂进来是另一件事，而标题那个表达式
+   *  在这里被重新发明一遍的话，页面写成别的也照样绿——漂移恰好从没人钉的那一侧发生。
+   *  整页渲染要走 hook + HTTP，本仓零 mock（AGENTS §9），所以挂载点照
+   *  `tests/components/numerology/PlainSummary.test.tsx:44-51` 的形状读页面源码。
+   *  路径必须先拼成变量再交给 `new URL`：字面量形式会被 jsdom 环境的客户端资源改写在转译期
+   *  换掉，读文件即 ENOENT（`tests/lib/readFixture.ts` 头注的实录陷阱）。
+   */
+  const specifier = '../../../src/pages/ZiweiPage.tsx';
+  const src = readFileSync(fileURLToPath(new URL(specifier, import.meta.url)), 'utf8');
+  expect(src).toContain('title: palace.name, text: palace.plain');
+  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+  expect(src.indexOf('<ZiweiChartGrid chart={chart} />')).toBeLessThan(src.indexOf('<PlainSectionList'));
 });
 
 it('the provenance block lists both tables the endpoint read', () => {
