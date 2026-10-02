@@ -10,8 +10,10 @@
  * the results page prints the response's `spread_description_zh` with the
  * English original footnoted beneath it (决策 25：语料抄进前端 TS 就是同一份事实
  * 存两处，必然漂移，`components/runes/RuneConsole.tsx:51-54` 记着卢恩那一版为何
- * 一开始就不抄目录)。Colour strings are written out in full (never concatenated at
- * runtime) so Tailwind's content scanner keeps them and SVG strokes stay stable.
+ * 一开始就不抄目录)。
+ *
+ * Colour strings are written out in full (never concatenated at runtime) so
+ * Tailwind's content scanner keeps them and SVG strokes stay stable.
  */
 
 import type { Arcana, CardOrientation, DrawnCard, TarotElement, TarotRank, TarotSuit } from '../types/tarot';

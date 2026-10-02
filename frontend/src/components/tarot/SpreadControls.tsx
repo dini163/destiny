@@ -145,7 +145,7 @@ export function SpreadControls({
           <span className="h-2 w-2 rounded-full bg-gold" />
           洗牌与正逆位由 Python <span className="text-gold-soft">secrets</span>（操作系统级 CSPRNG）决定，每次抽牌独立且不可复现。
         </span>
-        <span>牌义、关键词与综合解读均取自主策展牌库，未作运行时虚构。</span>
+        <span>牌名、关键词与牌义取自主策展 78 张牌库，综合解读由引擎的固定句式串起这些字段。</span>
       </div>
     </form>
   );
