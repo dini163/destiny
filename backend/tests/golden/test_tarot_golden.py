@@ -155,17 +155,22 @@ def test_drawn_card_fields_agree_with_orientation() -> None:
 def test_synthesis_references_question_and_spread() -> None:
     """整段 synthesis 里出现的是**本次那个阵**的中英双名，别的阵名一个都不串。
 
-    改前的写法是 `assert "Celtic Cross" not in result.synthesis`（现 `:157`，T5 动手前的复测：
-    `cd backend && grep -n "Celtic Cross\" not in" tests/golden/test_tarot_golden.py`），而那次抽的是
-    `single`——`celtic_cross` 的英文名当时**根本没可能**出现在句子里，这条断言恒真
-    （spec §8 明令要消灭的那一类「看着像测过」）。中文框架句里阵名是真插值，所以现在
-    可以钉「在位」与「不串台」两件事。
+    改前的写法是「`assert "Celtic Cross" not in result.synthesis`」，而那次抽的是 `single`——
+    `celtic_cross` 的英文名当时**根本没可能**出现在句子里，这条断言恒真（spec §8 明令要消灭的
+    那一类「看着像测过」）。中文框架句里阵名是真插值，所以现在可以钉「在位」与「不串台」两件事。
+    串台那半边从 `SPREADS` 现算（除本次那个阵之外全排），英文与中文两名都排：写死五个阵名的
+    话，第七个阵进来就静默漏排（复测：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "from app.content.tarot_deck import SPREADS;
+    print(len(SPREADS), [s.name for s in SPREADS.values()])"`）。
     """
     result = draw_spread(spread_id="single", question="Should I take the offer?")
     assert result.question == "Should I take the offer?"
     assert "本次以 单张牌（Single Card）为这个问题布阵：Should I take the offer?" in result.synthesis
-    for other in ("凯尔特十字", "时间之流三张", "关系牌阵", "事业牌阵", "是非抉择牌阵"):
-        assert other not in result.synthesis
+    for spread_id, other in SPREADS.items():
+        if spread_id == "single":
+            continue
+        assert other.name not in result.synthesis, spread_id
+        assert other.name_zh not in result.synthesis, spread_id
     assert result.synthesis.strip()
 
 
@@ -282,21 +287,56 @@ def _card_into(card_id: str, position, index: int, orientation: str) -> DrawnCar
     )
 
 
-def test_synthesis_frames_are_pinned_verbatim_question_major_many_all_upright() -> None:
-    """框架钉 ①：`lead_question` + `per_card`（正位）+ `major_many` + `all_upright`。
+def _wording_clean(label: str, text: str) -> str:
+    """G15 的第四、五类对象共用的一条措辞门：禁串与建议词一次判完。
 
-    四句合成**一整串**逐字对账，句与句之间那个空格就是引擎的 `join`，所以「句子本身对但
-    拼接变了形状」也红。为什么不用「`overview(引擎的 frame, parts) == result.synthesis`」
-    那种写法：见 `tests/golden/test_kabbalah_golden.py:414-436` 那段理由（拿唯一正主自己
-    拼再跟自己比是恒等式，什么也没钉）。
+    住在测文件里而不进 `plain_wording`：`FORBIDDEN` 与 `advice_hits` 的词表口径仍由那份唯一
+    正主供给（G8），这里只是把两判合起来用。为什么框架句本身也要扫（不只扫装配结果）：一次
+    抽牌只会命中八个分支里的**三个**（lead + 一个计数句 + 一个取向句），靠真抽取扫一遍撞不齐
+    ——`major_many` 要十张里过半是大牌，实测 300 次 `celtic_cross` 抽取只撞出 23~40 次（复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.tarot import draw_spread; print(sum(1 for _ in range(300) if '张牌里有' in draw_spread(spread_id='celtic_cross', allow_reversed=True).synthesis))"`；
+    抽牌走 CSPRNG（G4），所以这里给的是**同量级区间**而不是一个钉死的数——留一个单次测量值
+    在这里，下次跑出来不同就成了一条注释说谎）。而逐字钉的那三串本身就是八句的全部形状 ——
+    拿它们过门才是**确定性**覆盖。
     """
-    spread = SPREADS["single"]
-    cards = [_card_into("major-00", spread.positions[0], 0, "upright")]
-    assert _synthesize(spread, cards, "Should I take the offer?", 1, 0, True) == " ".join(
+    for banned in FORBIDDEN:
+        assert banned not in text, f"{label} 带禁串 {banned!r}"
+    hits = advice_hits(text)
+    assert hits == [], f"{label} 命中建议词 {hits}"
+    return text
+
+
+def test_synthesis_frames_are_pinned_verbatim_question_major_many_all_upright() -> None:
+    """框架钉 ①：`lead_question` + `per_card`（正位）×3 + `major_many` + `all_upright`。
+
+    六句合成**一整串**逐字对账，句与句之间那个空格就是引擎的 `join`，所以「句子本身对但
+    拼接变了形状」也红。为什么不用「`overview(引擎的 frame, parts) == result.synthesis`」
+    那种写法：见 `test_kabbalah_golden.py` 的
+    `test_gematria_synthesis_text_is_pinned_before_the_overview_migration` 那段理由
+    （拿唯一正主自己拼再跟自己比是恒等式，什么也没钉）。
+
+    两个计数刻意取**不一样**的数（3 张里 2 张大牌）：`major_many` 那句插了 `{total}` 与
+    `{major_count}` 两个槽，若这里传 1/1，把两个槽对调照样逐字相等，这一句就白钉了
+    （T5 评审实测：1/1 形状下该变异 26 条全绿）。`question` 两侧的空格同样是刻意的 ——
+    引擎那句走的是 `question.strip()`，钉得住才不算漏。
+    """
+    spread = SPREADS["three_card"]
+    cards = [
+        _card_into("major-00", spread.positions[0], 0, "upright"),
+        _card_into("wands-03", spread.positions[1], 1, "upright"),
+        _card_into("cups-06", spread.positions[2], 2, "upright"),
+    ]
+    text = _wording_clean(
+        "框架钉 ①",
+        _synthesize(spread, cards, "  Should I take the offer?  ", 2, 0, True),
+    )
+    assert text == " ".join(
         [
-            "本次以 单张牌（Single Card）为这个问题布阵：Should I take the offer?",
-            "指引（Guidance）抽出 愚人（The Fool），正位，取的是 开端、纯真、随性。",
-            "1 张牌里有 1 张大牌，那些超出你当下掌控的人生主题与力量正明显起作用。",
+            "本次以 时间之流三张（Three Card）为这个问题布阵：Should I take the offer?",
+            "过去（Past）抽出 愚人（The Fool），正位，取的是 开端、纯真、随性。",
+            "现在（Present）抽出 权杖三（Three of Wands），正位，取的是 准备、先见、事业开创。",
+            "未来（Future）抽出 圣杯六（Six of Cups），正位，取的是 重访旧日、童年记忆、纯真。",
+            "3 张牌里有 2 张大牌，那些超出你当下掌控的人生主题与力量正明显起作用。",
             "所有牌都落正位，这些能量表达得清楚，没有被挡。",
         ]
     )
@@ -306,7 +346,8 @@ def test_synthesis_frames_are_pinned_verbatim_plain_minor_reversed_no_major() ->
     """框架钉 ②：`lead_plain` + `per_card`（逆位）+ `no_major` + `some_reversed`。"""
     spread = SPREADS["three_card"]
     cards = [_card_into("pentacles-05", spread.positions[0], 0, "reversed")]
-    assert _synthesize(spread, cards, None, 0, 1, True) == " ".join(
+    text = _wording_clean("框架钉 ②", _synthesize(spread, cards, None, 0, 1, True))
+    assert text == " ".join(
         [
             "本次以 时间之流三张（Three Card）布阵。",
             "过去（Past）抽出 星币五（Five of Pentacles），逆位，取的是 从损失里回血、灵性上的贫瘠、重新燃起的希望。",
@@ -330,7 +371,7 @@ def test_synthesis_frames_are_pinned_verbatim_major_some_and_the_reversal_skip()
         _card_into("wands-03", spread.positions[1], 1, "upright"),
         _card_into("cups-06", spread.positions[2], 2, "upright"),
     ]
-    assert _synthesize(spread, cards, None, 1, 0, False) == " ".join(
+    assert _wording_clean("框架钉 ③", _synthesize(spread, cards, None, 1, 0, False)) == " ".join(
         [
             "本次以 时间之流三张（Three Card）布阵。",
             "过去（Past）抽出 愚人（The Fool），正位，取的是 开端、纯真、随性。",
@@ -350,8 +391,7 @@ def test_an_assembled_synthesis_passes_the_wording_gates() -> None:
     """
     for spread_id in SPREADS:
         for allow_reversed in (True, False):
+            label = f"{spread_id}/reversed={allow_reversed}"
             text = draw_spread(spread_id=spread_id, allow_reversed=allow_reversed).synthesis
-            assert "布阵" in text, spread_id
-            for banned in FORBIDDEN:
-                assert banned not in text, f"{spread_id}: {banned!r}"
-            assert advice_hits(text) == [], (spread_id, advice_hits(text))
+            assert "布阵" in text, label
+            _wording_clean(f"装配 {label}", text)
