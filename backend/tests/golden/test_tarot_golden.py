@@ -142,6 +142,10 @@ def test_drawn_card_fields_agree_with_orientation() -> None:
         assert card.keywords == list(source.keywords(card.orientation))
         assert card.meaning == source.meaning(card.orientation)
         # 配对的另一半：中文侧必须由**同一个 orientation** 决定，接反了读起来完全通顺。
+        # 变异复核的形状：把引擎那格的 `card.meaning_zh(orientation)` 改成 `meaning_zh("upright")`
+        # 之后，只有**本张牌是逆位**时断言才会红，而三张全正位的概率是 1/8（复测：
+        # `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "print(0.5**3)"` →
+        # `0.125`）。实测该变异跑 20 轮红 19 / 绿 1 —— 所以单轮看见绿**不等于门是空的**，要多跑几轮。
         assert card.keywords_zh == list(source.keywords_zh(card.orientation))
         assert card.meaning_zh == source.meaning_zh(card.orientation)
         assert card.position_meaning_zh != card.position_meaning
@@ -213,7 +217,7 @@ def test_tarot_spread_endpoint(client: TestClient) -> None:
 
 
 def test_tarot_endpoint_returns_both_halves_of_every_text_field(client: TestClient) -> None:
-    """端点侧的配对凭据：十个字段两两成对，且中文侧非空、与英文侧不同串。
+    """端点侧的配对凭据：四对字段两两成对（牌阵描述 1 对 + 每张牌 3 对），且中文侧非空、与英文侧不同串。
 
     内容层的不重复/长度/措辞门在 `tests/content/test_tarot_zh_corpus.py`，这里只钉
     「装配发生了、方向没接反、契约字段一个都没少」——同一件事两处断言就两份口径（AGENTS.md §2
