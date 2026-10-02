@@ -218,7 +218,9 @@ def test_all_156_chinese_meanings_are_distinct() -> None:
 def test_every_spread_position_carries_a_chinese_gloss() -> None:
     """29 个宫位各有中文释义：非空、不等于英文、在长度带内。
 
-    位次的中文**标签**早就成对（`label_zh`，`tests/golden/test_tarot_golden.py:96-103` 已钉），
+    位次的中文**标签**早就成对（`label_zh`，`tests/golden/test_tarot_golden.py` 的
+    `test_spread_positions_have_unique_keys_and_bilingual_labels` 已钉；此处刻意不写行号——
+    那条测原来在 `:96-103`，T4 在同文件追加两条测后漂到了 `:98-105`，见计划偏离表第 14 行），
     缺的是释义那半边——这正是 spec §3.2 实测出的形状：塔罗不是「全英文」，是「名字有中文、
     句子只有英文」。本条只钉这一件，标签那件不在这里重复（同一件事两份口径就是漂移的起点）。
     """
