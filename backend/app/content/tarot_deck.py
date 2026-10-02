@@ -13,6 +13,11 @@ from app.content.tarot_cards import TarotCard
 from app.content.tarot_major import MAJOR_ARCANA
 from app.content.tarot_minor import MINOR_ARCANA
 
+#: 牌义与布局的书级出处：三张牌表（`tarot_major` / `tarot_minor` / `tarot_deck`）共用这一串，
+#: 因为它们的凭据是同一条；关键词中译表另有其串（`tarot_keywords_zh.TAROT_KEYWORDS_ZH_SOURCE`），
+#: 理由见 `content/__init__.py` 的 `TAROT_CONTENT_SOURCES` 注（G14）。
+TAROT_SOURCE = "Rider-Waite-Smith 塔罗通行牌义 · 78 张大小阿卡纳与六种 Waite 系布阵位次（PRD 6.7）"
+
 # --- Deck -------------------------------------------------------------------
 
 DECK: tuple[TarotCard, ...] = MAJOR_ARCANA + MINOR_ARCANA

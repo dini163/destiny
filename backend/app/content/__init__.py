@@ -35,6 +35,8 @@ from app.content.rune_futhark import RUNES_SOURCE
 from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
 from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
+from app.content.tarot_deck import TAROT_SOURCE
+from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
 from app.content.ziwei_plain import ZIWEI_PLAIN_SOURCE
@@ -160,6 +162,21 @@ QIMEN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 LENORMAND_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("lenormand", LENORMAND_SOURCE),
     ("lenormand_plain", LENORMAND_PLAIN_SOURCE),
+)
+
+#: 塔罗一页真正读到的四张表：22 张大牌、56 张 minors、装配件（6 阵 29 位次）、529 条关键词
+#: 中译。单列理由同 `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它
+#: 没用过的牌库。`content/tarot_cards.py` **不列**——它是 dataclass 与两个工厂，自己不带
+#: 任何印进响应的文案（AGENTS.md §7「读了就列，宁缺勿多」的「勿多」那一半）。
+#: 前三行共用 `TAROT_SOURCE`、第四行单独用 `TAROT_KEYWORDS_ZH_SOURCE`：一张自持的现代译表
+#: 与公共领域的牌义不同凭据，抄成同一串就是让译表冒充原典（卢恩 spec 决策 24 的反向运用）。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+#: "from app.content import TAROT_CONTENT_SOURCES; print(len(TAROT_CONTENT_SOURCES))"` → 4。
+TAROT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("tarot_major", TAROT_SOURCE),
+    ("tarot_minor", TAROT_SOURCE),
+    ("tarot_deck", TAROT_SOURCE),
+    ("tarot_keywords_zh", TAROT_KEYWORDS_ZH_SOURCE),
 )
 
 #: 卡巴拉一页真正读到的两张表：十原质（三柱四界、行星守护、王徽色、大天使与神名）、

@@ -9,9 +9,11 @@ position texts, so every word returned traces back to the content library.
 
 import secrets
 
-from app.content.tarot_deck import DECK, Spread, get_spread
+from app.content import CONTENT_VERSION, TAROT_CONTENT_SOURCES
+from app.content.tarot_deck import DECK, Spread, TAROT_SOURCE, get_spread
 from app.core.errors import UnsupportedMethodError
-from app.schemas.tarot import DrawnCard, TarotSpreadResponse
+from app.schemas.common import ProvenanceTable
+from app.schemas.tarot import DrawnCard, TarotProvenance, TarotSpreadResponse
 
 # A single OS-backed generator; secrets.SystemRandom is stateless across calls
 # (it draws from os.urandom), so a module-level instance is safe to reuse.
@@ -21,6 +23,13 @@ _ORIENTATIONS = ("upright", "reversed")
 
 #: 取向的中文说法只在框架句里出现；表里的 `orientation` 值仍是英文（`upright` | `reversed`）。
 _ORIENTATION_ZH = {"upright": "正位", "reversed": "逆位"}
+
+#: 受控引擎文案（不是语料，也不是页面免责声明）：说清随机源、文案来源与中英配对这三件事。
+NOTE = (
+    "洗牌与正逆位由 Python secrets（操作系统级 CSPRNG）决定，抽牌无放回，每次抽取独立且不可复现。"
+    "牌名、关键词、牌义、宫位释义与综合解读一律取自策展 78 张牌库与六种布阵表，未在运行时虚构任何句子；"
+    "中文正文与英文原句同行成对呈现，英文侧的字段与取值在本次中文化里一字未改。"
+)
 
 
 def draw_spread(
@@ -87,6 +96,13 @@ def draw_spread(
         synthesis=synthesis,
         major_arcana_count=major_count,
         reversed_count=reversed_count,
+        provenance=TarotProvenance(
+            engine="tarot-content-library",
+            content_version=CONTENT_VERSION,
+            source=TAROT_SOURCE,
+            note=NOTE,
+            tables=_tables(),
+        ),
     )
 
 
@@ -143,3 +159,21 @@ def _synthesize(
             )
 
     return " ".join(sentences)
+
+
+def _tables() -> list[ProvenanceTable]:
+    """`TAROT_CONTENT_SOURCES` 的第一次被消费（G13：登记了却无人读就是虚账）。
+
+    表名与出处只那一处清单供给，引擎不抄书名（写法同 `engines/lenormand.py`、
+    `engines/qimen.py` 各自的 `_tables()`）。
+
+    复测（本树）：`cd backend && grep -rn TAROT_CONTENT_SOURCES app/ tests/ --include=*.py`
+    → `content/__init__.py` 定义处、本模块 import 与此处消费、`tests/golden/
+    test_tarot_golden.py` 的 import 与那条 `len(...) == 4`。改前（`git grep -n
+    TAROT_CONTENT_SOURCES de2be71 -- backend` → 空）这个名字根本不存在：定义与消费
+    同笔落地，不留「登记了无人读」的死账窗口。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in TAROT_CONTENT_SOURCES
+    ]

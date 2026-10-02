@@ -11,8 +11,10 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
+from app.content import CONTENT_VERSION, TAROT_CONTENT_SOURCES
 from app.content.tarot_cards import SUIT_ELEMENT
-from app.content.tarot_deck import DECK, MAJOR_SIZE, MINOR_SIZE, SPREADS, get_card
+from app.content.tarot_deck import DECK, MAJOR_SIZE, MINOR_SIZE, SPREADS, TAROT_SOURCE, get_card
+from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.core.errors import UnsupportedMethodError
 from app.engines.tarot import _synthesize, draw_spread
 from app.schemas.tarot import DrawnCard, TarotSpreadResponse
@@ -256,6 +258,58 @@ def test_tarot_spread_endpoint_rejects_unknown_spread(client: TestClient) -> Non
     response = client.post("/api/v1/tarot/spread", json={"spread_id": "nope"})
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "unsupported_method"
+
+
+def test_provenance_lists_exactly_the_four_tables_read() -> None:
+    """四行两串（G14）：三张牌表共用 `TAROT_SOURCE`，译表单独一串。
+
+    `tarot_cards.py` **不在清单里**：它是模型与工厂件，自己没有任何印进响应的文案（G13）。
+    行序就是页面上的展示序（`components/ui/ProvenancePanel.tsx` 按数组渲染），所以这里钉
+    **等序列表**而不是集合——集合会把「把译表挪到第一行」放过去，而那一改动在页面上看得见。
+    下面那条 `len(TAROT_CONTENT_SOURCES) == 4` 不是门，是 belt-and-braces：`_tables()` 迭代的
+    就是那个元组，清单任何增删都会先红在上面那条等序列表——把它单独当成一条门就是「看着像
+    测过」（spec §8 明令消灭的那一类）。
+    """
+    result = draw_spread(spread_id="single")
+    tables = result.provenance.tables
+    assert [(t.name, t.source) for t in tables] == [
+        ("tarot_major", TAROT_SOURCE),
+        ("tarot_minor", TAROT_SOURCE),
+        ("tarot_deck", TAROT_SOURCE),
+        ("tarot_keywords_zh", TAROT_KEYWORDS_ZH_SOURCE),
+    ]
+    assert len(TAROT_CONTENT_SOURCES) == 4
+    assert [t.version for t in tables] == [CONTENT_VERSION] * 4
+    # 三张牌表共用一串是刻意的（凭据同一条：RWS 通行牌义 + Waite 布局），抄成三份必漂。
+    assert tables[0].source == tables[1].source == tables[2].source
+    # 译表那串要能看出它不是古籍（G14 的反向运用：卢恩 spec 决策 24）。
+    assert tables[3].source != tables[0].source
+
+
+def test_provenance_engine_and_note_and_the_two_pinned_labels(client: TestClient) -> None:
+    """出处块不改动那两个已被逐字钉住的标签：`rng == "secrets"`、`engine == "content-library"`。
+
+    本期把正文翻成中文，**没有**换引擎、没有换随机源，所以 `test_tarot_spread_endpoint` 里
+    那两条逐字钉（`body["rng"] == "secrets"`、`body["engine"] == "content-library"`）必须原样
+    绿；`provenance.engine` 那一格说的是拼句方法，与响应顶层那个恒定的库标签是两个字段，不共用
+    （先例：`engines/lenormand.py` 里 `engine="lenormand-combination"` 那一格与它的响应标签）。
+    """
+    result = draw_spread(spread_id="three_card")
+    assert result.provenance.engine == "tarot-content-library"
+    assert result.provenance.content_version == CONTENT_VERSION
+    assert result.provenance.source == TAROT_SOURCE
+    assert "secrets" in result.provenance.note
+    assert result.provenance.note.strip()
+
+    body = client.post("/api/v1/tarot/spread", json={"spread_id": "single"}).json()
+    assert body["rng"] == "secrets"
+    assert body["engine"] == "content-library"
+    assert [t["name"] for t in body["provenance"]["tables"]] == [
+        "tarot_major",
+        "tarot_minor",
+        "tarot_deck",
+        "tarot_keywords_zh",
+    ]
 
 
 # --- Synthesis frames -------------------------------------------------------

@@ -6,6 +6,8 @@ so the frontend can consume responses without a mapping layer.
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class TarotSpreadRequest(BaseModel):
     """Input for a tarot spread draw.
@@ -20,6 +22,18 @@ class TarotSpreadRequest(BaseModel):
     spread_id: str = Field(description="Spread layout id, e.g. celtic_cross.")
     allow_reversed: bool = Field(default=True, description="Whether cards may land reversed.")
     question: str | None = Field(default=None, description="Optional question the reading addresses.")
+
+
+class TarotProvenance(BaseModel):
+    """Reading provenance — engine, corpus version, source, method note and tables."""
+
+    engine: str
+    content_version: str
+    source: str
+    note: str = Field(description="洗牌/牌义取处/中英配对口径说明。")
+    tables: list[ProvenanceTable] = Field(
+        description="本响应真正读过的语料表（AGENTS §7：读了就列，宁缺勿多）。"
+    )
 
 
 class DrawnCard(BaseModel):
@@ -67,6 +81,8 @@ class TarotSpreadResponse(BaseModel):
     # Derived emphasis
     major_arcana_count: int = Field(description="How many drawn cards are Major Arcana.")
     reversed_count: int = Field(description="How many drawn cards landed reversed.")
+
+    provenance: TarotProvenance
 
     rng: str = Field(default="secrets", description="Randomness source: Python secrets (CSPRNG).")
     engine: str = Field(default="content-library", description="Interpretations come from the curated deck.")
