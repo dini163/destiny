@@ -129,7 +129,15 @@ SENTENCE_BAND = (12, 60)
 
 
 def _sentence(label: str, text: str) -> str:
-    """通用的一句检查：禁串、建议词、长度带，一次把三项判完。"""
+    """通用的一句检查：语言方向、禁串、建议词、长度带，一次把四项判完。
+
+    方向那一项（必须有汉字）挡的是**中英互换**：`_spread()` 那格是五个一串的位置元组，
+    第 4/5 格一旦对调，落到 `meaning_zh` 上的英文句照样非空、照样在 12–60 带内、照样与
+    现在变成中文的 `meaning` 不相等、在 35 句里也照样唯一 —— 其余三项一个都不会红
+    （T3 评审量出来的这条，卡片侧同理）。它证不了「译得准」（G11 把那一半交给人工走查），
+    但它是「配对没接反」最便宜的机检，所以住在公共检查里而不是任何一家的门里。
+    """
+    assert CJK.search(text), f"{label} 不含汉字，疑似中英互换：{text!r}"
     for banned in FORBIDDEN:
         assert banned not in text, f"{label} 带禁串 {banned!r}：{text!r}"
     hits = advice_hits(text)
