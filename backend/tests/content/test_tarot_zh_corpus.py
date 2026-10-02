@@ -17,7 +17,7 @@
 import re
 from collections import Counter
 
-from app.content.tarot_deck import DECK
+from app.content.tarot_deck import DECK, SPREADS
 from app.content.tarot_keywords_zh import (
     KEYWORD_ZH,
     SHARED_TRANSLATION,
@@ -115,8 +115,16 @@ def test_translation_table_declares_its_own_credential() -> None:
 #: PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.tarot_deck import
 #: DECK; t=[len(c.meaning_zh(o)) for c in DECK for o in ('upright','reversed')];
 #: print(len(t), min(t), max(t), round(sum(t)/len(t),1))"` → `156 21 42 30.5`。
-#: T3 那 35 句位置/描述今天还不在这棵树里，所以这里不替它预填数字：它落地时要用同一条
-#: 命令量自己的表，把实测值写在下面而不是援引计划里的草稿值（AGENTS.md §8）。
+#: T3 那 35 句落地后按同一条命令量自己的表，实测值写在下面（不援引计划里的草稿值，
+#: AGENTS.md §8）：整族 17–31 字、均值 23.2，其中宫位释义 17–31 字、均值 23.0，牌阵描述
+#: 17–29 字、均值 24.2，复测：`cd backend && PYTHONIOENCODING=utf-8
+#: .venv/Scripts/python.exe -c "from app.content.tarot_deck import SPREADS;
+#: pos=[len(p.meaning_zh) for s in SPREADS.values() for p in s.positions];
+#: des=[len(s.description_zh) for s in SPREADS.values()];
+#: f=lambda t: (len(t), min(t), max(t), round(sum(t)/len(t),1)); print('all', f(pos+des));
+#: print('pos', f(pos)); print('desc', f(des))"` → `all (35, 17, 31, 23.2)` /
+#: `pos (29, 17, 31, 23.0)` / `desc (6, 17, 29, 24.2)`：距下限最少 5 字（最短句 17 字），
+#: 距上限最少 29 字（最长句 31 字）。
 SENTENCE_BAND = (12, 60)
 
 
@@ -197,3 +205,54 @@ def test_all_156_chinese_meanings_are_distinct() -> None:
     assert len(texts) == 156
     duplicated = {t for t, n in Counter(texts).items() if n > 1}
     assert duplicated == set()
+
+
+def test_every_spread_position_carries_a_chinese_gloss() -> None:
+    """29 个宫位各有中文释义：非空、不等于英文、在长度带内。
+
+    位次的中文**标签**早就成对（`label_zh`，`tests/golden/test_tarot_golden.py:96-103` 已钉），
+    缺的是释义那半边——这正是 spec §3.2 实测出的形状：塔罗不是「全英文」，是「名字有中文、
+    句子只有英文」。本条只钉这一件，标签那件不在这里重复（同一件事两份口径就是漂移的起点）。
+    """
+    total = 0
+    for spread in SPREADS.values():
+        for position in spread.positions:
+            total += 1
+            assert position.meaning_zh, f"{spread.id}/{position.key} 缺中文释义"
+            _sentence(f"{spread.id}/{position.key}", position.meaning_zh)
+            assert position.meaning_zh != position.meaning, f"{spread.id}/{position.key}"
+    assert total == 29, "宫位数动了：阵或位次被增删，先复核张数 1/3/10/5/5/5"
+
+
+def test_every_spread_carries_a_chinese_description() -> None:
+    """六个阵各有中文描述，且 `description_zh` 与 `description` 同在不互为副本。"""
+    assert len(SPREADS) == 6
+    for spread in SPREADS.values():
+        assert spread.description_zh, spread.id
+        _sentence(f"{spread.id}/description", spread.description_zh)
+        assert spread.description_zh != spread.description
+
+
+def test_spread_chinese_texts_are_all_distinct() -> None:
+    """35 句（29 释义 + 6 描述）两两不同。
+
+    这条不是洁癖：三个阵同名不同位（`celtic_cross.present` 与 `three_card.present`、
+    三个阵各有一个 `outcome`、两个阵各有一个 `guidance`/`challenge`），抄串了读起来完全
+    通顺，只有对账能发现（复测：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "from app.content.tarot_deck import SPREADS;
+    print([ (s,p.key) for s in SPREADS for p in SPREADS[s].positions if p.key in
+    ('present','outcome','guidance','challenge') ])"` → 实测 9 条重名位次（4 个键名分别被
+    2、3、2、2 个阵复用；计划草稿的 8 与本命令输出不符，以输出为准，AGENTS.md §8）。
+    """
+    texts = [p.meaning_zh for s in SPREADS.values() for p in s.positions]
+    texts += [s.description_zh for s in SPREADS.values()]
+    assert len(texts) == 35
+    assert len(set(texts)) == 35, {t for t, n in Counter(texts).items() if n > 1}
+
+
+def test_spread_texts_take_no_verdict_words() -> None:
+    """35 句宫位/描述过建议词门（G9 的 0 命中实测覆盖这一族）。"""
+    for spread in SPREADS.values():
+        assert advice_hits(spread.description_zh) == [], spread.id
+        for position in spread.positions:
+            assert advice_hits(position.meaning_zh) == [], f"{spread.id}/{position.key}"
