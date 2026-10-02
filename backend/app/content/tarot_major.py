@@ -9,6 +9,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["recklessness", "risk-taking", "holding back", "folly"],
         "The Fool stands at the cliff's edge, a knapsack of untapped potential over his shoulder: a new cycle begins, calling for trust and spontaneity.",
         "Reversed, the Fool warns of folly and heedless risk, or of fear that keeps you from taking a necessary leap.",
+        "愚人站在崖边，肩上背着装满未施展才干的行囊：一个新的循环开始，要的是信任与随性。",
+        "逆位时，愚人说的是糊涂与不顾后果的冒险，也可能是那份让你不敢纵身一跃的害怕。",
     ),
     major(
         1, "The Magician", "魔术师",
@@ -16,6 +18,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["manipulation", "poor planning", "untapped talents", "trickery"],
         "With one hand to the sky and one to the earth, the Magician channels will into form: you have every tool needed to manifest your intention.",
         "Reversed, talent is scattered or misused through manipulation, trickery, or plans that never reach the ground.",
+        "魔术师一手朝天一手朝地，把意志导成形状：显化你的意图要用的工具，你手里一样不缺。",
+        "逆位时，才干被分散、被操弄与欺骗手法用坏，或者是计划始终落不到地上。",
     ),
     major(
         2, "The High Priestess", "女祭司",
@@ -23,6 +27,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["secrets", "withdrawal", "silence", "disconnected from intuition"],
         "Seated between the pillars of the temple, the High Priestess guards hidden knowledge and urges you to trust intuition over appearances.",
         "Reversed, secrets are withheld or inner knowing is drowned out by noise; reconnect with your deeper wisdom.",
+        "女祭司坐在神庙两根柱子之间，守着隐藏的知识，催你把直觉放在表象之上。",
+        "逆位时，秘密被藏着不给你，或内在的了知被嘈杂盖过，去把更深的那份智慧重新接上。",
     ),
     major(
         3, "The Empress", "皇后",
@@ -30,6 +36,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["creative block", "dependence", "smothering", "neglect of self-care"],
         "The Empress embodies fertile creation and sensual abundance, nurturing projects and people to full growth.",
         "Reversed, creativity stalls or care becomes smothering; attend to your own needs before tending everyone else.",
+        "皇后体现丰饶的创造与感官的丰盛，把项目与人一路滋养到长足成长。",
+        "逆位时，创造力停摆，或照看变成令人窒息的包裹，在别人之前先照看好你自己。",
     ),
     major(
         4, "The Emperor", "皇帝",
@@ -37,6 +45,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["domination", "excessive control", "rigidity", "lack of discipline"],
         "The Emperor brings order through structure, authority and clear boundaries, building lasting stability on firm rules.",
         "Reversed, authority hardens into domination or rigidity, or discipline collapses into chaos.",
+        "皇帝以结构、权威与清晰的界线带来秩序，把长久的安稳建立在硬规矩上。",
+        "逆位时，权威硬化成支配或僵化，或者是纪律塌成了混乱。",
     ),
     major(
         5, "The Hierophant", "教皇",
@@ -44,6 +54,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["personal beliefs", "freedom", "challenging the status quo", "dogma"],
         "The Hierophant transmits established wisdom and tradition, pointing to teachers, institutions and shared belief.",
         "Reversed, you question convention and forge an independent path, or feel confined by dogma.",
+        "教皇传递既有的智慧与传统，指向老师、体制机构与共同信奉的那套东西。",
+        "逆位时，你质疑惯例、自己闯一条独立的路，或者觉得被教条困住。",
     ),
     major(
         6, "The Lovers", "恋人",
@@ -51,6 +63,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["disharmony", "imbalance", "mistrust", "misaligned values"],
         "The Lovers represent union and meaningful choice, where values align and relationships deepen through vulnerability.",
         "Reversed, values clash and harmony breaks down; a relationship or decision is out of balance.",
+        "恋人代表结合与有意义的选择，在这里价值观一致，关系因袒露脆弱而加深。",
+        "逆位时，价值观相冲、和谐散架，一段关系或一个决定失了衡。",
     ),
     major(
         7, "The Chariot", "战车",
@@ -58,6 +72,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["lack of direction", "opposition", "loss of control", "aggression"],
         "The Chariot advances by disciplined will, harnessing opposing forces to drive steadily toward victory.",
         "Reversed, direction is lost or force becomes aggression; conflicting pulls stall your momentum.",
+        "战车靠有纪律的意志前进，把两股相反的力套在同一辆车上，稳稳驶向得胜。",
+        "逆位时，方向丢了，或者力量变成攻击性，相互拉扯的几股劲让你的动能停住。",
     ),
     major(
         8, "Strength", "力量",
@@ -65,6 +81,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["self-doubt", "low energy", "raw emotion", "insecurity"],
         "Strength tames the lion not by force but by gentle courage and compassion; quiet inner resolve prevails.",
         "Reversed, self-doubt or raw emotion overcomes you; reclaim patience and trust in your own fortitude.",
+        "力量不以蛮力驯狮，而以温柔的勇气与慈悲，安静的内在决心最终说了算。",
+        "逆位时，自我怀疑或未经修饰的情绪把你压过，把耐心和对自己韧性的信任重新拿回来。",
     ),
     major(
         9, "The Hermit", "隐士",
@@ -72,6 +90,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["isolation", "loneliness", "withdrawal", "lost your way"],
         "The Hermit withdraws with his lantern to seek truth within, offering the clarity that comes from reflective solitude.",
         "Reversed, solitude curdles into isolation, or you refuse the counsel of experience and lose your way.",
+        "隐士提灯退隐，向内寻找真相，给出那种只有反思式独处才有的清明。",
+        "逆位时，独处变味成孤立，或者是你拒绝经验给的指点，因而迷失了路径。",
     ),
     major(
         10, "Wheel of Fortune", "命运之轮",
@@ -79,6 +99,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["bad luck", "resistance to change", "breaking cycles", "loss of control"],
         "The Wheel turns, marking a destined change of fortune and the endless cycle of rise and fall.",
         "Reversed, luck resists or you cling against the turning; disrupt a repeating pattern to regain momentum.",
+        "轮子在转，标记着命数里的一次运势转向，以及升落不已的循环。",
+        "逆位时，运气跟你顶着干，或者你逆着转动抓取，把一个反复出现的模式打断，动能才回得来。",
     ),
     major(
         11, "Justice", "正义",
@@ -86,6 +108,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["unfairness", "lack of accountability", "dishonesty", "bias"],
         "Justice weighs truth with the sword of reason, ensuring that actions return their rightful consequences.",
         "Reversed, fairness is distorted or accountability avoided; dishonesty or bias clouds the outcome.",
+        "正义用理性的剑称量真相，让每个行动都返回它本该有的结果。",
+        "逆位时，公平被扭曲、责任被回避，不诚实或偏颇把结果搅得看不清。",
     ),
     major(
         12, "The Hanged Man", "倒吊人",
@@ -93,6 +117,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["delays", "resistance", "stalling", "indecision"],
         "Suspended willingly, the Hanged Man sees the world from a new angle, finding wisdom in surrender and pause.",
         "Reversed, you stall and resist the necessary pause, prolonging indecision without gaining its insight.",
+        "倒吊人自愿悬着，从新的角度看世界，在臣服与暂停里找到智慧。",
+        "逆位时，你拖着、抗拒那份该有的一次暂停，犹豫被拉长，却拿不到它本该给的洞见。",
     ),
     major(
         13, "Death", "死神",
@@ -100,6 +126,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["resistance to change", "inability to move on", "stagnation", "fear"],
         "Death closes a chapter so transformation can begin; what must end is released to make way for renewal.",
         "Reversed, you cling to what has already died, resisting a change that would set you free.",
+        "死神合上一整章，好让转化得以开始，该了结的被放下来，为更新腾出位置。",
+        "逆位时，你抓着已经死掉的东西不放，抗拒那场本可以让你脱身的改变。",
     ),
     major(
         14, "Temperance", "节制",
@@ -107,6 +135,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["imbalance", "excess", "misalignment", "impatience"],
         "Temperance blends opposites in measured proportion, tempering extremes into patient, purposeful harmony.",
         "Reversed, moderation is lost to excess or impatience, and elements that should blend instead conflict.",
+        "节制把对立面按分寸调和，将两个极端磨成有耐心、有方向的和谐。",
+        "逆位时，分寸让位给过度或沉不住气，本该相融的几样东西彼此冲撞。",
     ),
     major(
         15, "The Devil", "恶魔",
@@ -114,6 +144,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["releasing limiting beliefs", "detachment", "reclaimed power", "exposing illusion"],
         "The Devil reveals the chains we forge ourselves, binding us through addiction, desire and material obsession.",
         "Reversed, the hold loosens as limiting beliefs are released and personal power reclaimed.",
+        "恶魔显出我们自己锻造的那串锁链，靠成瘾、欲望与物质执迷把人绑住。",
+        "逆位时，那股束缚松开，自我设限的信念被放下，力量回到自己手里。",
     ),
     major(
         16, "The Tower", "塔",
@@ -121,6 +153,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["fear of change", "averting disaster", "delayed collapse", "resistance"],
         "The Tower is struck by lightning, toppling false structures so that truth is revealed through sudden upheaval.",
         "Reversed, disaster is narrowly averted or the inevitable collapse merely delayed by resistance.",
+        "塔被雷击中，虚假的结构被推倒，真相透过突如其来的动荡显出来。",
+        "逆位时，灾祸被勉强避开，或者早晚要塌的那一下只被抗拒拖后了些。",
     ),
     major(
         17, "The Star", "星星",
@@ -128,6 +162,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["lack of faith", "despair", "disconnection", "discouragement"],
         "After the storm, the Star pours healing water under an open sky, restoring hope, faith and gentle renewal.",
         "Reversed, faith dims and spirit disconnects; despair obscures the guiding light you still possess.",
+        "风雨之后，星星在开阔的天空下倾倒疗愈的水，把希望、信念与温柔的更新送回来。",
+        "逆位时，信念转暗、灵性断线，灰心遮住了你其实还握在手里的那道光。",
     ),
     major(
         18, "The Moon", "月亮",
@@ -135,6 +171,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["release of fear", "clarity emerging", "uncovering deception", "confusion lifting"],
         "The Moon lights an uncertain path between two towers, where illusion and the subconscious stir fears and intuitions.",
         "Reversed, fog lifts and hidden truths surface, releasing fear and confusion into clearer understanding.",
+        "月亮照亮两塔之间那条不明的路，幻象与潜意识在这里搅动恐惧与直觉。",
+        "逆位时，雾散开、藏着的真相浮上来，恐惧与迷惑被松开，理解变得更清楚。",
     ),
     major(
         19, "The Sun", "太阳",
@@ -142,6 +180,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["unrealistic optimism", "feeling down", "delayed success", "overexposure"],
         "The Sun shines in full brilliance, bringing joy, vitality, clarity and open success to all it touches.",
         "Reversed, the warmth is clouded by low spirits or inflated optimism; success comes, only later.",
+        "太阳全盛地照耀，把喜乐、生命力、清明与摆在明处的成功带给它照到的一切。",
+        "逆位时，热度被低落的情绪或夸大的乐观遮住，成功会来，只是晚一步。",
     ),
     major(
         20, "Judgement", "审判",
@@ -149,6 +189,8 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["self-doubt", "inner critic", "ignoring the call", "harsh judgement"],
         "The trumpet sounds and the dead rise to be judged, answering an inner calling toward reckoning and rebirth.",
         "Reversed, a harsh inner critic or self-doubt causes you to ignore the call to renewal.",
+        "号角吹响，死者起身接受评判，听从内心的召唤，走向清算与重生。",
+        "逆位时，严苛的内在批评者或自我怀疑让你无视那次召唤，错过这轮更新。",
     ),
     major(
         21, "The World", "世界",
@@ -156,5 +198,7 @@ MAJOR_ARCANA: tuple[TarotCard, ...] = (
         ["seeking closure", "shortcuts", "delays", "incompleteness"],
         "The World crowns the journey with wholeness and accomplishment, a completed cycle celebrated before the next begins.",
         "Reversed, closure remains elusive and loose ends linger; a cycle is nearly, but not yet, complete.",
+        "世界用圆满与成就为旅程加冕，一个完成的循环在下一个开始之前被庆祝。",
+        "逆位时，了结迟迟不到、松散的头绪还留着，这个循环差一点就完成，但还没完成。",
     ),
 )

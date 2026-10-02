@@ -108,3 +108,87 @@ def test_translation_table_declares_its_own_credential() -> None:
     """
     assert TAROT_KEYWORDS_ZH_SOURCE
     assert "译" in TAROT_KEYWORDS_ZH_SOURCE, "出处串要能看出这是本系统自持的译表"
+
+
+#: 整句类 `_zh` 的长度带（G10）。下限 12 挡「只有一个词」的敷衍，上限 60 挡「把两句
+#: 拼成一段」的越界；156 句实测落在 21–42（均值 30.5），35 句位置/描述实测 17–31。
+SENTENCE_BAND = (12, 60)
+
+
+def _sentence(label: str, text: str) -> str:
+    """通用的一句检查：禁串、建议词、长度带，一次把三项判完。"""
+    for banned in FORBIDDEN:
+        assert banned not in text, f"{label} 带禁串 {banned!r}：{text!r}"
+    hits = advice_hits(text)
+    assert hits == [], f"{label} 命中建议词 {hits}：{text!r}"
+    low, high = SENTENCE_BAND
+    assert low <= len(text) <= high, f"{label} 长度 {len(text)} 出带：{text!r}"
+    return text
+
+
+def test_every_card_carries_chinese_meanings_for_both_orientations() -> None:
+    """78 张牌 × 2 向 = 156 句中文牌义，必填、与英文不同句、在长度带内（G10、G11）。
+
+    「非空」与「不等于英文」这两件只有真表量得到：字段若默认成英文串，页面看起来有中文、
+    其实一行都没译，而响应仍然 200。
+    """
+    for card in DECK:
+        for orientation in ("upright", "reversed"):
+            zh = card.meaning_zh(orientation)
+            en = card.meaning(orientation)
+            assert zh and zh != en, f"{card.id}/{orientation} 的中文牌义缺席或等于英文"
+            _sentence(f"{card.id}/{orientation}", zh)
+
+
+def test_reversed_meanings_open_with_the_reversal_marker() -> None:
+    """结构忠实门（G11 唯一能机检的那一半）：逆位中文句一律以「逆位时，」开头。
+
+    英文原句 78 条逆位全都以 `Reversed, ` 起头（复测：`cd backend &&
+    PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.tarot_deck import
+    DECK; print(sum(1 for c in DECK if c.reversed_meaning.startswith('Reversed, ')))"` → `78`），
+    所以中文侧同位开头是「没换句式、没自己起话」的可见凭据。钉不住语义，就钉句式；
+    语义那一半由 T8 的人工走查承担，且必须逐条贴「原句 / 译文」成对样本进 ledger。
+    """
+    for card in DECK:
+        assert card.reversed_meaning.startswith("Reversed, "), card.id
+        assert card.meaning_zh("reversed").startswith("逆位时，"), card.id
+        assert not card.meaning_zh("upright").startswith("逆位时，"), card.id
+
+
+def test_chinese_keyword_tuples_are_assembled_from_the_english_ones() -> None:
+    """装配等式门 ②（spec §6.3）：`*_keywords_zh` 必须逐位等于 `KEYWORD_ZH[*_keywords]`。
+
+    这条测的是**装配发生了**且**方向没接错**：等式若用同一份 `KEYWORD_ZH` 手算，它能抓住
+    「正位的中文表其实是逆位英文表算出来的」这类接反，也能抓住把中文表按英文顺序抄歪一格
+    （off-by-one）——那正是手抄 78 处会出、结构上一处不会出的错。
+    """
+    for card in DECK:
+        assert card.upright_keywords_zh == tuple(KEYWORD_ZH[w] for w in card.upright_keywords)
+        assert card.reversed_keywords_zh == tuple(KEYWORD_ZH[w] for w in card.reversed_keywords)
+        assert len(card.keywords_zh("upright")) == len(card.keywords("upright")), card.id
+        assert len(card.keywords_zh("reversed")) == len(card.keywords("reversed")), card.id
+
+
+def test_assembled_keyword_texts_pass_the_wording_gates() -> None:
+    """651 个装配出来的中文词（78 张牌 × 两个方向的每一个槽位）不带禁串、不带建议词。
+
+    译表自己过过一遍（T1）还不够：进响应的是**按牌装配后**的这些串，同一条门要在装配结果
+    上再走一次，才证明「装配」没有把某个词换成别的写法。651 的复测：`cd backend &&
+    PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.tarot_deck import
+    DECK; print(sum(len(c.upright_keywords) + len(c.reversed_keywords) for c in DECK))"` →
+    `651`（529 个 token 里有跨牌复用的，所以槽位数大于 token 数）。
+    """
+    for card in DECK:
+        for orientation in ("upright", "reversed"):
+            for zh in card.keywords_zh(orientation):
+                for banned in FORBIDDEN:
+                    assert banned not in zh, f"{card.id}/{orientation}：{zh!r}"
+                assert advice_hits(zh) == [], f"{card.id}/{orientation}：{zh!r}"
+
+
+def test_all_156_chinese_meanings_are_distinct() -> None:
+    """156 句两两不同：牌义抄重了不会被任何响应形状发现，只有这一条会。"""
+    texts = [card.meaning_zh(o) for card in DECK for o in ("upright", "reversed")]
+    assert len(texts) == 156
+    duplicated = {t for t, n in Counter(texts).items() if n > 1}
+    assert duplicated == set()
