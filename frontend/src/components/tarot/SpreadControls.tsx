@@ -92,7 +92,6 @@ export function SpreadControls({
                   type="button"
                   onClick={() => onSpreadChange(spread.id)}
                   aria-pressed={active}
-                  title={`${spread.name} — ${spread.description}`}
                   className={`flex flex-col gap-1 rounded-element border p-2.5 text-left transition ${
                     active
                       ? 'border-gold-strong bg-gold/10'
@@ -109,7 +108,6 @@ export function SpreadControls({
                       {spread.size} 张
                     </span>
                   </div>
-                  <span className="truncate text-[11px] text-ink-muted">{spread.description}</span>
                 </button>
               );
             })}

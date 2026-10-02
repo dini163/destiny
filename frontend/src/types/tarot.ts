@@ -3,6 +3,8 @@
  * snake_case is preserved end-to-end.
  */
 
+import type { ProvenanceTable } from './common';
+
 /** Minor-arcana suit; null for major arcana. */
 export type TarotSuit = 'wands' | 'cups' | 'swords' | 'pentacles';
 
@@ -17,6 +19,15 @@ export type CardOrientation = 'upright' | 'reversed';
 
 /** Which arcana a card belongs to. */
 export type Arcana = 'major' | 'minor';
+
+/** 出处块，镜像 `schemas/tarot.py:TarotProvenance`。 */
+export interface TarotProvenance {
+  engine: string;
+  content_version: string;
+  source: string;
+  note: string;
+  tables: ProvenanceTable[];
+}
 
 /**
  * Input for a tarot spread draw. `spread_id` selects a layout: `single`,
@@ -39,6 +50,8 @@ export interface DrawnCard {
   position_label_zh: string;
   /** What this position reveals. */
   position_meaning: string;
+  /** What this position reveals, in Chinese. */
+  position_meaning_zh: string;
 
   /** Deck card id, e.g. `major-00` or `wands-07`. */
   card_id: string;
@@ -53,8 +66,12 @@ export interface DrawnCard {
   orientation: CardOrientation;
   /** Keywords for the drawn orientation. */
   keywords: string[];
+  /** Chinese keywords for the drawn orientation. */
+  keywords_zh: string[];
   /** Interpretation text for the drawn orientation. */
   meaning: string;
+  /** Interpretation text in Chinese for the drawn orientation. */
+  meaning_zh: string;
 }
 
 /** Complete tarot spread produced by the backend engine. */
@@ -63,6 +80,7 @@ export interface TarotSpreadResponse {
   spread_name: string;
   spread_name_zh: string;
   spread_description: string;
+  spread_description_zh: string;
   question: string | null;
 
   /** Cards in spread-position order. */
@@ -75,6 +93,8 @@ export interface TarotSpreadResponse {
 
   major_arcana_count: number;
   reversed_count: number;
+
+  provenance: TarotProvenance;
 
   /** Randomness source: Python secrets (CSPRNG). */
   rng: string;

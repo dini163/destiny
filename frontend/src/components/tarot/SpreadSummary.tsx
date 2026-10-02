@@ -24,7 +24,8 @@ export function SpreadSummary({ spread }: SpreadSummaryProps) {
         <span className="font-display text-2xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-3xl">
           {spread.spread_name_zh}
         </span>
-        <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">{spread.spread_description}</p>
+        <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">{spread.spread_description_zh}</p>
+        <p className="text-xs leading-relaxed text-ink-muted">{spread.spread_description}</p>
       </div>
 
       {spread.question ? (

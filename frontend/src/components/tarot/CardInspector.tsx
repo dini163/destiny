@@ -71,13 +71,14 @@ export function CardInspector({ card }: CardInspectorProps) {
       </div>
 
       <div className="flex flex-col gap-3">
-        <Block label={`宫位释义 · ${card.position_label}`}>
-          <p className="text-sm leading-relaxed text-ink-variant">{card.position_meaning}</p>
+        <Block label={`宫位释义 · ${card.position_label_zh}`}>
+          <p className="text-sm leading-relaxed text-ink-variant">{card.position_meaning_zh}</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{card.position_meaning}</p>
         </Block>
 
         <Block label="关键词 · KEYWORDS">
           <div className="flex flex-wrap gap-1.5">
-            {card.keywords.map((keyword) => (
+            {card.keywords_zh.map((keyword) => (
               <span
                 key={keyword}
                 className="rounded-full border px-2.5 py-0.5 text-xs"
@@ -87,10 +88,12 @@ export function CardInspector({ card }: CardInspectorProps) {
               </span>
             ))}
           </div>
+          <p className="text-xs text-ink-muted">{card.keywords.join(' · ')}</p>
         </Block>
 
         <Block label={`牌义 · ${orientation.label}`}>
-          <p className="text-sm leading-relaxed text-ink-variant">{card.meaning}</p>
+          <p className="text-sm leading-relaxed text-ink-variant">{card.meaning_zh}</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{card.meaning}</p>
         </Block>
       </div>
     </div>

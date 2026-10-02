@@ -5,6 +5,7 @@ import { SpreadBoard } from '../components/tarot/SpreadBoard';
 import { SpreadControls } from '../components/tarot/SpreadControls';
 import { SpreadSummary } from '../components/tarot/SpreadSummary';
 import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useTarotSpread } from '../hooks/useTarotSpread';
 import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../types/tarot';
@@ -193,7 +194,7 @@ function TarotResults({
 /** Methodology + provenance note anchored to the real draw engine. */
 function Provenance({ spread }: { spread: TarotSpreadResponse }) {
   return (
-    <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="panel flex flex-col gap-3 p-5">
       <div className="flex items-start gap-3">
         <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
         <div className="flex flex-col gap-1">
@@ -201,12 +202,16 @@ function Provenance({ spread }: { spread: TarotSpreadResponse }) {
           <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
             本次<span className="text-gold-soft"> {spread.spread_name_zh} </span>由{' '}
             <span className="text-gold-soft">{spread.rng}</span> 加密安全乱数抽牌（不放回，牌张互不重复），
-            牌义与综合解读取自 <span className="text-gold-soft">{spread.engine}</span> 主策展牌库。
+            牌名、关键词与牌义取自 <span className="text-gold-soft">{spread.engine}</span> 策展 78 张牌库，综合解读由引擎的固定句式串起这些真实字段。
             塔罗为象征性自省工具，结果仅供娱乐与文化参考，不构成医疗、法律、财务或人生重大决策建议。
           </p>
         </div>
       </div>
-      <span className="label-caps shrink-0 text-ink-muted">RNG · {spread.rng}</span>
+      <ProvenancePanel tables={spread.provenance.tables} />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
+        <span className="label-caps">ENGINE · {spread.provenance.engine}</span>
+        <span className="label-caps">RNG · {spread.rng}</span>
+      </div>
     </div>
   );
 }

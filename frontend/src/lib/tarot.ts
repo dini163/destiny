@@ -5,7 +5,12 @@
  * orientation, keywords, meanings) drawn from the curated 78-card deck. These
  * maps supply *presentation only* — the spread catalogue, Chinese labels and
  * accent colours — so nothing interpretive is invented on the client (PRD
- * no-mock rule). Colour strings are written out in full (never concatenated at
+ * no-mock rule). The catalogue keeps only the three fields the picker itself
+ * needs (id, name_zh, size); spread descriptions are no longer copied here —
+ * the results page prints the response's `spread_description_zh` with the
+ * English original footnoted beneath it (决策 25：语料抄进前端 TS 就是同一份事实
+ * 存两处，必然漂移，`components/runes/RuneConsole.tsx:51-54` 记着卢恩那一版为何
+ * 一开始就不抄目录)。Colour strings are written out in full (never concatenated at
  * runtime) so Tailwind's content scanner keeps them and SVG strokes stay stable.
  */
 
@@ -16,60 +21,47 @@ import type { Arcana, CardOrientation, DrawnCard, TarotElement, TarotRank, Tarot
 /** A spread layout offered by the picker before a draw. */
 export interface SpreadOption {
   id: string;
-  name: string;
   name_zh: string;
   /** Number of cards the spread draws (its position count). */
   size: number;
-  description: string;
 }
 
 /**
  * The six classic Rider-Waite spreads. Values mirror the authoritative spread
- * library in `backend/app/content/tarot_deck.py` (id, bilingual name, position
- * count and description) so the picker never shows an invented layout.
+ * library in `backend/app/content/tarot_deck.py` (id, Chinese name, position
+ * count) so the picker never shows an invented layout; descriptions come from
+ * the response, not from this table.
  */
 export const SPREAD_CATALOG: readonly SpreadOption[] = [
   {
     id: 'single',
-    name: 'Single Card',
     name_zh: '单张牌',
     size: 1,
-    description: 'One card for a daily reflection or a quick, focused answer.',
   },
   {
     id: 'three_card',
-    name: 'Three Card',
     name_zh: '时间之流三张',
     size: 3,
-    description: 'The flow of a situation across time: past, present and future.',
   },
   {
     id: 'celtic_cross',
-    name: 'Celtic Cross',
     name_zh: '凯尔特十字',
     size: 10,
-    description: 'The classic ten-card spread for a deep, layered reading of a situation.',
   },
   {
     id: 'relationship',
-    name: 'Relationship',
     name_zh: '关系牌阵',
     size: 5,
-    description: 'A five-card spread reading both partners and the bond between them.',
   },
   {
     id: 'career',
-    name: 'Career',
     name_zh: '事业牌阵',
     size: 5,
-    description: 'A five-card spread for work, projects and professional direction.',
   },
   {
     id: 'decision',
-    name: 'Decision',
     name_zh: '是非抉择牌阵',
     size: 5,
-    description: 'A five-card spread comparing two options to inform a choice.',
   },
 ];
 
