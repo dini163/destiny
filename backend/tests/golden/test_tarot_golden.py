@@ -319,6 +319,11 @@ def test_synthesis_frames_are_pinned_verbatim_question_major_many_all_upright() 
     `{major_count}` 两个槽，若这里传 1/1，把两个槽对调照样逐字相等，这一句就白钉了
     （T5 评审实测：1/1 形状下该变异 26 条全绿）。`question` 两侧的空格同样是刻意的 ——
     引擎那句走的是 `question.strip()`，钉得住才不算漏。
+
+    `_lead_keywords_zh` 的 `limit=3` 截断在这里是**被量到**的：三张牌的中文关键词各有 4~5 条
+    （`major-00` 正位 5 条、`wands-03` 与 `cups-06` 各 4 条；复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.tarot_deck import get_card; print([len(get_card(c).keywords_zh('upright')) for c in ('major-00','wands-03','cups-06')])"` → `[5, 4, 4]`），
+    钉串里却只出现前三条，框架钉 ② 的 `pentacles-05` 逆位同理（4 条取 3）——所以「取的是 …」
+    那格的长度语义不是没测过。
     """
     spread = SPREADS["three_card"]
     cards = [
