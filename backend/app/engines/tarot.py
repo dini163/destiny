@@ -19,6 +19,9 @@ _RNG = secrets.SystemRandom()
 
 _ORIENTATIONS = ("upright", "reversed")
 
+#: 取向的中文说法只在框架句里出现；表里的 `orientation` 值仍是英文（`upright` | `reversed`）。
+_ORIENTATION_ZH = {"upright": "正位", "reversed": "逆位"}
+
 
 def draw_spread(
     *,
@@ -87,9 +90,9 @@ def draw_spread(
     )
 
 
-def _lead_keywords(card: DrawnCard, limit: int = 3) -> str:
-    """Join a card's leading keywords for the drawn orientation."""
-    return ", ".join(card.keywords[:limit]) if card.keywords else card.name
+def _lead_keywords_zh(card: DrawnCard, limit: int = 3) -> str:
+    """Join a card's leading Chinese keywords for the drawn orientation."""
+    return "、".join(card.keywords_zh[:limit]) if card.keywords_zh else card.name_zh
 
 
 def _synthesize(
@@ -104,41 +107,39 @@ def _synthesize(
     sentences: list[str] = []
 
     if question:
-        sentences.append(f"Reading the {spread.name} ({spread.name_zh}) for: {question.strip()}")
+        sentences.append(
+            f"本次以 {spread.name_zh}（{spread.name}）为这个问题布阵：{question.strip()}"
+        )
     else:
-        sentences.append(f"Reading the {spread.name} ({spread.name_zh}).")
+        sentences.append(f"本次以 {spread.name_zh}（{spread.name}）布阵。")
 
     for card in cards:
-        orientation_phrase = "reversed" if card.orientation == "reversed" else "upright"
         sentences.append(
-            f"{card.position_label} ({card.position_label_zh}) draws {card.name} "
-            f"({card.name_zh}) {orientation_phrase}, highlighting {_lead_keywords(card)}."
+            f"{card.position_label_zh}（{card.position_label}）抽出 {card.name_zh}（{card.name}），"
+            f"{_ORIENTATION_ZH[card.orientation]}，取的是 {_lead_keywords_zh(card)}。"
         )
 
     total = len(cards)
     if major_count == 0:
         sentences.append(
-            "No Major Arcana appeared, so the reading turns on everyday, practical "
-            "forces you can act on directly rather than on larger destiny-level themes."
+            "一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，"
+            "而不是更大的人生主题。"
         )
     elif major_count * 2 >= total:
         sentences.append(
-            f"With {major_count} of {total} cards being Major Arcana, powerful life "
-            "themes and forces beyond your immediate control are strongly at work."
+            f"{total} 张牌里有 {major_count} 张大牌，"
+            "那些超出你当下掌控的人生主题与力量正明显起作用。"
         )
     else:
-        sentences.append(
-            f"{major_count} Major Arcana card(s) mark the significant, fated threads "
-            "running through an otherwise everyday situation."
-        )
+        sentences.append(f"{major_count} 张大牌在这份日常处境里标出分量更重、由不得你选的线索。")
 
     if allow_reversed:
         if reversed_count == 0:
-            sentences.append("Every card fell upright, suggesting these energies express themselves clearly and without obstruction.")
+            sentences.append("所有牌都落正位，这些能量表达得清楚，没有被挡。")
         else:
             sentences.append(
-                f"{reversed_count} reversed card(s) point to energies that are blocked, "
-                "internalised or delayed, and ask to be examined rather than forced."
+                f"{reversed_count} 张逆位，指向被阻滞、被内收或被延迟的能量，"
+                "它们要的是被看清，不是被硬推。"
             )
 
     return " ".join(sentences)
