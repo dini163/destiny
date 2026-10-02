@@ -9,11 +9,13 @@ instead the tests assert structural guarantees and, where useful, variety.
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.content.tarot_cards import SUIT_ELEMENT
 from app.content.tarot_deck import DECK, MAJOR_SIZE, MINOR_SIZE, SPREADS, get_card
 from app.core.errors import UnsupportedMethodError
 from app.engines.tarot import draw_spread
+from app.schemas.tarot import DrawnCard, TarotSpreadResponse
 
 SPREAD_SIZES = {
     "single": 1,
@@ -139,6 +141,10 @@ def test_drawn_card_fields_agree_with_orientation() -> None:
         assert card.arcana == source.arcana
         assert card.keywords == list(source.keywords(card.orientation))
         assert card.meaning == source.meaning(card.orientation)
+        # 配对的另一半：中文侧必须由**同一个 orientation** 决定，接反了读起来完全通顺。
+        assert card.keywords_zh == list(source.keywords_zh(card.orientation))
+        assert card.meaning_zh == source.meaning_zh(card.orientation)
+        assert card.position_meaning_zh != card.position_meaning
 
 
 def test_synthesis_references_question_and_spread() -> None:
@@ -165,6 +171,30 @@ def test_unknown_spread_raises() -> None:
         draw_spread(spread_id="not_a_spread")
 
 
+def test_the_chinese_half_of_every_text_field_is_required() -> None:
+    """新字段是契约不是装饰：从真实响应里删掉任一格，模型必须拒绝。
+
+    为什么不用「少字段仍然 200」那种写法：那证明的是 pydantic 容许缺席，而本期要的正好相反
+    （G12）。这里先拿真响应 `model_dump()` 再逐格删，删的是**这一次真实抽取**的字段，
+    所以证明的是「这条 JSON 契约少一格就立不住」（spec §8「字段自身归 pydantic」那一支，
+    AGENTS.md §4）。
+    """
+    result = draw_spread(spread_id="three_card", question="required fields?")
+    payload = result.model_dump()
+
+    for field in ("position_meaning_zh", "keywords_zh", "meaning_zh"):
+        broken_card = {k: v for k, v in payload["cards"][0].items() if k != field}
+        with pytest.raises(ValidationError) as excinfo:
+            DrawnCard.model_validate(broken_card)
+        assert field in str(excinfo.value)
+
+    for field in ("spread_description_zh", "cards"):
+        broken_response = {k: v for k, v in payload.items() if k != field}
+        with pytest.raises(ValidationError) as excinfo:
+            TarotSpreadResponse.model_validate(broken_response)
+        assert field in str(excinfo.value)
+
+
 # --- HTTP adapter -----------------------------------------------------------
 
 
@@ -180,6 +210,26 @@ def test_tarot_spread_endpoint(client: TestClient) -> None:
     assert len(set(body["drawn_ids"])) == 3
     assert body["rng"] == "secrets"
     assert body["engine"] == "content-library"
+
+
+def test_tarot_endpoint_returns_both_halves_of_every_text_field(client: TestClient) -> None:
+    """端点侧的配对凭据：十个字段两两成对，且中文侧非空、与英文侧不同串。
+
+    内容层的不重复/长度/措辞门在 `tests/content/test_tarot_zh_corpus.py`，这里只钉
+    「装配发生了、方向没接反、契约字段一个都没少」——同一件事两处断言就两份口径（AGENTS.md §2
+    的那条精神在 backend 内部同样适用）。
+    """
+    body = client.post(
+        "/api/v1/tarot/spread",
+        json={"spread_id": "celtic_cross", "allow_reversed": True, "question": "both halves"},
+    ).json()
+    assert body["spread_description_zh"] and body["spread_description_zh"] != body["spread_description"]
+    assert len(body["cards"]) == 10
+    for card in body["cards"]:
+        assert card["meaning_zh"] and card["meaning_zh"] != card["meaning"]
+        assert card["position_meaning_zh"] and card["position_meaning_zh"] != card["position_meaning"]
+        assert len(card["keywords_zh"]) == len(card["keywords"]) > 0
+        assert card["keywords_zh"] != card["keywords"]
 
 
 def test_tarot_spread_endpoint_rejects_unknown_spread(client: TestClient) -> None:

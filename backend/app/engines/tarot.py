@@ -50,6 +50,7 @@ def draw_spread(
                 position_label=position.label,
                 position_label_zh=position.label_zh,
                 position_meaning=position.meaning,
+                position_meaning_zh=position.meaning_zh,
                 card_id=card.id,
                 name=card.name,
                 name_zh=card.name_zh,
@@ -60,7 +61,9 @@ def draw_spread(
                 element=card.element,
                 orientation=orientation,
                 keywords=list(card.keywords(orientation)),
+                keywords_zh=list(card.keywords_zh(orientation)),
                 meaning=card.meaning(orientation),
+                meaning_zh=card.meaning_zh(orientation),
             )
         )
 
@@ -73,6 +76,7 @@ def draw_spread(
         spread_name=spread.name,
         spread_name_zh=spread.name_zh,
         spread_description=spread.description,
+        spread_description_zh=spread.description_zh,
         question=question,
         cards=cards,
         drawn_ids=[c.card_id for c in cards],

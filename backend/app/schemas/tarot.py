@@ -30,6 +30,7 @@ class DrawnCard(BaseModel):
     position_label: str = Field(description="English position label, e.g. Recent Past.")
     position_label_zh: str = Field(description="Chinese position label, e.g. 近期过去.")
     position_meaning: str = Field(description="What this position reveals.")
+    position_meaning_zh: str = Field(description="What this position reveals, in Chinese.")
 
     card_id: str = Field(description="Deck card id, e.g. major-00 or wands-07.")
     name: str
@@ -41,7 +42,9 @@ class DrawnCard(BaseModel):
     element: str | None = Field(description="fire | water | air | earth; null for majors.")
     orientation: str = Field(description="upright | reversed")
     keywords: list[str] = Field(description="Keywords for the drawn orientation.")
+    keywords_zh: list[str] = Field(description="Chinese keywords for the drawn orientation.")
     meaning: str = Field(description="Interpretation text for the drawn orientation.")
+    meaning_zh: str = Field(description="Interpretation text in Chinese for the drawn orientation.")
 
 
 class TarotSpreadResponse(BaseModel):
@@ -52,6 +55,7 @@ class TarotSpreadResponse(BaseModel):
     spread_name: str
     spread_name_zh: str
     spread_description: str
+    spread_description_zh: str
     question: str | None = Field(description="The question echoed back, if provided.")
 
     # Draw
