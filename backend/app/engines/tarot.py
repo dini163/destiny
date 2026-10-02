@@ -25,9 +25,12 @@ _ORIENTATIONS = ("upright", "reversed")
 _ORIENTATION_ZH = {"upright": "正位", "reversed": "逆位"}
 
 #: 受控引擎文案（不是语料，也不是页面免责声明）：说清随机源、文案来源与中英配对这三件事。
+#: 第二句刻意把「综合解读」拆成两半说：牌面词取自表，串词的八句框架住在本模块（G16），
+#: 说成「一律取自牌库」就是让引擎字面冒充语料（AGENTS.md §7 的诚实性同一条）。
 NOTE = (
     "洗牌与正逆位由 Python secrets（操作系统级 CSPRNG）决定，抽牌无放回，每次抽取独立且不可复现。"
-    "牌名、关键词、牌义、宫位释义与综合解读一律取自策展 78 张牌库与六种布阵表，未在运行时虚构任何句子；"
+    "牌名、关键词、牌义与宫位释义取自策展 78 张牌库与六种布阵表，综合解读用本模块的固定句式"
+    "串起这些真实字段，未在运行时虚构任何句子；"
     "中文正文与英文原句同行成对呈现，英文侧的字段与取值在本次中文化里一字未改。"
 )
 
@@ -167,11 +170,9 @@ def _tables() -> list[ProvenanceTable]:
     表名与出处只那一处清单供给，引擎不抄书名（写法同 `engines/lenormand.py`、
     `engines/qimen.py` 各自的 `_tables()`）。
 
-    复测（本树）：`cd backend && grep -rn TAROT_CONTENT_SOURCES app/ tests/ --include=*.py`
-    → `content/__init__.py` 定义处、本模块 import 与此处消费、`tests/golden/
-    test_tarot_golden.py` 的 import 与那条 `len(...) == 4`。改前（`git grep -n
-    TAROT_CONTENT_SOURCES de2be71 -- backend` → 空）这个名字根本不存在：定义与消费
-    同笔落地，不留「登记了无人读」的死账窗口。
+    复测（消费处就这一行，别处都是定义、import、测与注释提及）：`cd backend && grep -rn "for module, source in TAROT_CONTENT_SOURCES" app/engines/tarot.py` → 一条命中，即本函数体内那行。
+    改前（`git grep -c TAROT_CONTENT_SOURCES de2be71 -- backend` → 无输出、exit 1）这个名字
+    根本不存在：定义与消费同笔落地，不留「登记了无人读」的死账窗口。
     """
     return [
         ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)

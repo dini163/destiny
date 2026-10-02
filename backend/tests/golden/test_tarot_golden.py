@@ -263,7 +263,9 @@ def test_tarot_spread_endpoint_rejects_unknown_spread(client: TestClient) -> Non
 def test_provenance_lists_exactly_the_four_tables_read() -> None:
     """四行两串（G14）：三张牌表共用 `TAROT_SOURCE`，译表单独一串。
 
-    `tarot_cards.py` **不在清单里**：它是模型与工厂件，自己没有任何印进响应的文案（G13）。
+    `tarot_cards.py` **不在清单里**：它带的是 dataclass、两个工厂与几张查表字典（`element`、
+    `rank` 那两格的取值确实进了响应），但没有一行是印进页面的句子——完整理由与「读了文案 ≠
+    import 过字典」这条界线见 `content/__init__.py` 的 `TAROT_CONTENT_SOURCES` 注（G13）。
     行序就是页面上的展示序（`components/ui/ProvenancePanel.tsx` 按数组渲染），所以这里钉
     **等序列表**而不是集合——集合会把「把译表挪到第一行」放过去，而那一改动在页面上看得见。
     下面那条 `len(TAROT_CONTENT_SOURCES) == 4` 不是门，是 belt-and-braces：`_tables()` 迭代的
@@ -293,13 +295,26 @@ def test_provenance_engine_and_note_and_the_two_pinned_labels(client: TestClient
     那两条逐字钉（`body["rng"] == "secrets"`、`body["engine"] == "content-library"`）必须原样
     绿；`provenance.engine` 那一格说的是拼句方法，与响应顶层那个恒定的库标签是两个字段，不共用
     （先例：`engines/lenormand.py` 里 `engine="lenormand-combination"` 那一格与它的响应标签）。
+
+    末尾那三条走 `client` 而不是走 `draw_spread`：上面一条测钉的是**引擎对象**上的四行两串，
+    这里钉的是同一份清单**穿过 snake_case JSON 之后**还在原位（`provenance` 整块被 pydantic
+    漏掉、`tables` 在序列化时变成 dict 而前端类型照列表读，都只在走线这一侧才红）。两边断言
+    的对象不同，不是同一件事的两份口径（AGENTS.md §2 的分工精神）。
     """
     result = draw_spread(spread_id="three_card")
     assert result.provenance.engine == "tarot-content-library"
     assert result.provenance.content_version == CONTENT_VERSION
     assert result.provenance.source == TAROT_SOURCE
+    # 非空由这一条管：`note` 必须真说出随机源（页面上它就是一行小字，空串照样「有出处块」）。
+    # 曾另有一句 `assert note.strip()`——被本条严格蕴含（含 "secrets" 必非空），留就是没登记的
+    # belt-and-braces，删。
     assert "secrets" in result.provenance.note
-    assert result.provenance.note.strip()
+    # 出处诚实性的第二格（G13 同类，先例是 `engines/qimen.py` 的 `SCHOOL_NOTE` 被
+    # `tests/content/test_qimen_plain_corpus.py` 逐句钉）：综合解读的**框架句式**住在本模块，
+    # 不在牌库里，所以 `note` 不许说成「一律取自牌库」——那正是本任务改前那句的写法。
+    # 变异复测：把 `NOTE` 第二句换回「…与综合解读一律取自策展 78 张牌库…」，本条红。
+    assert "固定句式" in result.provenance.note
+    assert "一律取自" not in result.provenance.note
 
     body = client.post("/api/v1/tarot/spread", json={"spread_id": "single"}).json()
     assert body["rng"] == "secrets"

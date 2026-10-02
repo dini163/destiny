@@ -166,8 +166,10 @@ LENORMAND_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 
 #: 塔罗一页真正读到的四张表：22 张大牌、56 张 minors、装配件（6 阵 29 位次）、529 条关键词
 #: 中译。单列理由同 `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它
-#: 没用过的牌库。`content/tarot_cards.py` **不列**——它是 dataclass 与两个工厂，自己不带
-#: 任何印进响应的文案（AGENTS.md §7「读了就列，宁缺勿多」的「勿多」那一半）。
+#: 没用过的牌库。`content/tarot_cards.py` **不列**：它带的是 dataclass、两个组装工厂和几张
+#: 查表字典（`SUIT_ELEMENT`、`COURT_RANKS` 这类 `element`/`rank` 取值确实进了响应），但那是
+#: 结构件不是文案——它没有一行是印进页面的句子，列它等于把「读了」稀释成「import 过」
+#: （AGENTS.md §7「读了就列」说的是读文案，不是碰字典）。
 #: 前三行共用 `TAROT_SOURCE`、第四行单独用 `TAROT_KEYWORDS_ZH_SOURCE`：一张自持的现代译表
 #: 与公共领域的牌义不同凭据，抄成同一串就是让译表冒充原典（卢恩 spec 决策 24 的反向运用）。
 #: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
