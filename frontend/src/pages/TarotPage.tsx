@@ -15,10 +15,12 @@ import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../type
  *
  * The console deals a real spread via `useTarotSpread`; the page then owns the
  * reading interaction — which positions are flipped face-up and which card the
- * inspector focalises. Every card face, keyword, meaning, position gloss and the
- * synthesis come straight from the backend's curated deck and CSPRNG draw, so the
- * mockup's invented inspector copy, confidence indices and action directives are
- * omitted (PRD no-mock rule).
+ * inspector focalises. Every card face, keyword, meaning and position gloss
+ * comes straight from the backend's curated deck and CSPRNG draw, while the
+ * synthesis is stitched by the engine's fixed sentence frames out of those same
+ * fields; nothing here is invented at render time, so the mockup's invented
+ * inspector copy, confidence indices and action directives are omitted
+ * (PRD no-mock rule).
  */
 export function TarotPage() {
   const [spreadId, setSpreadId] = useState('celtic_cross');
