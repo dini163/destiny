@@ -7,9 +7,12 @@ len(set(t)))"` → `651 529`）。**这张表把 529 个词各译一次**，牌�
 `reversed_keywords_zh` 一律由 `content/tarot_cards.py` 的 `major()` / `minor()` 两个工厂从这里
 组装（组装等式由 `tests/content/test_tarot_zh_corpus.py` 钉，G1/T2）。
 
-为什么不把中文词直接抄进 78 张牌：同一个词在不同牌上会漂成两种中文（"instability" 一处
-「不稳」、一处「动荡」），而这两处都是响应里的正文，读者无从判断哪个是正主。一词一译放在
-一张表里，漂移在结构上就无处发生；代价是一张表 + 一次组装，比 78 处手抄便宜。
+为什么不把中文词直接抄进 78 张牌：同一个词会被多张牌共用，手抄就没人保证各处一致（实测
+`delays` 被印 6 次、`imbalance` 5 次，复测：`cd backend && PYTHONIOENCODING=utf-8
+.venv/Scripts/python.exe -c "from collections import Counter; from app.content.tarot_deck
+import DECK; print(Counter(k for c in DECK for k in (*c.upright_keywords,
+*c.reversed_keywords)).most_common(2))"`）。这些抄件都直接进响应正文，读者无从判断哪一处是
+正主。一词一译放在一张表里，漂移在结构上就无处发生；代价是一张表 + 一次组装，比 78 处手抄便宜。
 
 `SHARED_TRANSLATION` 是「多词一译」的登记表，实测 0 条碰撞，所以它是**空表**——空表仍留下，
 理由同 `tests/test_architecture.py::BASELINE`：它是「例外必须登记」这一机制的接口，不是债。
