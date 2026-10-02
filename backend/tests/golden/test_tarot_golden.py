@@ -137,21 +137,43 @@ def test_reversals_enabled_produce_both_orientations_over_many_draws() -> None:
 
 
 def test_drawn_card_fields_agree_with_orientation() -> None:
-    result = draw_spread(spread_id="three_card")
+    """牌侧六格回 `get_card()`、位次侧四格回 `SPREADS` 逐字对账：同一张牌、同一个 orientation、同一个位次。
+
+    位次那一半是终审发现 3 补的缺口：改前只有
+    `test_celtic_cross_draws_ten_unique_cards_in_position_order` 的 `position_key` 顺序钉，
+    加上 `label`/`label_zh`/`meaning`/`meaning_zh` 四格无人对账——「引擎把第 3 位的中文释义
+    装到第 5 位上」今天无测可红。形状照 `tests/test_runes.py:115-119`（逐位比
+    `position_key` / `position_index` / `position_label_zh`）。四格等式立起来之后，
+    `position_meaning_zh != position_meaning` 就被语料门的
+    `test_every_spread_position_carries_a_chinese_gloss` 蕴含，留它是同一件事两份口径
+    （AGENTS.md §2），删。
+    """
+    # 十张的阵：取向那两格只在出现逆位时才分得出（见循环里的注释），十张把可见率放大到 1023/1024。
+    result = draw_spread(spread_id="celtic_cross")
     for card in result.cards:
         source = get_card(card.card_id)
         assert card.name == source.name
         assert card.arcana == source.arcana
         assert card.keywords == list(source.keywords(card.orientation))
         assert card.meaning == source.meaning(card.orientation)
-        # 配对的另一半：中文侧必须由**同一个 orientation** 决定，接反了读起来完全通顺。
+        # 配对的另一半：中文侧必须由**同一个 orientation** 决定，接反了读起来完全通顺，
+        # 所以只有出现逆位时这两格才分得出取向。
         # 变异复核的形状：把引擎那格的 `card.meaning_zh(orientation)` 改成 `meaning_zh("upright")`
-        # 之后，只有**本张牌是逆位**时断言才会红，而三张全正位的概率是 1/8（复测：
-        # `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "print(0.5**3)"` →
-        # `0.125`）。实测该变异跑 20 轮红 19 / 绿 1 —— 所以单轮看见绿**不等于门是空的**，要多跑几轮。
+        # 之后，只有**本张牌是逆位**时断言才会红，而本条抽十张、全正位（这一格看不见）的概率是
+        # `0.5**10`（复测：`cd backend && PYTHONIOENCODING=utf-8
+        # .venv/Scripts/python.exe -c "print(0.5**10)"` → `0.0009765625`）。改前用 `three_card`
+        # （`0.5**3` → `0.125`，即 1/8 的轮次看不见这个变异；当时实测「跑 20 轮红 19 / 绿 1」，
+        # 那组读数是历史记录，住在 ledger 的变异表里，不在本注释）。
+        # 所以单轮看见绿**不等于门是空的**，要多跑几轮。
         assert card.keywords_zh == list(source.keywords_zh(card.orientation))
         assert card.meaning_zh == source.meaning_zh(card.orientation)
-        assert card.position_meaning_zh != card.position_meaning
+        # 位次侧同账：引擎那五格全读同一个 `position` 对象，所以按 `position_index` 回原表
+        # 逐项重组对账，错装一位就红（这一半与朝向无关，每轮都确定性走到）。
+        pos = SPREADS[result.spread_id].positions[card.position_index]
+        assert card.position_label == pos.label
+        assert card.position_label_zh == pos.label_zh
+        assert card.position_meaning == pos.meaning
+        assert card.position_meaning_zh == pos.meaning_zh
 
 
 def test_synthesis_references_question_and_spread() -> None:
@@ -200,6 +222,14 @@ def test_the_chinese_half_of_every_text_field_is_required() -> None:
     （G12）。这里先拿真响应 `model_dump()` 再逐格删，删的是**这一次真实抽取**的字段，
     所以证明的是「这条 JSON 契约少一格就立不住」（spec §8「字段自身归 pydantic」那一支，
     AGENTS.md §4）。
+
+    要钉的清单是**五格**：牌侧三格（`position_meaning_zh` / `keywords_zh` / `meaning_zh`）走第一个
+    循环，响应侧 `spread_description_zh` / `cards` / `provenance` 走第二个。`cards` 是对照格（本来就
+    必填，用来证明这个循环确实能红），所以第二循环里真正新增的是两格。G12 的原话把 `provenance`
+    单列在「5 个字段」之后（`plans/…plan-d.md:28`），按计划自己的件表（`:83`：`DrawnCard` +3、
+    响应 +`spread_description_zh` +`provenance`）它就是那第五格，别再往外加。
+    `provenance` 补齐的是终审发现 4：改前它没有缺席证明，缺席只会被别处的
+    `body["provenance"]["tables"]` KeyError 顺带打红——那是撞上的，不是钉的。
     """
     result = draw_spread(spread_id="three_card", question="required fields?")
     payload = result.model_dump()
@@ -210,7 +240,7 @@ def test_the_chinese_half_of_every_text_field_is_required() -> None:
             DrawnCard.model_validate(broken_card)
         assert field in str(excinfo.value)
 
-    for field in ("spread_description_zh", "cards"):
+    for field in ("spread_description_zh", "cards", "provenance"):
         broken_response = {k: v for k, v in payload.items() if k != field}
         with pytest.raises(ValidationError) as excinfo:
             TarotSpreadResponse.model_validate(broken_response)
