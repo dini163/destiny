@@ -111,7 +111,12 @@ def test_translation_table_declares_its_own_credential() -> None:
 
 
 #: 整句类 `_zh` 的长度带（G10）。下限 12 挡「只有一个词」的敷衍，上限 60 挡「把两句
-#: 拼成一段」的越界；156 句实测落在 21–42（均值 30.5），35 句位置/描述实测 17–31。
+#: 拼成一段」的越界。156 句牌义实测 21–42 字、均值 30.5，复测：`cd backend &&
+#: PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.tarot_deck import
+#: DECK; t=[len(c.meaning_zh(o)) for c in DECK for o in ('upright','reversed')];
+#: print(len(t), min(t), max(t), round(sum(t)/len(t),1))"` → `156 21 42 30.5`。
+#: T3 那 35 句位置/描述今天还不在这棵树里，所以这里不替它预填数字：它落地时要用同一条
+#: 命令量自己的表，把实测值写在下面而不是援引计划里的草稿值（AGENTS.md §8）。
 SENTENCE_BAND = (12, 60)
 
 
