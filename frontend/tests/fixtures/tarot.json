@@ -3,6 +3,7 @@
   "spread_name": "Three Card",
   "spread_name_zh": "时间之流三张",
   "spread_description": "The flow of a situation across time: past, present and future.",
+  "spread_description_zh": "三张牌铺开一条时间线，看一件事的来路、当下与去处。",
   "question": null,
   "cards": [
     {
@@ -11,22 +12,30 @@
       "position_label": "Past",
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
-      "card_id": "wands-10",
-      "name": "Ten of Wands",
-      "name_zh": "权杖十",
+      "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
+      "card_id": "swords-07",
+      "name": "Seven of Swords",
+      "name_zh": "宝剑七",
       "arcana": "minor",
-      "number": 10,
-      "suit": "wands",
+      "number": 7,
+      "suit": "swords",
       "rank": null,
-      "element": "fire",
-      "orientation": "upright",
+      "element": "air",
+      "orientation": "reversed",
       "keywords": [
-        "burden",
-        "extra responsibility",
-        "hard work",
-        "stress"
+        "impostor syndrome",
+        "self-deceit",
+        "keeping secrets",
+        "conscience"
       ],
-      "meaning": "A figure strains beneath ten heavy wands toward a distant home, carrying more than necessary."
+      "keywords_zh": [
+        "冒名顶替感",
+        "自欺",
+        "守着秘密",
+        "良知"
+      ],
+      "meaning": "Reversed, the deception unravels, or guilt compels the stolen blades be returned.",
+      "meaning_zh": "逆位时，欺瞒散开，或是愧疚逼着那些偷来的剑被还回去。"
     },
     {
       "position_index": 1,
@@ -34,22 +43,30 @@
       "position_label": "Present",
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
-      "card_id": "swords-12",
-      "name": "Knight of Swords",
-      "name_zh": "宝剑骑士",
+      "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
+      "card_id": "pentacles-01",
+      "name": "Ace of Pentacles",
+      "name_zh": "星币王牌",
       "arcana": "minor",
-      "number": 12,
-      "suit": "swords",
-      "rank": "Knight",
-      "element": "air",
+      "number": 1,
+      "suit": "pentacles",
+      "rank": null,
+      "element": "earth",
       "orientation": "reversed",
       "keywords": [
-        "aggression",
-        "impulsiveness",
-        "haste",
-        "scattered thought"
+        "lost opportunity",
+        "lack of planning",
+        "scarcity",
+        "poor foresight"
       ],
-      "meaning": "Reversed, fearless drive becomes reckless aggression and scattered, blunt force."
+      "keywords_zh": [
+        "错失的机会",
+        "疏于规划",
+        "短缺",
+        "缺乏远见"
+      ],
+      "meaning": "Reversed, a promising opportunity is missed through poor planning or a scarcity mindset.",
+      "meaning_zh": "逆位时，一个有希望的机会因规划粗疏或短缺心态而被错过。"
     },
     {
       "position_index": 2,
@@ -57,33 +74,69 @@
       "position_label": "Future",
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
-      "card_id": "wands-13",
-      "name": "Queen of Wands",
-      "name_zh": "权杖王后",
+      "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
+      "card_id": "pentacles-05",
+      "name": "Five of Pentacles",
+      "name_zh": "星币五",
       "arcana": "minor",
-      "number": 13,
-      "suit": "wands",
-      "rank": "Queen",
-      "element": "fire",
-      "orientation": "reversed",
+      "number": 5,
+      "suit": "pentacles",
+      "rank": null,
+      "element": "earth",
+      "orientation": "upright",
       "keywords": [
-        "self-respect",
-        "introverted",
-        "re-establish",
-        "jealousy"
+        "financial loss",
+        "poverty",
+        "lack mindset",
+        "isolation"
       ],
-      "meaning": "Reversed, confidence wavers into jealousy or self-doubt; reclaim your self-respect."
+      "keywords_zh": [
+        "财务损失",
+        "贫困",
+        "匮乏心态",
+        "孤立"
+      ],
+      "meaning": "Two figures trudge past a lit church window in the cold, embodying want, hardship and feeling left out.",
+      "meaning_zh": "两个人在寒冷中走过明亮的教堂彩窗，是匮乏、艰苦与被排除在外的滋味。"
     }
   ],
   "drawn_ids": [
-    "wands-10",
-    "swords-12",
-    "wands-13"
+    "swords-07",
+    "pentacles-01",
+    "pentacles-05"
   ],
   "allow_reversed": true,
-  "synthesis": "Reading the Three Card (时间之流三张). Past (过去) draws Ten of Wands (权杖十) upright, highlighting burden, extra responsibility, hard work. Present (现在) draws Knight of Swords (宝剑骑士) reversed, highlighting aggression, impulsiveness, haste. Future (未来) draws Queen of Wands (权杖王后) reversed, highlighting self-respect, introverted, re-establish. No Major Arcana appeared, so the reading turns on everyday, practical forces you can act on directly rather than on larger destiny-level themes. 2 reversed card(s) point to energies that are blocked, internalised or delayed, and ask to be examined rather than forced.",
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 宝剑七（Seven of Swords），逆位，取的是 冒名顶替感、自欺、守着秘密。 现在（Present）抽出 星币王牌（Ace of Pentacles），逆位，取的是 错失的机会、疏于规划、短缺。 未来（Future）抽出 星币五（Five of Pentacles），正位，取的是 财务损失、贫困、匮乏心态。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
   "major_arcana_count": 0,
   "reversed_count": 2,
+  "provenance": {
+    "engine": "tarot-content-library",
+    "content_version": "2026.09",
+    "source": "Rider-Waite-Smith 塔罗通行牌义 · 78 张大小阿卡纳与六种 Waite 系布阵位次（PRD 6.7）",
+    "note": "洗牌与正逆位由 Python secrets（操作系统级 CSPRNG）决定，抽牌无放回，每次抽取独立且不可复现。牌名、关键词、牌义与宫位释义取自策展 78 张牌库与六种布阵表，综合解读用本模块的固定句式串起这些真实字段，未在运行时虚构任何句子；中文正文与英文原句同行成对呈现，英文侧的字段与取值在本次中文化里一字未改。",
+    "tables": [
+      {
+        "name": "tarot_major",
+        "version": "2026.09",
+        "source": "Rider-Waite-Smith 塔罗通行牌义 · 78 张大小阿卡纳与六种 Waite 系布阵位次（PRD 6.7）"
+      },
+      {
+        "name": "tarot_minor",
+        "version": "2026.09",
+        "source": "Rider-Waite-Smith 塔罗通行牌义 · 78 张大小阿卡纳与六种 Waite 系布阵位次（PRD 6.7）"
+      },
+      {
+        "name": "tarot_deck",
+        "version": "2026.09",
+        "source": "Rider-Waite-Smith 塔罗通行牌义 · 78 张大小阿卡纳与六种 Waite 系布阵位次（PRD 6.7）"
+      },
+      {
+        "name": "tarot_keywords_zh",
+        "version": "2026.09",
+        "source": "本系统自持译表：塔罗关键词中译（一词一译，随 Rider-Waite 通行英词表）"
+      }
+    ]
+  },
   "rng": "secrets",
   "engine": "content-library"
 }
