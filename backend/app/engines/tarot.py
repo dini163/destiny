@@ -1,10 +1,10 @@
 """Tarot draw engine: cryptographically secure draws over the curated 78-card deck.
 
-This module is a pure function over :mod:`app.content.tarot_deck`. Card
-selection and orientation use :mod:`secrets` (an OS-backed CSPRNG), never the
-``random`` module, satisfying PRD 4.4. Interpretations are not generated: the
-synthesis is composed deterministically from the real card meanings and spread
-position texts, so every word returned traces back to the content library.
+This module is a pure function over :mod:`app.content.tarot_deck`. Card selection and
+orientation use :mod:`secrets` (an OS-backed CSPRNG), never the ``random`` module,
+satisfying PRD 4.4. Interpretations are not generated: card faces, keywords, meanings and
+position glosses come from the content tables, while the synthesis's fixed sentence frames
+are literals in this module, filled with those real fields — so nothing is invented.
 """
 
 import secrets
