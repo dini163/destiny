@@ -260,11 +260,6 @@ def test_text_accessors_agree_with_the_raw_tables() -> None:
 # deterministic; verified against lunar-python.
 CAST_TIME = datetime(2024, 5, 15, 10, 30)
 
-#: 周易响应真正读到的五张表；行序 = 页面展示序（丁组 spec §5、AGENTS.md §7）。
-#: 名单的**字面**由 `tests/content/test_zhouyi_plain_corpus.py` 钉，本文件用它钉引擎保真
-#: （两头各钉一件事，抄第二份字面就违反 AGENTS.md §8）。
-PROVENANCE_TABLE_NAMES = [name for name, _source in _ZHOUYI_CONTENT_SOURCES]
-
 
 def _manual(coins: list[list[int]]):
     return cast_hexagram(method=CastMethod.MANUAL, manual_coins=coins, cast_time=CAST_TIME)
@@ -532,8 +527,15 @@ def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> Non
 
 
 def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
+    """响应忠于登记表：成对钉「名 + 出处串」，而不是只钉名。
+
+    表名与出处串的**字面**只住在 `tests/content/test_zhouyi_plain_corpus.py` 那一处（抄第二份
+    字面违反 AGENTS.md §8），所以本测比的是投影相等于那张元组——引擎若手抄一份表名对而出处串错，
+    只有成对这一条抓得到（简报变异 3a 那一手）。下面那五行字面钉的是响应/展示序本身，
+    T16 的前端夹具吃这一序。
+    """
     provenance = _manual([[3, 2, 2]] * 6).provenance
-    assert [table.name for table in provenance.tables] == PROVENANCE_TABLE_NAMES
+    assert [(table.name, table.source) for table in provenance.tables] == list(_ZHOUYI_CONTENT_SOURCES)
     assert [table.name for table in provenance.tables] == [
         "zhouyi_trigrams",
         "zhouyi_hexagrams",
@@ -549,13 +551,17 @@ def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
 
 def test_zhouyi_cast_endpoint_serves_the_provenance_block(client: TestClient) -> None:
     """键集即前端契约（`tests/test_meihua_api.py` 那套 `FRONTEND_*_KEYS` 的周易简化版：
-    周易没有独立的 api 测文件，端点形状就钉在 golden 里，与 T14 那条端点测同一个家）。"""
+    周易没有独立的 api 测文件，端点形状就钉在 golden 里，与 T14 那条端点测同一个家）。
+    JSON 这一侧同样成对钉名与出处串：序列化不该让响应比引擎多知道一份表名。"""
     response = client.post(
         "/api/v1/zhouyi/cast",
         json={"method": "manual", "manual_coins": [[3, 2, 2]] * 6, "cast_time": "2024-05-15T10:30:00"},
     )
+    assert response.status_code == 200
     body = response.json()
     assert set(body["provenance"]) == {"engine", "content_version", "tables"}
     for table in body["provenance"]["tables"]:
         assert set(table) == {"name", "version", "source"}
-    assert [table["name"] for table in body["provenance"]["tables"]] == PROVENANCE_TABLE_NAMES
+    assert [(table["name"], table["source"]) for table in body["provenance"]["tables"]] == list(
+        _ZHOUYI_CONTENT_SOURCES
+    )
