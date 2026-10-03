@@ -4,12 +4,11 @@
 哪一爻不必再数一遍；键构造住在 `content/zhouyi_plain.py`，本文件不出现键字符串。
 """
 
-#: King Wen 卦号 -> 六条 (爻辞 anchor, 今译)，下→上。
-#: 「还没建」不等于「没有这一层」：T7-T12 一批建六卦，所以建齐之前本表都是**不完整**的一张，
-#: 聚合面 `zhouyi_plain.py` 对它不得做任何非空或齐卦假设。缺口只按复测口径判——上一版在这里
-#: 抄了一份实跑卦号清单，T8 一落地它就自动变成假话：
-#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.zhouyi_yaoci_plain_lower import YAOCI_PLAIN_LOWER as L; print(sorted(L))"`
-#: → 建齐了是 `list(range(31, 65))`。
+#: King Wen 卦号 -> 六条 (爻辞 anchor, 今译)，下→上。31-64 三十四卦已由 T7-T12 建齐。
+#: 「建齐」不在这里抄卦号清单——上一版抄过一份实跑清单，T8 一落地它就自动变成假话；
+#: 复测 = `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.zhouyi_yaoci_plain_lower import YAOCI_PLAIN_LOWER as L; print(sorted(L) == list(range(31, 65)), len(L), sum(len(v) for v in L.values()))"` → `True 34 204`。
+#: 「还没建」从不等于「没有这一层」：聚合面 `zhouyi_plain.py` 按卦号取格，对本表不做任何
+#: 非空或齐卦假设——这条约束不因今天建齐而放松，下经若有改动仍以复测口径为准。
 YAOCI_PLAIN_LOWER: dict[int, tuple[tuple[str, str], ...]] = {
     # 31 咸
     31: (

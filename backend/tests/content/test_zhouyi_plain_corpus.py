@@ -189,11 +189,14 @@ def test_every_stated_shi_ying_claim_matches_the_najia_columns() -> None:
                 )
 
 
-#: 断词清点句的五种写法，全站实测覆盖得完（415 键 = 计数 54 / 零自述 3 / 单断词 15 /
-#: 不下断词 50 / 点名句 200，共 322 条断言）。口径同 `VERDICT_WORDS`：只数那六个字在
+#: 断词清点句的五种写法，全站实测覆盖得完（450 键 = 计数 59 / 零自述 3 / 单断词 16 /
+#: 不下断词 54 / 点名句 221，共 353 条断言；T12 已建满 450 键，此后只有改语句才会改这个数）。
+#: 口径同 `VERDICT_WORDS`：只数那六个字在
 #: anchor 里的**出现次数**（`无咎` 记 1、`贞吉` 记 1、`悔厉吉` 记 3）。
 #: 钉不住的两种写法有意留在门外：「它给的不是断词而是……」（与 `不给断词` 不同形，
 #: 强并会把「不是」读成否定式清点）与裸量词「它两处给顺路」（宾语是利字，不是断词）。
+#: 五个数的复测（一行，与本文件下方五个正则同口径）：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re;from app.content.zhouyi_plain import ZHOUYI_READINGS as R;P=[('计数',r'([一两二三四五六])个断词'),('零自述',r'一个断词也不[给说]'),('单断词',r'断词只(?:有|出现|那|这)[^，。]{0,6}一[个处次]'),('不下断词',r'不[下给]断词|没有断词'),('点名句',r'断词[^，。「」]{0,6}「([吉凶厉悔吝咎])」')];o={k:len(re.findall(p,''.join(R.values()))) for k,p in P};print(o,sum(o.values()))"`
 _VERDICT_COUNT = re.compile(r"([一两二三四五六])个断词")
 _VERDICT_ZERO = re.compile(r"一个断词也不[给说]")
 _VERDICT_SINGLE = re.compile(r"断词只(?:有|出现|那|这)[^，。]{0,6}一[个处次]")
