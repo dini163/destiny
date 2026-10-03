@@ -22,6 +22,7 @@ from app.content.zhouyi_plain import (
     yong_ci_key,
 )
 from app.engines.plain_compose import PlainCorpus
+from app.engines.plain_corpora import PLAIN_CORPORA, ZHOUYI
 from tests.plain_wording import advice_hits, wording_violations
 
 #: 本批已覆盖的卦号。T2-T12 每批往里加自己那 5-6 卦，一条也不许多。
@@ -34,14 +35,13 @@ _QUOTED = re.compile(r"「[^」]*」")
 
 
 def _plain_corpus() -> PlainCorpus:
-    return PlainCorpus(
-        system="zhouyi",
-        entries=ZHOUYI_READINGS,
-        openers={},
-        closers=None,
-        grouping="keep",
-        universe=lambda: set(ZHOUYI_READINGS),
-    )
+    """T13 起吃**真登记**的那张 corpus，与工厂同源。
+
+    T1-T12 期间这张测侧自造的 `PlainCorpus` 是必需的：登记行要等 450 条齐了才能进
+    `PLAIN_CORPORA`，否则键全集门在只有 8 条时就红 11 批（计划偏差表第 4 行）。登记完成后
+    再留着它，就是同一份措辞口径的第二份副本——AGENTS.md §8 说的那种会漂的东西。
+    """
+    return ZHOUYI
 
 
 def _built_keys() -> list[str]:
@@ -302,3 +302,27 @@ def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
     assert "今译" in ZHOUYI_PLAIN_SOURCE, ZHOUYI_PLAIN_SOURCE
     for banned in ("；", "（《", "』"):
         assert banned not in ZHOUYI_PLAIN_SOURCE
+
+
+def test_the_corpus_is_registered_under_its_own_name() -> None:
+    """R24 形状：`PLAIN_CORPORA` 是字典字面量里的 `X.system: X`，两行 `zhouyi` 会静默留后一条，
+    前一张表就此掉出机检闸外而计数照样对得上（同 `tests/test_plain_corpora.py` 那条键一致钉）。"""
+    assert PLAIN_CORPORA["zhouyi"] is ZHOUYI
+
+
+def test_the_registered_shape_is_sectionless_unclosed_and_unsorted() -> None:
+    """spec §5 的登记形状，三个方向都不许后来者顺手改：开篇句一添就成了「页面渲染不到的小节」，
+    档位句一添就是白话自己下了一句总吉凶（spec §7 规则 5「不新增判断」）。"""
+    assert ZHOUYI.openers == {}
+    assert ZHOUYI.closers is None
+    assert ZHOUYI.grouping == "keep"
+
+
+def test_the_universe_is_exactly_the_450_computed_from_the_source_tables() -> None:
+    """工厂钉的是两侧**相等**，钉不出「两侧一起少」；450 这一格由本条数出来。
+
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 450。
+    """
+    assert len(ZHOUYI.universe()) == 450
+    assert ZHOUYI.universe() == set(ZHOUYI_READINGS)
+    assert set(ZHOUYI_ANCHORS) == set(ZHOUYI_READINGS)

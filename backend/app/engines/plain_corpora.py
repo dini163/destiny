@@ -14,6 +14,7 @@ from app.content import (
     qimen_plain,
     synastry_plain,
     ziwei_plain,
+    zhouyi_plain,
 )
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
@@ -262,6 +263,25 @@ LENORMAND = PlainCorpus(
     universe=_lenormand_universe,
 )
 
+#: 周易一页真正读到的 450 条今译（64 卦辞 + 384 爻辞 + 用九/用六）。单列理由同
+#: `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的《周易》表。
+ZHOUYI = PlainCorpus(
+    system="zhouyi",
+    entries=zhouyi_plain.ZHOUYI_READINGS,
+    # 今译挂在卦辞那一行与六条爻行自身，页面上没有段落容器（spec §5 与卡巴拉同形）：
+    # 硬造一句开篇句就是一句永远不会被印出来的死字，所以是 `{}` 并进 `SECTIONLESS` 登记。
+    openers={},
+    # 六爻无分数、无档位（spec §7 规则 5）：白话只说倾向，不替读者补一句综合吉凶。
+    closers=None,
+    # 450 条没有任何吉凶符号可分带，而 `band` 分支遇 0 值符号直接 `ValueError`（第一期
+    # delta=0 静默丢句那条坑的机器化防线）；读序本来就是卦内爻序（初 → 上），`keep` 正是它。
+    grouping="keep",
+    # 键全集由聚合面从三张源表（`GUA_CI` / `YONG_CI` / `YAO_CI`）现算，这里不写第二份算法：
+    # 源表多一条而今译少一句，工厂的 `set(entries) == universe()` 立刻红。
+    # 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 450。
+    universe=zhouyi_plain.plain_universe,
+)
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
@@ -273,4 +293,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     ZIWEI.system: ZIWEI,
     QIMEN.system: QIMEN,
     LENORMAND.system: LENORMAND,
+    ZHOUYI.system: ZHOUYI,
 }

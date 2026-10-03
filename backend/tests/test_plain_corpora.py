@@ -65,7 +65,22 @@ def test_universe_is_reproducible_and_non_empty(corpus) -> None:
 #: 「例外要写得出名字」才是接口，「放松断言」不是）。名单内要求 `openers == {}`，
 #: 两个方向都钉——今天多写一句开篇句也红，因为没人会去渲染它。
 #: 复测：`cd backend && grep -n "SECTIONLESS" tests/test_plain_corpora.py`。
-SECTIONLESS = {"kabbalah"}
+SECTIONLESS = {"kabbalah", "zhouyi"}
+
+
+def test_sectionless_roster_is_the_two_named_exceptions_verbatim() -> None:
+    """名单逐字钉（丁组 spec §5：「登记表与名单是两处编辑，忘一处会假绿」）。
+
+    新系统要进名单，必须在这里改一行、把名字留下——静默加进来就是那张表永远没有开篇句
+    也没有人问一句为什么。spec 把这条钉放在周易的 corpus 测里，实测搬不过来：`tests/`
+    没有 `__init__.py`（复测：`cd backend && ls tests/__init__.py` → 不存在），
+    别处 `from tests.test_plain_corpora import SECTIONLESS` 会把 pytest 已经以顶层名
+    `test_plain_corpora` 导入过的同一个文件再导入一遍，参数化用例在两个模块名下各跑一次。
+    **常量住在哪个文件，逐字钉就住在哪个文件**；周易那一侧的另一半（`ZHOUYI.openers == {}`）
+    由 `tests/content/test_zhouyi_plain_corpus.py::test_the_registered_shape_is_sectionless_unclosed_and_unsorted`
+    钉。见计划偏差表第 7 行。
+    """
+    assert SECTIONLESS == {"kabbalah", "zhouyi"}
 
 
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)
@@ -73,7 +88,8 @@ def test_openers_are_non_empty_and_never_slot_keys(corpus) -> None:
     """名字即判据：这条只钉「有小节的公司有开篇句」与「开篇句的键不落在槽位词表上」，不查覆盖面。
 
     「覆盖面」在这里无从查起——小节名单由各系统的装配测试钉（spec §4 第 3 条）。
-    卡巴拉是唯一无小节的一家（T2 裁定，见计划 G19 表行 7）。
+    无小节的两家是卡巴拉与周易（卡巴拉 T2 裁定，见多系统计划 G19 表行 7；周易依丁组 spec §5，
+    它的今译挂在卦辞行与六条爻行上，页面没有段落容器）。
     """
     if corpus.system in SECTIONLESS:
         assert corpus.openers == {}, f"{corpus.system} 登记为无小节却不空"
