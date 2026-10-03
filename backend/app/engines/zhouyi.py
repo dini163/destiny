@@ -248,7 +248,14 @@ def cast_hexagram(
 
 
 def zhouyi_provenance() -> ZhouyiProvenance:
-    """响应自带出处：五张表全取自 `ZHOUYI_CONTENT_SOURCES`，本模块不列第二遍表名。"""
+    """响应自带出处：五张表全取自 `ZHOUYI_CONTENT_SOURCES`，本模块不列第二遍表名。
+
+    `engine` 这一格写的是历法事实来自哪个库，不是本端点的推导器名（那是顶层
+    `ZhouyiCast.engine`）；值取内联字面量而不学 `engines/meihua.py` 提一个 `ENGINE_LUNAR`——
+    三处八字装配都是内联写法（`engines/bazi.py:352`、`engines/bazi_liuri.py:285`、
+    `engines/bazi_transit.py:793`），为一个 12 字符串改 `core/provenance.py` 是拿跨层依赖换
+    一个常量（AGENTS §1），复测：`cd backend && grep -rn 'engine="lunar-python"' app/engines/bazi*.py`。
+    """
     return ZhouyiProvenance(
         engine="lunar-python",
         content_version=CONTENT_VERSION,

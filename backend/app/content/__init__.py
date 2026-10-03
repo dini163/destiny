@@ -239,7 +239,8 @@ MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: （本文件 `MEIHUA_CONTENT_SOURCES` 注里写的同一条，八字同样不列，复测：
 #: `cd backend && grep -n "wuxing" app/content/__init__.py` → 只命中注释行，一张清单都没列它）。
 #: 张力写在明处：周易这一侧每爻的 `branch_element` 确实是 `ZHI_ELEMENT` 的字面
-#: （`engines/zhouyi.py:223`），丁组 spec §5 因此要求列它——本计划不因一个系统破全站口径。
+#: （`engines/zhouyi.py:224`，复测：`cd backend && grep -n "branch_element=ZHI_ELEMENT" app/engines/zhouyi.py` → 224），
+#: 丁组 spec §5 因此要求列它——本计划不因一个系统破全站口径。
 #: 代价：若日后裁定要列，周易与八字两家一起动，不在本期（偏差表第 1 行）。
 #: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 5。
 ZHOUYI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
