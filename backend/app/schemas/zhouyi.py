@@ -64,7 +64,7 @@ class ZhouyiLine(BaseModel):
 
 
 class HexagramInfo(BaseModel):
-    """Structural identity of a hexagram plus its classical 卦辞."""
+    """Structural identity of a hexagram plus its classical 卦辞 and the 今译 pair."""
 
     number: int = Field(description="King Wen sequence number 1-64.")
     name_zh: str = Field(description="Short name, e.g. 屯.")
