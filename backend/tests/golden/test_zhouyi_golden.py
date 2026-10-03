@@ -30,6 +30,7 @@ from app.content.zhouyi_najia import (
     liushen_for_day_gan,
     najia_for_hexagram,
 )
+from app.content.zhouyi_plain import gua_ci_key, yao_ci_key, yong_ci_key
 from app.content.zhouyi_text import (
     YAO_CI,
     YAO_CI_COUNT,
@@ -48,8 +49,10 @@ from app.content.zhouyi_trigrams import (
 from app.content.zhouyi_yaoci_lower import YAO_CI_LOWER, YAO_CI_LOWER_COUNT
 from app.content.zhouyi_yaoci_upper import YAO_CI_UPPER, YAO_CI_UPPER_COUNT
 from app.core.errors import InvalidCastInputError
+from app.engines.plain_compose import reading
+from app.engines.plain_corpora import ZHOUYI
 from app.engines.zhouyi import cast_hexagram
-from app.schemas.zhouyi import CastMethod
+from app.schemas.zhouyi import CastMethod, HexagramInfo, ZhouyiLine
 
 GAN = "甲乙丙丁戊己庚辛壬癸"
 
@@ -439,3 +442,75 @@ def test_zhouyi_cast_endpoint_rejects_manual_without_coins(client: TestClient) -
     response = client.post("/api/v1/zhouyi/cast", json={"method": "manual"})
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "invalid_cast_input"
+
+
+# --- 白话今译随卦走（丁组 spec §5、§8） --------------------------------------
+
+
+def test_the_plain_fields_are_required_not_defaulted() -> None:
+    """必填即契约：缺字段视为伪造响应（spec §5 与多系统 spec 的 `score` 同一条立场）。
+    只有用九/用六是合法的缺席，所以它带 default。"""
+    assert HexagramInfo.model_fields["plain_gua_ci"].is_required()
+    assert ZhouyiLine.model_fields["plain_yao_ci"].is_required()
+    assert not HexagramInfo.model_fields["plain_yong_ci"].is_required()
+
+
+def test_qian_cast_carries_every_plain_retelling_of_its_own_rows() -> None:
+    """乾那一手：卦辞、用九、六爻今译逐条等于表里的那一条（对账走 `reading`，不抄第二份字面）。"""
+    result = _manual([[3, 2, 2]] * 6)
+    assert result.ben.plain_gua_ci == reading(ZHOUYI, gua_ci_key(1))
+    assert result.ben.plain_yong_ci == reading(ZHOUYI, yong_ci_key(1))
+    assert [line.plain_yao_ci for line in result.lines] == [
+        reading(ZHOUYI, yao_ci_key(1, position)) for position in range(1, 7)
+    ]
+
+
+def test_a_plain_retelling_is_never_the_source_line_it_renders() -> None:
+    """spec §4.2 门 2 的响应侧一半：今译字段里不许原样躺着经文——那是把源文当白话发出去。"""
+    result = _manual([[3, 2, 2]] * 6)
+    assert result.ben.plain_gua_ci != result.ben.gua_ci
+    assert result.ben.plain_yong_ci != result.ben.yong_ci
+    for line in result.lines:
+        assert line.plain_yao_ci != line.yao_ci
+
+
+def test_bian_and_hu_carry_their_own_plain_gua_ci() -> None:
+    """`bian` / `hu` 走同一个 `_hexagram_info`，今译必须跟着走（spec §8 golden 行点名这两个）。
+
+    六掷与 `scripts/record_frontend_fixtures.py` 的 zhouyi 夹具同手（丰 55 → 咸 31，互卦大过 28），
+    T16 的前端测吃的就是这一手：两头对得上才叫一条链，不是两处各测各的。
+    """
+    result = _manual([[3, 3, 3], [3, 3, 2], [2, 2, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2]])
+    assert result.ben.number == 55
+    assert result.bian is not None and result.bian.number == 31
+    assert result.hu.number == 28
+    assert result.bian.plain_gua_ci == reading(ZHOUYI, gua_ci_key(31))
+    assert result.hu.plain_gua_ci == reading(ZHOUYI, gua_ci_key(28))
+    assert result.bian.plain_yong_ci is None
+
+
+def test_a_hexagram_without_yong_has_no_plain_yong_ci() -> None:
+    """62 卦的 `None` 是忠实的缺席（spec §5），不许由引擎兜底编一句出来。"""
+    result = cast_hexagram(method=CastMethod.TIME, cast_time=CAST_TIME)  # 天山遁 (33)
+    assert result.ben.number == 33
+    assert result.ben.yong_ci is None
+    assert result.ben.plain_yong_ci is None
+    assert result.ben.plain_gua_ci == reading(ZHOUYI, gua_ci_key(33))
+
+
+def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> None:
+    """HTTP 层的形状钉：键在响应里、值是表里那一条（`bian` 无动爻故为 null，这条一手安静）。"""
+    response = client.post(
+        "/api/v1/zhouyi/cast",
+        json={
+            "method": "manual",
+            "manual_coins": [[3, 2, 2]] * 6,
+            "cast_time": "2024-05-15T10:30:00",
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["ben"]["plain_gua_ci"] == reading(ZHOUYI, gua_ci_key(1))
+    assert body["ben"]["plain_yong_ci"] == reading(ZHOUYI, yong_ci_key(1))
+    assert body["lines"][0]["plain_yao_ci"] == reading(ZHOUYI, yao_ci_key(1, 1))
+    assert body["hu"]["plain_gua_ci"] == reading(ZHOUYI, gua_ci_key(1))

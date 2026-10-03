@@ -12,6 +12,10 @@ and dresses the primary (本卦) hexagram with 纳甲 (stem/branch), 六亲, 六
 All hexagram, najia and palace structure comes from the content tables; the
 day pillar (for 六神) and the lunar numbers (for the time method) come from
 ``lunar-python``. The engine performs no HTTP or I/O beyond these pure lookups.
+
+The 卦辞/爻辞 vernacular retellings are looked up one key at a time (``reading``);
+``compose``/``overview`` are deliberately not called — 450 rows carry nothing to merge
+or rank, and stitching a summary paragraph would be a new judgment (spec §5).
 """
 
 from datetime import datetime
@@ -23,8 +27,12 @@ from app.content import zhouyi_text
 from app.content.wuxing import CONTROLLED_BY, GENERATES, GENERATED_BY, ZHI_ELEMENT
 from app.content.zhouyi_hexagrams import Hexagram, hexagram_from_lines, hexagram_from_trigrams
 from app.content.zhouyi_najia import liushen_for_day_gan, najia_for_hexagram
+from app.content.zhouyi_plain import gua_ci_key, yao_ci_key, yong_ci_key
 from app.content.zhouyi_trigrams import TRIGRAM_BY_KEY, TRIGRAM_BY_MEIHUA
 from app.core.errors import InvalidCastInputError
+# 同层 engines 互引合规（AGENTS §1 只禁 `engines → api`），先例 `engines/qimen.py:50-51`。
+from app.engines.plain_compose import reading
+from app.engines.plain_corpora import ZHOUYI
 from app.schemas.zhouyi import CastMethod, HexagramInfo, ZhouyiCast, ZhouyiLine
 
 # An OS-backed CSPRNG (never the ``random`` module) for coin/time casting.
@@ -164,7 +172,9 @@ def _hexagram_info(hexagram: Hexagram) -> HexagramInfo:
         shi=hexagram.shi,
         ying=hexagram.ying,
         gua_ci=zhouyi_text.gua_ci(hexagram.number),
+        plain_gua_ci=reading(ZHOUYI, gua_ci_key(hexagram.number)),
         yong_ci=yong[1] if yong is not None else None,
+        plain_yong_ci=reading(ZHOUYI, yong_ci_key(hexagram.number)) if yong is not None else None,
     )
 
 
@@ -217,6 +227,7 @@ def cast_hexagram(
             is_ying=position == ben.ying,
             yao_name=zhouyi_text.line_name(position, bool(bit)),
             yao_ci=zhouyi_text.yao_ci(ben.number, position),
+            plain_yao_ci=reading(ZHOUYI, yao_ci_key(ben.number, position)),
         )
         for position, (value, bit) in enumerate(zip(values, bits), start=1)
     ]

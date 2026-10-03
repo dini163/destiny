@@ -5,6 +5,10 @@ are fully dressed with 纳甲 (stem/branch), 六亲, 六神, 世应 and the clas
 爻题/爻辞; the changed (变卦) and nuclear (互卦) hexagrams are reported
 structurally. Every hexagram carries its 卦辞, and 乾/坤 additionally carry the
 用九/用六 line.
+
+Each 卦辞 / 爻辞 / 用九·用六 is paired with a vernacular retelling (`plain_*`), taken
+row-by-row from the curated table `content/zhouyi_plain.py`; the 用 fields are null for
+the 62 hexagrams that have no 用九/用六.
 """
 
 from datetime import datetime
@@ -56,6 +60,7 @@ class ZhouyiLine(BaseModel):
     is_ying: bool = Field(description="Whether this is the 应 (response) line.")
     yao_name: str = Field(description="爻题 — classical line title, e.g. 初九 / 六二 / 上六.")
     yao_ci: str = Field(description="爻辞 — the classical line statement of the primary hexagram.")
+    plain_yao_ci: str = Field(description="爻辞的白话今译，逐键取自 content/zhouyi_plain.py（丁组 spec §5）。")
 
 
 class HexagramInfo(BaseModel):
@@ -81,8 +86,13 @@ class HexagramInfo(BaseModel):
     shi: int = Field(description="世 line position 1-6.")
     ying: int = Field(description="应 line position 1-6.")
     gua_ci: str = Field(description="卦辞 — the classical hexagram judgment.")
+    plain_gua_ci: str = Field(description="卦辞的白话今译，逐键取自 content/zhouyi_plain.py。")
     yong_ci: str | None = Field(
         default=None, description="用九/用六 line (乾/坤 only); null for the other 62 hexagrams."
+    )
+    plain_yong_ci: str | None = Field(
+        default=None,
+        description="用九/用六的今译；其余 62 卦为 None 是忠实的缺席（丁组 spec §5），不是缺字段。",
     )
 
 
