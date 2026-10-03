@@ -529,9 +529,10 @@ def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> Non
 def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
     """响应忠于登记表：成对钉「名 + 出处串」，而不是只钉名。
 
-    表名与出处串的**字面**只住在 `tests/content/test_zhouyi_plain_corpus.py` 那一处（抄第二份
-    字面违反 AGENTS.md §8），所以本测比的是投影相等于那张元组——引擎若手抄一份表名对而出处串错，
-    只有成对这一条抓得到（简报变异 3a 那一手）。下面那五行字面钉的是响应/展示序本身，
+    出处串的**字面**只住在 `tests/content/test_zhouyi_plain_corpus.py` 那一处（抄第二份字面
+    违反 AGENTS.md §8），所以本测比的是投影相等于那张元组——引擎若改手抄五行、表名与次序都对而
+    出处串写错，只有成对这一条抓得到（只钉名的话全套测照样绿）。下面那五行表名是刻意的第二份：
+    它钉的是响应/展示序本身（登记表自己改序时它红，成对那一半只看忠实不忠实），
     T16 的前端夹具吃这一序。
     """
     provenance = _manual([[3, 2, 2]] * 6).provenance
