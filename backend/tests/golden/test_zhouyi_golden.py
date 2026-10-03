@@ -499,7 +499,10 @@ def test_a_hexagram_without_yong_has_no_plain_yong_ci() -> None:
 
 
 def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> None:
-    """HTTP 层的形状钉：键在响应里、值是表里那一条（`bian` 无动爻故为 null，这条一手安静）。"""
+    """HTTP 层的形状钉：键在响应里、值是表里那一条，六爻一个都不漏。
+
+    纯乾一手安静（无动爻），`bian` 因此为 null——这条把它钉住，免得「一手安静」只是句旁白。
+    """
     response = client.post(
         "/api/v1/zhouyi/cast",
         json={
@@ -512,5 +515,8 @@ def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> Non
     body = response.json()
     assert body["ben"]["plain_gua_ci"] == reading(ZHOUYI, gua_ci_key(1))
     assert body["ben"]["plain_yong_ci"] == reading(ZHOUYI, yong_ci_key(1))
-    assert body["lines"][0]["plain_yao_ci"] == reading(ZHOUYI, yao_ci_key(1, 1))
+    assert [line["plain_yao_ci"] for line in body["lines"]] == [
+        reading(ZHOUYI, yao_ci_key(1, position)) for position in range(1, 7)
+    ]
     assert body["hu"]["plain_gua_ci"] == reading(ZHOUYI, gua_ci_key(1))
+    assert body["bian"] is None
