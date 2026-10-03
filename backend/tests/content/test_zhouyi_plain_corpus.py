@@ -24,7 +24,7 @@ from app.engines.plain_compose import PlainCorpus
 from tests.plain_wording import advice_hits, wording_violations
 
 #: 本批已覆盖的卦号。T2-T12 每批往里加自己那 5-6 卦，一条也不许多。
-COVERED: tuple[int, ...] = (1,)
+COVERED: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7,)
 
 #: 原文的六个断词与八个升格串（spec §4.4）。
 VERDICT_WORDS = ("吉", "凶", "厉", "悔", "吝", "咎")
