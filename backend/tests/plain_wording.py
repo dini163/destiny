@@ -9,6 +9,10 @@
 复测两个口径仍各在其位（条数随登记表增长，数以命令输出为准，本注释不钉数）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/test_plain_corpora.py -o addopts=""` 与 `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/content/test_bazi_plain_corpus.py -o addopts=""`。建议词/结论词第三口径的复测是本模块自身的闸内自测——文件名不带 `test_` 前缀，全量跑不收集，须显式点名的路子同 `tests/content/name_radical_fixture.py`：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/plain_wording.py -o addopts=""`。
 """
 
+import re
+
+from app.engines.plain_compose import is_slot_key
+
 #: 机检禁字集逐字取自第一期 spec §3 第 2 条：「（《」与「』」是出处引用标记，「；」是
 #: 拼接残留。「则」「之」同条只列为**风格**要求（白话不得有文言句式），不进机检——单字黑名单会连带打死
 #: 「规则」「之前」，红得一派无辜（第一期控制器裁定 R3，本表沿用同一口径）。
@@ -51,6 +55,42 @@ def advice_hits(
     for form in masks:
         masked = masked.replace(form, "")
     return [token for token in tokens if token in masked]
+
+
+_PLACEHOLDER = re.compile(r"\{[a-z][a-z0-9_]*\}")
+
+
+def wording_violations(corpus, key: str) -> list[str]:
+    """一条白话条目的措辞违例清单，空表即合规；判定次序：先禁字，再按槽位/整句分流。
+
+    返回违例而不是直接 assert，是为了让参数化用例与本文件末尾的槽位自测走同一份代码
+    （R21）：口径分流那条分支在生产登记表上今天无人触发，把分支体抄第二遍来「补覆盖」
+    只会多出一个会漂的副本。
+    """
+    text = corpus.entries[key]
+    violations: list[str] = []
+    for token in FORBIDDEN:
+        if token in text:
+            violations.append(f"FORBIDDEN 禁字「{token}」")
+    if is_slot_key(corpus, key):
+        if not text.strip():
+            violations.append("槽位词条非空契约破")
+        for token in SLOT_FORBIDDEN:
+            if token in text:
+                violations.append(f"SLOT_FORBIDDEN 禁字「{token}」")
+        if len(text) > 20:
+            violations.append(f"槽位词条 {len(text)} 字，超过 20 字上限")
+        return violations
+    # 条目可以合法携带 `{slot}`（T6 的 5 条相位框架句就带 {a}/{b}），所以长度按剥掉占位符的
+    # 正体算，而标点契约按原文算。
+    body = _PLACEHOLDER.sub("", text)
+    if len(body) < 40:
+        violations.append(f"剥掉占位符后正体 {len(body)} 字，不足 40 字")
+    if not (text.endswith("。") and text.count("。") == 1):
+        violations.append("整句须以唯一一个「。」收尾")
+    if "你" not in text:
+        violations.append("整句缺「你」")
+    return violations
 
 
 def test_advice_hits_masks_named_word_forms() -> None:
