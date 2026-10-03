@@ -1,8 +1,9 @@
 """周易今译的聚合面（丁组 spec §4.3）：键构造器 + 两张投影（anchor 表与今译表）。
 
 形状照 `content/zhouyi_text.py` 那一刀：源表分三部（卦辞、上经爻辞、下经爻辞），本表也
-分三部聚。键**只**由下面三个具名函数产出，`universe()` 在 `engines/plain_corpora.py` 里
-用同一批构造器现算——两处各拼一份字符串，改编号宽度时就会漂（多系统 spec §4）。
+分三部聚。键**只**由下面三个具名函数产出，键全集由本文件下方的 `plain_universe` 用同一批
+构造器现算，`engines/plain_corpora.py` 的 `ZHOUYI` 登记只引用这个函数对象、不另拼一份字符串
+——两处各拼一份，改编号宽度时就会漂（多系统 spec §4）。
 
 工厂吃的只有 `ZHOUYI_READINGS`（今译那一半）。`ZHOUYI_ANCHORS` 是校对用的另一半，
 它进不了 `entries`：原文「元亨利贞。」既不满 40 字也不含「你」（spec §4.2 门 2）。

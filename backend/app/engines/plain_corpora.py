@@ -13,8 +13,8 @@ from app.content import (
     name_plain,
     qimen_plain,
     synastry_plain,
-    ziwei_plain,
     zhouyi_plain,
+    ziwei_plain,
 )
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
@@ -263,8 +263,11 @@ LENORMAND = PlainCorpus(
     universe=_lenormand_universe,
 )
 
-#: 周易一页真正读到的 450 条今译（64 卦辞 + 384 爻辞 + 用九/用六）。单列理由同
-#: `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的《周易》表。
+
+#: 周易今译的登记表：450 条（64 卦辞 + 384 爻辞 + 用九/用六）。登记这一行只让工厂机检得到
+#: 这张表——页面今天还读不到它，填装归 T14、出处清单归 T15。
+#: 条数复测见本块 `universe=` 旁那一行；分解数复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.zhouyi_guaci import GUA_CI, YONG_CI; from app.content.zhouyi_text import YAO_CI; print(len(GUA_CI), sum(len(v) for v in YAO_CI.values()), len(YONG_CI))"` → 64 384 2。
 ZHOUYI = PlainCorpus(
     system="zhouyi",
     entries=zhouyi_plain.ZHOUYI_READINGS,
@@ -281,6 +284,7 @@ ZHOUYI = PlainCorpus(
     # 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 450。
     universe=zhouyi_plain.plain_universe,
 )
+
 
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。

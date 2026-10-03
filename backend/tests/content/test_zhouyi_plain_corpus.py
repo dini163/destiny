@@ -1,9 +1,14 @@
 """周易今译的本地门（丁组 spec §4.2、§4.4、§8）。
 
-这些门**不走 `PLAIN_CORPORA`**：语料分 12 批建，登记行要到 T13 才进工厂，而每一批都
-要在落地当次就跑共享口径，所以这里用一张测试侧自造的 `PlainCorpus` 吃
-`tests.plain_wording.wording_violations`（同 `tests/test_plain_compose.py` 给闸自造
-输入的口径，AGENTS §9 不拦这个——那是闸的输入样例，不是假命盘、不是假响应）。
+自 T13 起本文件吃**真登记**的那张 `PLAIN_CORPORA["zhouyi"]`（即 `ZHOUYI`），与工厂同源。
+工厂看得见的是共享措辞契约那一条（`test_every_plain_text_meets_the_shared_factory_contract`）；
+这里跑的是工厂看不见的那几族：anchor 逐字、断词引用/不漏译/不升格、剥 `「…」` 后的建议词，
+以及七族自述清点（爻题起头 / 极性·位·得正失正 / 世应 / 断词个数 / 点名断词 / 字数 / 处数）。
+
+T1-T12 期间这张测必须自造一张 `PlainCorpus`：登记行要等 450 条齐了才能进 `PLAIN_CORPORA`，
+否则键全集门在只有 8 条时就红 11 批（计划偏差表第 4 行）。登记完成后那张已删——留着就是
+同一份措辞口径的第二份副本（AGENTS.md §8 说的那种会漂的东西）；本地这条 450 例扫描为什么
+仍然留，见该测的 docstring。
 """
 
 import re
@@ -21,7 +26,6 @@ from app.content.zhouyi_plain import (
     yao_ci_key,
     yong_ci_key,
 )
-from app.engines.plain_compose import PlainCorpus
 from app.engines.plain_corpora import PLAIN_CORPORA, ZHOUYI
 from tests.plain_wording import advice_hits, wording_violations
 
@@ -32,16 +36,6 @@ COVERED: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1
 VERDICT_WORDS = ("吉", "凶", "厉", "悔", "吝", "咎")
 ESCALATION = ("大吉", "小吉", "凶险", "注定", "必然", "一定", "天意", "命定")
 _QUOTED = re.compile(r"「[^」]*」")
-
-
-def _plain_corpus() -> PlainCorpus:
-    """T13 起吃**真登记**的那张 corpus，与工厂同源。
-
-    T1-T12 期间这张测侧自造的 `PlainCorpus` 是必需的：登记行要等 450 条齐了才能进
-    `PLAIN_CORPORA`，否则键全集门在只有 8 条时就红 11 批（计划偏差表第 4 行）。登记完成后
-    再留着它，就是同一份措辞口径的第二份副本——AGENTS.md §8 说的那种会漂的东西。
-    """
-    return ZHOUYI
 
 
 def _built_keys() -> list[str]:
@@ -83,8 +77,15 @@ def test_covered_hexagrams_are_complete_no_row_missing() -> None:
 
 @pytest.mark.parametrize("key", _built_keys())
 def test_every_plain_text_meets_the_shared_factory_contract(key) -> None:
-    """≥40 字 / 恰一「。」 / 含「你」/ 无「；」（spec §4.1 的契约来源是工厂，不是本文件）。"""
-    assert wording_violations(_plain_corpus(), key) == []
+    """≥40 字 / 恰一「。」 / 含「你」/ 无「；」（spec §4.1 的契约来源是工厂，不是本文件）。
+
+    工厂的 `test_every_entry_meets_the_wording_contract[zhouyi:*]` 对同一个对象跑同一条谓词，
+    这份重复是**刻意留的**：那 450 例的存在依赖登记——有人把 `zhouyi` 从 `PLAIN_CORPORA` 摘掉时，
+    工厂那侧的用例是静默消失而不是变红（T13 评审实测：un-register 只让
+    `test_the_corpus_is_registered_under_its_own_name` 一条红）。本条不依赖登记，照样逐条跑，
+    所以它是「登记被撤销时仍然存在的独立验证」，不是口径副本。
+    """
+    assert wording_violations(ZHOUYI, key) == []
 
 
 @pytest.mark.parametrize("key", _built_keys())
