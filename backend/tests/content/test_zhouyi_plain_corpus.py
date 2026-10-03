@@ -12,6 +12,7 @@ import pytest
 
 from app.content import zhouyi_text
 from app.content.zhouyi_guaci import YONG_CI
+from app.content.zhouyi_hexagrams import HEXAGRAM_BY_NUMBER
 from app.content.zhouyi_plain import (
     ZHOUYI_ANCHORS,
     ZHOUYI_PLAIN_SOURCE,
@@ -113,6 +114,45 @@ def test_the_plain_table_never_leaks_the_source_text_into_entries() -> None:
     for key in _built_keys():
         assert ZHOUYI_READINGS[key] != ZHOUYI_ANCHORS[key], key
         assert not ZHOUYI_READINGS[key].startswith(ZHOUYI_ANCHORS[key][:6]), key
+
+
+def test_every_line_reading_opens_with_its_own_yao_title() -> None:
+    """spec §4.1 段② 的骨架：每一条爻辞今译都以本爻的爻题起头，题从卦画表现算，
+    不写字面量清单（T2/T3 实测「上九」被写成「居奇位」这一类自相矛盾，就是这条钉住的）。"""
+    for key in _built_keys():
+        if not key.startswith("zhouyi.yao."):
+            continue
+        number, position = (int(x) for x in key[len("zhouyi.yao."):].split("."))
+        expected = zhouyi_text.line_name(
+            position, HEXAGRAM_BY_NUMBER[number].lines[position - 1] == 1
+        )
+        assert ZHOUYI_READINGS[key].startswith(expected), (
+            f"{key} 的今译以 {ZHOUYI_READINGS[key][:2]} 起头，本爻的题是 {expected}"
+        )
+
+
+#: 段② 里唯一能对卦画验算的句式：「阳爻居偶位算失正」。第三组可缺——有些行只说居中不说得正。
+_POSITION_CLAIM = re.compile(r"([阳阴])爻居([奇偶])位(?:算(得正|失正))?")
+
+
+def test_every_stated_position_claim_matches_the_line_binary() -> None:
+    """极性、位的奇偶、得正/失正三样都从 `Hexagram.lines` 现算对一遍（spec §4.1：段② 只许说
+    卦画里**已有**的结构，说反了就是往用户眼前塞一条错的位置事实）。"""
+    for key in _built_keys():
+        if not key.startswith("zhouyi.yao."):
+            continue
+        number, position = (int(x) for x in key[len("zhouyi.yao."):].split("."))
+        is_yang = HEXAGRAM_BY_NUMBER[number].lines[position - 1] == 1
+        for polarity, parity, verdict in _POSITION_CLAIM.findall(ZHOUYI_READINGS[key]):
+            assert polarity == ("阳" if is_yang else "阴"), (
+                f"{key} 写成{polarity}爻，卦画这一爻是{'阳' if is_yang else '阴'}"
+            )
+            assert parity == ("奇" if position % 2 else "偶"), (
+                f"{key} 把第 {position} 位说成{parity}位"
+            )
+            if verdict:
+                expected = "得正" if is_yang == (position % 2 == 1) else "失正"
+                assert verdict == expected, f"{key} 说 {verdict}，按卦画应是 {expected}"
 
 
 def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
