@@ -165,6 +165,30 @@ def test_every_stated_position_claim_matches_the_line_binary() -> None:
                 )
 
 
+#: 今译里自称世/应的句式全站只有两种（T6/T7 实跑 67 条：33 世、34 应），所以能逐条对列复算。
+_SHI_YING_CLAIM = re.compile(r"它是这一卦的(世爻|「应爻」)")
+
+
+def test_every_stated_shi_ying_claim_matches_the_najia_columns() -> None:
+    """段② 剩下那一半：京房世应住在 `Hexagram.shi` / `.ying`（`zhouyi_hexagrams.py:123-124`，由
+    `SHI_BY_GENERATION` × `_ying_of` 现算），所以「它是这一卦的世爻」这句话是**可机检的事实**，
+    不是只能人读的语气。说错一格就是往用户眼前塞一条错的卦位身份。"""
+    for key in _built_keys():
+        if not key.startswith("zhouyi.yao."):
+            continue
+        number, position = (int(x) for x in key[len("zhouyi.yao."):].split("."))
+        hexagram = HEXAGRAM_BY_NUMBER[number]
+        for claimed in _SHI_YING_CLAIM.findall(ZHOUYI_READINGS[key]):
+            if claimed == "世爻":
+                assert position == hexagram.shi, (
+                    f"{key} 自称世爻，这一卦（{hexagram.name_zh}·{hexagram.generation}）世在 {hexagram.shi}"
+                )
+            else:
+                assert position == hexagram.ying, (
+                    f"{key} 自称「应爻」，这一卦（{hexagram.name_zh}·{hexagram.generation}）应在 {hexagram.ying}"
+                )
+
+
 def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
     """出处串自述身份（同 `test_tarot_zh_corpus.py` 里那条译表自述的先例）。"""
     assert ZHOUYI_PLAIN_SOURCE
