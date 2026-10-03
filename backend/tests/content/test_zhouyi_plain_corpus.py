@@ -131,8 +131,10 @@ def test_every_line_reading_opens_with_its_own_yao_title() -> None:
         )
 
 
-#: 段② 里唯一能对卦画验算的句式：「阳爻居偶位算失正」。第三组可缺——有些行只说居中不说得正。
-_POSITION_CLAIM = re.compile(r"([阳阴])爻居([奇偶])位(?:算(得正|失正))?")
+#: 段② 里能对卦画验算的句式。「阳位/阴位」是「奇位/偶位」的同一说法（阳位 = 奇位）；判语只认
+#: 与这半句同一个小句里的「得正/失正」——很多行只报位置不下判，所以判语组是可缺的。
+_POSITION_CLAIM = re.compile(r"([阳阴])爻居([奇偶阳阴])位")
+_VERDICT = re.compile(r"(得正|失正)")
 
 
 def test_every_stated_position_claim_matches_the_line_binary() -> None:
@@ -143,16 +145,24 @@ def test_every_stated_position_claim_matches_the_line_binary() -> None:
             continue
         number, position = (int(x) for x in key[len("zhouyi.yao."):].split("."))
         is_yang = HEXAGRAM_BY_NUMBER[number].lines[position - 1] == 1
-        for polarity, parity, verdict in _POSITION_CLAIM.findall(ZHOUYI_READINGS[key]):
+        is_odd = position % 2 == 1
+        expected_verdict = "得正" if is_yang == is_odd else "失正"
+        for clause in ZHOUYI_READINGS[key].split("，"):
+            match = _POSITION_CLAIM.search(clause)
+            if match is None:
+                continue
+            polarity, parity = match.groups()
             assert polarity == ("阳" if is_yang else "阴"), (
                 f"{key} 写成{polarity}爻，卦画这一爻是{'阳' if is_yang else '阴'}"
             )
-            assert parity == ("奇" if position % 2 else "偶"), (
-                f"{key} 把第 {position} 位说成{parity}位"
+            assert (parity in ("奇", "阳")) == is_odd, (
+                f"{key} 把第 {position} 位（{'奇' if is_odd else '偶'}位）说成{parity}位"
             )
-            if verdict:
-                expected = "得正" if is_yang == (position % 2 == 1) else "失正"
-                assert verdict == expected, f"{key} 说 {verdict}，按卦画应是 {expected}"
+            stated = _VERDICT.search(clause)
+            if stated:
+                assert stated.group(1) == expected_verdict, (
+                    f"{key} 说 {stated.group(1)}，按卦画应是 {expected_verdict}"
+                )
 
 
 def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
