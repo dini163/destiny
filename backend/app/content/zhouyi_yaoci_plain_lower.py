@@ -5,10 +5,11 @@
 """
 
 #: King Wen 卦号 -> 六条 (爻辞 anchor, 今译)，下→上。
-#: 「还没建」不等于「没有这一层」：T7 起了 31-36，37-64 还要等 T8-T12 那五批，所以本表今天
-#: 仍然是**不完整**的一张，聚合面 `zhouyi_plain.py` 对它不得做任何非空或齐卦假设。缺口复测：
+#: 「还没建」不等于「没有这一层」：T7-T12 一批建六卦，所以建齐之前本表都是**不完整**的一张，
+#: 聚合面 `zhouyi_plain.py` 对它不得做任何非空或齐卦假设。缺口只按复测口径判——上一版在这里
+#: 抄了一份实跑卦号清单，T8 一落地它就自动变成假话：
 #: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.zhouyi_yaoci_plain_lower import YAOCI_PLAIN_LOWER as L; print(sorted(L))"`
-#: → 现在 `[31, 32, 33, 34, 35, 36]`，建齐了是 `list(range(31, 65))`。
+#: → 建齐了是 `list(range(31, 65))`。
 YAOCI_PLAIN_LOWER: dict[int, tuple[tuple[str, str], ...]] = {
     # 31 咸
     31: (
