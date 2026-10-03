@@ -189,27 +189,106 @@ def test_every_stated_shi_ying_claim_matches_the_najia_columns() -> None:
                 )
 
 
-#: 「N个断词」这类清点句全站只有带量词一种写法，且「一个断词也不给」是零的自述而非计数，
-#: 所以两句正则就能把整张表数完（不必读上下文）。
+#: 断词清点句的五种写法，全站实测覆盖得完（415 键 = 计数 54 / 零自述 3 / 单断词 15 /
+#: 不下断词 50 / 点名句 200，共 322 条断言）。口径同 `VERDICT_WORDS`：只数那六个字在
+#: anchor 里的**出现次数**（`无咎` 记 1、`贞吉` 记 1、`悔厉吉` 记 3）。
+#: 钉不住的两种写法有意留在门外：「它给的不是断词而是……」（与 `不给断词` 不同形，
+#: 强并会把「不是」读成否定式清点）与裸量词「它两处给顺路」（宾语是利字，不是断词）。
 _VERDICT_COUNT = re.compile(r"([一两二三四五六])个断词")
 _VERDICT_ZERO = re.compile(r"一个断词也不[给说]")
+_VERDICT_SINGLE = re.compile(r"断词只(?:有|出现|那|这)[^，。]{0,6}一[个处次]")
+_VERDICT_NONE = re.compile(r"不[下给]断词|没有断词")
+_VERDICT_NAMED = re.compile(r"断词[^，。「」]{0,6}「([吉凶厉悔吝咎])」")
 _CN_COUNT = {"一": 1, "两": 2, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6}
 
 
+def _verdict_tally(anchor: str) -> int:
+    return sum(anchor.count(word) for word in VERDICT_WORDS)
+
+
 def test_every_stated_verdict_count_matches_the_anchor() -> None:
-    """段③ 里「这一爻两个断词」是**可验算的清点句**：口径与 `test_verdict_words_are_quoted_and_never_escalated`
-    同源，只数 `VERDICT_WORDS` 那六个字在 anchor 里的出现次数。亨、利、誉、恤都不算断词——把亨称作
-    断词就是替原文多下一句判词，而点错数就是当着用户的面数错原文（T8/T9 评审揪出的正是这一类）。"""
+    """「这一爻两个断词」是**可验算的清点句**：数错就是当着用户的面数错原文，把亨称作
+    断词就是替原文多下一句判词（T8/T9 评审揪出的正是这一类）。零自述、单断词、不下断词
+    三种写法在这里各自独立钉一次实数——先前的门只把零自述当计数的豁免，自己一条也不主张，
+    所以一行满口断词照样可以自称「一个断词也不给」（T10/T11 评审 I-3）。"""
     for key in _built_keys():
         anchor = ZHOUYI_ANCHORS[key]
-        real = sum(anchor.count(word) for word in VERDICT_WORDS)
-        zero_spans = [m.span() for m in _VERDICT_ZERO.finditer(ZHOUYI_READINGS[key])]
-        for m in _VERDICT_COUNT.finditer(ZHOUYI_READINGS[key]):
+        reading = ZHOUYI_READINGS[key]
+        real = _verdict_tally(anchor)
+        zero_spans = [m.span() for m in _VERDICT_ZERO.finditer(reading)]
+        for m in _VERDICT_COUNT.finditer(reading):
             claimed = (
                 0 if any(s <= m.start() < e for s, e in zero_spans) else _CN_COUNT[m.group(1)]
             )
             assert claimed == real, (
                 f"{key} 说「{m.group(0)}」，anchor「{anchor}」里断词实数 {real}"
+            )
+        for rx, want, label in (
+            (_VERDICT_ZERO, 0, "零自述"),
+            (_VERDICT_SINGLE, 1, "单断词自述"),
+            (_VERDICT_NONE, 0, "不下断词"),
+        ):
+            for m in rx.finditer(reading):
+                assert real == want, (
+                    f"{key} 的{label}「{m.group(0)}」，anchor「{anchor}」里断词实数 {real}"
+                )
+
+
+def test_every_named_verdict_word_appears_in_the_anchor() -> None:
+    """点名句（「原断词是「吉」」「断词只有一个「凶」」）报出的那个字必须真在原文里。
+    它只查**存在**，不查唯一性——唯一性归上一条的「单断词自述」；这一条管更硬的那错：
+    报一个原文里根本没有的断词，等于替原文凭空造一句判词。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        for m in _VERDICT_NAMED.finditer(ZHOUYI_READINGS[key]):
+            assert m.group(1) in anchor, (
+                f"{key} 点名「{m.group(0)}」，anchor「{anchor}」里没有 {m.group(1)} 字"
+            )
+
+
+#: 「N个字」只钉主语是整条的那一式（卦辞/这一爻 + 只 + 数词）。「末尾多给两个字」
+#: 「只留一个字说可以食」数的是末句那半条，基准不同，硬并会误红——它们由评审员人核。
+_CHAR_COUNT = re.compile(r"(?:卦辞|这一爻)只[有留]?([一两二三四五六])个字")
+#: 卦辞行里的结构清点句：数量词紧跟得正/失正/失位，基准是全卦六爻（`lines` 底向上，
+#: 阳居奇位、阴居偶位为得正）。这是段② 唯一能对整卦复算的句式，也是 T10/T11 评审 I-2
+#: 那条「两处失位」（归妹实为四处）唯一的机器兜底。
+_POSITION_TALLY = re.compile(r"([一两二三四五六])处(得正|失正|失位)")
+_PUNCTUATION = ("，", "。", "：", "；", "、")
+
+
+def test_every_stated_character_count_matches_the_anchor_length() -> None:
+    """「兑卦的卦辞只有四个字」是可点数的：原文去掉标点剩几个字就是几个。句数复测 =
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re
+    from app.content.zhouyi_plain import ZHOUYI_READINGS as R;print(sum(len(re.findall(
+    r'(?:卦辞|这一爻)只[有留]?[一两二三四五六]个字', v)) for v in R.values()))"`。
+    T10/T11 评审实跑数出 2 句点错（`gua.58` 亨，利贞。= 三、`yao.6.5` 讼，元吉。= 三），
+    而旧的清点门只看断词，看不见它。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        for m in _CHAR_COUNT.finditer(ZHOUYI_READINGS[key]):
+            real = len([c for c in anchor if c not in _PUNCTUATION])
+            assert _CN_COUNT[m.group(1)] == real, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」去掉标点是 {real} 字"
+            )
+
+
+def test_every_stated_position_tally_matches_the_line_binaries() -> None:
+    """「N处失位／得正」数的是全卦六爻里站错与站对的位置，能从 `Hexagram.lines` 现算，
+    所以这句话同样是事实句而非评述。基准只有一处含糊不得：整卦，不是下卦也不是某爻
+    上下——本门按整卦钉，别的读法不许用这个句式写。"""
+    for key in _built_keys():
+        number = int(key.split(".")[2])
+        hexagram = HEXAGRAM_BY_NUMBER[number]
+        misplaced = sum(
+            1
+            for position in range(1, 7)
+            if bool(hexagram.lines[position - 1]) != (position % 2 == 1)
+        )
+        for m in _POSITION_TALLY.finditer(ZHOUYI_READINGS[key]):
+            real = misplaced if m.group(2) != "得正" else 6 - misplaced
+            assert _CN_COUNT[m.group(1)] == real, (
+                f"{key} 说「{m.group(0)}」，{hexagram.name_zh} 卦画里失位 {misplaced} 爻、"
+                f"得正 {6 - misplaced} 爻"
             )
 
 
