@@ -189,6 +189,30 @@ def test_every_stated_shi_ying_claim_matches_the_najia_columns() -> None:
                 )
 
 
+#: 「N个断词」这类清点句全站只有带量词一种写法，且「一个断词也不给」是零的自述而非计数，
+#: 所以两句正则就能把整张表数完（不必读上下文）。
+_VERDICT_COUNT = re.compile(r"([一两二三四五六])个断词")
+_VERDICT_ZERO = re.compile(r"一个断词也不[给说]")
+_CN_COUNT = {"一": 1, "两": 2, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6}
+
+
+def test_every_stated_verdict_count_matches_the_anchor() -> None:
+    """段③ 里「这一爻两个断词」是**可验算的清点句**：口径与 `test_verdict_words_are_quoted_and_never_escalated`
+    同源，只数 `VERDICT_WORDS` 那六个字在 anchor 里的出现次数。亨、利、誉、恤都不算断词——把亨称作
+    断词就是替原文多下一句判词，而点错数就是当着用户的面数错原文（T8/T9 评审揪出的正是这一类）。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        real = sum(anchor.count(word) for word in VERDICT_WORDS)
+        zero_spans = [m.span() for m in _VERDICT_ZERO.finditer(ZHOUYI_READINGS[key])]
+        for m in _VERDICT_COUNT.finditer(ZHOUYI_READINGS[key]):
+            claimed = (
+                0 if any(s <= m.start() < e for s, e in zero_spans) else _CN_COUNT[m.group(1)]
+            )
+            assert claimed == real, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」里断词实数 {real}"
+            )
+
+
 def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
     """出处串自述身份（同 `test_tarot_zh_corpus.py` 里那条译表自述的先例）。"""
     assert ZHOUYI_PLAIN_SOURCE
