@@ -11,8 +11,7 @@ import re
 import pytest
 
 from app.content import zhouyi_text
-from app.content.zhouyi_guaci import GUA_CI, YONG_CI
-from app.content.zhouyi_guaci_plain import GUACI_PLAIN, YONG_PLAIN
+from app.content.zhouyi_guaci import YONG_CI
 from app.content.zhouyi_plain import (
     ZHOUYI_ANCHORS,
     ZHOUYI_PLAIN_SOURCE,
@@ -21,11 +20,8 @@ from app.content.zhouyi_plain import (
     yao_ci_key,
     yong_ci_key,
 )
-from app.content.zhouyi_text import YAO_CI
-from app.content.zhouyi_yaoci_plain_lower import YAOCI_PLAIN_LOWER
-from app.content.zhouyi_yaoci_plain_upper import YAOCI_PLAIN_UPPER
 from app.engines.plain_compose import PlainCorpus
-from tests.plain_wording import ADVICE_TOKENS, advice_hits, wording_violations
+from tests.plain_wording import advice_hits, wording_violations
 
 #: 本批已覆盖的卦号。T2-T12 每批往里加自己那 5-6 卦，一条也不许多。
 COVERED: tuple[int, ...] = (1,)
@@ -85,7 +81,7 @@ def test_covered_hexagrams_are_complete_no_row_missing() -> None:
 
 
 @pytest.mark.parametrize("key", _built_keys())
-def test_every_pain_text_meets_the_shared_factory_contract(key) -> None:
+def test_every_plain_text_meets_the_shared_factory_contract(key) -> None:
     """≥40 字 / 恰一「。」 / 含「你」/ 无「；」（spec §4.1 的契约来源是工厂，不是本文件）。"""
     assert wording_violations(_plain_corpus(), key) == []
 

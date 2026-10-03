@@ -17,7 +17,6 @@
 AGENTS.md §9 不拦这个），而不是把分支体抄第二遍。
 """
 
-import re
 import pytest
 
 from app.engines.plain_compose import PlainCorpus, is_slot_key

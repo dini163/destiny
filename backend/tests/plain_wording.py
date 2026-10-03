@@ -63,7 +63,7 @@ _PLACEHOLDER = re.compile(r"\{[a-z][a-z0-9_]*\}")
 def wording_violations(corpus, key: str) -> list[str]:
     """一条白话条目的措辞违例清单，空表即合规；判定次序：先禁字，再按槽位/整句分流。
 
-    返回违例而不是直接 assert，是为了让参数化用例与本文件末尾的槽位自测走同一份代码
+    返回违例而不是直接 assert，是为了让参数化用例与 `tests/test_plain_corpora.py` 末尾的槽位自测走同一份代码
     （R21）：口径分流那条分支在生产登记表上今天无人触发，把分支体抄第二遍来「补覆盖」
     只会多出一个会漂的副本。
     """
