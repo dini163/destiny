@@ -23,7 +23,7 @@ import secrets
 
 from lunar_python import Solar
 
-from app.content import zhouyi_text
+from app.content import CONTENT_VERSION, ZHOUYI_CONTENT_SOURCES, zhouyi_text
 from app.content.wuxing import CONTROLLED_BY, GENERATES, GENERATED_BY, ZHI_ELEMENT
 from app.content.zhouyi_hexagrams import Hexagram, hexagram_from_lines, hexagram_from_trigrams
 from app.content.zhouyi_najia import liushen_for_day_gan, najia_for_hexagram
@@ -33,7 +33,8 @@ from app.core.errors import InvalidCastInputError
 # 同层 engines 互引合规（AGENTS §1 只禁 `engines → api`），先例 `engines/qimen.py:50-51`。
 from app.engines.plain_compose import reading
 from app.engines.plain_corpora import ZHOUYI
-from app.schemas.zhouyi import CastMethod, HexagramInfo, ZhouyiCast, ZhouyiLine
+from app.schemas.common import ProvenanceTable
+from app.schemas.zhouyi import CastMethod, HexagramInfo, ZhouyiCast, ZhouyiLine, ZhouyiProvenance
 
 # An OS-backed CSPRNG (never the ``random`` module) for coin/time casting.
 _RNG = secrets.SystemRandom()
@@ -242,4 +243,17 @@ def cast_hexagram(
         hu=_hexagram_info(hu),
         moving_positions=moving_positions,
         lines=lines,
+        provenance=zhouyi_provenance(),
+    )
+
+
+def zhouyi_provenance() -> ZhouyiProvenance:
+    """响应自带出处：五张表全取自 `ZHOUYI_CONTENT_SOURCES`，本模块不列第二遍表名。"""
+    return ZhouyiProvenance(
+        engine="lunar-python",
+        content_version=CONTENT_VERSION,
+        tables=[
+            ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+            for module, source in ZHOUYI_CONTENT_SOURCES
+        ],
     )

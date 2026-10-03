@@ -38,6 +38,11 @@ from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.vedic import VEDIC_SOURCE
+from app.content.zhouyi_hexagrams import ZHOUYI_HEXAGRAMS_SOURCE
+from app.content.zhouyi_najia import ZHOUYI_NAJIA_SOURCE
+from app.content.zhouyi_plain import ZHOUYI_PLAIN_SOURCE
+from app.content.zhouyi_text import ZHOUYI_SOURCE
+from app.content.zhouyi_trigrams import ZHOUYI_TRIGRAMS_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
 from app.content.ziwei_plain import ZIWEI_PLAIN_SOURCE
 from app.core.provenance import MODEL_PARAM_SOURCE
@@ -206,7 +211,9 @@ SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 
 #: 梅花一页真正读到的五张表。单列理由同 `NAME_CONTENT_SOURCES`：混进 `CONTENT_SOURCES`
 #: 等于让八字声称引了它没用过的周易表。三张 `zhouyi_*` 是梅花**真的**在引——卦名卦画
-#: （`zhouyi_hexagrams`）、先天卦数（`zhouyi_trigrams`）、页面上那句卦辞（`zhouyi_text`）。
+#: （`zhouyi_hexagrams`）、邵雍先天数 → 卦键那一份 lookup（`zhouyi_trigrams` 的
+#: `TRIGRAM_BY_MEIHUA`，调用点 `engines/meihua.py:226`；该表出处串自述的是「先天卦序」，
+#: 说的是同一列 `meihua_number`，两个词不许混着改），页面上那句卦辞（`zhouyi_text`）。
 #: `zhouyi_text` 是聚合面，它印进响应的卦辞正文住在 `content/zhouyi_guaci.py` 的 `GUA_CI`
 #: （复测：`cd backend && grep -n "GUA_CI" app/content/zhouyi_text.py`）。
 #: 不列的两张各有其因：`content/wuxing` 只提供生克关系这一结构运算、其文字不进任何响应
@@ -219,7 +226,26 @@ SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("meihua", MEIHUA_SOURCE),
     ("meihua_plain", MEIHUA_PLAIN_SOURCE),
-    ("zhouyi_trigrams", "八卦卦名、卦象与邵雍先天卦序"),
-    ("zhouyi_hexagrams", "《周易》通行本文王六十四卦卦序与卦画"),
-    ("zhouyi_text", "《周易》卦辞 · 通行本（王弼注本）公版原文"),
+    ("zhouyi_trigrams", ZHOUYI_TRIGRAMS_SOURCE),
+    ("zhouyi_hexagrams", ZHOUYI_HEXAGRAMS_SOURCE),
+    ("zhouyi_text", ZHOUYI_SOURCE),
+)
+
+#: 周易一页真正读到的五张表：三张《周易》通行本（八卦、六十四卦卦序卦画、卦爻辞正文）、
+#: 一张京房纳甲与六神起例，以及逐条转述它们的今译表。单列理由同 `ZIWEI_CONTENT_SOURCES`：
+#: 主八字盘不引用它们。三张 `zhouyi_*` 的出处串与 `MEIHUA_CONTENT_SOURCES` 共用同一份常量
+#: （丁组计划偏差表第 5 行）。
+#: **不列 `content/wuxing`**：全站口径是「只提供生克关系这一结构运算、其文字不进任何响应」
+#: （本文件 `MEIHUA_CONTENT_SOURCES` 注里写的同一条，八字同样不列，复测：
+#: `cd backend && grep -n "wuxing" app/content/__init__.py` → 只命中注释行，一张清单都没列它）。
+#: 张力写在明处：周易这一侧每爻的 `branch_element` 确实是 `ZHI_ELEMENT` 的字面
+#: （`engines/zhouyi.py:223`），丁组 spec §5 因此要求列它——本计划不因一个系统破全站口径。
+#: 代价：若日后裁定要列，周易与八字两家一起动，不在本期（偏差表第 1 行）。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 5。
+ZHOUYI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("zhouyi_trigrams", ZHOUYI_TRIGRAMS_SOURCE),
+    ("zhouyi_hexagrams", ZHOUYI_HEXAGRAMS_SOURCE),
+    ("zhouyi_najia", ZHOUYI_NAJIA_SOURCE),
+    ("zhouyi_text", ZHOUYI_SOURCE),
+    ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE),
 )

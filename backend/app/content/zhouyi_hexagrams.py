@@ -20,6 +20,9 @@ from dataclasses import dataclass
 
 from app.content.zhouyi_trigrams import TRIGRAM_BY_BINARY, TRIGRAM_BY_KEY, TRIGRAM_BY_NAME, TRIGRAM_BY_NATURE
 
+#: 表级出处（丁组计划偏差表第 5 行：梅花与周易两份清单共用同一份，不抄第二遍）。
+ZHOUYI_HEXAGRAMS_SOURCE = "《周易》通行本文王六十四卦卦序与卦画"
+
 # Generation names in palace order, and the 世 line position of each generation.
 GENERATION_NAMES = ("本宫", "一世", "二世", "三世", "四世", "五世", "游魂", "归魂")
 SHI_BY_GENERATION = (6, 1, 2, 3, 4, 5, 4, 3)

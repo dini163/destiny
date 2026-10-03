@@ -14,6 +14,10 @@ from app.content.zhouyi_guaci import GUA_CI, GUA_CI_COUNT, YONG_CI
 from app.content.zhouyi_yaoci_lower import YAO_CI_LOWER
 from app.content.zhouyi_yaoci_upper import YAO_CI_UPPER
 
+#: 源文书的书级出处。这一串是全站唯一的一份：`content/__init__.py` 里梅花与周易两张
+#: 清单共用它（丁组计划偏差表第 5 行），抄第二遍必漂。
+ZHOUYI_SOURCE = "《周易》卦辞 · 通行本（王弼注本）公版原文"
+
 # King Wen number -> six 爻辞 (bottom-to-top), merged from the two canons.
 YAO_CI: dict[int, tuple[str, ...]] = {**YAO_CI_UPPER, **YAO_CI_LOWER}
 

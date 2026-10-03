@@ -2,9 +2,9 @@
 
 This module is built up across the Zhouyi implementation: it starts with the
 structural content invariants (八 trigrams, 64 hexagrams across the eight
-palaces, 纳甲 / 六神 tables) and grows to cover casting, derivation and the
-classical text. Counts are content invariants per PRD 4.4 — the data is curated,
-never generated.
+palaces, 纳甲 / 六神 tables) and grows to cover casting, derivation, the
+classical text, the 白话今译 fields and the provenance block. Counts are content
+invariants per PRD 4.4 — the data is curated, never generated.
 """
 
 from datetime import datetime
@@ -12,6 +12,7 @@ from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content import CONTENT_VERSION, ZHOUYI_CONTENT_SOURCES as _ZHOUYI_CONTENT_SOURCES
 from app.content.wuxing import ZHI_ELEMENT
 from app.content.zhouyi_guaci import GUA_CI, GUA_CI_COUNT, YONG_CI
 from app.content.zhouyi_hexagrams import (
@@ -258,6 +259,11 @@ def test_text_accessors_agree_with_the_raw_tables() -> None:
 # A fixed cast moment keeps the day pillar (己卯) and the time-method result
 # deterministic; verified against lunar-python.
 CAST_TIME = datetime(2024, 5, 15, 10, 30)
+
+#: 周易响应真正读到的五张表；行序 = 页面展示序（丁组 spec §5、AGENTS.md §7）。
+#: 名单的**字面**由 `tests/content/test_zhouyi_plain_corpus.py` 钉，本文件用它钉引擎保真
+#: （两头各钉一件事，抄第二份字面就违反 AGENTS.md §8）。
+PROVENANCE_TABLE_NAMES = [name for name, _source in _ZHOUYI_CONTENT_SOURCES]
 
 
 def _manual(coins: list[list[int]]):
@@ -520,3 +526,36 @@ def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> Non
     ]
     assert body["hu"]["plain_gua_ci"] == reading(ZHOUYI, gua_ci_key(1))
     assert body["bian"] is None
+
+
+# --- 出处块：五张表 + 历法来源（丁组 spec §5、AGENTS.md §7） --------------------
+
+
+def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
+    provenance = _manual([[3, 2, 2]] * 6).provenance
+    assert [table.name for table in provenance.tables] == PROVENANCE_TABLE_NAMES
+    assert [table.name for table in provenance.tables] == [
+        "zhouyi_trigrams",
+        "zhouyi_hexagrams",
+        "zhouyi_najia",
+        "zhouyi_text",
+        "zhouyi_plain",
+    ]
+    assert provenance.engine == "lunar-python"
+    assert provenance.content_version == CONTENT_VERSION
+    assert {table.version for table in provenance.tables} == {CONTENT_VERSION}
+    assert all(table.source for table in provenance.tables)
+
+
+def test_zhouyi_cast_endpoint_serves_the_provenance_block(client: TestClient) -> None:
+    """键集即前端契约（`tests/test_meihua_api.py` 那套 `FRONTEND_*_KEYS` 的周易简化版：
+    周易没有独立的 api 测文件，端点形状就钉在 golden 里，与 T14 那条端点测同一个家）。"""
+    response = client.post(
+        "/api/v1/zhouyi/cast",
+        json={"method": "manual", "manual_coins": [[3, 2, 2]] * 6, "cast_time": "2024-05-15T10:30:00"},
+    )
+    body = response.json()
+    assert set(body["provenance"]) == {"engine", "content_version", "tables"}
+    for table in body["provenance"]["tables"]:
+        assert set(table) == {"name", "version", "source"}
+    assert [table["name"] for table in body["provenance"]["tables"]] == PROVENANCE_TABLE_NAMES

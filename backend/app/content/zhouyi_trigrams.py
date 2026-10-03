@@ -8,6 +8,9 @@ plum-blossom time-casting method; ``nature`` is the classical image (象).
 
 from dataclasses import dataclass
 
+#: 表级出处（丁组计划偏差表第 5 行：梅花与周易两份清单共用同一份，不抄第二遍）。
+ZHOUYI_TRIGRAMS_SOURCE = "八卦卦名、卦象与邵雍先天卦序"
+
 
 @dataclass(frozen=True)
 class Trigram:

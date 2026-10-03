@@ -16,6 +16,8 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import ProvenanceTable
+
 
 class CastMethod(str, Enum):
     """How the hexagram is cast."""
@@ -96,6 +98,22 @@ class HexagramInfo(BaseModel):
     )
 
 
+class ZhouyiProvenance(BaseModel):
+    """出处块：历法来源一个短值 + 本页真读到的五张语料表（丁组 spec §5）。
+
+    顶层 `ZhouyiCast.engine`（恒为 `liuyao-najia`）是**本端点的推导器名**，本块的 `engine`
+    是**历法事实来自哪个库**——日柱（定六神）与时间起卦的农历数都由它给出。两个键同名不同职，
+    这条限度与 `schemas/meihua.py` 的 `MeihuaProvenance` 同文；`content_version` 那一格照
+    后四家（`schemas/tarot.py:27`、`schemas/lenormand.py`、`schemas/ziwei.py`、`schemas/qimen.py`）
+    的新形状。`MeihuaProvenance` 多的那一格 `method` 这里不收：梅花要说清「起卦与卦气的算式口径」，
+    周易的装卦口径已经在 `ZhouyiCast.method` 与每爻的纳甲字段里，本块不重复一遍。
+    """
+
+    engine: str = Field(description="历法来源引擎，恒为 lunar-python。")
+    content_version: str = Field(description="语料滚动版本，全表共用 content.CONTENT_VERSION。")
+    tables: list[ProvenanceTable] = Field(description="本页真正读到的五张表，来自 ZHOUYI_CONTENT_SOURCES。")
+
+
 class ZhouyiCast(BaseModel):
     """Complete Zhouyi cast produced by :mod:`app.engines.zhouyi`."""
 
@@ -113,6 +131,8 @@ class ZhouyiCast(BaseModel):
     # Lines
     moving_positions: list[int] = Field(description="Moving-line positions (1-6, bottom-to-top).")
     lines: list[ZhouyiLine] = Field(description="The six dressed lines of the primary hexagram.")
+
+    provenance: ZhouyiProvenance = Field(description="出处块：五张表 + 历法来源 + 语料版本。")
 
     rng: str = Field(default="secrets", description="Randomness source for coin/time casting (CSPRNG).")
     engine: str = Field(default="liuyao-najia", description="Derivation engine name.")

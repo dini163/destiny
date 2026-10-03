@@ -11,6 +11,9 @@ from a beast chosen by the day's heavenly stem (日干).
 These are immutable classical tables (real reference data), not runtime output.
 """
 
+#: 装卦表的出处（只有周易一页引它，故不并进偏差 5 的三张共用串）。
+ZHOUYI_NAJIA_SOURCE = "京房纳甲爻辰与六神日干起例"
+
 # Trigram key -> {"inner": lines 1-3, "outer": lines 4-6} as (stem, branch) pairs.
 NAJIA: dict[str, dict[str, tuple[tuple[str, str], ...]]] = {
     "qian": {"inner": (("甲", "子"), ("甲", "寅"), ("甲", "辰")), "outer": (("壬", "午"), ("壬", "申"), ("壬", "戌"))},

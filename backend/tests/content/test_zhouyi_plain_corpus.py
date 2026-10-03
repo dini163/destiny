@@ -2,10 +2,12 @@
 
 自 T13 起本文件吃**真登记**的那张 `PLAIN_CORPORA["zhouyi"]`（即 `ZHOUYI`），与工厂同源。
 共享措辞契约那一条工厂也在跑（工厂侧叫 `test_every_entry_meets_the_wording_contract`）；
-本文件另 17 条门工厂一条都不跑，其中最要紧的是断词那一族（引用 / 不漏译 / 不升格、剥 `「…」`
+本文件另 20 条门工厂一条都不跑（条数复测：`cd backend && grep -c "^def test_" tests/content/test_zhouyi_plain_corpus.py`
+→ 21，减去与工厂同跑的那一条），其中最要紧的是断词那一族（引用 / 不漏译 / 不升格、剥 `「…」`
 后的建议词，以及七类自述句：爻题起头 / 极性·位·得正失正 / 世应 / 断词个数 / 点名断词 / 字数 /
 处数），另有 anchor 逐字、键构造器、`COVERED` 名单、门 2「源文不漏进 `entries`」、出处串自述，
-与文件末尾那三条登记钉。
+与文件末尾的三条登记钉（`PLAIN_CORPORA` 名下一份、登记形状、450 键全集）和三条出处钉
+（`ZHOUYI_CONTENT_SOURCES` 的逐字名单、与梅花共用串的等值、今译表落在第五行）。
 
 T1-T12 期间这张测必须自造一张 `PlainCorpus`：登记行要等 450 条齐了才能进 `PLAIN_CORPORA`，
 否则键全集门在只有 8 条时就红 11 批（计划偏差表第 4 行）。登记完成后那张已删——留着就是
@@ -17,7 +19,7 @@ import re
 
 import pytest
 
-from app.content import zhouyi_text
+from app.content import MEIHUA_CONTENT_SOURCES, ZHOUYI_CONTENT_SOURCES, zhouyi_text
 from app.content.zhouyi_guaci import YONG_CI
 from app.content.zhouyi_hexagrams import HEXAGRAM_BY_NUMBER
 from app.content.zhouyi_plain import (
@@ -28,6 +30,7 @@ from app.content.zhouyi_plain import (
     yao_ci_key,
     yong_ci_key,
 )
+from app.content.zhouyi_text import ZHOUYI_SOURCE
 from app.engines.plain_corpora import PLAIN_CORPORA, ZHOUYI
 from tests.plain_wording import advice_hits, wording_violations
 
@@ -329,3 +332,41 @@ def test_the_universe_is_exactly_the_450_computed_from_the_source_tables() -> No
     assert len(ZHOUYI.universe()) == 450
     assert ZHOUYI.universe() == set(ZHOUYI_READINGS)
     assert set(ZHOUYI_ANCHORS) == set(ZHOUYI_READINGS)
+
+
+#: `zhouyi_najia` 那一条的出处串在本测里写**字面量**，是因为逐字钉一吃常量就退化成
+#: 「这张元组等于它自己」——丙组终审裁定的原话：响应侧的有序断言只能钉引擎保真，
+#: 钉不住登记表自身，因为 `zhouyi_provenance()` 与那条测读同一份元组。
+ZHOUYI_NAJIA_SOURCE_LITERAL = "京房纳甲爻辰与六神日干起例"
+
+
+def test_provenance_roster_is_the_five_rows_in_reading_order() -> None:
+    """登记表由字面量钉（上一条注释）。顺序 = 页面展示序 = `zhouyi_provenance()` 的产出序。
+
+    三条 `zhouyi_*` 的字面同时钉住了梅花那一侧：两家共用同一份常量（计划偏差表第 5 行），
+    改一个值本条立刻红、`MEIHUA_CONTENT_SOURCES` 的打印也随之变（梅花那侧没有逐字钉，它的
+    凭据是那份逐字节 diff 的验收命令）；抄第二份则两份各红各的，谁也不会静默漂。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 5。
+    """
+    assert ZHOUYI_CONTENT_SOURCES == (
+        ("zhouyi_trigrams", "八卦卦名、卦象与邵雍先天卦序"),
+        ("zhouyi_hexagrams", "《周易》通行本文王六十四卦卦序与卦画"),
+        ("zhouyi_najia", ZHOUYI_NAJIA_SOURCE_LITERAL),
+        ("zhouyi_text", "《周易》卦辞 · 通行本（王弼注本）公版原文"),
+        ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE),
+    )
+
+
+def test_the_shared_source_strings_are_one_copy_with_meihua() -> None:
+    """偏差表第 5 行的验收：三张共用表在两份清单里逐字相等，且 `ZHOUYI_SOURCE` 就是 `zhouyi_text` 那一格。"""
+    zhouyi_rows = dict(ZHOUYI_CONTENT_SOURCES)
+    meihua_rows = dict(MEIHUA_CONTENT_SOURCES)
+    for name in ("zhouyi_trigrams", "zhouyi_hexagrams", "zhouyi_text"):
+        assert name in meihua_rows, name
+        assert zhouyi_rows[name] == meihua_rows[name], name
+    assert zhouyi_rows["zhouyi_text"] == ZHOUYI_SOURCE
+
+
+def test_the_plain_source_line_is_the_registered_fifth_row() -> None:
+    """今译表进清单（AGENTS.md §7「读了就列」）：`ZHOUYI_PLAIN_SOURCE` 的自述与登记同一笔。"""
+    assert ZHOUYI_CONTENT_SOURCES[-1] == ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE)
