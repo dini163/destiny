@@ -6,6 +6,7 @@ import { ClassicalText } from '../components/zhouyi/ClassicalText';
 import { HexagramCard } from '../components/zhouyi/HexagramCard';
 import { HexagramStack } from '../components/zhouyi/HexagramStack';
 import { Icon } from '../components/ui/Icon';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useZhouyiCast } from '../hooks/useZhouyiCast';
 import { defaultManualCoins, methodLabel, positionLabel } from '../lib/zhouyi';
@@ -20,6 +21,10 @@ import type { CastMethod, ZhouyiCast, ZhouyiCastRequest } from '../types/zhouyi'
  * 互卦 identity cards and the classical 卦爻辞 — every value taken straight from the
  * engine. The mockup's invented 用神/伏神/神煞/旺衰 annotations and case numbers are
  * omitted because the engine does not compute them (PRD no-mock rule).
+ *
+ * The 卦爻辞 panel carries each line's curated vernacular retelling above the received
+ * text (丁组 spec §5), so there is no separate 白话 block on this page: the retelling
+ * belongs to the line it translates.
  */
 export function ZhouyiPage() {
   const [method, setMethod] = useState<CastMethod>('three_coin');
@@ -196,20 +201,29 @@ function Meta({ label, value }: { label: string; value: string }) {
 /** Methodology + provenance note anchored to the real cast engine. */
 function Provenance({ cast }: { cast: ZhouyiCast }) {
   return (
-    <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">起卦溯源与免责</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本次以 <span className="text-gold-soft">{methodLabel(cast.method)}</span> 起卦，由{' '}
-            <span className="text-gold-soft">{cast.engine}</span> 依《周易》通行本与京房纳甲法真实推演；铜钱取爻以{' '}
-            <span className="text-gold-soft">{cast.rng}</span> 加密安全乱数决定，梅花时间法则依起卦时刻定数。
-            六爻为传统象数自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。
-          </p>
+    <div className="panel flex flex-col gap-4 p-5 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
+          <div className="flex flex-col gap-1">
+            <span className="font-display text-base text-ink">起卦溯源与免责</span>
+            <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
+              本次以 <span className="text-gold-soft">{methodLabel(cast.method)}</span> 起卦，由{' '}
+              <span className="text-gold-soft">{cast.engine}</span> 依《周易》通行本与京房纳甲法真实推演；铜钱取爻以{' '}
+              <span className="text-gold-soft">{cast.rng}</span> 加密安全乱数决定，梅花时间法则依起卦时刻定数。
+              六爻为传统象数自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。
+            </p>
+          </div>
         </div>
+        <span className="label-caps shrink-0 text-ink-muted">ENGINE · {cast.engine}</span>
       </div>
-      <span className="label-caps shrink-0 text-ink-muted">ENGINE · {cast.engine}</span>
+
+      <ProvenancePanel tables={cast.provenance.tables} />
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
+        <span className="label-caps">历法 · {cast.provenance.engine}</span>
+        <span className="label-caps">CONTENT · {cast.provenance.content_version}</span>
+      </div>
     </div>
   );
 }

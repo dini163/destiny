@@ -1,4 +1,5 @@
 import type { HexagramInfo, ZhouyiLine } from '../../types/zhouyi';
+import { PlainProse } from '../ui/PlainProse';
 
 interface ClassicalTextProps {
   /** 本卦 — supplies the 卦辞 and 用九/用六. */
@@ -12,8 +13,11 @@ interface ClassicalTextProps {
  * hexagram — its 卦辞, the 用九/用六 line when the hexagram is 乾 or 坤, and all
  * six 爻辞 in reading order (初 → 上), with the moving lines highlighted.
  *
- * Every string is the curated classical text returned by the engine's content
- * module; nothing is paraphrased or generated on the client.
+ * Every string is real: the classical text and its vernacular retelling both come from
+ * the engine's content tables (`content/zhouyi_guaci.py` / `zhouyi_yaoci_*.py` and
+ * `content/zhouyi_plain.py`). Nothing is paraphrased or generated on the client — the
+ * retelling above each line is the curated row, and the received text stays verbatim
+ * below it as the footnote.
  */
 export function ClassicalText({ ben, lines }: ClassicalTextProps) {
   return (
@@ -23,14 +27,14 @@ export function ClassicalText({ ben, lines }: ClassicalTextProps) {
           <span className="label-caps">卦辞 · JUDGMENT</span>
           <span className="gold-rule flex-1" />
         </div>
-        <p className="font-display text-lg leading-relaxed text-ink text-glow-gold">{ben.gua_ci}</p>
-        {ben.yong_ci ? (
-          <p className="font-display text-base leading-relaxed text-gold-soft">
-            <span className="label-caps mr-2 align-middle text-ink-muted">
-              {ben.number === 1 ? '用九' : '用六'}
-            </span>
-            {ben.yong_ci}
-          </p>
+        <PlainProse text={ben.plain_gua_ci} />
+        <p className="font-display text-sm leading-relaxed text-ink-muted">{ben.gua_ci}</p>
+        {ben.plain_yong_ci ? (
+          <div className="flex flex-col gap-1">
+            <span className="label-caps self-start text-ink-muted">{ben.number === 1 ? '用九' : '用六'}</span>
+            <PlainProse text={ben.plain_yong_ci} />
+            <p className="font-display text-sm leading-relaxed text-ink-muted">{ben.yong_ci}</p>
+          </div>
         ) : null}
       </section>
 
@@ -66,7 +70,8 @@ export function ClassicalText({ ben, lines }: ClassicalTextProps) {
                   </span>
                 ) : null}
               </div>
-              <p className="font-display text-sm leading-relaxed text-ink-variant">{line.yao_ci}</p>
+              <PlainProse text={line.plain_yao_ci} className="mb-1" />
+              <p className="font-display text-sm leading-relaxed text-ink-muted">{line.yao_ci}</p>
             </div>
           ))}
         </div>

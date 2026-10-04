@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "swords-07",
-      "name": "Seven of Swords",
-      "name_zh": "宝剑七",
+      "card_id": "pentacles-10",
+      "name": "Ten of Pentacles",
+      "name_zh": "星币十",
       "arcana": "minor",
-      "number": 7,
-      "suit": "swords",
+      "number": 10,
+      "suit": "pentacles",
       "rank": null,
-      "element": "air",
-      "orientation": "reversed",
+      "element": "earth",
+      "orientation": "upright",
       "keywords": [
-        "impostor syndrome",
-        "self-deceit",
-        "keeping secrets",
-        "conscience"
+        "legacy",
+        "culmination",
+        "inheritance",
+        "family wealth"
       ],
       "keywords_zh": [
-        "冒名顶替感",
-        "自欺",
-        "守着秘密",
-        "良知"
+        "传承",
+        "顶点成果",
+        "继承",
+        "家业财富"
       ],
-      "meaning": "Reversed, the deception unravels, or guilt compels the stolen blades be returned.",
-      "meaning_zh": "逆位时，欺瞒散开，或是愧疚逼着那些偷来的剑被还回去。"
+      "meaning": "Three generations gather beneath an arch of ten pentacles, wealth and legacy rooted in family.",
+      "meaning_zh": "三代人聚在十枚星币的拱下，财富与传承扎根在家里。"
     },
     {
       "position_index": 1,
@@ -44,29 +44,29 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "pentacles-01",
-      "name": "Ace of Pentacles",
-      "name_zh": "星币王牌",
+      "card_id": "wands-06",
+      "name": "Six of Wands",
+      "name_zh": "权杖六",
       "arcana": "minor",
-      "number": 1,
-      "suit": "pentacles",
+      "number": 6,
+      "suit": "wands",
       "rank": null,
-      "element": "earth",
-      "orientation": "reversed",
+      "element": "fire",
+      "orientation": "upright",
       "keywords": [
-        "lost opportunity",
-        "lack of planning",
-        "scarcity",
-        "poor foresight"
+        "success",
+        "public recognition",
+        "advancement",
+        "self-confidence"
       ],
       "keywords_zh": [
-        "错失的机会",
-        "疏于规划",
-        "短缺",
-        "缺乏远见"
+        "成功",
+        "公开的认可",
+        "晋升",
+        "自信心"
       ],
-      "meaning": "Reversed, a promising opportunity is missed through poor planning or a scarcity mindset.",
-      "meaning_zh": "逆位时，一个有希望的机会因规划粗疏或短缺心态而被错过。"
+      "meaning": "A victor rides crowned with laurel, wand raised, enjoying public acclaim and hard-won recognition.",
+      "meaning_zh": "得胜者头戴桂冠骑马而来，权杖高举，享受着公开的喝彩与来之不易的认可。"
     },
     {
       "position_index": 2,
@@ -75,40 +75,40 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "pentacles-05",
-      "name": "Five of Pentacles",
-      "name_zh": "星币五",
+      "card_id": "cups-01",
+      "name": "Ace of Cups",
+      "name_zh": "圣杯王牌",
       "arcana": "minor",
-      "number": 5,
-      "suit": "pentacles",
+      "number": 1,
+      "suit": "cups",
       "rank": null,
-      "element": "earth",
-      "orientation": "upright",
+      "element": "water",
+      "orientation": "reversed",
       "keywords": [
-        "financial loss",
-        "poverty",
-        "lack mindset",
-        "isolation"
+        "self-love",
+        "avoiding love",
+        "emotional vulnerability",
+        "emptiness"
       ],
       "keywords_zh": [
-        "财务损失",
-        "贫困",
-        "匮乏心态",
-        "孤立"
+        "自爱",
+        "回避爱意",
+        "情感上的脆弱",
+        "空乏"
       ],
-      "meaning": "Two figures trudge past a lit church window in the cold, embodying want, hardship and feeling left out.",
-      "meaning_zh": "两个人在寒冷中走过明亮的教堂彩窗，是匮乏、艰苦与被排除在外的滋味。"
+      "meaning": "Reversed, the cup runs dry or love is blocked; attend to self-love before giving.",
+      "meaning_zh": "逆位时，杯干了或爱被堵住，先把自己那份自爱补足，再往外给。"
     }
   ],
   "drawn_ids": [
-    "swords-07",
-    "pentacles-01",
-    "pentacles-05"
+    "pentacles-10",
+    "wands-06",
+    "cups-01"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 宝剑七（Seven of Swords），逆位，取的是 冒名顶替感、自欺、守着秘密。 现在（Present）抽出 星币王牌（Ace of Pentacles），逆位，取的是 错失的机会、疏于规划、短缺。 未来（Future）抽出 星币五（Five of Pentacles），正位，取的是 财务损失、贫困、匮乏心态。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 星币十（Ten of Pentacles），正位，取的是 传承、顶点成果、继承。 现在（Present）抽出 权杖六（Six of Wands），正位，取的是 成功、公开的认可、晋升。 未来（Future）抽出 圣杯王牌（Ace of Cups），逆位，取的是 自爱、回避爱意、情感上的脆弱。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
   "major_arcana_count": 0,
-  "reversed_count": 2,
+  "reversed_count": 1,
   "provenance": {
     "engine": "tarot-content-library",
     "content_version": "2026.09",

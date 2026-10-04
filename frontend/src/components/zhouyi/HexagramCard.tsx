@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { HexagramInfo } from '../../types/zhouyi';
 import { wuxingChip } from '../../lib/wuxing';
 import { HexagramGlyph } from '../ui/HexagramGlyph';
+import { PlainProse } from '../ui/PlainProse';
 
 interface HexagramCardProps {
   /** The hexagram to describe (变卦 or 互卦). */
@@ -20,8 +21,11 @@ interface HexagramCardProps {
  * 世应 and 卦辞 — but *without* per-line najia / 六亲 / 六神 dressing (only the
  * primary hexagram is dressed). This card therefore shows exactly what is real:
  * the six-line figure, King Wen number, palace + generation, trigram natures,
- * 世应 positions and the classical 卦辞 (plus 用九/用六 for 乾/坤). No 卦德
- * gloss, 六冲/六合 tag or 错卦/综卦 is invented.
+ * 世应 positions, the classical 卦辞 (plus 用九/用六 for 乾/坤) and the curated
+ * vernacular retelling of each — the retelling comes from `content/zhouyi_plain.py`
+ * on the same `HexagramInfo`, so 变卦 and 互卦 get the same table as 本卦 and this
+ * component holds no second copy of it. No 卦德 gloss, 六冲/六合 tag or 错卦/综卦
+ * is invented.
  */
 export function HexagramCard({ hexagram, moving, note }: HexagramCardProps) {
   return (
@@ -67,17 +71,17 @@ export function HexagramCard({ hexagram, moving, note }: HexagramCardProps) {
 
       <div className="gold-rule" />
 
-      <p className="font-display text-sm leading-relaxed text-ink-variant">
-        <span className="label-caps mr-2 align-middle">卦辞</span>
-        {hexagram.gua_ci}
-      </p>
-      {hexagram.yong_ci ? (
-        <p className="font-display text-sm leading-relaxed text-gold-soft">
-          <span className="label-caps mr-2 align-middle text-ink-muted">
-            {hexagram.number === 1 ? '用九' : '用六'}
-          </span>
-          {hexagram.yong_ci}
-        </p>
+      <div className="flex flex-col gap-1">
+        <span className="label-caps">卦辞</span>
+        <PlainProse text={hexagram.plain_gua_ci} />
+        <p className="font-display text-sm leading-relaxed text-ink-muted">{hexagram.gua_ci}</p>
+      </div>
+      {hexagram.plain_yong_ci ? (
+        <div className="flex flex-col gap-1">
+          <span className="label-caps text-ink-muted">{hexagram.number === 1 ? '用九' : '用六'}</span>
+          <PlainProse text={hexagram.plain_yong_ci} />
+          <p className="font-display text-sm leading-relaxed text-ink-muted">{hexagram.yong_ci}</p>
+        </div>
       ) : null}
     </div>
   );

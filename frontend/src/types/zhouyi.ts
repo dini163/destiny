@@ -3,6 +3,8 @@
  * snake_case is preserved end-to-end.
  */
 
+import type { ProvenanceTable } from './common';
+
 /** How the hexagram is cast. */
 export type CastMethod = 'three_coin' | 'manual' | 'time';
 
@@ -52,6 +54,8 @@ export interface ZhouyiLine {
   yao_name: string;
   /** 爻辞 — the classical line statement of the primary hexagram. */
   yao_ci: string;
+  /** 爻辞的白话今译，逐键取自 `content/zhouyi_plain.py`。 */
+  plain_yao_ci: string;
 }
 
 /** Structural identity of a hexagram plus its classical 卦辞. */
@@ -90,8 +94,24 @@ export interface HexagramInfo {
   ying: number;
   /** 卦辞 — the classical hexagram judgment. */
   gua_ci: string;
+  /** 卦辞的白话今译。 */
+  plain_gua_ci: string;
   /** 用九/用六 line (乾/坤 only); null for the other 62 hexagrams. */
   yong_ci: string | null;
+  /** 用九/用六的今译；其余 62 卦为 null 是忠实的缺席（丁组 spec §5）。 */
+  plain_yong_ci: string | null;
+}
+
+/**
+ * 出处块，镜像 `backend/app/schemas/zhouyi.py` 的 `ZhouyiProvenance`。
+ *
+ * `engine`（恒 `lunar-python`）是**历法事实**的来源，与顶层 `engine`（本端点推导器名
+ * `liuyao-najia`）同名不同职——两个键都在响应里，别在页面上把它们混成一句话。
+ */
+export interface ZhouyiProvenance {
+  engine: string;
+  content_version: string;
+  tables: ProvenanceTable[];
 }
 
 /** Complete Zhouyi cast produced by the backend engine. */
@@ -114,6 +134,8 @@ export interface ZhouyiCast {
   moving_positions: number[];
   /** The six dressed lines of the primary hexagram. */
   lines: ZhouyiLine[];
+
+  provenance: ZhouyiProvenance;
 
   rng: string;
   engine: string;
