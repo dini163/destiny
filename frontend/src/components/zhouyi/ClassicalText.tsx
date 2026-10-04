@@ -4,7 +4,7 @@ import { PlainProse } from '../ui/PlainProse';
 interface ClassicalTextProps {
   /** 本卦 — supplies the 卦辞 and 用九/用六. */
   ben: HexagramInfo;
-  /** The six dressed lines; each carries its classical 爻辞 of the primary hexagram. */
+  /** The six dressed lines; each carries its classical 爻辞 of the primary hexagram and its 今译. */
   lines: ZhouyiLine[];
 }
 

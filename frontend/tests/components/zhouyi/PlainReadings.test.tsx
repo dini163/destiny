@@ -44,6 +44,7 @@ describe('周易就地今译与出处块', () => {
       expect(hexagram.plain_gua_ci).not.toBe(hexagram.gua_ci);
     }
     if (cast.bian) {
+      expect(cast.bian.plain_gua_ci).toBeTruthy();
       expect(cast.bian.plain_gua_ci).not.toBe(cast.bian.gua_ci);
     }
     // 55 卦没有用九/用六：这一格是 null 而不是空串（spec §5「忠实的缺席」）。
@@ -93,7 +94,11 @@ describe('周易就地今译与出处块', () => {
     ]);
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
     expect(page).toContain('<ProvenancePanel tables={cast.provenance.tables} />');
-    pinLiteralOrder(page, ['起卦溯源与免责', '<ProvenancePanel tables=']);
+    pinLiteralOrder(page, ['起卦溯源与免责', '<ProvenancePanel tables=', '历法 · ']);
+    // 两个同名不同职的 `engine`（顶层 = 本端点推导器名，`provenance.engine` = 历法库）不许混成
+    // 一句话：历法那一格只能出现在面板之下的小字行里（雷诺曼同法，`tests/components/
+    // lenormand/PlainSummary.test.tsx:83` 的三锚点形状）。
+    expect(page).toContain('历法 · {cast.provenance.engine}');
     // 出处口径不许有两份手抄（R37 那一类）：页面正文那段说「依《周易》通行本与京房纳甲法
     // 真实推演」，具体是哪五张表一律由面板从响应渲染，源码里不许出现表名。
     expect(page).not.toContain('zhouyi_plain');
@@ -108,6 +113,12 @@ describe('周易就地今译与出处块', () => {
     pinLiteralOrder(text, ['{ben.plain_gua_ci}', '{ben.gua_ci}']);
     pinLiteralOrder(text, ['{line.plain_yao_ci}', '{line.yao_ci}']);
     pinLiteralOrder(card, ['{hexagram.plain_gua_ci}', '{hexagram.gua_ci}']);
+    // 用九/用六那一支夹具吃不到（头注「限度」），所以它的今译/原句两头都由源码扫钉：
+    // 只钉 `{ben.gua_ci}` 的话，删掉 `{ben.plain_yong_ci}` 那一行没人管得住。
+    expect(text).toContain('<PlainProse text={ben.plain_yong_ci} />');
+    expect(card).toContain('<PlainProse text={hexagram.plain_yong_ci} />');
+    pinLiteralOrder(text, ['{ben.plain_yong_ci}', '{ben.yong_ci}']);
+    pinLiteralOrder(card, ['{hexagram.plain_yong_ci}', '{hexagram.yong_ci}']);
     // 用九/用六的 title 仍由 `number === 1` 派生（偏差表第 6 行：本期不动它）。
     expect(text).toContain("ben.number === 1 ? '用九' : '用六'");
     expect(card).toContain("hexagram.number === 1 ? '用九' : '用六'");
