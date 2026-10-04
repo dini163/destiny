@@ -99,6 +99,8 @@ describe('周易就地今译与出处块', () => {
     // 一句话：历法那一格只能出现在面板之下的小字行里。三锚点形状照雷诺曼那一家的先例
     // （`tests/components/lenormand/PlainSummary.test.tsx:83`）。
     expect(page).toContain('历法 · {cast.provenance.engine}');
+    // 另一个同名 engine（顶层 = 本端点推导器名）也钉住，两个 engine 标签如今两端都锁死。
+    expect(page).toContain('ENGINE · {cast.engine}');
     // 出处口径不许有两份手抄（R37 那一类）：页面正文那段说「依《周易》通行本与京房纳甲法
     // 真实推演」，具体是哪五张表一律由面板从响应渲染，源码里不许出现表名。
     expect(page).not.toContain('zhouyi_plain');
