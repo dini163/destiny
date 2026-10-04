@@ -2,10 +2,11 @@
 
 自 T13 起本文件吃**真登记**的那张 `PLAIN_CORPORA["zhouyi"]`（即 `ZHOUYI`），与工厂同源。
 共享措辞契约那一条工厂也在跑（工厂侧叫 `test_every_entry_meets_the_wording_contract`）；
-本文件另 20 条门工厂一条都不跑（条数复测：`cd backend && grep -c "^def test_" tests/content/test_zhouyi_plain_corpus.py`
-→ 21，减去与工厂同跑的那一条），其中最要紧的是断词那一族（引用 / 不漏译 / 不升格、剥 `「…」`
+本文件另 24 条门工厂一条都不跑（条数复测：`cd backend && grep -c "^def test_" tests/content/test_zhouyi_plain_corpus.py`
+→ 25，减去与工厂同跑的那一条），其中最要紧的是断词那一族（引用 / 不漏译 / 不升格、剥 `「…」`
 后的建议词，以及七类自述句：爻题起头 / 极性·位·得正失正 / 世应 / 断词个数 / 点名断词 / 字数 /
 处数），另有 anchor 逐字、键构造器、`COVERED` 名单、门 2「源文不漏进 `entries`」、出处串自述，
+以及 Plan E 终审补的四门两字·点名单字·句数·中间段自述（`G1`-`G4`），
 与文件末尾的三条登记钉（`PLAIN_CORPORA` 名下一份、登记形状、450 键全集）和三条出处钉
 （`ZHOUYI_CONTENT_SOURCES` 的逐字名单、与梅花共用串的等值、今译表落在第五行）。
 
@@ -299,6 +300,108 @@ def test_every_stated_position_tally_matches_the_line_binaries() -> None:
             assert _CN_COUNT[m.group(1)] == real, (
                 f"{key} 说「{m.group(0)}」，{hexagram.name_zh} 卦画里失位 {misplaced} 爻、"
                 f"得正 {6 - misplaced} 爻"
+            )
+
+
+#: ── Plan E 终审新增四门：钉「自述自己 anchor」那一族谎话 ──────────────────────────────
+#: 这四门由 2026-10-03 丁组 spec 的**全分支终审**建：450 条今译里有六句把自己 anchor 的
+#: 结构说反了，而那六个句式恰好落在计划「每批由评审员人核」的豁免里，人核那道缓解失效，
+#: 终审逐句读 anchor 才抓出来。G1-G4 把可判的那四类谎话收进机器；(c) gua.36 那一类
+#: 「把注释当清点句」不可从 anchor 单判，仍留人读，故不在门下。
+#: 断句基准：`anchor.split("。")` 去空段——原文里一个「。」切一句，与 `「N句里」`、
+#: 「中间那句」、「同一句里」这些自述句数的说法同口径。
+_TWO_CHAR_ID = re.compile(r"([一-龥]{2})二字")
+_NAMED_CHAR = re.compile(r"它给的([一-龥])字")
+_SENTENCE_SPAN = re.compile(r"在([一两二三四五六])句里")
+_ONE_SENTENCE_ID = re.compile(r"同一句里")
+_MIDDLE_SEGMENT = re.compile(r"中间那句")
+_NAMED_VERDICT = re.compile(r"原断词是「([吉凶厉悔吝咎])」")
+
+
+def _segments(anchor: str) -> list[str]:
+    """按「。」切句、去空尾段——四门共用的断句口径。"""
+    return [s for s in anchor.split("。") if s.strip()]
+
+
+def test_every_two_character_identity_claim_is_contiguous_in_its_source() -> None:
+    """「XY二字」是**逐字身份句**：说 anchor（或卦名）里有连着两字 XY，那 XY 必须真连着出现。
+    写「小事」却称 anchor 压着「小心」就是把没在原文里的字端给了用户。条数复测（本正则同口径）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re
+    from app.content.zhouyi_plain import ZHOUYI_READINGS as R;print(sum(len(re.findall(r'([一-龥]{2})二字',v)) for v in R.values()))"` → 1。
+    命中这一式的只有 `gua.38`（睽·小事吉。），终审正是从这里揪出「小心二字」→「小事二字」。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        name = HEXAGRAM_BY_NUMBER[int(key.split(".")[2])].name_zh
+        for m in _TWO_CHAR_ID.finditer(ZHOUYI_READINGS[key]):
+            pair = m.group(1)
+            assert pair in anchor or pair in name, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」卦名「{name}」里没有连着的 {pair} 二字"
+            )
+
+
+def test_every_named_single_character_is_in_the_anchor() -> None:
+    """「它给的X字」点名 anchor 里那一个**单字**，X 就必须真在 anchor 里——这是比 G1 更窄的一式，
+    只认「它给的」+ 单字 + 「字」。不复用宽度更大的 `X字` 门：全站实测 34 条用「…字」，宽的写法
+    会误红约 28 条合法句（「把久字当作…」），清点那族已由 `:261` 的 `_CHAR_COUNT` 负责。条数复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re
+    from app.content.zhouyi_plain import ZHOUYI_READINGS as R;print(sum(len(re.findall(r'它给的[一-龥]字',v)) for v in R.values()))"` → 1。
+    命中只有 `gua.21`（噬嗑·亨，利用狱。），终审揪出「刑字」→「狱字」。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        for m in _NAMED_CHAR.finditer(ZHOUYI_READINGS[key]):
+            assert m.group(1) in anchor, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」里没有 {m.group(1)} 字"
+            )
+
+
+def test_every_stated_sentence_span_matches_the_anchor_segments() -> None:
+    """句数自述两式，都拿 `。`-切段复算（丁组 spec §4.4「段② 只许说 anchor 里已有的结构」）：
+    ①「在N句里」声称内容横跨 N 句，anchor 去空段就得 ≥N 段；若同句还带「各」，
+      `原断词是「X」` 点名的断词就得在**恰好** N 段里各出现一次（各 = 每段一次）。
+    ②「同一句里」声称两件事挤在同一句，那 anchor 就只能有 1 段——把分在两句里的东西说成同一句，
+      既谎报结构又和同段的「末句」自相矛盾（终审 `gua.48` 正是这句）。
+    复测（本测两正则同口径，Items 1–2 落地后）：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "import re;from app.content.zhouyi_plain import ZHOUYI_READINGS as
+    R;print('在N句里',sum(len(re.findall(r'在[一两二三四五六]句里',v)) for v in R.values()),
+    '同一句里',sum(len(re.findall('同一句里',v)) for v in R.values()))"` → 在N句里 2（`gua.48`、`yao.24.6` 两句，各 2 段真话）
+    / 同一句里 1（`yao.7.1`「师出以律，否臧凶。」单段，「摆在同一句里」正是真话，此路放行）。
+    终审前这两句都是谎：`gua.48` 把分在两句里的东西说成同一句、`yao.24.6` 说断词「凶」在同一句里出现两次
+    （实际每段各一次），故本门落地时对这两行先红后绿。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        reading = ZHOUYI_READINGS[key]
+        segs = _segments(anchor)
+        for m in _SENTENCE_SPAN.finditer(reading):
+            want = _CN_COUNT[m.group(1)]
+            assert len(segs) >= want, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」只有 {len(segs)} 段"
+            )
+            if "各" in reading:
+                named = _NAMED_VERDICT.search(reading)
+                if named:
+                    hit = sum(1 for s in segs if named.group(1) in s)
+                    assert hit == want, (
+                        f"{key} 说断词「{named.group(1)}」在 {want} 句里各一次，"
+                        f"anchor「{anchor}」里它在 {hit} 段出现"
+                    )
+        for m in _ONE_SENTENCE_ID.finditer(reading):
+            assert len(segs) == 1, (
+                f"{key} 说「{m.group(0)}」当作同一句，anchor「{anchor}」却有 {len(segs)} 段"
+            )
+
+
+def test_every_middle_segment_claim_needs_three_segments() -> None:
+    """「中间那句」预设 anchor 至少三段才谈得上中间；两段就没有中间，把末句称作中间那句是错指。
+    前瞻兜底门：Items 1–2 落地后全站命中归零，复测
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re
+    from app.content.zhouyi_plain import ZHOUYI_READINGS as R;print(sum(len(re.findall('中间那句',v)) for v in R.values()))"` → 0。
+    终审落地前这条给 1（`gua.18`「元亨，利涉大川。先甲三日，后甲三日。」两段却把末句写成「中间那句」，
+    改「末那句」后归零）；留门是为后来者再写「中间那句」而原文不足三段时立刻红。"""
+    for key in _built_keys():
+        anchor = ZHOUYI_ANCHORS[key]
+        for m in _MIDDLE_SEGMENT.finditer(ZHOUYI_READINGS[key]):
+            assert len(_segments(anchor)) >= 3, (
+                f"{key} 说「{m.group(0)}」，anchor「{anchor}」只有 {len(_segments(anchor))} 段，没有中间"
             )
 
 
