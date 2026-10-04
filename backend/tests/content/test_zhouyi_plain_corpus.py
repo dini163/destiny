@@ -313,6 +313,10 @@ def test_every_stated_position_tally_matches_the_line_binaries() -> None:
 _TWO_CHAR_ID = re.compile(r"([一-龥]{2})二字")
 _NAMED_CHAR = re.compile(r"它给的([一-龥])字")
 _SENTENCE_SPAN = re.compile(r"在([一两二三四五六])句里")
+#: 「在N句里……各」——「各」得紧跟在同一小句里才算逐段清点，且点名的断词取该小句之前
+#: 最近的「原断词是「X」」。整行别处的「各」不算：像「摆在事情前后各三天去推」这类写法
+#: 把「各」用在别的东西上，若按整行判就会让这一支因为毫不相干的字而红（终审复审 F-2）。
+_SPAN_EACH = re.compile(r"在[一两二三四五六]句里[^，。]*各")
 _ONE_SENTENCE_ID = re.compile(r"同一句里")
 _MIDDLE_SEGMENT = re.compile(r"中间那句")
 _NAMED_VERDICT = re.compile(r"原断词是「([吉凶厉悔吝咎])」")
@@ -356,15 +360,19 @@ def test_every_named_single_character_is_in_the_anchor() -> None:
 
 def test_every_stated_sentence_span_matches_the_anchor_segments() -> None:
     """句数自述两式，都拿 `。`-切段复算（丁组 spec §4.4「段② 只许说 anchor 里已有的结构」）：
-    ①「在N句里」声称内容横跨 N 句，anchor 去空段就得 ≥N 段；若同句还带「各」，
-      `原断词是「X」` 点名的断词就得在**恰好** N 段里各出现一次（各 = 每段一次）。
-    ②「同一句里」声称两件事挤在同一句，那 anchor 就只能有 1 段——把分在两句里的东西说成同一句，
-      既谎报结构又和同段的「末句」自相矛盾（终审 `gua.48` 正是这句）。
-    复测（本测两正则同口径，Items 1–2 落地后）：`cd backend && PYTHONIOENCODING=utf-8
+    ①「在N句里」声称内容横跨 N 句，anchor 去空段就得 ≥N 段；若同一小句里紧跟着「各」，
+      该小句之前那个 `原断词是「X」` 点名的断词就得在**恰好** N 段里出现（各 = 每段都有）。
+    ②「同一句里」声称两件事挤在同一句，本门按 anchor 只有 1 段来判——把分在两句里的东西说成
+      同一句，既谎报结构又和同段的「末句」自相矛盾（终审 `gua.48` 正是这句）。
+    ②是**保守近似**而非定义：多段 anchor 里「这两样都在第一句」那种真话本门辨不出，一律红。
+    正解是把白话改写成「两句/某句」的口径，**不是把 `== 1` 松成 `>= 1`**——松了就等于没门。
+    复测（本测三正则同口径，Items 1–2 落地后）：`cd backend && PYTHONIOENCODING=utf-8
     .venv/Scripts/python.exe -c "import re;from app.content.zhouyi_plain import ZHOUYI_READINGS as
     R;print('在N句里',sum(len(re.findall(r'在[一两二三四五六]句里',v)) for v in R.values()),
-    '同一句里',sum(len(re.findall('同一句里',v)) for v in R.values()))"` → 在N句里 2（`gua.48`、`yao.24.6` 两句，各 2 段真话）
-    / 同一句里 1（`yao.7.1`「师出以律，否臧凶。」单段，「摆在同一句里」正是真话，此路放行）。
+    '在N句里各',sum(len(re.findall(r'在[一两二三四五六]句里[^，。]*各',v)) for v in R.values()),
+    '同一句里',sum(len(re.findall('同一句里',v)) for v in R.values()))"` → 在N句里 2（`gua.48`、
+    `yao.24.6`，各 2 段真话）/ 在N句里各 1（`yao.24.6`，凶在两段各有）/ 同一句里 1（`yao.7.1`
+    「师出以律，否臧凶。」单段，「摆在同一句里」正是真话，此路放行）。
     终审前这两句都是谎：`gua.48` 把分在两句里的东西说成同一句、`yao.24.6` 说断词「凶」在同一句里出现两次
     （实际每段各一次），故本门落地时对这两行先红后绿。"""
     for key in _built_keys():
@@ -376,14 +384,15 @@ def test_every_stated_sentence_span_matches_the_anchor_segments() -> None:
             assert len(segs) >= want, (
                 f"{key} 说「{m.group(0)}」，anchor「{anchor}」只有 {len(segs)} 段"
             )
-            if "各" in reading:
-                named = _NAMED_VERDICT.search(reading)
-                if named:
-                    hit = sum(1 for s in segs if named.group(1) in s)
-                    assert hit == want, (
-                        f"{key} 说断词「{named.group(1)}」在 {want} 句里各一次，"
-                        f"anchor「{anchor}」里它在 {hit} 段出现"
-                    )
+            named = None
+            for candidate in _NAMED_VERDICT.finditer(reading[: m.start()]):
+                named = candidate
+            if _SPAN_EACH.match(reading, m.start()) and named:
+                hit = sum(1 for s in segs if named.group(1) in s)
+                assert hit == want, (
+                    f"{key} 说断词「{named.group(1)}」在 {want} 句里各一次，"
+                    f"anchor「{anchor}」里它在 {hit} 段出现"
+                )
         for m in _ONE_SENTENCE_ID.finditer(reading):
             assert len(segs) == 1, (
                 f"{key} 说「{m.group(0)}」当作同一句，anchor「{anchor}」却有 {len(segs)} 段"
