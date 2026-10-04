@@ -216,8 +216,12 @@ SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: 说的是同一列 `meihua_number`，两个词不许混着改），页面上那句卦辞（`zhouyi_text`）。
 #: `zhouyi_text` 是聚合面，它印进响应的卦辞正文住在 `content/zhouyi_guaci.py` 的 `GUA_CI`
 #: （复测：`cd backend && grep -n "GUA_CI" app/content/zhouyi_text.py`）。
-#: 不列的两张各有其因：`content/wuxing` 只提供生克关系这一结构运算、其文字不进任何响应
-#: （同 `CONTENT_SOURCES` 今天也不列 wuxing 的既有口径）；`lunar-python` 定农历数与月建，
+#: 不列的两张各有其因：`content/wuxing` 不进 tables 是一条**只管文案表**的口径——它自维护的
+#: 五行生克叙述（哪一生哪一克那一段话）不转述进任何响应，故不列（同 `CONTENT_SOURCES` 今天
+#: 也不列 wuxing 的既有口径）。这条口径只管文案、不管字段取值：地支本气 `zhi_element` 就取自
+#: `ZHI_ELEMENT`（复测：`cd backend && grep -n "zhi_element" app/schemas/bazi.py` 命中字段声明，
+#: 填装在 `app/engines/bazi_pillar.py`），那是**字段的五行名**而非生克文案，与「文案不进响应」不冲突；
+#: 旧注说成「其文字不进任何响应」是说过头了，Plan E 终审改口。`lunar-python` 定农历数与月建，
 #: 它供给的是**计算事实**，没有被转述进响应的文案，故不进 tables 也不是漏账——它在
 #: `provenance.engine` 那一格按八字 `engines/bazi.py:352` 的短值口径认账。分界画在文案上、
 #: 不画在版本上：库的文案进了响应就得进表打版，本文件 `ALMANAC_CONTENT_SOURCES` 列通书
@@ -235,9 +239,11 @@ MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: 一张京房纳甲与六神起例，以及逐条转述它们的今译表。单列理由同 `ZIWEI_CONTENT_SOURCES`：
 #: 主八字盘不引用它们。三张 `zhouyi_*` 的出处串与 `MEIHUA_CONTENT_SOURCES` 共用同一份常量
 #: （丁组计划偏差表第 5 行）。
-#: **不列 `content/wuxing`**：全站口径是「只提供生克关系这一结构运算、其文字不进任何响应」
+#: **不列 `content/wuxing`**：全站口径是「它自维护的五行生克**文案**不转述进响应，故不进 tables」
 #: （本文件 `MEIHUA_CONTENT_SOURCES` 注里写的同一条，八字同样不列，复测：
 #: `cd backend && grep -n "wuxing" app/content/__init__.py` → 只命中注释行，一张清单都没列它）。
+#: 这条只管文案表、不管字段取值——五行名确实进响应（复测：`cd backend && grep -n "zhi_element" app/schemas/bazi.py`
+#: 命中字段声明），旧注「其文字不进任何响应」说过头了，Plan E 终审改口为「生克文案不进响应」。
 #: 张力写在明处：周易这一侧每爻的 `branch_element` 确实是 `ZHI_ELEMENT` 的字面
 #: （`engines/zhouyi.py:224`，复测：`cd backend && grep -n "branch_element=ZHI_ELEMENT" app/engines/zhouyi.py` → 224），
 #: 丁组 spec §5 因此要求列它——本计划不因一个系统破全站口径。
