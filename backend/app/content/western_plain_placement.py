@@ -12,10 +12,10 @@
 
 from app.content.western_plain import planet_house_key, planet_sign_key
 
-#: 本表按批追加，各族当前条数不住在这里，由
-#: `tests/content/test_western_plain_corpus.py::ROSTER_TARGETS` 逐批钉住（复测：
-#: `cd backend && grep -n "ROSTER_TARGETS" -A8 tests/content/test_western_plain_corpus.py`）。
-#: `planet_sign` 120 条归 T1-T3，`planet_house` 120 条归 T4-T6。
+#: 本表按批追加。下面的 `#` 行标的是**一族应有多少条**（族内总数，不是已落地数）；
+#: 各族**已落地**的条数由 `tests/content/test_western_plain_corpus.py::ROSTER_TARGETS`
+#: 逐批钉住（复测：`cd backend && grep -n "ROSTER_TARGETS" -A12 tests/content/test_western_plain_corpus.py`，
+#: 该表共十族，故 `-A12` 才盖得住）。`planet_sign` 120 条归 T1-T3，`planet_house` 120 条归 T4-T6。
 WESTERN_PLACEMENT_READINGS: dict[str, str] = {
     # Sun 太阳落十二座（12 条）
     planet_sign_key("Sun", "Aries"): "你太阳落在白羊，自我表达默认是抢先一步的那档，事情还没谈完就已经动手，别人读到的你是快、直、不太等人。",
