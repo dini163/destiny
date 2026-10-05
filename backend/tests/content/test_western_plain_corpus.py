@@ -73,9 +73,9 @@ ROSTER_TARGETS: dict[str, int] = {
     "node_sign": 12,
     "node_house": 12,
     "house_theme": 12,
-    "element": 0,
-    "modality": 0,
-    "retrograde": 0,
+    "element": 4,
+    "modality": 3,
+    "retrograde": 10,
 }
 
 
