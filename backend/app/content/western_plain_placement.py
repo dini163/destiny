@@ -12,8 +12,10 @@
 
 from app.content.western_plain import planet_house_key, planet_sign_key
 
-#: T1 落地 `planet_sign` 的 Sun/Moon/Mercury 三族 36 条（本族 120 条的前三族），
-#: `planet_house` 一族归 T4-T6，其余各族见各批。
+#: 本表按批追加，各族当前条数不住在这里，由
+#: `tests/content/test_western_plain_corpus.py::ROSTER_TARGETS` 逐批钉住（复测：
+#: `cd backend && grep -n "ROSTER_TARGETS" -A8 tests/content/test_western_plain_corpus.py`）。
+#: `planet_sign` 120 条归 T1-T3，`planet_house` 120 条归 T4-T6。
 WESTERN_PLACEMENT_READINGS: dict[str, str] = {
     # Sun 太阳落十二座（12 条）
     planet_sign_key("Sun", "Aries"): "你太阳落在白羊，自我表达默认是抢先一步的那档，事情还没谈完就已经动手，别人读到的你是快、直、不太等人。",
@@ -85,12 +87,12 @@ WESTERN_PLACEMENT_READINGS: dict[str, str] = {
     planet_sign_key("Jupiter", "Taurus"): "你木星落在金牛，扩张走在实处，一样样攒在手边的东西才让人安心，机会来得慢而稳，肯在吃穿用度上花心思，日子也就过得厚。",
     planet_sign_key("Jupiter", "Gemini"): "你木星落在双子，运气藏在听来的消息里，多认识几个人就多一条路，学什么都上手快，长处是把几种说法接成自己能用的部分。",
     planet_sign_key("Jupiter", "Cancer"): "你木星落在巨蟹，被托住的感觉来自那几段亲近关系，屋里气氛一好整个人都放开，肯给自家人留余地，好运常常和照顾别人一起来。",
-    planet_sign_key("Jupiter", "Leo"): "你木星落在狮子，运气在人前展开，被看见就有资源跟上来，肯大方给也肯被夸，舞台感一丢，气势先矮下去一截。",
+    planet_sign_key("Jupiter", "Leo"): "你木星落在狮子，运气在人前展开，被人看见的时候机会容易凑到跟前，肯大方给也肯被夸，舞台感一丢，气势先矮下去一截。",
     planet_sign_key("Jupiter", "Virgo"): "你木星落在处女，扩张走在一件件小事里，把手艺磨精就是这一格的运气路，讲用处不讲排场，长处是把乱的东西理成能跑的秩序。",
     planet_sign_key("Jupiter", "Libra"): "你木星落在天秤，运气在谈得成的场合里，讲公道话容易引来帮手，两头的道理都肯听，机会多在与人商量处出现，独断反倒把局收窄。",
     planet_sign_key("Jupiter", "Scorpio"): "你木星落在天蝎，扩张走深不走宽，越是难啃的事越给你长劲，看穿一层就敢往一层里去，运气带着烈度，来得慢但一次给得足。",
     planet_sign_key("Jupiter", "Sagittarius"): "你木星落在射手，运气与扩张都走在远的方向，路走得越开、见的事越多，你越容易觉得自己被托住。",
     planet_sign_key("Jupiter", "Capricorn"): "你木星落在摩羯，运气靠一格格往上垒，肯多担一点就多接一分分量，扩得慢却扎实，时间在这条路上是站在你这一边的。",
     planet_sign_key("Jupiter", "Aquarius"): "你木星落在水瓶，运气在人群和新鲜念头里，圈子里多认识一位就多开一扇窗，肯给不相干的人留余地，扩张的方向是先人后己。",
-    planet_sign_key("Jupiter", "Pisces"): "你木星落在双鱼，扩张是没有边界的那一种，靠感受和想象把世界放大，对谁都不忍把话说死，运气来得含糊，常在不算计时出现。",
+    planet_sign_key("Jupiter", "Pisces"): "你木星落在双鱼，扩张走的不是数得清的路子，靠感受和想象把世界放大，对谁都不忍把话说死，运气来得含糊，常在你不追着要结果的时候出现。",
 }
