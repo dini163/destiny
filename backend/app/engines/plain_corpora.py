@@ -7,12 +7,15 @@
 
 from __future__ import annotations
 
+from itertools import combinations, product
+
 from app.content import (
     kabbalah_plain,
     lenormand_plain,
     name_plain,
     qimen_plain,
     synastry_plain,
+    western_plain,
     zhouyi_plain,
     ziwei_plain,
 )
@@ -40,7 +43,7 @@ from app.engines.plain_compose import PlainCorpus
 # 这条合法。**不许**改成 `from app.engines.synastry import _AXIS_ZH`——`synastry.py` 反过来要
 # import 本模块取 `SYNASTRY`，那就是循环。两轴的字面量因此留在 `_synastry_universe()` 里，
 # 由本系统 golden 测的那条 `_AXIS_ZH` 对账条款守住它不漂。
-from app.engines.western import ASPECTS, PLANETS
+from app.engines.western import ASPECTS, PLANETS, SIGN_ELEMENT, SIGN_MODALITY, SIGNS
 
 
 def _bazi_universe() -> set[str]:
@@ -283,6 +286,63 @@ ZHOUYI = PlainCorpus(
     # 源表多一条而今译少一句，工厂的 `set(entries) == universe()` 立刻红。
     # 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 450。
     universe=zhouyi_plain.plain_universe,
+)
+
+
+def _western_universe() -> set[str]:
+    """西洋本命的键全集 = spec §5.3 那十条键式，基数全部从 content/engines 现算，不写字面量清单。
+
+    542 = 120 落座 + 120 落宫 + 225 相位 + 24 轴座 + 12 交点座 + 12 交点宫 + 12 宫题
+          + 4 元素 + 3 形态 + 10 逆行。条数复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import WESTERN; print(len(WESTERN.universe()))"` → 542。
+    分族基数复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from itertools import combinations; from app.engines.western import ASPECTS, PLANETS; print(len(list(combinations(PLANETS,2))), len(ASPECTS))"` → 45 5（225 = 45×5）。
+
+    元素与形态的名册从 `SIGN_ELEMENT`/`SIGN_MODALITY` 用 `dict.fromkeys` 去重取，不写四串三串：
+    那两张表是 `SIGNS` 的平行数组（`engines/western.py:42-43`），星座表一动这里自动跟着动，
+    写字面量清单就是把「十二个星座各属哪一格」这件事抄第二遍。
+    """
+    planet_names = [name for name, *_ in PLANETS]
+    aspect_names = [aspect[0] for aspect in ASPECTS]
+    return (
+        {western_plain.planet_sign_key(planet, sign) for planet, sign in product(planet_names, SIGNS)}
+        | {western_plain.planet_house_key(planet, house) for planet, house in product(planet_names, range(1, 13))}
+        | {
+            western_plain.aspect_key(first, second, aspect)
+            for (first, second), aspect in product(combinations(planet_names, 2), aspect_names)
+        }
+        # 两轴写字面量而不是取 `compute_western_chart` 的 `axes`：那张表恒含 DES/IC 四枚（`engines/western.py:202-203`
+        # 就是 `ascendant + 180` 算出来的镜像），而 spec §2 刻意不建 DES/IC 与南交点。同一处形状
+        # 的先例是 `_synastry_universe` 里那两枚 `("ASC", "MC")`（本文件上方 `SYNASTRY` 登记前的
+        # import 注），漂了由 `test_western_plain_corpus.py` 的轴族对账门抓。
+        | {western_plain.axis_sign_key(axis, sign) for axis, sign in product(("ASC", "MC"), SIGNS)}
+        | {western_plain.node_sign_key(sign) for sign in SIGNS}
+        | {western_plain.node_house_key(house) for house in range(1, 13)}
+        | {western_plain.house_theme_key(house) for house in range(1, 13)}
+        | {western_plain.element_key(element) for element in dict.fromkeys(SIGN_ELEMENT)}
+        | {western_plain.modality_key(modality) for modality in dict.fromkeys(SIGN_MODALITY)}
+        | {western_plain.retrograde_key(planet) for planet in planet_names}
+    )
+
+
+#: 西洋本命白话的登记表：542 条自撰判语（spec 裁定 R46「自撰 + 诚实双署」）。
+#: **本对象从 T1 就存在但不进 `PLAIN_CORPORA`**，登记行归 T15——提前登记会让工厂的
+#: `set(entries) == universe()` 从 T1 红到 T14（`universe()` 是全量算的，语料是一批批建的）。
+#: 这段时间它的口径由 `tests/content/test_western_plain_corpus.py` 逐条守着：那 542 例不依赖
+#: 登记，所以「登记被撤销/忘了加」这一类失败在本系统里仍有一条独立验证（同一立意的先例见
+#: `tests/content/test_zhouyi_plain_corpus.py:85` 那条刻意重复的契约测）。
+WESTERN = PlainCorpus(
+    system="western",
+    entries=western_plain.WESTERN_READINGS,
+    # 八个小节 + 两条空态开篇句，共十条；键名就是 `build_plain` 传给 `compose()` 的 section 名。
+    openers=western_plain.WESTERN_OPENERS,
+    # 本命盘没有分数账本（spec 裁定 R48）：三页一律不给「这盘好不好」的总结句，
+    # 而 `plain_compose.py:72-74` 那条 `ValueError` 正是为了拦「由合成器补一句结论」。
+    closers=None,
+    # 不分带（spec §6 三条理由：丙组三条语料今天全是 keep；`band` 分支遇 0 值符号直接崩而落座/
+    # 宫题/元素没有符号；页尾块的次序应按盘面既有次序，重排本身就是一种判断）。
+    grouping="keep",
+    universe=_western_universe,
 )
 
 

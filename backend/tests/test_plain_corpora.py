@@ -21,7 +21,7 @@ import pytest
 
 from app.engines.plain_compose import PlainCorpus, is_slot_key
 from app.engines.plain_corpora import PLAIN_CORPORA
-from tests.plain_wording import FORBIDDEN, SLOT_FORBIDDEN, wording_violations
+from tests.plain_wording import SLOT_FORBIDDEN, frame_violations, wording_violations
 
 CORPORA = list(PLAIN_CORPORA.values())
 SYSTEMS = [corpus.system for corpus in CORPORA]
@@ -110,11 +110,13 @@ def test_every_entry_meets_the_wording_contract(corpus, key) -> None:
     ids=[f"{system}:{section}" for system, section, _text in FRAME_SENTENCES],
 )
 def test_frame_sentences_meet_the_same_contract(system, section, text) -> None:
-    assert len(text) >= 20, text
-    assert text.endswith("。") and text.count("。") == 1, text
-    assert "你" in text, text
-    for token in FORBIDDEN:
-        assert token not in text, (text, token)
+    """四项口径逐字搬进 `tests.plain_wording.frame_violations`（唯一正主），本条只调它。
+
+    抽取的理由见那份函数自己的 docstring：戊组增量禁串也要管框架句，而 `WESTERN` 在语料批
+    阶段刻意不登记，工厂的参数化用例看不到它——本地门必须能吃同一份口径，抄第二遍就会有
+    一处忘记加。用例数与结果对既有登记表逐字节不变（本文件只换了判定住的地方）。
+    """
+    assert frame_violations(system, text) == [], (section, text)
 
 
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)

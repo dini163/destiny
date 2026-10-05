@@ -43,6 +43,24 @@ VERDICT_TOKENS: tuple[str, ...] = ("宜", "忌", "吉", "凶")
 #: `tests/content/test_qimen_plain_corpus.py::test_no_retelling_borrows_the_source_tables_orientation_word`）。
 NON_ADVICE_FORMS: tuple[str, ...] = ("对应", "反应", "适应")
 
+#: 戊组三系统（西洋本命 / 行运 / 吠陀）的时态门：本期出处口径是**平台自撰**（spec 裁定 R46），
+#: 没有古籍可挡在句子前面，所以「这句在替用户预告事件」这一类必须由机器兜住最刺眼的一段。
+#: 用户 2026-10-04 的第 4 条裁定把它写成硬要求（spec §7 G31）。清单**可增不可减**，减要走裁定。
+#: 甲–丁不追改：它们的判语是转述已有出处，句式里本来就没有未来时。
+PREDICTION_FORBIDDEN: tuple[str, ...] = (
+    "将会", "一定会", "必然会", "注定", "保证", "明年", "下个月",
+    "你会", "你将", "你要", "你该", "建议你", "记得", "务必", "千万别", "一定要",
+)
+
+#: 戊组决策名词门（spec §7 点名的雷区：健康＝第六宫／处女座／土星—月亮一线，投资＝第十一宫／
+#: 木星，法律＝第七宫）。footer 免责声明承诺了「不是建议」，语料就不许给具体决策名词。
+#: 这八串是把「等」写成清单（Plan F 偏差表第 8 行）：不写死就会在新句子里漏进「手术」「投资」
+#: 「吃了一片药」这类形状，而 542 条读不完。
+WU_DECISION_FORBIDDEN: tuple[str, ...] = ("就诊", "体检", "理财", "买房", "诉讼", "手术", "投资", "药")
+
+#: 上面两组只对这三家生效。复测：`cd backend && grep -n "PREDICTION_GATED_SYSTEMS" tests/plain_wording.py`。
+PREDICTION_GATED_SYSTEMS: frozenset[str] = frozenset({"western", "transit", "vedic"})
+
 
 def advice_hits(
     text: str,
@@ -72,6 +90,10 @@ def wording_violations(corpus, key: str) -> list[str]:
     for token in FORBIDDEN:
         if token in text:
             violations.append(f"FORBIDDEN 禁字「{token}」")
+    if corpus.system in PREDICTION_GATED_SYSTEMS:
+        for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN:
+            if token in text:
+                violations.append(f"戊组禁字「{token}」")
     if is_slot_key(corpus, key):
         if not text.strip():
             violations.append("槽位词条非空契约破")
@@ -90,6 +112,37 @@ def wording_violations(corpus, key: str) -> list[str]:
         violations.append("整句须以唯一一个「。」收尾")
     if "你" not in text:
         violations.append("整句缺「你」")
+    return violations
+
+
+def frame_violations(system: str, text: str) -> list[str]:
+    """框架句（小节开篇句与档位收尾句）的违例清单，空表即合规。
+
+    四项口径与 `tests/test_plain_corpora.py::test_frame_sentences_meet_the_same_contract` 逐字同值
+    （≥20 字 / 恰一「。」 / 含「你」/ `FORBIDDEN`），本函数是那份断言的**唯一正主**，工厂改为调用它。
+    抽成可调用物的理由有两条，都不是美学：①本期新增门 `PREDICTION_FORBIDDEN` 与
+    `WU_DECISION_FORBIDDEN` 也要管框架句，抄第二遍就会有一处忘记加；②`WESTERN` 在语料批阶段
+    **刻意不登记**（Plan F 全局约束「批次期定义而不登记」），工厂的参数化用例看不到它，本地门
+    必须能吃同一份口径——这是 Plan E 偏差 4 把 `wording_violations` 移到本模块的同一条路子。
+
+    40 字下限**不适用**：开篇句是引导句不是判语，把整句口径套上去是假红（工厂 docstring 里
+    R6 那条「两种口径各在其位」的同一理由）。`system` 是入参而不是从 corpus 取，因为框架句
+    在装配前就要能被判。
+    """
+    violations: list[str] = []
+    for token in FORBIDDEN:
+        if token in text:
+            violations.append(f"FORBIDDEN 禁字「{token}」")
+    if system in PREDICTION_GATED_SYSTEMS:
+        for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN:
+            if token in text:
+                violations.append(f"戊组禁字「{token}」")
+    if len(text) < 20:
+        violations.append(f"框架句 {len(text)} 字，不足 20 字")
+    if not (text.endswith("。") and text.count("。") == 1):
+        violations.append("框架句须以唯一一个「。」收尾")
+    if "你" not in text:
+        violations.append("框架句缺「你」")
     return violations
 
 
