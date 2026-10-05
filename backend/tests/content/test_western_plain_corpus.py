@@ -67,7 +67,7 @@ _FORBIDDEN_FOR_TITLES = ("；", "（《", "』", "（", "）", "、")
 #: 之后才存在，而多建出来的键会漂到引擎永远不触发的位置上（spec §5.3），没人校对得到。
 ROSTER_TARGETS: dict[str, int] = {
     "planet_sign": 120,
-    "planet_house": 0,
+    "planet_house": 36,
     "aspect": 0,
     "axis_sign": 0,
     "node_sign": 0,
