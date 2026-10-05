@@ -305,7 +305,8 @@ def test_sections_and_openers_cover_the_declared_shape() -> None:
     `WESTERN.openers` 的键必须恰好是 `WESTERN_SECTION_TITLES` 的八个键并上
     `WESTERN_NONE_BRANCHES` 的两个值——少一条，空触发的那段就承诺引擎给不出的话；
     多一条，就是永远印不出来的死字。标题另走一套口径：它是 `<h3>` 不是句子，
-    所以要求「≤8 字、不含「你」、不含「。」、不含 `FORBIDDEN`」，与开篇句的四项分开。
+    所以要求「≤8 字、不含「你」、不含「。」、不含 `_FORBIDDEN_FOR_TITLES`」——那张表是
+    `FORBIDDEN` 的超集（另加 `（` `）` `、`），与开篇句的四项口径分开。
     """
     expected_openers = set(western_plain.WESTERN_SECTION_TITLES) | set(western_plain.WESTERN_NONE_BRANCHES.values())
     assert set(western_plain.WESTERN_OPENERS) == expected_openers
