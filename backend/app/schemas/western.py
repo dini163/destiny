@@ -102,6 +102,9 @@ class WesternProvenance(BaseModel):
     `chart.engine` 已有，`source` 与 `tables[*].source` 是同一个字符串——四格形状会让一张
     出处面板把同一句话印两遍（偏差表第 3 行）。真同形先例是 `ZiweiProvenance`/`QimenProvenance`
     （`VedicProvenance` 没有 `tables`，spec 那句「与 Vedic 同形」是假的）。
+    **日后若全站统一 provenance 形状，这一家要动的是两处**：这里补格，
+    以及 `app/engines/western.py::_western_tables()` 之外的 `engine` 注入点——
+    别照别人的形状直接加 `engine`/`source`，那两格在本系统是重复印刷，不是缺格。
     """
 
     note: str = Field(description="自撰声明（R50 三句），页面出处块与免责文案共用。")

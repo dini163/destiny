@@ -184,7 +184,7 @@ CONTENT_STEM_ALIAS: dict[str, str] = {"runes": "rune"}
 #: 无 `content/` 语料的已裁定例外（ledger F-A2-2）：transit 的"表"刻意复用
 #: `app.engines.western` 而不双份维护（`app/engines/transit.py:16` 头注）。
 #: `western` 已于 Plan F（T17）从本名单摘除：它从 T1 起就有三个自维护白话语料模块
-#: （`content/western_plain*.py`），豁免留着不会红、只会静默放宽（`:210` 只在
+#: （`content/western_plain*.py`），豁免留着不会红、只会静默放宽（`:212` 只在
 #: `system not in CONTENT_LESS_SYSTEMS` 时才查 content 件）。
 CONTENT_LESS_SYSTEMS = {"transit"}
 
