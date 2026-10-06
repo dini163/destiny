@@ -39,6 +39,8 @@ from fastapi.testclient import TestClient
 
 from app.content.western_plain import (
     axis_sign_key,
+    element_key,
+    modality_key,
     node_house_key,
     node_sign_key,
     retrograde_key,
@@ -472,7 +474,10 @@ def test_an_empty_aspect_list_fires_the_none_opener_and_nothing_else() -> None:
     `test_natal_aspect_orb_boundary_is_inclusive_at_the_shared_limit` 用 `_pp()` 构造行星对
     同一条路子（AGENTS §9：这是真实件的真实边界，不是 mock 响应）。
     """
-    # 本文件唯一一条函数级 import，而 `app/engines/` 里那处（`build_plain` 自己）是全站第二处。
+    # 本文件仅有的两条函数级 import，都只为 `build_plain`（另一条在
+    # `test_a_section_that_goes_empty_without_a_declared_none_branch_crashes`）。而
+    # `app/engines/` 里那处（`build_plain` 自己）是该目录唯一一处；`app/` 下更早还有一处
+    # `app/content/meihua.py:110`，所以「全站第一处」这个说法对 `app/` 不成立。
     # 为什么这里必须函数级而不能并进文件顶部的 import 段：T16 Step 1 要的是**逐条** RED——
     # 五条红在 `AttributeError: 'WesternChart' object has no attribute 'plain'`、本条红在
     # `ImportError: cannot import name 'build_plain'`，同一次运行里既有 21 条passed。而模块级
@@ -492,3 +497,56 @@ def test_an_empty_aspect_list_fires_the_none_opener_and_nothing_else() -> None:
     assert aspect_section.title == "主要相位"
     assert aspect_section.text == WESTERN.openers["aspect_none"]
     assert len(plain) == 8
+
+
+def test_a_section_that_goes_empty_without_a_declared_none_branch_crashes() -> None:
+    """一张恒非空的段收不到键就崩，不静默拼出「只有开篇句」的一段。
+
+    `build_plain` 的 `emit` 有两个空态合取项，后半段（`section in WESTERN_NONE_BRANCHES`）
+    在本任务落地时**零覆盖**：删掉它，本文件 27 条一条不红（控制器 2026-10-06 实测），
+    而装配器会去拿 section 自己的开篇句拼一段空话——页面上读起来像「这一段今天没什么可说」，
+    这与 `plain_compose` 开篇「未知键 `KeyError`（宁崩不漏）」是同一条纪律。
+
+    本条用 `nodes` 那条路进不去（它恒两句，`node_sign_key`/`node_house_key` 永不返回空），
+    所以改走 `axes`：传 `axes=[]` 即命中「收不到键且不在 none 表」——`axis` 段在真盘上恒两句，
+    空 `axes` 因此是编程错误而不是「这一盘没有轴」。
+    """
+    # 与上面那条同一条纪律的第二个实例：本文件不在顶部 import `build_plain`，理由逐字见那条的注释。
+    from app.engines.western import build_plain
+
+    chart = _greenwich_chart()
+    with pytest.raises(ValueError, match="west 段 'axis' 收不到任何键"):
+        build_plain(
+            planets=chart.planets, axes=[], aspects=chart.aspects, nodes=chart.nodes,
+            element_balance=chart.element_balance, modality_balance=chart.modality_balance,
+        )
+
+
+def test_the_balance_section_keeps_the_declared_element_then_modality_order() -> None:
+    """`balance` 段的键序：先四个元素（按引擎字面量序）、再三个形态（同样按字面量序）。
+
+    为什么这条要单独钉：行数测只数个数，改字面量的**顺序**不红；逐字节比对本可以抓，
+    但那会把 542 条之外的又一份手抄引进 golden。`element_balance` 与 `modality_balance`
+    都是 `compute_western_chart` 里的 dict **字面量**（`app/engines/western.py:330-331`），
+    插入序在 3.7+ 有保证，所以顺序稳定——但它是稳定地透传字面量序，改字面量会**静默**改掉
+    用户在页面上看到的先后。期望值按字面量逐字写出而不是按 `set` 比较，就是为了让改序变红。
+    """
+    chart = _greenwich_chart()
+    lines = chart.plain[7].text.split("\n")[1:]
+    fired = {
+        element_key(name) for name, count in chart.element_balance.items() if count > 0
+    } | {
+        modality_key(name) for name, count in chart.modality_balance.items() if count > 0
+    }
+    # 按字面量序逐字列出，而不是按 set：set 会把顺序这一半判据吃掉，而改序正是本条要抓的。
+    expected = [
+        key
+        for key in (
+            [element_key(name) for name in ("fire", "earth", "air", "water")]
+            + [modality_key(name) for name in ("cardinal", "fixed", "mutable")]
+        )
+        if key in fired
+    ]
+    assert len(lines) == len(expected)
+    for line, key in zip(lines, expected, strict=True):
+        assert WESTERN.entries[key] == line

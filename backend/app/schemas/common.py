@@ -52,8 +52,10 @@ class ProvenanceTable(BaseModel):
 class PlainSection(BaseModel):
     """页尾白话块里的一格：`title` 是版面那一格的名字，`text` 是引擎拼好的整段。
 
-    系统无关（紫微十二宫、奇门九宫、本命八段共用一个形状），所以住 `common.py`；
-    前端镜像在 `frontend/src/types/common.ts`（AGENTS §3：snake_case 端到端、不重命名）。
+    系统无关（紫微十二宫、奇门九宫、本命八段共用一个形状），所以住 `common.py`。
+    前端镜像在 `frontend/src/components/ui/PlainSectionList.tsx:4`（Plan F T18 才搬进
+    `types/common.ts`；AGENTS §3 说的是「镜像 `schemas/common.py` 的**落点**是 types/」，
+    那一步归 T18，本任务只把后端契约立起来）。
     """
 
     title: str = Field(description="小节名，取自各系统 content 的小节名册，不是引擎现编的词。")

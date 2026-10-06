@@ -204,7 +204,15 @@ def build_plain(
     def emit(section: str, keys: list[str]) -> PlainSection:
         # `keep` 分组不看符号（`plain_compose.py:64-71`：`band` 在 64-69、`keep` 在 70-71），符号位一律传 0；
         # 传 0 而不是省略是为了保住 `compose` 的签名形状，与其他九个系统的调用一致。
-        opener = WESTERN_NONE_BRANCHES[section] if not keys and section in WESTERN_NONE_BRANCHES else section
+        if not keys and section not in WESTERN_NONE_BRANCHES:
+            # 崩而不静默：一张恒非空的段收不到键，是编程错误（该段的名字漏了、过滤写错了、
+            # 或者调用方传错了入参），不是用户输入。若放过去，装配器会拿 section 自己的开篇句
+            # 拼出一段只有开篇句的「白话」，页面上读起来像「这一段今天没什么可说」——那正是
+            # `plain_compose` 开篇那句「宁崩不漏」的同一条纪律，本条把它落到八段装配的每一段上。
+            # 钉：`tests/golden/test_western_golden.py::test_a_section_that_goes_empty_without_a_declared_none_branch_crashes`
+            # （复测：删掉本条这七行，同文件 `pytest` 由 29 passed 变 28 passed / 1 failed）。
+            raise ValueError(f"west 段 {section!r} 收不到任何键，且它不在 WESTERN_NONE_BRANCHES 里：{WESTERN_NONE_BRANCHES}")
+        opener = WESTERN_NONE_BRANCHES[section] if not keys else section
         return PlainSection(
             title=WESTERN_SECTION_TITLES[section],
             text=compose(WESTERN, opener, [(key, 0) for key in keys]),
