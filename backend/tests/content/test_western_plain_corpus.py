@@ -68,7 +68,7 @@ _FORBIDDEN_FOR_TITLES = ("；", "（《", "』", "（", "）", "、")
 ROSTER_TARGETS: dict[str, int] = {
     "planet_sign": 120,
     "planet_house": 120,
-    "aspect": 180,
+    "aspect": 225,
     "axis_sign": 24,
     "node_sign": 12,
     "node_house": 12,
