@@ -20,9 +20,14 @@ from itertools import combinations
 import pytest
 
 from app.content import western_plain, western_plain_aspect, western_plain_placement
-from app.engines.plain_corpora import WESTERN
+from app.engines.plain_corpora import PLAIN_CORPORA, WESTERN
 from app.engines.western import ASPECTS, PLANETS, SIGN_ELEMENT, SIGN_MODALITY, SIGNS, SIGNS_ZH
-from tests.plain_wording import advice_hits, frame_violations, wording_violations
+from tests.plain_wording import (
+    PREDICTION_GATED_SYSTEMS,
+    advice_hits,
+    frame_violations,
+    wording_violations,
+)
 
 PLANET_NAMES = [name for name, *_ in PLANETS]
 PLANET_ZH = [zh for _name, _glyph, zh, _swe in PLANETS]
@@ -336,3 +341,52 @@ def test_the_source_string_is_a_provenance_string_not_a_sentence() -> None:
     assert "宫头" not in source and "南交" not in source, source
     assert source.startswith("平台自撰的通行教义转述表"), source
     assert source.endswith("。"), source
+
+
+def test_the_corpus_is_registered_under_its_own_system_name() -> None:
+    """登记行在，且登记的对象就是本地门逐条跑过的那一个。
+
+    `key == corpus.system` 这一条工厂自己也查（`test_plain_corpora.py:40-50`），但工厂查的是
+    「键与它指向的对象同值」，查不出「这张表整个不在字典里」——少一行时工厂只是用例变少，
+    全绿。所以同值这条必须在**这里**也钉一遍，两边的失败形状才互补。
+    """
+    assert "western" in PLAIN_CORPORA, "登记行丢了：工厂从此静默不查这 542 条"
+    assert PLAIN_CORPORA["western"] is WESTERN, "登记的对象与本地门吃的不是同一个 corpus"
+
+
+def test_the_wu_group_gates_are_routed_to_this_system() -> None:
+    """G31 与 G36 只对 `PREDICTION_GATED_SYSTEMS` 生效，所以「本家在名单里」本身就是一条门。
+
+    这一颗钉的不是登记，是**分流**：`wording_violations` 里那句 `if corpus.system in
+    PREDICTION_GATED_SYSTEMS` 一旦把 `western` 丢掉（改名、拼错、或有人为了别的系统动这张表），
+    542 条会继续全绿而**一条时态禁串也没查过**——这是本期最省事的一条假绿，也是唯一能把它
+    抓出来的写法。名单本身的可增不可减由 `tests/plain_wording.py` 的自测守。
+    """
+    assert "western" in PREDICTION_GATED_SYSTEMS
+
+
+def test_the_key_universe_is_the_declared_542_and_the_table_covers_it() -> None:
+    """键全集基数 542 与「已建集合 == 全集」两半并一条：批次期的 `⊆` 在这里补成 `==`。
+
+    `test_roster_counts_and_no_key_outside_universe` 断的是 `set(entries) <= universe()`，配合
+    花名册的十个数加起来是 542 才等价于全等；但那条只数**已建**，不数**应有**。工厂的
+    `test_entry_keys_mirror_the_source_tables_exactly` 登记后会查这一等式，可它依赖登记行本身
+    ——这颗钉把同一件事从「靠登记」里解出来，与上一颗同一个立意。基数与 `universe()` 的式子
+    都住在本计划偏差表与 T1 Step 4，不在这里重算。
+    """
+    universe = WESTERN.universe()
+    assert len(universe) == 542, len(universe)
+    assert set(WESTERN.entries) == universe, sorted(universe ^ set(WESTERN.entries))[:12]
+
+
+def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
+    """Plan F 只交付本命盘：`transit` 与 `vedic` 两键今天必须取不到。
+
+    用 `pytest.raises(KeyError)` 而不是 `not in` 或 `is not None`：那两种写法在一个值为 `None`
+    的占位行下照样绿，`KeyError` 断的是「字典里确实没有这一键」。这一条是**给 Plan G/H 的握手件**
+    ——他们登记时本条当场变红，逼那两次实施来改这一行并写下自己的裁定，而不是悄悄多一行
+    （同 `test_plain_corpora.py::SECTIONLESS` 那条「例外要写得出名字」的机制）。
+    """
+    for system in ("transit", "vedic"):
+        with pytest.raises(KeyError):
+            PLAIN_CORPORA[system]
