@@ -1,10 +1,5 @@
 import { PlainProse } from './PlainProse';
-
-/** 一个小节：`title` 是盘面那一格的名字（宫名/卦宫），`text` 是引擎拼好的整段白话。 */
-export interface PlainSection {
-  title: string;
-  text: string;
-}
+import type { PlainSection } from '../../types/common';
 
 /**
  * 「一格一段」的共用列表（多系统白话 spec §10 丙组）。

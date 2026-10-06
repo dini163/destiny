@@ -52,3 +52,11 @@ export interface ProvenanceTable {
   version: string;
   source: string;
 }
+
+/** 白话详解的一个小节，镜像 `backend/app/schemas/common.py:PlainSection`（系统无关）。
+ *  `title` 取自各系统 content 的小节名册，不是引擎现编的词；`text` 是引擎拼好的整段——
+ *  开篇句与逐条判语以 `\n` 分行，请求时一个字也不生成。 */
+export interface PlainSection {
+  title: string;
+  text: string;
+}
