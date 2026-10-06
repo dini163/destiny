@@ -3,6 +3,8 @@
  * `backend/app/schemas/western.py`. snake_case is preserved end-to-end.
  */
 
+import type { PlainSection, ProvenanceTable } from './common';
+
 /** One of the four chart angles. */
 export type AxisName = 'ASC' | 'DES' | 'MC' | 'IC';
 
@@ -96,6 +98,16 @@ export interface NodeInfo {
   south_node_house: number;
 }
 
+/** 本命页的出处块，镜像 `backend/app/schemas/western.py:WesternProvenance`。
+ *  两格而不是四格：`engine` 就在同一响应的顶层，`source` 与 `tables[*].source` 是同一个串
+ *  （Plan F 偏差表第 3 行）。 */
+export interface WesternProvenance {
+  /** 自撰声明（R50 三句）。页面出处块与免责文案共用这一句，前端不再自己编。 */
+  note: string;
+  /** 本响应真读到的三张白话表（AGENTS §7 读了就列）。 */
+  tables: ProvenanceTable[];
+}
+
 /** Complete Western natal chart produced by the backend engine. */
 export interface WesternChart {
   local_datetime: string;
@@ -127,6 +139,11 @@ export interface WesternChart {
   element_balance: Record<string, number>;
   /** cardinal/fixed/mutable counts among the planets. */
   modality_balance: Record<string, number>;
+
+  /** 页尾「白话详解」八段，逐字取自 `content/western_plain*.py`；请求时不生成任何中文。 */
+  plain: PlainSection[];
+  /** 出处块：自撰声明 + 三张表。 */
+  provenance: WesternProvenance;
 
   engine: string;
 }

@@ -10,6 +10,8 @@ import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SelectMenu } from '../components/ui/SelectMenu';
 import { ResultCard } from '../components/ui/ResultCard';
 import { aspectStyle } from '../lib/astro';
@@ -40,9 +42,11 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
  * The input console collects Gregorian birth data plus a location (latitude is
  * required — houses and the ascendant depend on it) and an optional house system
  * and UTC offset. On submit the chart is computed by the pyswisseph engine
- * (`useWesternNatal`) and rendered from real positions only: the astro-wheel, the
- * ephemeris, aspects, houses and element/modality balance. Transit predictions and
- * archetype readings from the mockup are omitted (PRD no-mock rule).
+ * (`useWesternNatal`) and rendered from real positions only. The trailing 白话详解 block
+ * transposes those same computed facts into sentences curated in
+ * `content/western_plain*.py` — self-authored, one row per fact,
+ * nothing generated on request (Plan F spec §8). The mockup's invented transit
+ * predictions are still omitted: this page shows the natal chart only.
  */
 export function WesternNatalPage() {
   const [houseSystem, setHouseSystem] = useState('P');
@@ -176,6 +180,10 @@ function WesternResults({ chart }: { chart: WesternChart }) {
         </div>
       </div>
 
+      <ResultCard title="白话详解" eyebrow="PLAIN READING" icon="sparkle" elevated>
+        <PlainSectionList sections={chart.plain} />
+      </ResultCard>
+
       <Provenance chart={chart} />
     </>
   );
@@ -242,24 +250,28 @@ function AspectLegend() {
   );
 }
 
-/** Methodology + provenance note anchored to the real ephemeris engine. */
+/** Methodology + provenance: the astronomy facts, then the self-authored declaration. */
 function Provenance({ chart }: { chart: WesternChart }) {
   const offsetSource = chart.utc_offset_source === 'explicit' ? '显式时区' : '按经度推算的理论时区';
   return (
-    <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">天文算法与星历溯源</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            行星黄经、四轴与宫头均由 <span className="text-gold-soft">{chart.engine}</span>{' '}
-            瑞士星历实时计算（{chart.zodiac === 'tropical' ? '热带黄道' : chart.zodiac}），分宫制为{' '}
-            <span className="text-gold-soft">{chart.house_system}</span>，世界时以{offsetSource}
-            换算。相位按经典容许度检测，未作主观吉凶演绎，星盘仅供文化参考。
-          </p>
+    <div className="panel flex flex-col gap-4 p-5 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
+          <div className="flex flex-col gap-1">
+            <span className="font-display text-base text-ink">天文算法与星历溯源</span>
+            <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
+              行星黄经、四轴与宫头均由 <span className="text-gold-soft">{chart.engine}</span>{' '}
+              瑞士星历实时计算（{chart.zodiac === 'tropical' ? '热带黄道' : chart.zodiac}），分宫制为{' '}
+              <span className="text-gold-soft">{chart.house_system}</span>，世界时以{offsetSource}换算。
+            </p>
+            <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">{chart.provenance.note}</p>
+          </div>
         </div>
+        <span className="label-caps shrink-0 text-ink-muted">ENGINE · {chart.engine}</span>
       </div>
-      <span className="label-caps shrink-0 text-ink-muted">ENGINE · {chart.engine}</span>
+
+      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }
