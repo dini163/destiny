@@ -360,7 +360,11 @@ def test_the_wu_group_gates_are_routed_to_this_system() -> None:
     这一颗钉的不是登记，是**分流**：`wording_violations` 里那句 `if corpus.system in
     PREDICTION_GATED_SYSTEMS` 一旦把 `western` 丢掉（改名、拼错、或有人为了别的系统动这张表），
     542 条会继续全绿而**一条时态禁串也没查过**——这是本期最省事的一条假绿，也是唯一能把它
-    抓出来的写法。名单本身的可增不可减由 `tests/plain_wording.py` 的自测守。
+    抓出来的写法。542 这个数由下一颗钉现算，本条只管分流。
+    名单的**上界**（「可增不可减」）今天**没有机器正主**：`tests/plain_wording.py`
+    里唯一那条自测 `test_advice_hits_masks_named_word_forms` 只查具名词形遮罩，不碰名单成员。
+    换句话说，往名单里加一家是自由动作、无人拦；要减才被本条与 Plan G/H 的登记形状顶出来。
+    （复测：`cd backend && grep -n "def test_" tests/plain_wording.py` 只一条。）
     """
     assert "western" in PREDICTION_GATED_SYSTEMS
 
@@ -382,8 +386,10 @@ def test_the_key_universe_is_the_declared_542_and_the_table_covers_it() -> None:
 def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
     """Plan F 只交付本命盘：`transit` 与 `vedic` 两键今天必须取不到。
 
-    用 `pytest.raises(KeyError)` 而不是 `not in` 或 `is not None`：那两种写法在一个值为 `None`
-    的占位行下照样绿，`KeyError` 断的是「字典里确实没有这一键」。这一条是**给 Plan G/H 的握手件**
+    用 `pytest.raises(KeyError)` 而不是 `PLAIN_CORPORA.get(system) is None`：后者在一行为
+    `{"transit": None}` 的占位行下**照样绿**，而 `not in` 在同一行下会红（实测 `'transit' not in
+    {"transit": None}` → `False`）——所以真正会假绿的是 `is None` 那一种，`not in` 已经够用，
+    `KeyError` 是把「字典里确实没有这一键」写成不依赖取值路径的那一种。这一条是**给 Plan G/H 的握手件**
     ——他们登记时本条当场变红，逼那两次实施来改这一行并写下自己的裁定，而不是悄悄多一行
     （同 `test_plain_corpora.py::SECTIONLESS` 那条「例外要写得出名字」的机制）。
     """

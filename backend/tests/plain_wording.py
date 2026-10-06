@@ -125,8 +125,9 @@ def frame_violations(system: str, text: str) -> list[str]:
     四项口径与 `tests/test_plain_corpora.py::test_frame_sentences_meet_the_same_contract` 逐字同值
     （≥20 字 / 恰一「。」 / 含「你」/ `FORBIDDEN`），本函数是那份断言的**唯一正主**，工厂改为调用它。
     抽成可调用物的理由有两条，都不是美学：①本期新增门 `PREDICTION_FORBIDDEN` 与
-    `WU_DECISION_FORBIDDEN` 也要管框架句，抄第二遍就会有一处忘记加；②`WESTERN` 在语料批阶段
-    **刻意不登记**（Plan F 全局约束「批次期定义而不登记」），工厂的参数化用例看不到它，本地门
+    `WU_DECISION_FORBIDDEN` 也要管框架句，抄第二遍就会有一处忘记加；②`WESTERN` 在 T1-T14
+    **刻意不登记**（Plan F 全局约束「批次期定义而不登记」，登记行归 T15，2026-10-06 已补），
+    那十四批里工厂的参数化用例看不到它，本地门
     必须能吃同一份口径——这是 Plan E 偏差 4 把 `wording_violations` 移到本模块的同一条路子。
 
     40 字下限**不适用**：开篇句是引导句不是判语，把整句口径套上去是假红（工厂 docstring 里

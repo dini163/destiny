@@ -326,11 +326,12 @@ def _western_universe() -> set[str]:
 
 
 #: 西洋本命白话的登记表：542 条自撰判语（spec 裁定 R46「自撰 + 诚实双署」）。
-#: **本对象从 T1 就存在但不进 `PLAIN_CORPORA`**，登记行归 T15——提前登记会让工厂的
+#: **从 T1 到 T14 刻意不进 `PLAIN_CORPORA`，登记行在 T15 补上**——提前登记会让工厂的
 #: `set(entries) == universe()` 从 T1 红到 T14（`universe()` 是全量算的，语料是一批批建的）。
-#: 这段时间它的口径由 `tests/content/test_western_plain_corpus.py` 逐条守着：那 542 例不依赖
+#: 那十四批的口径由 `tests/content/test_western_plain_corpus.py` 逐条守着，那 542 例不依赖
 #: 登记，所以「登记被撤销/忘了加」这一类失败在本系统里仍有一条独立验证（同一立意的先例见
-#: `tests/content/test_zhouyi_plain_corpus.py:85` 那条刻意重复的契约测）。
+#: `tests/content/test_zhouyi_plain_corpus.py:85` 那条刻意重复的契约测；本系统对应的那颗钉是
+#: 同文件的 `test_the_corpus_is_registered_under_its_own_system_name`）。
 WESTERN = PlainCorpus(
     system="western",
     entries=western_plain.WESTERN_READINGS,
