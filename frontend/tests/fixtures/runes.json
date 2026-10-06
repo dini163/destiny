@@ -11,28 +11,27 @@
       "position_label": "Urðr · What Has Become",
       "position_label_zh": "乌尔德 · 源起",
       "position_meaning": "已经织成的那一段：事情从何而来，哪些已成定局、不可再改。Urðr 之名出自古埃达《女先知之歌》第 20 节，本义近「已发生之事」；但把它当牌阵位次读作「过去」，是现代占卜的类比。",
-      "order": 12,
-      "key": "jera",
-      "glyph": "ᛃ",
-      "name": "Jera",
-      "name_zh": "杰拉",
-      "transliteration": "j",
-      "name_meaning": "原始日耳曼语 *jērą「年、收成」—— 一年一熟，急不来",
+      "order": 19,
+      "key": "ehwaz",
+      "glyph": "ᛖ",
+      "name": "Ehwaz",
+      "name_zh": "埃瓦兹",
+      "transliteration": "e",
+      "name_meaning": "原始日耳曼语 *ehwaz「马」—— 与拉丁语 equus 同源",
       "name_meaning_uncertain": false,
-      "aett": "heimdall",
-      "aett_zh": "海姆达尔之族",
-      "reversible": false,
+      "aett": "tyr",
+      "aett_zh": "提尔之族",
+      "reversible": true,
       "is_wyrd": false,
-      "orientation": "upright",
+      "orientation": "reversed",
       "keywords": [
-        "收成",
-        "周期",
-        "回报",
-        "一年一熟",
-        "因果"
+        "失和的伙伴",
+        "受阻的移动",
+        "背信",
+        "各行其是"
       ],
-      "meaning": "一年一轮的收成：先前种下的到此结果，好坏都是自己那份。宜按周期办事，不求速成。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Jera（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Ehwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
       "position_index": 1,
@@ -40,28 +39,27 @@
       "position_label": "Verðandi · What Is Becoming",
       "position_label_zh": "薇尔丹蒂 · 显相",
       "position_meaning": "正在织的那一段：此刻还在成形、仍有转圜的力量与状态。Verðandi 本义近「正在发生之事」—— 这一位是三枚里唯一还改得动的，故现代读法把它当「现在」，也当可以下手的地方。",
-      "order": 23,
-      "key": "dagaz",
-      "glyph": "ᛞ",
-      "name": "Dagaz",
-      "name_zh": "达加兹",
-      "transliteration": "d",
-      "name_meaning": "原始日耳曼语 *dagaz「日、白昼」",
+      "order": 5,
+      "key": "raido",
+      "glyph": "ᚱ",
+      "name": "Raido",
+      "name_zh": "莱多",
+      "transliteration": "r",
+      "name_meaning": "原始日耳曼语 *raidō「骑行、旅程」—— 有节奏的前行，也指车辙与秩序",
       "name_meaning_uncertain": false,
-      "aett": "tyr",
-      "aett_zh": "提尔之族",
-      "reversible": false,
+      "aett": "freyja",
+      "aett_zh": "弗蕾亚之族",
+      "reversible": true,
       "is_wyrd": false,
-      "orientation": "upright",
+      "orientation": "reversed",
       "keywords": [
-        "破晓",
-        "转折",
-        "通透",
-        "转化",
-        "苦尽"
+        "行程受阻",
+        "脱序",
+        "原地打转",
+        "方向错误"
       ],
-      "meaning": "天亮的那一下：转折、通透与长夜之后的豁然。宜认下这个转捩点，往前走。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Dagaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Raido（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
       "position_index": 2,
@@ -69,34 +67,34 @@
       "position_label": "Skuld · What Shall Be",
       "position_label_zh": "诗蔻蒂 · 必然",
       "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
-      "order": 18,
-      "key": "berkana",
-      "glyph": "ᛒ",
-      "name": "Berkana",
-      "name_zh": "贝尔卡纳",
-      "transliteration": "b",
-      "name_meaning": "原始日耳曼语 *berkanō「桦树」—— 新生与哺育之木",
+      "order": 9,
+      "key": "hagalaz",
+      "glyph": "ᚺ",
+      "name": "Hagalaz",
+      "name_zh": "哈加拉兹",
+      "transliteration": "h",
+      "name_meaning": "原始日耳曼语 *haglaz「冰雹」—— 从天而降、不由人定",
       "name_meaning_uncertain": false,
-      "aett": "tyr",
-      "aett_zh": "提尔之族",
-      "reversible": true,
+      "aett": "heimdall",
+      "aett_zh": "海姆达尔之族",
+      "reversible": false,
       "is_wyrd": false,
       "orientation": "upright",
       "keywords": [
-        "新生",
-        "孕育",
-        "哺育",
-        "成长",
-        "家事"
+        "天灾",
+        "突变",
+        "不由人",
+        "破而后立",
+        "考验"
       ],
-      "meaning": "桦树的新芽与哺乳的母亲：孕育、生长与家中事。宜养、宜护，让新起的慢慢长成。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Berkana（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Hagalaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     }
   ],
   "drawn_keys": [
-    "jera",
-    "dagaz",
-    "berkana"
+    "ehwaz",
+    "raido",
+    "hagalaz"
   ],
   "allow_reversed": true,
   "include_wyrd": false,
@@ -105,7 +103,7 @@
       "key": "freyja",
       "name": "Freyja's Aett",
       "name_zh": "弗蕾亚之族",
-      "count": 0
+      "count": 1
     },
     {
       "key": "heimdall",
@@ -117,7 +115,7 @@
       "key": "tyr",
       "name": "Tyr's Aett",
       "name_zh": "提尔之族",
-      "count": 2
+      "count": 1
     },
     {
       "key": "wyrd",
@@ -126,24 +124,41 @@
       "count": 0
     }
   ],
-  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起落得杰拉（Jera，正位）——一年一轮的收成：先前种下的到此结果，好坏都是自己那份。宜按周期办事，不求速成。薇尔丹蒂 · 显相落得达加兹（Dagaz，正位）——天亮的那一下：转折、通透与长夜之后的豁然。宜认下这个转捩点，往前走。诗蔻蒂 · 必然落得贝尔卡纳（Berkana，正位）——桦树的新芽与哺乳的母亲：孕育、生长与家中事。宜养、宜护，让新起的慢慢长成。三组配比（本次共 3 枚）：弗蕾亚之族 0 枚、海姆达尔之族 1 枚、提尔之族 2 枚。其中 提尔之族 占 2 枚，现代解读作「超越、律法与宿命」——这是分组主题的通行说法，非古文献，也不据此断吉凶。本次 1 枚可逆符文全为正位。",
+  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起落得埃瓦兹（Ehwaz，逆位）——骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。薇尔丹蒂 · 显相落得莱多（Raido，逆位）——车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。诗蔻蒂 · 必然落得哈加拉兹（Hagalaz，正位）——从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 1 枚、提尔之族 1 枚。本次 2 枚可逆符文中有 2 枚为逆位。",
   "shadow_counsel": [
     {
-      "key": "berkana",
-      "name": "Berkana",
-      "name_zh": "贝尔卡纳",
-      "glyph": "ᛒ",
-      "position_key": "skuld",
-      "position_label_zh": "诗蔻蒂 · 必然",
-      "drawn_orientation": "upright",
+      "key": "ehwaz",
+      "name": "Ehwaz",
+      "name_zh": "埃瓦兹",
+      "glyph": "ᛖ",
+      "position_key": "urd",
+      "position_label_zh": "乌尔德 · 源起",
+      "drawn_orientation": "reversed",
       "shadow_keywords": [
-        "生长受阻",
-        "家事不宁",
-        "不孕",
-        "过度保护"
+        "失和的伙伴",
+        "受阻的移动",
+        "背信",
+        "各行其是"
       ],
-      "shadow_meaning": "长不动或护过了头：新生受阻、家宅不宁，或以照顾之名把人捆住。",
-      "note": "本次为正位；此条是它的反面参照（逆位释义），不是本次结果。"
+      "shadow_meaning": "骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。",
+      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
+    },
+    {
+      "key": "raido",
+      "name": "Raido",
+      "name_zh": "莱多",
+      "glyph": "ᚱ",
+      "position_key": "verdandi",
+      "position_label_zh": "薇尔丹蒂 · 显相",
+      "drawn_orientation": "reversed",
+      "shadow_keywords": [
+        "行程受阻",
+        "脱序",
+        "原地打转",
+        "方向错误"
+      ],
+      "shadow_meaning": "车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。",
+      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
     }
   ],
   "reversible_note": "卢恩的逆位叫 merkstave（暗枝），指石碑掷出时上下颠倒。故「有没有逆位」是个几何问题：把字形转 180° 后与原形重合的，颠倒与否根本无从分辨，也就没有逆位读法。24 枚里有八枚如此（Gebo、Hagalaz、Isa、Jera、Eihwaz、Sowilo、Ingwaz、Dagaz），本页对它们不印逆位徽标、也不编逆位释义。你可以自己把这些字形转半圈核对。",

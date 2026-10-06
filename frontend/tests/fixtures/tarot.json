@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "pentacles-10",
-      "name": "Ten of Pentacles",
-      "name_zh": "星币十",
+      "card_id": "swords-06",
+      "name": "Six of Swords",
+      "name_zh": "宝剑六",
       "arcana": "minor",
-      "number": 10,
-      "suit": "pentacles",
+      "number": 6,
+      "suit": "swords",
       "rank": null,
-      "element": "earth",
+      "element": "air",
       "orientation": "upright",
       "keywords": [
-        "legacy",
-        "culmination",
-        "inheritance",
-        "family wealth"
+        "transition",
+        "change",
+        "physical journey",
+        "moving on"
       ],
       "keywords_zh": [
-        "传承",
-        "顶点成果",
-        "继承",
-        "家业财富"
+        "过渡",
+        "改变",
+        "实际的出行",
+        "放下前行"
       ],
-      "meaning": "Three generations gather beneath an arch of ten pentacles, wealth and legacy rooted in family.",
-      "meaning_zh": "三代人聚在十枚星币的拱下，财富与传承扎根在家里。"
+      "meaning": "A ferryman poles a mother and child across calm water toward a new shore, leaving trouble behind.",
+      "meaning_zh": "船夫载着一对母子划过平静的水面驶向新岸，把麻烦留在身后。"
     },
     {
       "position_index": 1,
@@ -44,29 +44,31 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "wands-06",
-      "name": "Six of Wands",
-      "name_zh": "权杖六",
-      "arcana": "minor",
-      "number": 6,
-      "suit": "wands",
+      "card_id": "major-16",
+      "name": "The Tower",
+      "name_zh": "塔",
+      "arcana": "major",
+      "number": 16,
+      "suit": null,
       "rank": null,
-      "element": "fire",
+      "element": null,
       "orientation": "upright",
       "keywords": [
-        "success",
-        "public recognition",
-        "advancement",
-        "self-confidence"
+        "sudden change",
+        "upheaval",
+        "chaos",
+        "revelation",
+        "awakening"
       ],
       "keywords_zh": [
-        "成功",
-        "公开的认可",
-        "晋升",
-        "自信心"
+        "突发变化",
+        "动荡",
+        "混乱",
+        "揭示",
+        "觉醒"
       ],
-      "meaning": "A victor rides crowned with laurel, wand raised, enjoying public acclaim and hard-won recognition.",
-      "meaning_zh": "得胜者头戴桂冠骑马而来，权杖高举，享受着公开的喝彩与来之不易的认可。"
+      "meaning": "The Tower is struck by lightning, toppling false structures so that truth is revealed through sudden upheaval.",
+      "meaning_zh": "塔被雷击中，虚假的结构被推倒，真相透过突如其来的动荡显出来。"
     },
     {
       "position_index": 2,
@@ -75,39 +77,39 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "cups-01",
-      "name": "Ace of Cups",
-      "name_zh": "圣杯王牌",
+      "card_id": "cups-08",
+      "name": "Eight of Cups",
+      "name_zh": "圣杯八",
       "arcana": "minor",
-      "number": 1,
+      "number": 8,
       "suit": "cups",
       "rank": null,
       "element": "water",
       "orientation": "reversed",
       "keywords": [
-        "self-love",
-        "avoiding love",
-        "emotional vulnerability",
-        "emptiness"
+        "talking it out",
+        "trying one more time",
+        "high anxiety",
+        "fear"
       ],
       "keywords_zh": [
-        "自爱",
-        "回避爱意",
-        "情感上的脆弱",
-        "空乏"
+        "把话说开",
+        "再试一次",
+        "高度焦躁",
+        "恐惧"
       ],
-      "meaning": "Reversed, the cup runs dry or love is blocked; attend to self-love before giving.",
-      "meaning_zh": "逆位时，杯干了或爱被堵住，先把自己那份自爱补足，再往外给。"
+      "meaning": "Reversed, departure is delayed by fear or a reluctant attempt to make it work.",
+      "meaning_zh": "逆位时，离开的脚步被恐惧拖住，或者勉强再试一次想把它凑合下去。"
     }
   ],
   "drawn_ids": [
-    "pentacles-10",
-    "wands-06",
-    "cups-01"
+    "swords-06",
+    "major-16",
+    "cups-08"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 星币十（Ten of Pentacles），正位，取的是 传承、顶点成果、继承。 现在（Present）抽出 权杖六（Six of Wands），正位，取的是 成功、公开的认可、晋升。 未来（Future）抽出 圣杯王牌（Ace of Cups），逆位，取的是 自爱、回避爱意、情感上的脆弱。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
-  "major_arcana_count": 0,
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 宝剑六（Six of Swords），正位，取的是 过渡、改变、实际的出行。 现在（Present）抽出 塔（The Tower），正位，取的是 突发变化、动荡、混乱。 未来（Future）抽出 圣杯八（Eight of Cups），逆位，取的是 把话说开、再试一次、高度焦躁。 1 张大牌在这份日常处境里标出分量更重、由不得你选的线索。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "major_arcana_count": 1,
   "reversed_count": 1,
   "provenance": {
     "engine": "tarot-content-library",
