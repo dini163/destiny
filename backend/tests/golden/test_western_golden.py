@@ -40,8 +40,10 @@ from fastapi.testclient import TestClient
 
 from app.content import CONTENT_VERSION
 from app.content.western_plain import (
+    WESTERN_NONE_BRANCHES,
     WESTERN_PLAIN_NOTE,
     WESTERN_PLAIN_SOURCE,
+    WESTERN_SECTION_TITLES,
     axis_sign_key,
     element_key,
     modality_key,
@@ -576,3 +578,38 @@ def test_the_provenance_tables_are_the_three_plain_modules_in_order() -> None:
     for row in chart.provenance.tables:
         assert row.version == CONTENT_VERSION, row.name
         assert row.source == WESTERN_PLAIN_SOURCE, row.name
+
+
+def test_the_retrograde_none_opener_is_reachable_from_a_real_chart() -> None:
+    """偏差 30 的补：`retrograde_none` 这句开篇句必须真被发出去，不是没人读的存货。
+
+    `WESTERN_NONE_BRANCHES` 有两个键（偏差 5），但两条空态分支的**可达性**以前不对称：
+    `aspect_none` 被 `test_an_empty_aspect_list_fires_the_none_opener_and_nothing_else` 用
+    `aspects=[]` 的构造输入钉住，而 `retrograde_none` 走的是**真盘**——2001-01-27 14:00
+    那盘零逆行（Plan F 地基表第二行：逆行 0 颗 ⇒ 57 句 / 65 行）。零颗逆行是真盘事实，
+    所以今天不能用构造输入去代替真盘：构造输入证明的是「装配器能处理空」，真盘证明的是
+    「真存在这样一盘」。
+
+    本条钉两件事，缺一不可：
+    ①**它真被发出去**——那条盘的第 4 段（逆行诸星）逐字节等于 `retrograde_none` 那句，
+       不是别的什么（变异：把 `WESTERN_NONE_BRANCHES["retrograde"]` 换成任何一句别的话，
+       本条红）；
+    ②**它没有变成死字**——把这句改成一段没人会读到的存货（例如把 `retrograde_none`
+       的值改掉）同样红。改动前本条不存在时，上面那个变异得到 **1437 passed / 0 failed**
+       （控制器 2026-10-06 实测，`:golden 31 + :工厂 1406`），即全仓没有任何一条测会红——
+       这就是「没有测的空态分支」的确切形状。
+    """
+    chart = compute_western_chart(
+        birth_date=date(2001, 1, 27),
+        birth_time=time(14, 0),
+        latitude=51.5,
+        longitude=-0.13,
+        utc_offset_hours=0.0,
+    )
+    assert [planet.name for planet in chart.planets if planet.retrograde] == []
+    retrograde_section = chart.plain[3]
+    assert retrograde_section.title == WESTERN_SECTION_TITLES["retrograde"]
+    assert retrograde_section.text == WESTERN.openers["retrograde_none"]
+    # 这条盘顺带走另一个真盘空态：cardinal 计数为 0，所以「元素与形态」段只有
+    # 元素三行 + 形态两行，少一个形态键。写在这里是因为它同样是「真盘上的空」而不是构造出来的空。
+    assert chart.modality_balance["cardinal"] == 0
