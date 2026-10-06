@@ -133,7 +133,7 @@ WESTERN_PLACEMENT_READINGS: dict[str, str] = {
     planet_sign_key("Neptune", "Sagittarius"): "你海王星落在射手，远方的图景靠想象补全，补进去的那部分并不在路上，走到跟前，自己会先撞见这个缺口。",
     planet_sign_key("Neptune", "Capricorn"): "你海王星落在摩羯，日子过得有分量，也留着一块不对外说的柔软，理想压在实事底下慢慢显形，不急着自己兑现。",
     planet_sign_key("Neptune", "Aquarius"): "你海王星落在水瓶，对人总抱着好的想象，自己先离开人群去看，那份好里有几分是提前想出来的，这两层常常分不清。",
-    planet_sign_key("Neptune", "Pisces"): "你海王星落在双鱼，感受的边界偏软，别人的情绪容易先进到你心里，这份敏感要小心的是分不清哪一部分是自己的。",
+    planet_sign_key("Neptune", "Pisces"): "你海王星落在双鱼，内外之间没有一道门，碰到的都在同一层，替谁受的疼自己先认下，这份敏感要小心的是分不清哪一部分是自己的。",
     # Pluto 冥王星落十二座（12 条）
     planet_sign_key("Pluto", "Aries"): "你冥王星落在白羊，出手之前先把劲攒足，一次投入就想见底，冲得猛也收得干脆，半途松开手的那一种自己不肯认。",
     planet_sign_key("Pluto", "Taurus"): "你冥王星落在金牛，认准的东西握得久，改变来得慢半拍，力气都花在守住那一段上，松开手要很长的酝酿。",
