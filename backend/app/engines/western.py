@@ -17,7 +17,23 @@ from datetime import date, datetime, time, timedelta
 
 import swisseph as swe
 
+from app.content.western_plain import (
+    WESTERN_NONE_BRANCHES,
+    WESTERN_SECTION_TITLES,
+    aspect_key,
+    axis_sign_key,
+    element_key,
+    house_theme_key,
+    modality_key,
+    node_house_key,
+    node_sign_key,
+    planet_house_key,
+    planet_sign_key,
+    retrograde_key,
+)
 from app.core.errors import EphemerisError, UnsupportedMethodError
+from app.engines.plain_compose import compose
+from app.schemas.common import PlainSection
 from app.schemas.western import (
     Aspect,
     AxisPoint,
@@ -155,6 +171,64 @@ def _compute_aspects(planets: list[PlanetPlacement]) -> list[Aspect]:
     return aspects
 
 
+def build_plain(
+    *,
+    planets: list[PlanetPlacement],
+    axes: list[AxisPoint],
+    aspects: list[Aspect],
+    nodes: NodeInfo,
+    element_balance: dict[str, int],
+    modality_balance: dict[str, int],
+) -> list[PlainSection]:
+    """按盘面已经算出的位置逐条选句，拼成页尾「白话详解」的八段。
+
+    **只选句，不现编**：每个键都是盘面上一个已印事实的中文名（`plain_compose.compose` 的立身
+    规矩，戊组 spec §1.1 R50 的支点）。八段的发射序是产品决定，由
+    `tests/golden/test_western_golden.py::test_the_plain_block_is_eight_sections_in_the_declared_order`
+    钉成字面量；每段行数 == 该段实发键数 + 1 由同文件那条行数测钉。
+
+    入参是六个关键字而不是一个 `chart`：`plain` 是 `WesternChart` 的字段，装配时那个对象还
+    没造出来（spec §8 的原签名 `build_plain(chart)` 在这一点上不成立，见偏差表第 10 行）。
+
+    `plain_corpora` 的 import 在**函数内**，这是 `app/engines/` 里唯一一处函数级 import：
+    `engines/plain_corpora.py:46` 顶层 `from app.engines.western import ...`，
+    本模块若在顶层回引它就是 `ImportError: cannot import name ...（circular import）`。
+    两条边不能同时是顶层，而登记表引引擎是既有的、九个系统共用的形状，所以断的是这一侧。
+    复测（本函数落地后全目录恰好一行命中，就是下面这行）：
+    `cd backend && grep -rn "^    from app" app/engines/ --include=*.py`。
+    同形状的第二处在 `tests/golden/test_western_golden.py` 的 `test_an_empty_aspect_list_fires_the_none_opener_and_nothing_else`
+    （那里为的是让 T16 Step 1 的 RED 能逐条报出6 failed 而不是收集期就中断），不在本条纪律的射程内。
+    """
+    from app.engines.plain_corpora import WESTERN  # 循环边在本函数内断，理由见 docstring
+
+    def emit(section: str, keys: list[str]) -> PlainSection:
+        # `keep` 分组不看符号（`plain_compose.py:64-71`：`band` 在 64-69、`keep` 在 70-71），符号位一律传 0；
+        # 传 0 而不是省略是为了保住 `compose` 的签名形状，与其他九个系统的调用一致。
+        opener = WESTERN_NONE_BRANCHES[section] if not keys and section in WESTERN_NONE_BRANCHES else section
+        return PlainSection(
+            title=WESTERN_SECTION_TITLES[section],
+            text=compose(WESTERN, opener, [(key, 0) for key in keys]),
+        )
+
+    return [
+        emit("planet_sign", [planet_sign_key(p.name, p.sign) for p in planets]),
+        emit("planet_house", [planet_house_key(p.name, p.house) for p in planets]),
+        emit("aspect", [aspect_key(a.planet1, a.planet2, a.type) for a in aspects]),
+        emit("retrograde", [retrograde_key(p.name) for p in planets if p.retrograde]),
+        # 页面印四轴，白话只讲 ASC/MC：`axes` 里过滤这两个是 spec §2 排除表的实现面（偏差 17）。
+        emit("axis", [axis_sign_key(a.name, a.sign) for a in axes if a.name in ("ASC", "MC")]),
+        # 只取北交点：南交点在页面上有格子（`NodeInfo` 带 south_*），但 spec §2 不建它的键族，
+        # 而 G33 把「南交」列进禁字，所以这一段恒两句。
+        emit("nodes", [node_sign_key(nodes.north_node_sign), node_house_key(nodes.north_node_house)]),
+        emit("house_theme", [house_theme_key(house) for house in range(1, 13)]),
+        emit(
+            "balance",
+            [element_key(name) for name, count in element_balance.items() if count > 0]
+            + [modality_key(name) for name, count in modality_balance.items() if count > 0],
+        ),
+    ]
+
+
 def compute_western_chart(
     *,
     birth_date: date,
@@ -262,6 +336,16 @@ def compute_western_chart(
     sun = next(planet for planet in planets if planet.name == "Sun")
     moon = next(planet for planet in planets if planet.name == "Moon")
 
+    aspects = _compute_aspects(planets)
+    plain = build_plain(
+        planets=planets,
+        axes=axes,
+        aspects=aspects,
+        nodes=nodes,
+        element_balance=element_balance,
+        modality_balance=modality_balance,
+    )
+
     return WesternChart(
         local_datetime=local_dt.strftime("%Y-%m-%d %H:%M"),
         utc_datetime=ut_dt.strftime("%Y-%m-%d %H:%M"),
@@ -280,8 +364,9 @@ def compute_western_chart(
         planets=planets,
         axes=axes,
         houses=houses,
-        aspects=_compute_aspects(planets),
+        aspects=aspects,
         nodes=nodes,
         element_balance=element_balance,
         modality_balance=modality_balance,
+        plain=plain,
     )

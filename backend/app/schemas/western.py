@@ -4,6 +4,8 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import PlainSection
+
 
 class WesternNatalRequest(BaseModel):
     """Input for a Western natal chart.
@@ -123,5 +125,8 @@ class WesternChart(BaseModel):
     nodes: NodeInfo
     element_balance: dict[str, int] = Field(description="fire/earth/air/water counts among planets")
     modality_balance: dict[str, int] = Field(description="cardinal/fixed/mutable counts among planets")
+    plain: list[PlainSection] = Field(
+        description="页尾「白话详解」的八段，逐字取自自撰表 `content/western_plain*.py`（戊组 spec §8）。必填：缺白话即视为伪造响应。"
+    )
 
     engine: str = Field(default="pyswisseph")

@@ -47,3 +47,14 @@ class ProvenanceTable(BaseModel):
     name: str = Field(description="语料模块名，如 bazi_shensha。")
     version: str = Field(description="语料版本号，全表共用 content.CONTENT_VERSION。")
     source: str = Field(description="书级出处，或 模型参数/本系统纲要 声明。")
+
+
+class PlainSection(BaseModel):
+    """页尾白话块里的一格：`title` 是版面那一格的名字，`text` 是引擎拼好的整段。
+
+    系统无关（紫微十二宫、奇门九宫、本命八段共用一个形状），所以住 `common.py`；
+    前端镜像在 `frontend/src/types/common.ts`（AGENTS §3：snake_case 端到端、不重命名）。
+    """
+
+    title: str = Field(description="小节名，取自各系统 content 的小节名册，不是引擎现编的词。")
+    text: str = Field(description="开篇句 + 逐条判语，段内以 \\n 分行；全表没有一句请求时生成。")

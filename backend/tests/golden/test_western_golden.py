@@ -27,7 +27,8 @@ would be caught rather than self-confirmed:
   (`test_aspect_orb_inclusion_is_identical_across_the_three_tables`): one construction, fed
   into all three helpers, must be kept or dropped identically.
 
-Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
+Recount this file's tests: 27 = 21 既有 + 6 白话（页尾块的形状契约六条，见文件末尾）。
+`cd backend && PYTHONIOENCODING=utf-8
 .venv/Scripts/python.exe -m pytest tests/golden/test_western_golden.py -v`.
 """
 
@@ -36,7 +37,14 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content.western_plain import (
+    axis_sign_key,
+    node_house_key,
+    node_sign_key,
+    retrograde_key,
+)
 from app.core.errors import UnsupportedMethodError
+from app.engines.plain_corpora import WESTERN
 from app.engines.synastry import _synastry_aspects
 from app.engines.transit import _cross_aspects
 from app.engines.western import (
@@ -373,3 +381,114 @@ def test_aspect_orb_inclusion_is_identical_across_the_three_tables() -> None:
         assert natal == expected, (delta, "natal")
         assert transit == expected, (delta, "transit")
         assert synastry == expected, (delta, "synastry")
+
+
+# ------------------------------------------- Step 7(T16): 页尾白话块的装配形状
+
+
+def test_the_plain_block_is_eight_sections_in_the_declared_order() -> None:
+    """页尾块的形状契约：八个小节、字面序、每格两键。
+
+    发射序是**产品决定**（先讲星怎么出手，再讲落在哪块生活，再讲星与星的关系，最后给底色），
+    所以钉成字面量清单而不是从 `WESTERN_SECTION_TITLES` 派生——派生写法在标题表被重排时不会红，
+    而那正是用户会看见的变化。
+    """
+    chart = _greenwich_chart()
+    assert [section.title for section in chart.plain] == [
+        "十星落座", "十星落宫", "主要相位", "逆行诸星", "上升与天顶", "北交点", "十二宫主题", "元素与形态",
+    ]
+
+
+def test_the_north_node_section_is_a_byte_for_byte_transcription() -> None:
+    """整段逐字节只抄一段（spec §10.3 与偏差表第 6 行）：北交点三行 = 开篇句 + 座 + 宫。
+
+    期望串从**登记表本身**拼，不从响应拼：这样「装配器取了南交点的键」「开篇句串到别的段」
+    「多一个空行」都会红，而语料改一个字不需要改这条测（抄 3000 字进 golden 就是 542 条的
+    第二份手抄，那是 Plan E偏差 16 算过的债）。
+    """
+    chart = _greenwich_chart()
+    nodes = chart.plain[5]
+    expected = "\n".join(
+        [
+            WESTERN.openers["nodes"],
+            WESTERN.entries[node_sign_key(chart.nodes.north_node_sign)],
+            WESTERN.entries[node_house_key(chart.nodes.north_node_house)],
+        ]
+    )
+    assert nodes.text == expected
+
+
+def test_every_section_line_count_is_one_opener_plus_the_fired_facts() -> None:
+    """七段的行数 == 该段实发键数 + 1（开篇句），逐段核对，不整块比字符串。
+
+    这条管的是「漏句」：`keep` 分组按传入序逐条 `reading()`，少一个键就少一行，而整段字符串
+    比对在 542 条规模上抄不动（上一段说的就是这件事）。行数与盘面事实的**计数**关系是唯一
+    写得动、也真判得住的形状。
+    """
+    chart = _greenwich_chart()
+    non_zero_elements = sum(1 for count in chart.element_balance.values() if count > 0)
+    non_zero_modalities = sum(1 for count in chart.modality_balance.values() if count > 0)
+    retro_count = sum(1 for planet in chart.planets if planet.retrograde)
+    expected_lines = [11, 11, len(chart.aspects) + 1, retro_count + 1, 3, 3, 13,
+                      non_zero_elements + non_zero_modalities + 1]
+    assert [len(section.text.split("\n")) for section in chart.plain] == expected_lines
+
+
+def test_the_axis_section_does_not_borrow_des_or_ic() -> None:
+    """盘面四轴而白话两轴（偏差表第 17 行的覆盖面决定的）：`axis` 段必须逐字节等于 ASC 与 MC 两句。"""
+    chart = _greenwich_chart()
+    asc = next(a for a in chart.axes if a.name == "ASC")
+    mc = next(a for a in chart.axes if a.name == "MC")
+    expected = "\n".join(
+        [
+            WESTERN.openers["axis"],
+            WESTERN.entries[axis_sign_key("ASC", asc.sign)],
+            WESTERN.entries[axis_sign_key("MC", mc.sign)],
+        ]
+    )
+    assert chart.plain[4].text == expected
+
+
+def test_the_sun_and_moon_never_appear_in_the_retrograde_lines() -> None:
+    """偏差表第 11 行的第二半：日月速度不为负 ⇒ 那两句今天不发射，段里不许有它们。
+
+    第一半（两键仍在 `universe()` 里、也就仍在 entries 里）由 T15 追加的
+    `test_the_key_universe_is_the_declared_542_and_the_table_covers_it` 钉；本条钉的是**发射面**。
+    J2000 盘 Saturn 逆行（`test_saturn_retrograde_flag_matches_negative_speed` 已钉），所以这一段的
+    那一行必须存在且只有它——一个反例都没有的「不出现」测是测不出装配错的。
+    """
+    chart = _greenwich_chart()
+    lines = chart.plain[3].text.split("\n")
+    assert lines[0] == WESTERN.openers["retrograde"]
+    assert lines[1:] == [WESTERN.entries[retrograde_key("Saturn")]]
+    assert WESTERN.entries[retrograde_key("Sun")] not in lines
+    assert WESTERN.entries[retrograde_key("Moon")] not in lines
+
+
+def test_an_empty_aspect_list_fires_the_none_opener_and_nothing_else() -> None:
+    """`aspect_none` 分支用构造输入钉（真盘最少 11 条相位，见偏差表第 14 行）。
+
+    入参全部来自 `_greenwich_chart()` 的**真实 schema 件**，只把 `aspects` 换成 `[]`——与
+    `test_natal_aspect_orb_boundary_is_inclusive_at_the_shared_limit` 用 `_pp()` 构造行星对
+    同一条路子（AGENTS §9：这是真实件的真实边界，不是 mock 响应）。
+    """
+    # 本文件唯一一条函数级 import，而 `app/engines/` 里那处（`build_plain` 自己）是全站第二处。
+    # 为什么这里必须函数级而不能并进文件顶部的 import 段：T16 Step 1 要的是**逐条** RED——
+    # 五条红在 `AttributeError: 'WesternChart' object has no attribute 'plain'`、本条红在
+    # `ImportError: cannot import name 'build_plain'`，同一次运行里既有 21 条passed。而模块级
+    # import 一个还不存在的名字会让 pytest 在**收集期**就中断（实测 `collected 0 items / 1 error`，
+    # 整文件一条都不跑），那样的 RED 既分不出是哪一条门坏、也证明不了既有 21 条没被碰。
+    # 换句话说：这里的函数级 import 不是风格选择，是「让门先红后绿」这条纪律能落地的前提。
+    # 复现（Step 1 的RED）：把下面这行挪到文件顶部、删掉本注释，同一条命令得到
+    # `collected 0 items / 1 error` 而 6 failed / 21 passed。
+    from app.engines.western import build_plain
+
+    chart = _greenwich_chart()
+    plain = build_plain(
+        planets=chart.planets, axes=chart.axes, aspects=[], nodes=chart.nodes,
+        element_balance=chart.element_balance, modality_balance=chart.modality_balance,
+    )
+    aspect_section = plain[2]
+    assert aspect_section.title == "主要相位"
+    assert aspect_section.text == WESTERN.openers["aspect_none"]
+    assert len(plain) == 8
