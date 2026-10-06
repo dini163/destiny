@@ -217,7 +217,7 @@ WESTERN_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Moon", "Uranus", "opposition"): "你盘上月亮与天王星成冲相，盼人陪的心事与想安静的心事同桌而坐，陪伴到场时独座不撤，人散之后独座接着把剩下的半程暖回来。",
     aspect_key("Moon", "Neptune", "opposition"): "你盘上月亮与海王星成冲相，胸口的起伏与外头压来的气压隔着一截距离，两边的动静都往心里落，落下来的位置有人伸手认领，边线也一直有人守着看。",
     aspect_key("Moon", "Pluto", "opposition"): "你盘上月亮与冥王星成冲相，想软的心与攥紧的心分桌摆开，每桌的道理齐全，理与理之间不递话，软与攥之间揉不出第三种样子。",
-    aspect_key("Mercury", "Venus", "opposition"): "你盘上水星与金星成冲相，讲的条理与好听的劲儿各在一边，条理与顺耳各自齐全，说顺耳的一套时条理安静听着，讲条理时另一套也在场。",
+    aspect_key("Mercury", "Venus", "opposition"): "你盘上水星与金星成冲相，讲的条理与好听的劲儿各在一边，条理与顺耳都齐全，说顺耳的一套时条理安静听着，顺耳铺的调子换到条理全白费。",
     aspect_key("Mercury", "Mars", "opposition"): "你盘上水星与火星成冲相，说法与动手分两程办，讲到哪儿手上停到哪儿，手真正落下去时话已经换到第二桩。",
     aspect_key("Mercury", "Jupiter", "opposition"): "你盘上水星与木星成冲相，学来的一套与用惯的一套同桌摆着，开口先起的一套连底端完，对面照样齐整，招牌在桌上并立。",
     aspect_key("Mercury", "Saturn", "opposition"): "你盘上水星与土星成冲相，转念与落笔分开办，话讲完之后写下的部分原样摆在原处，摆着的既不推翻讲完的，也不接替它。",
