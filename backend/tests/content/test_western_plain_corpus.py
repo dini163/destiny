@@ -396,3 +396,49 @@ def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
     for system in ("transit", "vedic"):
         with pytest.raises(KeyError):
             PLAIN_CORPORA[system]
+
+
+def test_the_provenance_tables_name_modules_that_exist_on_disk() -> None:
+    """`tables` 印的是**模块名**，读者可以拿去 grep；列一个不存在的模块就是假出处（AGENTS §7）。
+
+    工厂与架构门都不查这件事：架构门只 glob `content/western*.py` 存不存在（`test_architecture.py:210`），
+    它对 `WESTERN_CONTENT_SOURCES` 里写错一个名字毫无感知。本条用 `Path` 查而不是 `importlib`，
+    因为「模块能 import」不等于「它是这张表」——查文件名的那条 glob 与架构门用的那条同形，
+    两边漂开时至少有一边红。
+    """
+    from pathlib import Path
+
+    from app.content import WESTERN_CONTENT_SOURCES
+
+    content_dir = Path(__file__).resolve().parents[2] / "app" / "content"
+    for name, source in WESTERN_CONTENT_SOURCES:
+        assert (content_dir / f"{name}.py").is_file(), name
+        assert source == western_plain.WESTERN_PLAIN_SOURCE, name
+    assert [name for name, _s in WESTERN_CONTENT_SOURCES] == [
+        "western_plain", "western_plain_placement", "western_plain_aspect",
+    ]
+
+
+def test_the_note_is_the_self_authored_declaration() -> None:
+    """出处 note：`FORBIDDEN` 全禁（含「；」）、禁书名、禁它不覆盖的名词、含 R50 三件事。
+
+    note 不进 `wording_violations`（工厂只遍历 `entries`/`openers`/`closers`），所以它的禁字由本条
+    自守——与卡巴拉那条同名门、T1 那条出处串门同一个路子：**不出现在遍历里的串，谁用谁自守**。
+    「；」也禁：note 不是判语，门本来管不到它，但它要与 542 条判语**同屏印在同一个 `<p>` 里**，
+    读者无法知道哪一句走哪套口径，两套口径在这里并成一套（这是裁定，不是抄近路）。
+    三件事逐件钉关键词而不是整串逐字：整串逐字在 golden 里钉
+    （`test_the_provenance_note_is_the_r50_declaration_verbatim`），本条要的是「日后有人改写这句时，
+    诚实的那三点不许被改掉」。
+    """
+    from tests.plain_wording import FORBIDDEN
+
+    note = western_plain.WESTERN_PLAIN_NOTE
+    for token in FORBIDDEN:
+        assert token not in note, token
+    assert "；" not in note, note
+    assert "《" not in note and "依" not in note, note
+    assert "宫头" not in note and "南交" not in note, note
+    assert "自撰" in note, note
+    assert "请求时不生成" in note, note
+    assert "不预测具体事件" in note, note
+    assert note.endswith("。"), note

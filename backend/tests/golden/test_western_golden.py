@@ -27,7 +27,8 @@ would be caught rather than self-confirmed:
   (`test_aspect_orb_inclusion_is_identical_across_the_three_tables`): one construction, fed
   into all three helpers, must be kept or dropped identically.
 
-Recount this file's tests: 27 = 21 既有 + 6 白话（页尾块的形状契约六条，见文件末尾）。
+Recount this file's tests: 31 = 21 既有 + 6 白话 + 2 装配纪律（控制器 2026-10-06 在 T16 后补的两颗钉：
+空段崩而不静默、balance 段键序）+ 2 出处（T17）。
 `cd backend && PYTHONIOENCODING=utf-8
 .venv/Scripts/python.exe -m pytest tests/golden/test_western_golden.py -v`.
 """
@@ -37,7 +38,10 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content import CONTENT_VERSION
 from app.content.western_plain import (
+    WESTERN_PLAIN_NOTE,
+    WESTERN_PLAIN_SOURCE,
     axis_sign_key,
     element_key,
     modality_key,
@@ -550,3 +554,25 @@ def test_the_balance_section_keeps_the_declared_element_then_modality_order() ->
     assert len(lines) == len(expected)
     for line, key in zip(lines, expected, strict=True):
         assert WESTERN.entries[key] == line
+
+
+def test_the_provenance_note_is_the_r50_declaration_verbatim() -> None:
+    """用户可见的那句「这些中文从哪来」逐字钉：改写它要走裁定，不是顺手编辑。
+
+    与上一条本地门的分工是「逐字 vs 判据」：本地门管三个诚实要点不许丢，本条管这句在响应里
+    **就是这一句**。整串从 `content` 取而不是在这里重抄一遍——重抄就是第二份手抄（偏差 6/16
+    算过的同一笔债），取源对象仍然能抓住「装配器填了别的串」。
+    """
+    chart = _greenwich_chart()
+    assert chart.provenance.note == WESTERN_PLAIN_NOTE
+
+
+def test_the_provenance_tables_are_the_three_plain_modules_in_order() -> None:
+    """三行、次序、每行 `version == CONTENT_VERSION`：出处面板印的就是这三样。"""
+    chart = _greenwich_chart()
+    assert [row.name for row in chart.provenance.tables] == [
+        "western_plain", "western_plain_placement", "western_plain_aspect",
+    ]
+    for row in chart.provenance.tables:
+        assert row.version == CONTENT_VERSION, row.name
+        assert row.source == WESTERN_PLAIN_SOURCE, row.name

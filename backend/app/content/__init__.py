@@ -38,6 +38,7 @@ from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.vedic import VEDIC_SOURCE
+from app.content.western_plain import WESTERN_PLAIN_NOTE, WESTERN_PLAIN_SOURCE
 from app.content.zhouyi_hexagrams import ZHOUYI_HEXAGRAMS_SOURCE
 from app.content.zhouyi_najia import ZHOUYI_NAJIA_SOURCE
 from app.content.zhouyi_plain import ZHOUYI_PLAIN_SOURCE
@@ -151,6 +152,20 @@ RUNE_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 ZIWEI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("ziwei", ZIWEI_SOURCE),
     ("ziwei_plain", ZIWEI_PLAIN_SOURCE),
+)
+
+#: 西洋本命一页真正读到的三张白话表：落座与落宫（`western_plain_placement`）、轴/交点/宫题/
+#: 元素/形态/逆行（`WESTERN_SMALL_READINGS` 住在 `western_plain`）、相位（`western_plain_aspect`）。
+#: 三行共用同一个 `WESTERN_PLAIN_SOURCE`：一张自撰表的三个分册，同一条凭据（塔罗那张
+#: `TAROT_CONTENT_SOURCES` 用两条凭据是因为其中一行是**另一件东西**——一张现代译表，不是同一张表的分册）。
+#: **不列 `western` 本体**：这一家没有 `content/western.py`，权威数据源是 pyswisseph（AGENTS §2/§6），
+#: 列它等于凭空造一张不存在的表。单列不进 `CONTENT_SOURCES` 的理由同 `ZIWEI_CONTENT_SOURCES`。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+#: "from app.content import WESTERN_CONTENT_SOURCES; print(len(WESTERN_CONTENT_SOURCES))"` → 3。
+WESTERN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("western_plain", WESTERN_PLAIN_SOURCE),
+    ("western_plain_placement", WESTERN_PLAIN_SOURCE),
+    ("western_plain_aspect", WESTERN_PLAIN_SOURCE),
 )
 
 #: 奇门遁甲一页真正读到的两张表：安盘正表（洛书九宫、九星八门八神、三奇六仪甲遁、

@@ -17,8 +17,10 @@ from datetime import date, datetime, time, timedelta
 
 import swisseph as swe
 
+from app.content import CONTENT_VERSION, WESTERN_CONTENT_SOURCES
 from app.content.western_plain import (
     WESTERN_NONE_BRANCHES,
+    WESTERN_PLAIN_NOTE,
     WESTERN_SECTION_TITLES,
     aspect_key,
     axis_sign_key,
@@ -33,7 +35,7 @@ from app.content.western_plain import (
 )
 from app.core.errors import EphemerisError, UnsupportedMethodError
 from app.engines.plain_compose import compose
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.western import (
     Aspect,
     AxisPoint,
@@ -41,6 +43,7 @@ from app.schemas.western import (
     NodeInfo,
     PlanetPlacement,
     WesternChart,
+    WesternProvenance,
 )
 
 # --- Fixed reference tables (standard Western astrology) ---------------------
@@ -237,6 +240,21 @@ def build_plain(
     ]
 
 
+def _western_tables() -> list[ProvenanceTable]:
+    """`WESTERN_CONTENT_SOURCES` 的第一次被消费（AGENTS §7「读了就列」）。
+
+    复测（行号随本注一起漂，改动常量后重跑这条即得）：
+    `cd backend && grep -rn "WESTERN_CONTENT_SOURCES" app/ tests/ --include=*.py` → 定义在
+    `content/__init__.py`、本模块 import 一处、消费一处，测侧 `tests/content/test_western_plain_corpus.py`
+    与 `tests/golden/test_western_golden.py` 各一处。
+    引擎不在此另列表名、不抄书名（照 `engines/ziwei.py:239-252` 的写法）。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in WESTERN_CONTENT_SOURCES
+    ]
+
+
 def compute_western_chart(
     *,
     birth_date: date,
@@ -377,4 +395,5 @@ def compute_western_chart(
         element_balance=element_balance,
         modality_balance=modality_balance,
         plain=plain,
+        provenance=WesternProvenance(note=WESTERN_PLAIN_NOTE, tables=_western_tables()),
     )

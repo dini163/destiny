@@ -4,7 +4,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 
 
 class WesternNatalRequest(BaseModel):
@@ -95,6 +95,19 @@ class NodeInfo(BaseModel):
     south_node_house: int
 
 
+class WesternProvenance(BaseModel):
+    """本命页的出处块：一句自撰声明 + 本响应真读到的三张白话表。
+
+    两格而不是 spec §8 说的四格（`engine`/`note`/`source`/`tables`）：`engine` 在同一响应的
+    `chart.engine` 已有，`source` 与 `tables[*].source` 是同一个字符串——四格形状会让一张
+    出处面板把同一句话印两遍（偏差表第 3 行）。真同形先例是 `ZiweiProvenance`/`QimenProvenance`
+    （`VedicProvenance` 没有 `tables`，spec 那句「与 Vedic 同形」是假的）。
+    """
+
+    note: str = Field(description="自撰声明（R50 三句），页面出处块与免责文案共用。")
+    tables: list[ProvenanceTable] = Field(description="本响应真读到的三张白话表（AGENTS §7 读了就列）。")
+
+
 class WesternChart(BaseModel):
     """Complete Western natal chart produced by :mod:`app.engines.western`."""
 
@@ -127,6 +140,9 @@ class WesternChart(BaseModel):
     modality_balance: dict[str, int] = Field(description="cardinal/fixed/mutable counts among planets")
     plain: list[PlainSection] = Field(
         description="页尾「白话详解」的八段，逐字取自自撰表 `content/western_plain*.py`（戊组 spec §8）。必填：缺白话即视为伪造响应。"
+    )
+    provenance: WesternProvenance = Field(
+        description="出处块：自撰声明与被读取的三张白话表。必填，缺出处即视为伪造响应。"
     )
 
     engine: str = Field(default="pyswisseph")

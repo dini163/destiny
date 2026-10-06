@@ -16,6 +16,20 @@ WESTERN_PLAIN_SOURCE = (
     "不是古籍引文，不署任何书名，不构成医疗、法律、财务建议。"
 )
 
+#: 页面出处块与三页文案共用的**自撰声明**（spec 裁定 R50）。它是 R46「自撰 + 诚实双署」里
+#: 「诚实」那一半的唯一用户可见落点：用户看见的「这些中文从哪来」就这一句，所以它必须
+#: 自己说得全，而不是等一本书名来背书。
+#: 三句、句间「。」、无「；」——`FORBIDDEN` 含「；」，本串的口径与语料同源（T1 的出处串门
+#: `test_the_source_string_is_a_provenance_string_not_a_sentence` 只管 `WESTERN_PLAIN_SOURCE`，
+#: 本串由本任务 Step 1 那条 note 门管）。
+#: 不写「宫头」：本页 `HouseTable` 印宫头星座，但白话不建那 144 条（spec §2、偏差 17），
+#: 出处句不许声称转述了它没转述的东西（AGENTS §7 同一条纪律）。
+WESTERN_PLAIN_NOTE = (
+    "四轴、十颗主星的位置、相位与元素计数由 Swiss Ephemeris 实时计算，页面先只报这些天文与结构事实。"
+    "下方的白话逐条转述上面已经算出的位置与相位，句子全部预先写在自撰语料表里，请求时不生成任何中文。"
+    "这张表是平台自撰的通行教义归纳，不是古籍引文，不署任何书名，不构成医疗、法律或财务建议，也不预测具体事件。"
+)
+
 
 def planet_sign_key(planet: str, sign: str) -> str:
     return f"western.planet_sign.{planet}.{sign}"
