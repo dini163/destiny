@@ -187,7 +187,7 @@ WESTERN_SMALL_READINGS: dict[str, str] = {
     modality_key("fixed"): "你盘上有固定宫这一份配置，它给的是稳住局面的耐力，认定了就不轻易改方向，好处是扛得住，代价是切换慢。",
     modality_key("mutable"): "你盘上有变动宫这一份配置，它给的是转身的灵活，此路不通你就换一条，好处是不钻死胡同，代价是同一件事难做长久。",
     # 逆行十颗（10 条，按 `PLANETS` 序；Sun/Moon 两句本期不发射——日月速度不为负，
-    # `engines/western.py:218` 恒给 retrograde=False，故按「若……这一句讲的是那种节奏」的形状写）
+    # `engines/western.py:321` 恒给 retrograde=False，故按「若……这一句讲的是那种节奏」的形状写）
     retrograde_key("Sun"): "若你盘上的太阳逆行，这一句讲的是那种节奏，光彩往里收一层，主张在暗处反复发酵，说出口时人已经冷静了一半。",
     retrograde_key("Moon"): "若你盘上的月亮逆行，读到的是退回来消化的节奏，情绪不摆到明处，安全感慢慢沉下来，对外的软就有落点。",
     retrograde_key("Mercury"): "你盘上水星逆行，思路和沟通走得绕，同一件事往往要在心里过好几遍才说出口，慢那一段不是在损耗，是在把话理顺。",

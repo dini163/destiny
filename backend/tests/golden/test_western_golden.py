@@ -298,7 +298,7 @@ def test_whole_sign_renumbers_houses_without_moving_the_planets() -> None:
 def test_retrograde_flag_is_the_sign_of_the_speed() -> None:
     """十曜全体 `retrograde == (speed < 0)`：逆行旗标就是速度符号，不是第二套判定。
 
-    引擎 `retrograde = positions[name][3] < 0`、`speed = round(...,6)`（`app/engines/western.py:218-219`），
+    引擎 `retrograde = positions[name][3] < 0`、`speed = round(...,6)`（`app/engines/western.py:321-322`），
     二者天然同号（round 到 6 位不会把真实逆行速度抹成 0）。Saturn 于 2000-01-01 12:00 UT
     （金牛 10°24′、黄经 40.3956°）确实逆行这一**单点**锚已由
     `test_saturn_retrograde_flag_matches_negative_speed` 钉住，本条不重复它，只把同一式子推到

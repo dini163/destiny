@@ -56,6 +56,15 @@ class PlainSection(BaseModel):
     前端镜像在 `frontend/src/types/common.ts`（Plan F T18 已搬；组件
     `components/ui/PlainSectionList.tsx` 改为 `import type` 消费它，那边不再有第二份定义）。
     AGENTS §3 说的是「镜像 `schemas/common.py` 的落点是 types/」，搬家的那笔是 `2825f79`。
+
+    **为什么只有两格**：块容器只承载「格的名字 + 拼好的整段」。逐条判语在 `text` 里已经
+    合成一段（那是 `plain_compose.compose` 的活），而段内计数、键值、出处都不进这一格——
+    紫微/奇门那两边干脆连 pydantic 块都没有，直接把 `compose()` 的返回串放进 `plain: str`
+    （`schemas/ziwei.py:54`、`schemas/qimen.py:77`）；命盘是唯一一处要按格发一列的系统。
+    **日后若全站统一块形状，这一家要动的是各系统 content 的小节名册与 `compose()` 的返回
+    契约，不是这两格**：给块加第三格（例如「本段计数」）要动的是三个系统的 `plain` 字段类型
+    与前端那三处 `sections={...}` 映射，而它们并不载那个事实。写法参照同族的
+    `schemas/western.py::WesternProvenance`（「日后若全站统一…要动的是哪几处」那段）。
     """
 
     title: str = Field(description="小节名，取自各系统 content 的小节名册，不是引擎现编的词。")

@@ -213,7 +213,8 @@ def build_plain(
             # 拼出一段只有开篇句的「白话」，页面上读起来像「这一段今天没什么可说」——那正是
             # `plain_compose` 开篇那句「宁崩不漏」的同一条纪律，本条把它落到八段装配的每一段上。
             # 钉：`tests/golden/test_western_golden.py::test_a_section_that_goes_empty_without_a_declared_none_branch_crashes`
-            # （复测：删掉本条这七行，同文件 `pytest` 由 29 passed 变 28 passed / 1 failed）。
+            # （复测：删掉本条这七行，同文件 `pytest` 出一条 FAILED；条数随该文件增删变，
+            # 数字不复述——重跑这条命令即得现值）。
             raise ValueError(f"west 段 {section!r} 收不到任何键，且它不在 WESTERN_NONE_BRANCHES 里：{WESTERN_NONE_BRANCHES}")
         opener = WESTERN_NONE_BRANCHES[section] if not keys else section
         return PlainSection(
@@ -245,7 +246,7 @@ def _western_tables() -> list[ProvenanceTable]:
 
     复测（行号随本注一起漂，改动常量后重跑这条即得）：
     `cd backend && grep -rn "WESTERN_CONTENT_SOURCES" app/ tests/ --include=*.py` → 定义在
-    `content/__init__.py:165`、本模块 import 一处（`:20`）、消费一处（本函数 `:254`），
+    `content/__init__.py:165`、本模块 import 一处（`:20`）、消费一处（本函数 `:257`），
     测侧只有 `tests/content/test_western_plain_corpus.py:411` 一处。
     **golden 里刻意零命中**：它钉的是字面量清单（三个模块名逐字 + `len(tables) == 3`），
     不 import 这个常量——否则登记表加行时测与被测同动，钉的只是「引擎如实复现登记」。

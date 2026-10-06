@@ -299,7 +299,7 @@ def _western_universe() -> set[str]:
     `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from itertools import combinations; from app.engines.western import ASPECTS, PLANETS; print(len(list(combinations(PLANETS,2))), len(ASPECTS))"` → 45 5（225 = 45×5）。
 
     元素与形态的名册从 `SIGN_ELEMENT`/`SIGN_MODALITY` 用 `dict.fromkeys` 去重取，不写四串三串：
-    那两张表是 `SIGNS` 的平行数组（`engines/western.py:42-43`），星座表一动这里自动跟着动，
+    那两张表是 `SIGNS` 的平行数组（`engines/western.py:61-62`），星座表一动这里自动跟着动，
     写字面量清单就是把「十二个星座各属哪一格」这件事抄第二遍。
     """
     planet_names = [name for name, *_ in PLANETS]
@@ -311,7 +311,7 @@ def _western_universe() -> set[str]:
             western_plain.aspect_key(first, second, aspect)
             for (first, second), aspect in product(combinations(planet_names, 2), aspect_names)
         }
-        # 两轴写字面量而不是取 `compute_western_chart` 的 `axes`：那张表恒含 DES/IC 四枚（`engines/western.py:202-203`
+        # 两轴写字面量而不是取 `compute_western_chart` 的 `axes`：那张表恒含 DES/IC 四枚（`engines/western.py:306-307`
         # 就是 `ascendant + 180` 算出来的镜像），而 spec §2 刻意不建 DES/IC 与南交点。同一处形状
         # 的先例是 `_synastry_universe` 里那两枚 `("ASC", "MC")`（本文件上方 `SYNASTRY` 登记前的
         # import 注），漂了由 `test_western_plain_corpus.py` 的轴族对账门抓。
