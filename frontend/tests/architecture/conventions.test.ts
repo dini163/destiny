@@ -9,7 +9,7 @@
  * 「不再变差」；现测为零的规则就是硬门。为什么是身份而不是计数（评审 Minor 5）：
  * `BASELINE = 1` 这种纯计数棘轮允许「修掉这条边、换一条同样非法的边」照样绿，
  * 身份子集判定则任何未登记的新违规（哪怕总数不变）都红。
- * 复测口径（2026-09-26 全绿，10 项）：
+ * 复测口径（2026-10-06 全绿，11 项——此前头注写「10 项」是数漏了本模块自己那一条）：
  * `cd frontend && npx vitest run tests/architecture/conventions.test.ts`
  */
 import { readdirSync, readFileSync } from 'node:fs';

@@ -66,9 +66,16 @@ it('the block keeps every line break and adds no sentence of its own', () => {
   const { container } = render(<PlainSectionList sections={chart.plain} />);
   const paragraphs = [...container.querySelectorAll('p')];
   expect(paragraphs).toHaveLength(chart.plain.length);
-  for (const section of chart.plain) {
+  // 断行是否真的到了 DOM：断 `paragraph.textContent` 而不是断夹具。
+  // 断夹具的那一版（`chart.plain` 每段含 `\n`）恒真——评审实测把组件的 `{text}` 改成
+  // `{text.replace(/\n/g, ' ')}` 时它照样全绿，而那条腿的标题恰恰叫 `keeps every line break`。
+  for (const [index, section] of chart.plain.entries()) {
     // 每段都是「开篇句 + ≥1 条判语」，所以段内必有换行；零换行的那一段就是装配掉了条目。
     expect(section.text).toContain('\n');
+    expect(paragraphs[index].textContent).toBe(section.text);
+    expect(paragraphs[index].textContent?.split('\n')).toHaveLength(
+      section.text.split('\n').length,
+    );
   }
   for (const paragraph of paragraphs) {
     expect(paragraph.className).toContain('whitespace-pre-line');
