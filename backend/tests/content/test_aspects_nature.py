@@ -27,8 +27,9 @@ def test_the_five_aspect_types_carry_the_declared_taxonomy() -> None:
 def test_both_overlay_engines_read_the_table_and_define_no_local_copy() -> None:
     """搬家是**两个**消费者（实测，不是 spec 说的三个；吠陀引擎不读它）。
 
-    复测：`cd backend && grep -rn "_NATURE" app/ --include=*.py | grep -v pyc` → 只有本表
-    与两处 `ASPECT_NATURE[...]` 调用点，`engines/vedic.py` 零命中。
+    复测：`cd backend && grep -rn "ASPECT_NATURE" app/engines/` → 源码只命中 transit.py 与
+    synastry.py 各一条 import 加一处 `ASPECT_NATURE[aspect_name]` 调用（`__pycache__/*.pyc`
+    会一并匹配），`engines/vedic.py` 零命中。
     """
     root = Path(__file__).resolve().parents[2]
     for name in ("transit.py", "synastry.py"):

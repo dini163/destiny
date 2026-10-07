@@ -349,8 +349,8 @@ def test_natal_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
 def _mp(name: str, longitude: float) -> MovingPoint:
     """A MovingPoint bare enough to feed `_cross_aspects`.
 
-    几何只读 `name`/`longitude`（`app/engines/transit.py:130-134`）；`name_zh` 与 `glyph` 会被
-    抄进 `CrossAspect`（`app/engines/transit.py:140-141`），但下面的关系测只比 orb，所以这里的
+    几何只读 `name`/`longitude`（`app/engines/transit.py:122-126`）；`name_zh` 与 `glyph` 会被
+    抄进 `CrossAspect`（`app/engines/transit.py:132-133`），但下面的关系测只比 orb，所以这里的
     占位串不进入断言。与 `tests/golden/test_transit_golden.py::_mp` 同形状（本仓第二份
     MovingPoint 裸构造器，属已知重复、由收口轮统一处理）。
     """
