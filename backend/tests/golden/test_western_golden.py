@@ -400,6 +400,9 @@ def test_the_plain_block_is_eight_sections_in_the_declared_order() -> None:
     发射序是**产品决定**（先讲星怎么出手，再讲落在哪块生活，再讲星与星的关系，最后给底色），
     所以钉成字面量清单而不是从 `WESTERN_SECTION_TITLES` 派生——派生写法在标题表被重排时不会红，
     而那正是用户会看见的变化。
+
+    代价是这份字面量清单本身：它是发射序在全仓唯一的机器侧记录，**给页尾块加第九段时这里
+    是必改的一处**（下面那份断言的列表与「八个小节」那句都要跟着改），漏改就是红而不是漏检。
     """
     chart = _greenwich_chart()
     assert [section.title for section in chart.plain] == [

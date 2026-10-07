@@ -250,6 +250,25 @@ def test_the_structural_fact_matches_the_table(key) -> None:
     assert not problems, f"{key}: {problems}"
 
 
+def test_the_modality_words_keep_their_three_glyph_shape() -> None:
+    """把两处注释的形状承诺变成机器门（`content/western_plain.py:185`、本文件 :47-48）。
+
+    G34 判的是「说得对不对」：它用 `MODALITY_ZH.values()` 做子串筛，把「基本宫」缩成「基本」
+    时筛出来的仍是那一个词，门全绿而句子读起来像漏字。三字形因此需要一个专门看词形的断言。
+    """
+    problems: list[str] = []
+    for key in built_keys():
+        family, arg = key_parts(key)
+        if family != "modality":
+            continue
+        word = MODALITY_ZH[arg["modality"]]
+        if len(word) != 3:
+            problems.append(f"{key}: 形态词「{word}」不是三字形")
+        if word not in WESTERN.entries[key]:
+            problems.append(f"{key}: 条目里没有形态词「{word}」")
+    assert not problems, problems
+
+
 def test_roster_counts_and_no_key_outside_universe() -> None:
     """批次花名册（族内不许多建）+ 键不外溢（族名拼错、参数越界当场红）。
 
