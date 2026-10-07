@@ -374,8 +374,8 @@ def test_aspect_orb_inclusion_is_identical_across_the_three_tables() -> None:
     同一份构造（相对 0° 点的 delta = `CONJUNCTION_ORB - 0.1 / +0.0 / +0.1`）同时走
     `_compute_aspects`、`_cross_aspects`、`_synastry_aspects`，三个返回集合逐一相等且等于期望的
     keep/keep/drop。上限一律从 `ASPECTS` 派生（`CONJUNCTION_ORB`），本文件不新写死数字。
-    三表共用的正是 `app/engines/western.py:60-66` 这张表与同一句 `orb <= orb_limit`
-    （`western.py:143`、`transit.py:138`、`synastry.py:136`）。
+    三表共用的正是 `app/engines/western.py:79-85` 这张表与同一句 `orb <= orb_limit`
+    （`western.py:162`、`transit.py:130`、`synastry.py:177`）。
     """
     cases = [
         (CONJUNCTION_ORB - 0.1, [CONJUNCTION_ORB - 0.1]),  # strictly inside
