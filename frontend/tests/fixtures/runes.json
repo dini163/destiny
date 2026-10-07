@@ -11,27 +11,28 @@
       "position_label": "Urðr · What Has Become",
       "position_label_zh": "乌尔德 · 源起",
       "position_meaning": "已经织成的那一段：事情从何而来，哪些已成定局、不可再改。Urðr 之名出自古埃达《女先知之歌》第 20 节，本义近「已发生之事」；但把它当牌阵位次读作「过去」，是现代占卜的类比。",
-      "order": 19,
-      "key": "ehwaz",
-      "glyph": "ᛖ",
-      "name": "Ehwaz",
-      "name_zh": "埃瓦兹",
-      "transliteration": "e",
-      "name_meaning": "原始日耳曼语 *ehwaz「马」—— 与拉丁语 equus 同源",
+      "order": 17,
+      "key": "tiwaz",
+      "glyph": "ᛏ",
+      "name": "Tiwaz",
+      "name_zh": "提瓦兹",
+      "transliteration": "t",
+      "name_meaning": "原始日耳曼语 *tīwaz「战神提尔」—— 与拉丁语 deus、希腊语 Zeus 同源于 *dyeus",
       "name_meaning_uncertain": false,
       "aett": "tyr",
       "aett_zh": "提尔之族",
       "reversible": true,
       "is_wyrd": false,
-      "orientation": "reversed",
+      "orientation": "upright",
       "keywords": [
-        "失和的伙伴",
-        "受阻的移动",
-        "背信",
-        "各行其是"
+        "公断",
+        "荣誉",
+        "决断",
+        "牺牲",
+        "法治"
       ],
-      "meaning": "骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Ehwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "提尔断腕立约的那把矛：公义、荣誉与必要的牺牲。宜依理裁断、认下代价，不徇私。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Tiwaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     },
     {
       "position_index": 1,
@@ -67,34 +68,33 @@
       "position_label": "Skuld · What Shall Be",
       "position_label_zh": "诗蔻蒂 · 必然",
       "position_meaning": "尚未织成的那一段：照现在的走法，接下来会落到哪里。Skuld 与「债、该当」同源 —— 故这一位读出的不是天降的判词，而是前面两枚欠下、到这一枚要还的账。",
-      "order": 9,
-      "key": "hagalaz",
-      "glyph": "ᚺ",
-      "name": "Hagalaz",
-      "name_zh": "哈加拉兹",
-      "transliteration": "h",
-      "name_meaning": "原始日耳曼语 *haglaz「冰雹」—— 从天而降、不由人定",
-      "name_meaning_uncertain": false,
+      "order": 14,
+      "key": "perthro",
+      "glyph": "ᛈ",
+      "name": "Perthro",
+      "name_zh": "佩尔索",
+      "transliteration": "p",
+      "name_meaning": "词源不详（构拟 *perþō 一说为「签筒、骰盅」，无定论）",
+      "name_meaning_uncertain": true,
       "aett": "heimdall",
       "aett_zh": "海姆达尔之族",
-      "reversible": false,
+      "reversible": true,
       "is_wyrd": false,
-      "orientation": "upright",
+      "orientation": "reversed",
       "keywords": [
-        "天灾",
-        "突变",
-        "不由人",
-        "破而后立",
-        "考验"
+        "坏签",
+        "隐情败露",
+        "误赌",
+        "不肯认命"
       ],
-      "meaning": "从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。",
-      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Hagalaz（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
+      "meaning": "摇出来的不是想要的那一支：意外走漏、赌错了，或被自己不肯认的那部分反噬。",
+      "source": "北欧 Elder Futhark 卢恩符文序、字形与释义·Perthro（序位据 Kylver 石碑，字形据 Unicode 标准字符名，符文名词义为原始日耳曼语构拟，释义为通行传统的摘要，非古籍、非逐字引文；第 25 枚空白符 Wyrd 为现代增补，不在此二凭据之列，另署出处）"
     }
   ],
   "drawn_keys": [
-    "ehwaz",
+    "tiwaz",
     "raido",
-    "hagalaz"
+    "perthro"
   ],
   "allow_reversed": true,
   "include_wyrd": false,
@@ -124,24 +124,24 @@
       "count": 0
     }
   ],
-  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起落得埃瓦兹（Ehwaz，逆位）——骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。薇尔丹蒂 · 显相落得莱多（Raido，逆位）——车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。诗蔻蒂 · 必然落得哈加拉兹（Hagalaz，正位）——从天上掉下来的、不由人定的那一场：突变、挫折与被打断的计划。宜认下损失，从中重整。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 1 枚、提尔之族 1 枚。本次 2 枚可逆符文中有 2 枚为逆位。",
+  "synthesis": "以诺伦三女神运命之阵（The Three Norns）铸石，未附所问。乌尔德 · 源起落得提瓦兹（Tiwaz，正位）——提尔断腕立约的那把矛：公义、荣誉与必要的牺牲。宜依理裁断、认下代价，不徇私。薇尔丹蒂 · 显相落得莱多（Raido，逆位）——车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。诗蔻蒂 · 必然落得佩尔索（Perthro，逆位）——摇出来的不是想要的那一支：意外走漏、赌错了，或被自己不肯认的那部分反噬。三组配比（本次共 3 枚）：弗蕾亚之族 1 枚、海姆达尔之族 1 枚、提尔之族 1 枚。本次 3 枚可逆符文中有 2 枚为逆位。",
   "shadow_counsel": [
     {
-      "key": "ehwaz",
-      "name": "Ehwaz",
-      "name_zh": "埃瓦兹",
-      "glyph": "ᛖ",
+      "key": "tiwaz",
+      "name": "Tiwaz",
+      "name_zh": "提瓦兹",
+      "glyph": "ᛏ",
       "position_key": "urd",
       "position_label_zh": "乌尔德 · 源起",
-      "drawn_orientation": "reversed",
+      "drawn_orientation": "upright",
       "shadow_keywords": [
-        "失和的伙伴",
-        "受阻的移动",
-        "背信",
-        "各行其是"
+        "失义",
+        "决断失误",
+        "争讼不利",
+        "白费的牺牲"
       ],
-      "shadow_meaning": "骑手与马不是一条心：伙伴失和、迁移受阻，或说好的没做到。",
-      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
+      "shadow_meaning": "理不直或断错了：争讼不利、誓言失效，或付出了却没换来该换来的。",
+      "note": "本次为正位；此条是它的反面参照（逆位释义），不是本次结果。"
     },
     {
       "key": "raido",
@@ -158,6 +158,23 @@
         "方向错误"
       ],
       "shadow_meaning": "车轮偏了：行程被打断、步骤乱了，或走得很快却不是往要去的地方。",
+      "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
+    },
+    {
+      "key": "perthro",
+      "name": "Perthro",
+      "name_zh": "佩尔索",
+      "glyph": "ᛈ",
+      "position_key": "skuld",
+      "position_label_zh": "诗蔻蒂 · 必然",
+      "drawn_orientation": "reversed",
+      "shadow_keywords": [
+        "坏签",
+        "隐情败露",
+        "误赌",
+        "不肯认命"
+      ],
+      "shadow_meaning": "摇出来的不是想要的那一支：意外走漏、赌错了，或被自己不肯认的那部分反噬。",
       "note": "本次已抽到逆位，此条与卡面所读同文，列出只为与其余各条并读，不是另一次结果。"
     }
   ],

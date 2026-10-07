@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "swords-06",
-      "name": "Six of Swords",
-      "name_zh": "宝剑六",
+      "card_id": "cups-02",
+      "name": "Two of Cups",
+      "name_zh": "圣杯二",
       "arcana": "minor",
-      "number": 6,
-      "suit": "swords",
+      "number": 2,
+      "suit": "cups",
       "rank": null,
-      "element": "air",
-      "orientation": "upright",
+      "element": "water",
+      "orientation": "reversed",
       "keywords": [
-        "transition",
-        "change",
-        "physical journey",
-        "moving on"
+        "imbalance",
+        "broken communication",
+        "tension",
+        "separation"
       ],
       "keywords_zh": [
-        "过渡",
-        "改变",
-        "实际的出行",
-        "放下前行"
+        "失衡",
+        "沟通中断",
+        "紧绷",
+        "分离"
       ],
-      "meaning": "A ferryman poles a mother and child across calm water toward a new shore, leaving trouble behind.",
-      "meaning_zh": "船夫载着一对母子划过平静的水面驶向新岸，把麻烦留在身后。"
+      "meaning": "Reversed, the exchange falters as imbalance or miscommunication strains the bond.",
+      "meaning_zh": "逆位时，交换卡住，失衡或沟通失真把这条纽带绷紧。"
     },
     {
       "position_index": 1,
@@ -44,31 +44,29 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "major-16",
-      "name": "The Tower",
-      "name_zh": "塔",
-      "arcana": "major",
-      "number": 16,
-      "suit": null,
+      "card_id": "wands-09",
+      "name": "Nine of Wands",
+      "name_zh": "权杖九",
+      "arcana": "minor",
+      "number": 9,
+      "suit": "wands",
       "rank": null,
-      "element": null,
+      "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "sudden change",
-        "upheaval",
-        "chaos",
-        "revelation",
-        "awakening"
+        "courage",
+        "persistence",
+        "test of faith",
+        "resilience"
       ],
       "keywords_zh": [
-        "突发变化",
-        "动荡",
-        "混乱",
-        "揭示",
-        "觉醒"
+        "勇气",
+        "持续不懈",
+        "信念的考验",
+        "韧性"
       ],
-      "meaning": "The Tower is struck by lightning, toppling false structures so that truth is revealed through sudden upheaval.",
-      "meaning_zh": "塔被雷击中，虚假的结构被推倒，真相透过突如其来的动荡显出来。"
+      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance.",
+      "meaning_zh": "疲惫的守护者靠在他的权杖上，缠着绷带却仍然站着，最后一场耐力的考验已近尾声。"
     },
     {
       "position_index": 2,
@@ -77,39 +75,39 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "cups-08",
-      "name": "Eight of Cups",
-      "name_zh": "圣杯八",
+      "card_id": "cups-09",
+      "name": "Nine of Cups",
+      "name_zh": "圣杯九",
       "arcana": "minor",
-      "number": 8,
+      "number": 9,
       "suit": "cups",
       "rank": null,
       "element": "water",
-      "orientation": "reversed",
+      "orientation": "upright",
       "keywords": [
-        "talking it out",
-        "trying one more time",
-        "high anxiety",
-        "fear"
+        "contentment",
+        "satisfaction",
+        "gratitude",
+        "wish come true"
       ],
       "keywords_zh": [
-        "把话说开",
-        "再试一次",
-        "高度焦躁",
-        "恐惧"
+        "知足",
+        "满意",
+        "感恩",
+        "如愿以偿"
       ],
-      "meaning": "Reversed, departure is delayed by fear or a reluctant attempt to make it work.",
-      "meaning_zh": "逆位时，离开的脚步被恐惧拖住，或者勉强再试一次想把它凑合下去。"
+      "meaning": "A satisfied figure sits with arms crossed before nine golden cups, the very picture of a wish fulfilled.",
+      "meaning_zh": "一个心满意足的人抱臂坐在九只金杯前，正是如愿以偿的那副模样。"
     }
   ],
   "drawn_ids": [
-    "swords-06",
-    "major-16",
-    "cups-08"
+    "cups-02",
+    "wands-09",
+    "cups-09"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 宝剑六（Six of Swords），正位，取的是 过渡、改变、实际的出行。 现在（Present）抽出 塔（The Tower），正位，取的是 突发变化、动荡、混乱。 未来（Future）抽出 圣杯八（Eight of Cups），逆位，取的是 把话说开、再试一次、高度焦躁。 1 张大牌在这份日常处境里标出分量更重、由不得你选的线索。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
-  "major_arcana_count": 1,
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 圣杯二（Two of Cups），逆位，取的是 失衡、沟通中断、紧绷。 现在（Present）抽出 权杖九（Nine of Wands），正位，取的是 勇气、持续不懈、信念的考验。 未来（Future）抽出 圣杯九（Nine of Cups），正位，取的是 知足、满意、感恩。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "major_arcana_count": 0,
   "reversed_count": 1,
   "provenance": {
     "engine": "tarot-content-library",
