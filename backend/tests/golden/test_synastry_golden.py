@@ -231,7 +231,7 @@ def test_missing_person_is_a_pydantic_422_not_a_domain_error(client: TestClient)
 def test_diametric_midpoint_walks_counterclockwise_from_a() -> None:
     """两点相差恰 180° 时无短弧，两个合法答案相差 180°；实现取「从 A 逆时针 +90°」这一支。
 
-    `_midpoint`（`app/engines/synastry.py:91-94`）先算 `delta = (lon_b - lon_a) % 360`，
+    `_midpoint`（`app/engines/synastry.py:95-98`）先算 `delta = (lon_b - lon_a) % 360`，
     恰好 180 时 `delta > 180` 为假，不减 360，于是结果 = `lon_a + 180/2 = lon_a + 90`。所以
     `_midpoint(0, 180) == 90`（A+90）、`_midpoint(180, 0) == 270`（仍是 A+90，A=180）。
     这是「按参数顺序定方向」的确定性取舍，不是几何唯一解——把这条写死，谁改了取法会在这里红。
@@ -261,7 +261,7 @@ def test_synastry_aspects_are_sorted_unique_and_within_their_orbs() -> None:
 def test_synastry_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
     """合盘表这一侧：构造 7.9/8.0 计入、8.1 剔除，只证明 `_synastry_aspects` 用 `orb <= orb_limit`。
 
-    `_synastry_aspects` 迭同一份 `ASPECTS`、同一句比较（`app/engines/synastry.py:126-128`），
+    `_synastry_aspects` 迭同一份 `ASPECTS`、同一句比较（`app/engines/synastry.py:175-177`），
     但本条看不到另外两张表——「三表同口径」由跨表关系测
     `tests/golden/test_western_golden.py::test_aspect_orb_inclusion_is_identical_across_the_three_tables`
     一次喂三张表来证（本命、行运各自的姊妹条同理，也只钉自己那一张）。8.0 是合相上限
@@ -305,7 +305,7 @@ def test_swapping_the_two_people_leaves_the_aspect_set_and_score_unchanged() -> 
 def test_only_counted_aspects_enter_the_score_ledger() -> None:
     """账本逐条对相位：非 counted 的相位其 rule 绝不出现在 factors；counted 的 rule 一条不缺。
 
-    `_synastry_score` 跳过 `counted=False`（`app/engines/synastry.py:155-157`），每条 counted 相位生成
+    `_synastry_score` 跳过 `counted=False`（`app/engines/synastry.py:205-207`），每条 counted 相位生成
     一行 `synastry.<a>.<b>.<type>`。所以 factors（除 base）的 rule 集合恰等于 counted rule 集合，
     且所有 non-counted 的 rule 都在其外——这是一条真正的「进账门」，不靠数数相等蒙混。
     """
