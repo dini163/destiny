@@ -354,8 +354,11 @@ def _transit_universe() -> set[str]:
     648 = 600（10 移动星 × 12 本命点 × 5 相位）+ 12 推运月亮落座 + 12 推运月亮落宫 + 24 推运两轴。
     复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT; print(len(TRANSIT.universe()))"` → 648。
     移动星名取 `PLANETS`，本命点取「十星 + ASC/MC」——这两枚的字面与 `_AXIS_ZH` 的一致性由
-    `tests/golden/test_transit_golden.py` 已有的轴对账钉守住，不在这里 import 引擎私有量
-    （`_natal_points` 是函数内局部构造，没有可 import 的常量）。
+    `tests/content/test_transit_plain_corpus.py::test_the_key_builders_are_the_only_key_source`
+    的轴对账钉守住（T2 整改轮 1 B1 补上；此前这里指向 `tests/golden/test_transit_golden.py` 的
+    「已有轴钉」是假话，该文件没有任何轴测）。本模块是生产代码，不 import 引擎私有量
+    （AGENTS §1 的依赖方向；`tests/plain_corpora` 的工厂测同样不引）——`_natal_points` 是
+    函数内局部构造，没有可 import 的常量。
     """
     planet_names = [name for name, *_ in PLANETS]
     aspect_names = [aspect[0] for aspect in ASPECTS]

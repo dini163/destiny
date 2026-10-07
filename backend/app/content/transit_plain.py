@@ -10,8 +10,9 @@
 合相」这一句同时是行运火星、次限火星、太阳弧火星三种读法的合法说法——同一个键会在同一份响应
 里被印到最多三个小节（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date, time; from app.engines.transit import compute_transits; c=compute_transits(birth_date=date(1990,5,4),birth_time=time(9,12),latitude=30.67,longitude=104.07,target_date=date(2026,10,3)); ks=[a.moving+'.'+a.natal+'.'+a.type for a in c.transit_aspects+c.progression.aspects+c.solar_arc.aspects]; from collections import Counter; print(max(Counter(ks).values()))"`
 → 该数 ≥2 即证同一键跨层复用）。层名一进句子，这张表就得复制三份（648 → 1944 条），而复制
-就是三份互相会漂的判语。层名因此只住在**开篇句**里，条目里出现层名由
-`tests/content/test_transit_plain_corpus.py::test_no_layer_word_inside_an_entry`（G37）判红。
+就是三份互相会漂的判语。层名因此只住在**开篇句**里，条目里出现层名或日历词由
+`tests/content/test_transit_plain_corpus.py::test_no_layer_word_and_no_calendar_word_inside_an_entry`
+（G37 两族同住，日历词十四串在 T2 整改轮 1 A2 进门）判红。
 
 覆盖面 = 页面已印事实的全集（spec 裁定 R47）：三层各自那张相位表逐条、次限月亮落座与落本命
 宫、次限上升与天顶落座。条数 = 648 = 600（10 移动星 × 12 本命点 × 5 相位）+ 12 推运月亮落座
@@ -101,17 +102,20 @@ TRANSIT_NONE_BRANCHES: dict[str, str] = {
 }
 
 #: 八条开篇句（五小节 + 三条空态分支）。**层名只住在这里**（G37 的反向义务：每条开篇句必须含
-#: 自己那一层的层名词，由本地门按 `LAYER_IN_OPENER` 对账）。「推运」在 `progressed_*` 两句里
+#: 自己那一层的层名词，由本地门按 `LAYER_IN_OPENER` 对账）。日期也住在这里，而且同样有尺度：
+#: 页面允许任选目标日，所以 T2 整改轮 1（B3）把这族文案改成「目标日」这类日期中立形状，
+#: 开篇句与条目一样不吃 `CALENDAR_WORDS` 十四串（本地门 `test_sections_and_openers_cover_the_declared_shape` 判）。
+#: 「推运」在 `progressed_*` 两句里
 #: 作为「推运盘」这一整体称呼出现是合法的——它是次限层在页面上的用户可见总称
 #: （`frontend/src/pages/TransitPage.tsx:252` 的「次限推运要点」、`:256` 的「推运太阴」、
 #: `:268` 的「推运上升/中天」），不是另一个层的名字。
 TRANSIT_OPENERS: dict[str, str] = {
-    "transit_aspect": "先说行运这一层：目标日那天的十颗星此刻压在你本命盘的哪些点上，下面逐条说的是这几天里哪股力气被外面的天带动。",
-    "transit_aspect_none": "行运这一层今天没有任何一条达到经典容许度的相位，这一段没有可逐条说的话，你本命盘的落座与宫位仍是它的事实。",
+    "transit_aspect": "先说行运这一层：目标日那天的十颗星此刻压在你本命盘的哪些点上，下面逐条说的是那一天哪股力气被外面的天带动。",
+    "transit_aspect_none": "行运这一层在目标日没有任何一条达到经典容许度的相位，这一段没有可逐条说的话，你本命盘的落座与宫位仍是它的事实。",
     "progressed_aspect": "再看次限这一层，它看的是把出生后的一天当一年推出来的那张盘，下面逐条说的是这张盘上的星与你的本命点成什么相。",
-    "progressed_aspect_none": "次限这一层此刻没有达到经典容许度的相位，这一段今天没有可逐条说的关系句，你推运盘上的落座与宫位仍是它的事实。",
+    "progressed_aspect_none": "次限这一层在目标日没有达到经典容许度的相位，这一段没有可逐条说的关系句，你推运盘上的落座与宫位仍是它的事实。",
     "directed_aspect": "太阳弧这一层把你本命每一颗星往前推同一段弧度，它说的是推前之后的那张盘与本命的关系，读的时候要连着前两段一起看。",
-    "directed_aspect_none": "太阳弧这一层今天没有达到经典容许度的相位，这一段没有可逐条说的话，你本命每一颗星被推进同一段弧度这件事仍是事实。",
+    "directed_aspect_none": "太阳弧这一层在目标日没有达到经典容许度的相位，这一段没有可逐条说的话，你本命每一颗星被推进同一段弧度这件事仍是事实。",
     "progressed_moon": "次限的月亮是这张推运盘上最好读的一格，它在星座与你的本命宫之间慢慢挪，走到哪一格，生活里哪一块就近了些。",
     "progressed_axis": "次限上升与次限天顶是你推运盘的两根轴，它们不由出生时刻锁死，会随年月一点点挪，这两格讲的是方向上的变化。",
 }
