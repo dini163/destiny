@@ -22,6 +22,7 @@ score is a self-explaining ledger whose weights are curated in :mod:`app.content
 from collections.abc import Sequence
 
 from app.content import CONTENT_VERSION, SYNASTRY_CONTENT_SOURCES, synastry_plain
+from app.content.aspects_nature import ASPECT_NATURE
 from app.content.synastry import (
     SYNASTRY_ASPECT_DELTA,
     SYNASTRY_ASPECT_ZH,
@@ -73,15 +74,6 @@ NOTE = (
     "行星黄经、四轴与宫头皆由瑞士星历实时计算，未作任何主观吉凶或个人运势的虚构演绎；"
     "相契度只由「人对人」的合盘相位按模型参数加权累加，账本逐条可核（口径详见 method）。"
 )
-
-#: Aspect type → (nature key, Chinese label). Standard harmony taxonomy, same as transit.
-_NATURE = {
-    "conjunction": ("fusion", "融合"),
-    "sextile": ("harmonious", "和谐"),
-    "trine": ("harmonious", "和谐"),
-    "square": ("challenging", "挑战"),
-    "opposition": ("challenging", "挑战"),
-}
 
 #: Only ASC and MC are taken from the axes: DES and IC are their exact opposites and so
 #: would duplicate every aspect. The name doubles as the point's glyph (no classic symbol).
@@ -183,7 +175,7 @@ def _synastry_aspects(
             for aspect_name, glyph, angle, orb_limit in ASPECTS:
                 orb = abs(delta - angle)
                 if orb <= orb_limit and (best is None or orb < best.orb):
-                    nature, nature_zh = _NATURE[aspect_name]
+                    nature, nature_zh = ASPECT_NATURE[aspect_name]
                     bond = tuple(sorted((name_a, name_b)))
                     best = SynastryAspect(
                         point_a=name_a, point_a_zh=zh_a, point_a_glyph=glyph_a,

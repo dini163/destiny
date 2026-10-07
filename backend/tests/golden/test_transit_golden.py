@@ -219,3 +219,19 @@ def test_transit_aspect_orb_boundary_is_inclusive_at_the_shared_limit() -> None:
     assert [a.orb for a in _cross_aspects([_mp("Sun", 0.0)], [("Saturn", "土星", 7.9)])] == [7.9]
     assert [a.orb for a in _cross_aspects([_mp("Sun", 0.0)], [("Saturn", "土星", 8.0)])] == [8.0]
     assert _cross_aspects([_mp("Sun", 0.0)], [("Saturn", "土星", 8.1)]) == []
+
+
+def test_every_aspect_row_labels_its_nature_from_the_shared_table() -> None:
+    """R49 搬家（Plan G T1）：三层每一条的 `(nature, nature_zh)` 等于共享表里那一档。
+
+    与本文件既有的 `test_cross_aspect_types_orbs_and_natures_are_valid` 分工不同：那条判
+    「值域合法」（nature 属于三档），本条判「与表一致」——搬家唯一有意义的失败是抄错一档，
+    值域测对它失明（`challenging` 与 `harmonious` 都在合法域里）。
+    """
+    from app.content.aspects_nature import ASPECT_NATURE
+
+    chart = _chart()
+    rows = [*chart.transit_aspects, *chart.progression.aspects, *chart.solar_arc.aspects]
+    assert rows, "三层相位全空——本条会静默通过"
+    for row in rows:
+        assert (row.nature, row.nature_zh) == ASPECT_NATURE[row.type], row

@@ -10,6 +10,7 @@ a version bump are one change, because responses echo the version per table and
 
 from importlib.metadata import version
 
+from app.content.aspects_nature import ASPECT_NATURE_SOURCE
 from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
 from app.content.bazi_hehun_rules import HEHUN_RULE_SOURCE
 from app.content.bazi_plain import PLAIN_SOURCE
@@ -216,12 +217,18 @@ VEDIC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("vedic", VEDIC_SOURCE),
 )
 
-#: 西洋合盘一页真正读到的两张表：相契度赋分权重（相位基准分、核心羁绊强调、
-#: 容许度衰减与四档分界），以及逐条转述它们的白话表。单列理由同 `ZIWEI_CONTENT_SOURCES`：
-#: 主八字盘不引用它们，且赋分是本系统模型参数而非古籍语料，出处串自己说清了这一点。
+#: 西洋合盘一页真正读到的三张表：相契度赋分权重（相位基准分、核心羁绊强调、
+#: 容许度衰减与四档分界）、逐条转述它们的白话表，以及 `aspects_nature`——五类主要相位
+#: →（性质键，中文档名）的三档归类表，Plan G T1 把两个引擎里各一份的 `_NATURE` 副本搬成
+#: content 表，它今天填着合盘每一条相位的 `nature`/`nature_zh`。读者只有两家（复测：
+#: `cd backend && grep -rn "ASPECT_NATURE" app/engines/`），所以行运与合盘之外的一律不列，
+#: 吠陀页的清单里不许出现它。行运一页自己的 `TRANSIT_OVERLAY_CONTENT_SOURCES` 尚未建，
+#: 由 Plan G T25 补。单列理由同 `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它们，且赋分是
+#: 本系统模型参数而非古籍语料，出处串自己说清了这一点。
 SYNASTRY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("synastry_scoring", SYNASTRY_SOURCE),
     ("synastry_plain", SYNASTRY_PLAIN_SOURCE),
+    ("aspects_nature", ASPECT_NATURE_SOURCE),
 )
 
 #: 梅花一页真正读到的五张表。单列理由同 `NAME_CONTENT_SOURCES`：混进 `CONTENT_SOURCES`

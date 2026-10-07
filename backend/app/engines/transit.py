@@ -23,6 +23,7 @@ from datetime import date, time
 
 import swisseph as swe
 
+from app.content.aspects_nature import ASPECT_NATURE
 from app.core.errors import EphemerisError, UnsupportedMethodError
 from app.engines.western import (  # shared, golden-tested astrology primitives
     ASPECTS,
@@ -57,15 +58,6 @@ NOTE = (
     "并仅以合相=融合、六合与拱=和谐、刑与冲=挑战的标准属性归类，未作任何主观吉凶或个人运势的虚构演绎。"
     "移动层的落宫指该行运/推运/太阳弧之星落入本命十二宫的哪一宫。"
 )
-
-#: Aspect type → (nature key, Chinese label). Standard harmony taxonomy.
-_NATURE = {
-    "conjunction": ("fusion", "融合"),
-    "sextile": ("harmonious", "和谐"),
-    "trine": ("harmonious", "和谐"),
-    "square": ("challenging", "挑战"),
-    "opposition": ("challenging", "挑战"),
-}
 
 _AXIS_ZH = {"ASC": "上升", "MC": "天顶"}
 
@@ -136,7 +128,7 @@ def _cross_aspects(
             for aspect_name, glyph, angle, orb_limit in ASPECTS:
                 orb = abs(delta - angle)
                 if orb <= orb_limit and (best is None or orb < best.orb):
-                    nature, nature_zh = _NATURE[aspect_name]
+                    nature, nature_zh = ASPECT_NATURE[aspect_name]
                     best = CrossAspect(
                         moving=body.name, moving_zh=body.name_zh, moving_glyph=body.glyph,
                         natal=name, natal_zh=name_zh,
