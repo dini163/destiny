@@ -1,8 +1,9 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
-键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；本批 T2 起填移动星 Sun
-的前六个本命点 30 条，其余 570 条归 T3-T21。**已落地的行一字不改**（改一行就等于改动别批
-已评审过的内容，那要走裁定）。
+键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；Sun 的十二个本命点已齐
+（T2 前半批 30 条 + T3 后半批 30 条 = 60 条），其余 540 条归 T4-T21 的十九批。**已落地的行一字不改**
+（改一行就等于改动别批已评审过的内容，那要走裁定）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 60。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
 **不许含层名**（`行运/次限/太阳弧/推运` 四字由 G37 判红），也不许含日历词与频率副词——
@@ -23,12 +24,13 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的，见本报告）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 本批 30。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 60（Sun 的十二点 × 五相已齐；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列）。
 """
 
 from app.content.transit_plain import aspect_key
 
-#: 键序 = 本命点序（`_natal_points`：十星按 `PLANETS` 序，ASC/MC 由 T5-T21 的批接在后面）×
+#: 键序 = 本命点序（`_natal_points`，`app/engines/transit.py:108`：十星按 `PLANETS` 序，ASC/MC 排在最后；
+#: 每颗移动星的后半批各接它那五句轴点，Sun 的已由 T3 落地）×
 #: `ASPECTS` 序（合相→六合→刑相→拱相→冲相），同一本命点的五句连续——这条序不是排版偏好：
 #: G38(a) 的「同对五句」切片与花名册的族计数都按它读，批次追加也按它接在后面。
 TRANSIT_ASPECT_READINGS: dict[str, str] = {
