@@ -116,7 +116,7 @@ CALENDAR_WORDS = (
 
 #: 反向义务：每条开篇句必须含**自己那一层**的层名词。这里的值是三个层名（不含 `推运`，它是
 #: 次限层的用户可见总称，合法地出现在 `progressed_*` 两句的「推运盘」里），门判两半：自己的
-#: 那个必须在，另外两个不许在。复测条数：`cd backend && grep -c "LAYER_IN_OPENER" tests/content/test_transit_plain_corpus.py`。
+#: 那个必须在，另外两个不许在。复测条数（`grep -c` 量的是提到这个词的行数，不是表条数）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import ast,pathlib; m=ast.parse(pathlib.Path('tests/content/test_transit_plain_corpus.py').read_text(encoding='utf-8')); print([len(n.value.keys) for n in m.body if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='LAYER_IN_OPENER'])"` → [8]。
 LAYER_IN_OPENER = {
     "transit_aspect": "行运",
     "transit_aspect_none": "行运",

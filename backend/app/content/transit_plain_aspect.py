@@ -49,7 +49,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     #: 派单钦定标准件（`task-2-brief.md:87`）的**第四拍经控制器裁定改写**（T2 整改轮 1 A1）：
     #: 句尾「今天」撞计划口径裁定 16（一张表被三层读，日期词在次限/太阳弧读法下是假话），裁定
     #: 撤下钦定句的这一拍；前三拍逐字节未动。改写后的句尾由同轮进门的日历词机检（`CALENDAR_WORDS`）
-    #: 守着，不再是「机检看不见的例外」。复测：`cd backend && grep -n "那部分不在话里" app/content/transit_plain_aspect.py` → 命中本行一处。
+    #: 守着，不再是「机检看不见的例外」。复测（不写 grep 引串，因为注释自己就含那个串会自匹配；点名跑那道两族门，一落地键一例）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest "tests/content/test_transit_plain_corpus.py::test_no_layer_word_and_no_calendar_word_inside_an_entry" -o addopts="" -q` → 30 passed。
     aspect_key("Sun", "Mercury", "conjunction"): "太阳与本命水星成合相，想的事与说的话走在同一个方向，你开口前已经知道要讲哪一句，绕弯的那部分不在话里。",
     aspect_key("Sun", "Mercury", "sextile"): "太阳与本命水星成六合，心里攒着的意思肯借你的嘴出来走走，你写几行就能把散开的东西收拢，收拢也不觉得勉强。",
     aspect_key("Sun", "Mercury", "square"): "太阳与本命水星成刑相，认真的那面与嘴上轻的那面对不上，你落话前多半要慢半拍，快起来时留下的常是一个壳。",
