@@ -15,6 +15,7 @@ from app.content import (
     name_plain,
     qimen_plain,
     synastry_plain,
+    transit_plain,
     western_plain,
     zhouyi_plain,
     ziwei_plain,
@@ -344,6 +345,50 @@ WESTERN = PlainCorpus(
     # 宫题/元素没有符号；页尾块的次序应按盘面既有次序，重排本身就是一种判断）。
     grouping="keep",
     universe=_western_universe,
+)
+
+
+def _transit_universe() -> set[str]:
+    """行运三层的键全集 = spec §5.3 那四行键式，基数全部从 content/engines 现算。
+
+    648 = 600（10 移动星 × 12 本命点 × 5 相位）+ 12 推运月亮落座 + 12 推运月亮落宫 + 24 推运两轴。
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT; print(len(TRANSIT.universe()))"` → 648。
+    移动星名取 `PLANETS`，本命点取「十星 + ASC/MC」——这两枚的字面与 `_AXIS_ZH` 的一致性由
+    `tests/golden/test_transit_golden.py` 已有的轴对账钉守住，不在这里 import 引擎私有量
+    （`_natal_points` 是函数内局部构造，没有可 import 的常量）。
+    """
+    planet_names = [name for name, *_ in PLANETS]
+    aspect_names = [aspect[0] for aspect in ASPECTS]
+    natal_points = (*planet_names, "ASC", "MC")
+    return (
+        {transit_plain.aspect_key(moving, natal, aspect)
+         for moving, natal, aspect in product(planet_names, natal_points, aspect_names)}
+        | {transit_plain.progressed_moon_sign_key(sign) for sign in SIGNS}
+        | {transit_plain.progressed_moon_house_key(house) for house in range(1, 13)}
+        | {transit_plain.progressed_axis_key(axis, sign) for axis, sign in product(("ASC", "MC"), SIGNS)}
+    )
+
+
+#: 行运三层白话的登记表：648 条自撰判语（Plan G spec 裁定 R46/R47/R48，与 `WESTERN` 同一条
+#: 诚实形状）。**从 T2 到 T22 刻意不进 `PLAIN_CORPORA`，登记行在 T23 补上**——提前登记会让工厂的
+#: `set(entries) == universe()` 从 T2 红到 T22（`universe()` 是全量算的，语料是一批批建的）。
+#: 那二十一批的口径由 `tests/content/test_transit_plain_corpus.py` 逐条守着，那 7×条数 例不依赖
+#: 登记；「早登记」与「漏分流」两侧的形状由同文件的
+#: `test_the_corpus_is_not_registered_while_batches_land` 一颗钉同时守住。
+#: content import 只引聚合面所在的那一个模块（`transit_plain` 内部已经 `import transit_plain_aspect`
+#: 并完成合并，与 `WESTERN` 同形；多引一枚 `transit_plain_aspect` 就是未使用的 import）。
+TRANSIT = PlainCorpus(
+    system="transit",
+    entries=transit_plain.TRANSIT_READINGS,
+    # 五个小节 + 三条空态开篇句，共八条；键名就是 `build_plain` 要传给 `compose()` 的 section 名。
+    openers=transit_plain.TRANSIT_OPENERS,
+    # 三层都不给分数账本（spec 裁定 R48）：页面不许由合成器补一句「这段时间好不好」的总结句，
+    # 而 `plain_compose.py:72-74` 那条 `ValueError` 正是为了拦「由合成器补一句结论」。
+    closers=None,
+    # 不分带（`band` 分支遇 0 值符号直接 `ValueError` 而相位条目没有符号可传，`plain_compose.py:64-67`；
+    # `keep` 分支不看符号，所以 `items` 的符号位一律传 `0`——这条形状写在 spec 裁定 R48）。
+    grouping="keep",
+    universe=_transit_universe,
 )
 
 
