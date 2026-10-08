@@ -1,11 +1,14 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
-键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**两颗移动星各十二点**——
-Sun（T2 前半批 30 + T3 后半批 30）与 Moon（T4 六个内点 30 + T5 六个外点含上升/天顶 30）= **120 条**，
-其余 480 条归 T6-T21 的**十六批**（每批 30 条 = 八颗移动星 × 前后两个半批）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 120 480`。
+键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**三颗移动星**——
+Sun（T2 前半批 30 + T3 后半批 30）与 Moon（T4 六个内点 30 + T5 六个外点含上升/天顶 30）与
+Mercury（T6-A 本命 Sun/Moon/Mercury 15 + T6-B 本命 Venus/Mars/Jupiter 15）= **150 条**，
+其余 450 条归 T7-T21 的**十五批**（Mercury 后半批一批 + 其余七颗移动星各两批，每批 30 条）。
+**自 T6 起一批分两派落地**（每派 15 句 = 三个本命点 × 五相，见计划口径裁定第 27 条）：ROSTER 与本地门
+停在真实落地数，两派合成一个语料批，头注这一支笔在两派之间不落。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 150 450`。
 **已落地的行一字不改**（改一行就等于改动别批已评审过的内容，那要走裁定）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 120。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 150。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
 **不许含层名**（`行运/次限/太阳弧/推运` 四字由 G37 判红），也不许含日历词与频率副词——
@@ -26,7 +29,7 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的（2026-10-07 逐条复测）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 120（Sun 与 Moon 各十二点；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 150（Sun/Moon 各十二点，Mercury 已落前半批六点；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
 """
 
 from app.content.transit_plain import aspect_key
@@ -188,7 +191,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Moon", "MC", "square"): "月亮与本命天顶成刑相，脸上的平静绷得住，心里的火却没有真的灭，两样一起摊在你手上，哪样都不肯收。",
     aspect_key("Moon", "MC", "trine"): "月亮与本命天顶成拱相，起落挡不住手上的路，你人前做得稳当，人后也还能自己慢慢缓回来。",
     aspect_key("Moon", "MC", "opposition"): "月亮与本命天顶成冲相，心里想随性去做，位置又不许你随性，你把两头各让一步，让步的样子谁都骗不了。",
-    # 移动星 Mercury × 本命 {Sun,Moon,Mercury} × 五相（15 条，T6-A 建；后半批六个外点归 T6-B）
+    # 移动星 Mercury × 本命 {Sun,Moon,Mercury} × 五相（15 条，T6-A 建；本命点序的前三格，后三格见下面三族）
     # 本命太阳（5 条，T6-A 建；反向键 Sun×本命水星 的五句 T2 已进表——这里是思路压到主张上，不是主张压到思路上）
     aspect_key("Mercury", "Sun", "conjunction"): "水星与本命太阳成合相，商量的路跟你立起来的方向是同一条，话讲到哪一步，事情就往哪一步收紧。",
     aspect_key("Mercury", "Sun", "sextile"): "水星与本命太阳成六合，你先能把想站的立场讲出个轮廓，讲完它就从嘴边挪到明处，形状是自己长出来的。",
