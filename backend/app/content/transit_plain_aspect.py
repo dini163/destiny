@@ -207,4 +207,22 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Mercury", "Mercury", "square"): "水星与本命水星成刑相，一条理推到半路分作两样，两样底下是同一份前提，一句说法因此改了又改，顶住的正是你最熟的一节。",
     aspect_key("Mercury", "Mercury", "trine"): "水星与本命水星成拱相，念头转得顺也说得圆，你自己跟自己商量的那条路，起头和收尾合得上，商量过就等于定过。",
     aspect_key("Mercury", "Mercury", "opposition"): "水星与本命水星成冲相，明处想把底细辩明白，暗处想把来龙去脉摸清楚，两头各拽着你的一句话，接了这头就丢那头。",
+    # 本命金星（5 条，T6-B 建；本派镜子 = 已落地的 Sun×本命金星 五句与 Moon×本命金星 五句；反向键 Venus×本命水星 归 T8）
+    aspect_key("Mercury", "Venus", "conjunction"): "水星与本命金星成合相，喜好要在纸上过一遍才成形，你还没落笔的时候，其实说不准自己中意哪样。",
+    aspect_key("Mercury", "Venus", "sextile"): "水星与本命金星成六合，谈得拢与谈得动是同一件事，你愿意把喜好直接讲出口，商量时少了一层来回的试探。",
+    aspect_key("Mercury", "Venus", "square"): "水星与本命金星成刑相，想先问明白到底喜欢什么，手上却已经在挑，你问的节奏总比挑的节奏慢半拍。",
+    aspect_key("Mercury", "Venus", "trine"): "水星与本命金星成拱相，一句喜好说到位便停住，你很少把喜欢铺到第二句，省下来的劲还留在身上。",
+    aspect_key("Mercury", "Venus", "opposition"): "水星与本命金星成冲相，一句要把喜欢往前推，一句又把它往后拽，你跟着前一句走，后一句自己在半路停住。",
+    # 本命火星（5 条，T6-B 建；镜子 = 已落地的 Sun×本命火星 五句与 Moon×本命火星 五句；反向键 Mars×本命水星 归 T10）
+    aspect_key("Mercury", "Mars", "conjunction"): "水星与本命火星成合相，想问与想动几乎同时起身，你话还没说尽，次序跟着就理顺了，两拍并成了一拍。",
+    aspect_key("Mercury", "Mars", "sextile"): "水星与本命火星成六合，三句要说的只讲两句，你少说一句也不觉得缺了什么，劲仍然完整地留着。",
+    aspect_key("Mercury", "Mars", "square"): "水星与本命火星成刑相，心里认下的理一落到字面上就变硬，你写了又删，删了又写，指头比嘴先急。",
+    aspect_key("Mercury", "Mars", "trine"): "水星与本命火星成拱相，说出口的安排与手上的动作咬成一处，你省了回头核对的工夫，劲不花在自我盘问上。",
+    aspect_key("Mercury", "Mars", "opposition"): "水星与本命火星成冲相，话递到一半又被按住，往外递与往里收分头使力，你只用上一头，另一头仍在原地憋着。",
+    # 本命木星（5 条，T6-B 建；镜子 = 已落地的 Sun×本命木星 五句与 Moon×本命木星 五句；反向键 Jupiter×本命水星 归 T12）
+    aspect_key("Mercury", "Jupiter", "conjunction"): "水星与本命木星成合相，本可以收住的话，你偏要一路铺开，铺到第五句才觉出自己绕出了好远。",
+    aspect_key("Mercury", "Jupiter", "sextile"): "水星与本命木星成六合，散着的想法愿意在你笔下理出头绪，你看着它们一行一行摆稳，口气也跟着放缓。",
+    aspect_key("Mercury", "Jupiter", "square"): "水星与本命木星成刑相，正说得兴起，胸口另有半句在拦，你哪头都不肯放下，话因此走得磕绊。",
+    aspect_key("Mercury", "Jupiter", "trine"): "水星与本命木星成拱相，话头一来，你的语速自己就提了上去，话头与话头中间几乎留不出空档。",
+    aspect_key("Mercury", "Jupiter", "opposition"): "水星与本命木星成冲相，话想讲得响，又想整个收进最里头，你朝外走一步，里头的声音矮了半截。",
 }
