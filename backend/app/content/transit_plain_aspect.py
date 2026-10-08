@@ -204,7 +204,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     # 本命水星（5 条，T6-A 建；自反对：反向键就是它自己，G38(b) 的 continue 由独立断言守着；五句尾必须五样）
     aspect_key("Mercury", "Mercury", "conjunction"): "水星与本命水星成合相，念头跟着念头往外冒，你问一句还剩三句候着，收不住尾，话一路往上叠。",
     aspect_key("Mercury", "Mercury", "sextile"): "水星与本命水星成六合，卡住的那截思路肯给自己让一步，你先把它放一放，回头再想它自己会顺。",
-    aspect_key("Mercury", "Mercury", "square"): "水星与本命水星成刑相，一套说法跟另一套在嘴里互掐，你明知道两套各有各的理，写下来时只留得住一边。",
-    aspect_key("Mercury", "Mercury", "trine"): "水星与本命水星成拱相，念头转得顺也说得圆，你自己跟自己商量的那条路，旁人听着同样顺耳。",
+    aspect_key("Mercury", "Mercury", "square"): "水星与本命水星成刑相，一条理推到半路分作两样，两样底下是同一份前提，一句说法因此改了又改，顶住的正是你最熟的一节。",
+    aspect_key("Mercury", "Mercury", "trine"): "水星与本命水星成拱相，念头转得顺也说得圆，你自己跟自己商量的那条路，起头和收尾合得上，商量过就等于定过。",
     aspect_key("Mercury", "Mercury", "opposition"): "水星与本命水星成冲相，明处想把底细辩明白，暗处想把来龙去脉摸清楚，两头各拽着你的一句话，接了这头就丢那头。",
 }
