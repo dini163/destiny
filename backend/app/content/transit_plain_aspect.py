@@ -188,4 +188,23 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Moon", "MC", "square"): "月亮与本命天顶成刑相，脸上的平静绷得住，心里的火却没有真的灭，两样一起摊在你手上，哪样都不肯收。",
     aspect_key("Moon", "MC", "trine"): "月亮与本命天顶成拱相，起落挡不住手上的路，你人前做得稳当，人后也还能自己慢慢缓回来。",
     aspect_key("Moon", "MC", "opposition"): "月亮与本命天顶成冲相，心里想随性去做，位置又不许你随性，你把两头各让一步，让步的样子谁都骗不了。",
+    # 移动星 Mercury × 本命 {Sun,Moon,Mercury} × 五相（15 条，T6-A 建；后半批六个外点归 T6-B）
+    # 本命太阳（5 条，T6-A 建；反向键 Sun×本命水星 的五句 T2 已进表——这里是思路压到主张上，不是主张压到思路上）
+    aspect_key("Mercury", "Sun", "conjunction"): "水星与本命太阳成合相，商量的路跟你立起来的方向是同一条，话讲到哪一步，事情就往哪一步收紧。",
+    aspect_key("Mercury", "Sun", "sextile"): "水星与本命太阳成六合，你先能把想站的立场讲出个轮廓，讲完它就从嘴边挪到明处，形状是自己长出来的。",
+    aspect_key("Mercury", "Sun", "square"): "水星与本命太阳成刑相，打听与追问先缠住你想立的那个架子，问到后来，连原本的主张都松了扣。",
+    aspect_key("Mercury", "Sun", "trine"): "水星与本命太阳成拱相，嘴上的话替主张开路，你一面说一面看清自己站在哪一处，立场跟着水落石出。",
+    aspect_key("Mercury", "Sun", "opposition"): "水星与本命太阳成冲相，外头问来的跟你所立的总差一步，你答得再顺，那句到底要什么反而听不见。",
+    # 本命月亮（5 条，T6-A 建；反向键 Moon×本命水星 的五句 T4 已进表——这里是问答压到心情上，不是心情渗到话里）
+    aspect_key("Mercury", "Moon", "conjunction"): "水星与本命月亮成合相，问一句答一句都贴着你心口一阵跳动，边讲边摸到情绪的形状，说得慢，摸得也细。",
+    aspect_key("Mercury", "Moon", "sextile"): "水星与本命月亮成六合，心里打的结经你自问自答就松了小半，你再往下梳，才看清自己真正在意的是什么。",
+    aspect_key("Mercury", "Moon", "square"): "水星与本命月亮成刑相，一句追一句直往软的地方戳，你被问得心里发紧，答出来的仍旧是客气话。",
+    aspect_key("Mercury", "Moon", "trine"): "水星与本命月亮成拱相，胸中一团说不清的话自己会找词，你顺着往下说，说着说着根由就露出来一半。",
+    aspect_key("Mercury", "Moon", "opposition"): "水星与本命月亮成冲相，讲给人听的一套和留下来自己消化的一套各走各路，你答得爽快，里头那块仍旧发软。",
+    # 本命水星（5 条，T6-A 建；自反对：反向键就是它自己，G38(b) 的 continue 由独立断言守着；五句尾必须五样）
+    aspect_key("Mercury", "Mercury", "conjunction"): "水星与本命水星成合相，念头跟着念头往外冒，你问一句还剩三句候着，收不住尾，话一路往上叠。",
+    aspect_key("Mercury", "Mercury", "sextile"): "水星与本命水星成六合，卡住的那截思路肯给自己让一步，你先把它放一放，回头再想它自己会顺。",
+    aspect_key("Mercury", "Mercury", "square"): "水星与本命水星成刑相，一套说法跟另一套在嘴里互掐，你明知道两套各有各的理，写下来时只留得住一边。",
+    aspect_key("Mercury", "Mercury", "trine"): "水星与本命水星成拱相，念头转得顺也说得圆，你自己跟自己商量的那条路，旁人听着同样顺耳。",
+    aspect_key("Mercury", "Mercury", "opposition"): "水星与本命水星成冲相，明处想把底细辩明白，暗处想把来龙去脉摸清楚，两头各拽着你的一句话，接了这头就丢那头。",
 }
