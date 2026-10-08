@@ -12,7 +12,7 @@
 → 该数 ≥2 即证同一键跨层复用）。层名一进句子，这张表就得复制三份（648 → 1944 条），而复制
 就是三份互相会漂的判语。层名因此只住在**开篇句**里，条目里出现层名或日历词由
 `tests/content/test_transit_plain_corpus.py::test_no_layer_word_and_no_calendar_word_inside_an_entry`
-（G37 两族同住，日历词十四串在 T2 整改轮 1 A2 进门）判红。
+（G37 两族同住，日历词十四串在 T2 整改轮 1 A2 进门、第 39 条在 T8-A 整改轮扩到廿六串）判红。
 
 覆盖面 = 页面已印事实的全集（spec 裁定 R47）：三层各自那张相位表逐条、次限月亮落座与落本命
 宫、次限上升与天顶落座。条数 = 648 = 600（10 移动星 × 12 本命点 × 5 相位）+ 12 推运月亮落座
@@ -104,7 +104,7 @@ TRANSIT_NONE_BRANCHES: dict[str, str] = {
 #: 八条开篇句（五小节 + 三条空态分支）。**层名只住在这里**（G37 的反向义务：每条开篇句必须含
 #: 自己那一层的层名词，由本地门按 `LAYER_IN_OPENER` 对账）。日期也住在这里，而且同样有尺度：
 #: 页面允许任选目标日，所以 T2 整改轮 1（B3）把这族文案改成「目标日」这类日期中立形状，
-#: 开篇句与条目一样不吃 `CALENDAR_WORDS` 十四串（本地门 `test_sections_and_openers_cover_the_declared_shape` 判）。
+#: 开篇句与条目一样不吃 `CALENDAR_WORDS` 廿六串（本地门 `test_sections_and_openers_cover_the_declared_shape` 判）。
 #: 「推运」在 `progressed_*` 两句里
 #: 作为「推运盘」这一整体称呼出现是合法的——它是次限层在页面上的用户可见总称
 #: （`frontend/src/pages/TransitPage.tsx:252` 的「次限推运要点」、`:256` 的「推运太阴」、

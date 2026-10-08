@@ -102,16 +102,26 @@ _FORBIDDEN_FOR_TITLES = ("；", "（《", "』", "（", "）", "、")
 #: 实为英文且不含「推运」，见本报告），条目写「推运月亮」就把次限层的名字偷带进了共享句。
 LAYER_WORDS = ("行运", "次限", "太阳弧", "推运")
 
-#: 日历词十四串（整改轮 1 A2 进门，与层名同住第七道 `test_no_layer_word_and_no_calendar_word_inside_an_entry`，
+#: 日历词廿六串（十四串由整改轮 1 A2 进门；另十二串由口径裁定第 39 条在 T8-A 整改轮进门，
+#: 与层名同住第七道 `test_no_layer_word_and_no_calendar_word_inside_an_entry`，
 #: 不开新 parametrize——用例数 `7×条数+9` 是 T3-T22 二十批的既定数字）。一张表被三层读，次限一格走一年、
 #: 太阳弧按弧长推，「今天」「这周」对任何非当日的目标日都是假话（页面允许选日期，`TransitPage.tsx` 的
-#: maxYear=now+30 与「目标日 {chart.target_date}」）；日期只许住在开篇句里，且开篇句同样不吃这十四串（B3）。
+#: maxYear=now+30 与「目标日 {chart.target_date}」）；日期只许住在开篇句里，且开篇句同样不吃这廿六串（B3）。
 #: **不禁** `这段时间`、`这段日子`、`这一格`——对任意目标日区间为真（计划口径裁定 1 明写合法）；
 #: `此刻` 也不禁（指快照那一刻，对任意目标日成立，成文理由见 task-2 报告整改轮 §B3）。
-#: 复测条数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import ast,pathlib; m=ast.parse(pathlib.Path('tests/content/test_transit_plain_corpus.py').read_text(encoding='utf-8')); print([len(n.value.elts) for n in m.body if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='CALENDAR_WORDS'])"` → [14]。
+#: **这张表是精确子串名单，而「日尺度」这一族词面是开放的**：`第二天` 不在原十四串里，却与已禁的 `明天` 同义
+#: （T8-A 的 `transit.aspect.Venus.Mercury.square` 就是这么漏过去的，四门全绿而句子在次限层为假）。所以①本表
+#: 只保证「常见写法进门就红」，**不保证穷举**——形状级的那一把在 `g_batch_probe.py` 的 `序数日形状`
+#: （report-only，命中即必须改句，不得只往本表加词）；②写任何「日/夜/晨」尺度的拍子之前，先按第 16 条问
+#: 次限层读到它是不是假话，而不是先查本表有没有这个词。
+#: 十二串新增成员（`第二天 第一天 首日 次日 翌日 隔天 隔日 头一天 过两天 明日 前天 后天`）进门前的实测：
+#: HEAD `4874e3f`（195 行，解析器口径）全表 **0 行**，`隔天` 已覆盖 `隔一天`、`后天` 已覆盖 `大后天` ⇒ 扩容不判红任何已落地句。
+#: 复测条数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import ast,pathlib; m=ast.parse(pathlib.Path('tests/content/test_transit_plain_corpus.py').read_text(encoding='utf-8')); print([len(n.value.elts) for n in m.body if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='CALENDAR_WORDS'])"` → [26]。
 CALENDAR_WORDS = (
     "今天", "明天", "昨天", "今晚", "这周", "本周", "下周",
     "这个月", "本月", "这几天", "一整天", "天天", "时辰", "钟点",
+    "第二天", "第一天", "首日", "次日", "翌日", "隔天", "隔日",
+    "头一天", "过两天", "明日", "前天", "后天",
 )
 
 #: 反向义务：每条开篇句必须含**自己那一层**的层名词。这里的值是三个层名（不含 `推运`，它是
@@ -518,7 +528,7 @@ def test_sections_and_openers_cover_the_declared_shape() -> None:
     ④层名词义务（G37 的反向半件）：每条开篇句必须含自己那一层的层名词，且不许含**另外两层**的
       层名词。`transit_aspect` 那句合法地写「本命盘」而不写「次限」；`progressed_*` 两句里的
       「推运盘」合法（`推运` 不是第三层的名字，它是次限层的用户可见总称，见 `LAYER_IN_OPENER` 注）。
-      开篇句同时吃 `CALENDAR_WORDS` 十四串（整改轮 1 B3）：页面允许任选目标日（`TransitPage.tsx`
+      开篇句同时吃 `CALENDAR_WORDS` 廿六串（整改轮 1 B3 定下十四串，第 39 条在 T8-A 整改轮扩十二串）：页面允许任选目标日（`TransitPage.tsx`
       的 maxYear=now+30 与「目标日 {chart.target_date}」），所以开篇句里的「今天」对任何非当日
       目标日同样是假话——日期要说也只许说「目标日」这类日期中立的形状。
     """
