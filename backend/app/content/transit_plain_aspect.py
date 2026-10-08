@@ -230,20 +230,20 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Mercury", "Jupiter", "opposition"): "水星与本命木星成冲相，话想讲得响，又想整个收进最里头，你朝外走一步，里头的声音矮了半截。",
     # 本命土星（5 条，T7-A 建；本派镜子 = 已落地的 Sun×本命土星 五句与 Moon×本命土星 五句；反向键 Saturn×本命水星 归 T14）
     aspect_key("Mercury", "Saturn", "conjunction"): "水星与本命土星成合相，想到的事要落成字才显出形状，你写一句停一停，写下的总比原先想讲的短一截。",
-    aspect_key("Mercury", "Saturn", "sextile"): "水星与本命土星成六合，前后要讲的三两句你自己分拣得清，话少却不缺项，剩下的没讲出口也在心里记着。",
+    aspect_key("Mercury", "Saturn", "sextile"): "水星与本命土星成六合，先讲哪样后讲哪样，你伸手理一理就顺了，讲完之后前后还连着，也没散。",
     aspect_key("Mercury", "Saturn", "square"): "水星与本命土星成刑相，理是通的那一头，口却先关上半扇，你把整句硬讲完，听着像从隔壁传过来。",
     aspect_key("Mercury", "Saturn", "trine"): "水星与本命土星成拱相，问与答中间自己让出一段空，你不抢着去填，话便一句压着一句地落稳。",
-    aspect_key("Mercury", "Saturn", "opposition"): "水星与本命土星成冲相，往外讲清与往里按下分头使劲，你顾住这一头，那一头自己又转了半圈。",
+    aspect_key("Mercury", "Saturn", "opposition"): "水星与本命土星成冲相，想把话讲透，转头又想把嘴闭上，你特意说慢些，落下来的字反倒更响。",
     # 本命天王星（5 条，T7-A 建；本派镜子 = 已落地的 Sun×本命天王星 五句与 Moon×本命天王星 五句；反向键 Uranus×本命水星 归 T16）
-    aspect_key("Mercury", "Uranus", "conjunction"): "水星与本命天王星成合相，临到落笔你换了个写法，一句之后还有半句自己站起来，和原先那条路不对形。",
+    aspect_key("Mercury", "Uranus", "conjunction"): "水星与本命天王星成合相，讲到中途调子忽然换掉，不经过你点头，等你往下接，话已经走到了没打算去的地方。",
     aspect_key("Mercury", "Uranus", "sextile"): "水星与本命天王星成六合，你脑筋转得快那一截肯带你一段，思路一拐到别处，另一头自己跟了上来。",
     aspect_key("Mercury", "Uranus", "square"): "水星与本命天王星成刑相，你想按原样开口，嗓子却先自己变了调，后半句的舌头有点跟不上。",
-    aspect_key("Mercury", "Uranus", "trine"): "水星与本命天王星成拱相，念头换得频，你说出来的反倒只剩两三句，解释那一道手续自己就少掉了。",
+    aspect_key("Mercury", "Uranus", "trine"): "水星与本命天王星成拱相，对方话还没说完，你已经答到了他要问的意思上，走的却是条没人走过的岔路。",
     aspect_key("Mercury", "Uranus", "opposition"): "水星与本命天王星成冲相，一句要说得稳，一句要说得怪，两者错开半步，你先抓住哪一句，另一句就迟到一截。",
     # 本命海王星（5 条，T7-A 建；本派镜子 = 已落地的 Sun×本命海王星 五句与 Moon×本命海王星 五句；反向键 Neptune×本命水星 归 T18）
     aspect_key("Mercury", "Neptune", "conjunction"): "水星与本命海王星成合相，意思走到笔尖时自己成了另一句，你回头再对，两句已经对不到一处。",
     aspect_key("Mercury", "Neptune", "sextile"): "水星与本命海王星成六合，追问一松手，答案自己浮了上来，等你重新开口时，它已经站到明处。",
     aspect_key("Mercury", "Neptune", "square"): "水星与本命海王星成刑相，一句问到要紧处，胸口先空了一下，剩下的半句你换了口气才问完。",
-    aspect_key("Mercury", "Neptune", "trine"): "水星与本命海王星成拱相，你感觉到的与说出口的中间没有堵，话从哪儿起，就顺着哪儿一直说到尾。",
+    aspect_key("Mercury", "Neptune", "trine"): "水星与本命海王星成拱相，你跟着感觉往下讲，讲出来的比事情本身宽一些，宽的那点正是你想捎上的。",
     aspect_key("Mercury", "Neptune", "opposition"): "水星与本命海王星成冲相，问出来的与咽回去的分住两头，前头那句你追到很细，后头的自己在底下变轻。",
 }
