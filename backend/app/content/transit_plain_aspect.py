@@ -220,7 +220,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Mercury", "Mars", "conjunction"): "水星与本命火星成合相，想问与想动几乎同时起身，你话还没说尽，次序跟着就理顺了，两拍并成了一拍。",
     aspect_key("Mercury", "Mars", "sextile"): "水星与本命火星成六合，三句要说的只讲两句，你少说一句也不觉得缺了什么，劲仍然完整地留着。",
     aspect_key("Mercury", "Mars", "square"): "水星与本命火星成刑相，心里认下的理一落到字面上就变硬，你写了又删，删了又写，指头比嘴先急。",
-    aspect_key("Mercury", "Mars", "trine"): "水星与本命火星成拱相，说出口的安排与手上的动作咬成一处，你省了回头核对的工夫，劲不花在自我盘问上。",
+    aspect_key("Mercury", "Mars", "trine"): "水星与本命火星成拱相，说出口的安排与手上的动作咬成一处，你报出的是哪一串步骤，做完摆出来的就是那一串。",
     aspect_key("Mercury", "Mars", "opposition"): "水星与本命火星成冲相，话递到一半又被按住，往外递与往里收分头使力，你只用上一头，另一头仍在原地憋着。",
     # 本命木星（5 条，T6-B 建；镜子 = 已落地的 Sun×本命木星 五句与 Moon×本命木星 五句；反向键 Jupiter×本命水星 归 T12）
     aspect_key("Mercury", "Jupiter", "conjunction"): "水星与本命木星成合相，本可以收住的话，你偏要一路铺开，铺到第五句才觉出自己绕出了好远。",
