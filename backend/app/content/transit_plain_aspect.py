@@ -1,8 +1,9 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
 键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；Sun 的十二个本命点已齐
-（T2 前半批 30 条 + T3 后半批 30 条 = 60 条），其余 540 条归 T4-T21 的十九批。**已落地的行一字不改**
-（改一行就等于改动别批已评审过的内容，那要走裁定）。
+（T2 前半批 30 条 + T3 后半批 30 条 = 60 条），其余 540 条归 T4-T21 的**十八批**（每批 30 条）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 60 540`。
+**已落地的行一字不改**（改一行就等于改动别批已评审过的内容，那要走裁定）。
 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 60。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
@@ -21,7 +22,7 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 红法是 `ImportError: cannot import name 'aspect_key' from partially initialized module
 'app.content.transit_plain'`（2026-10-07 实测的串，不是设想；Plan F 同处头注写的
 `AttributeError` 与「先 import 分表就红」两句在本仓今天**复测不成立**——`app/content/__init__.py`
-自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的，见本报告）。
+自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的（2026-10-07 逐条复测）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 60（Sun 的十二点 × 五相已齐；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列）。
