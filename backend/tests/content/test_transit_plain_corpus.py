@@ -489,7 +489,7 @@ def test_roster_counts_and_no_key_outside_universe() -> None:
 
     两道并一条是有意的：它们判的是同一件事的两面——多建的键一定落在 `universe()` 里或外面，
     只数数量会放过「族数对但键写歪」，只比全集会放过「全集内多建一条同族的键」。
-    当前数 = `aspect` **90 条**（移动星 Sun 的十二个本命点 60 + 移动星 Moon 的六个内点 30），
+    当前数 = `aspect` **120 条**（移动星 Sun 与 Moon 各十二个本命点，各 60 条），
     三族推运归 T22，所以是 0；`ROSTER_TARGETS` 只许改那一行的数字（通用循环 Step 3，本 docstring 跟着数走）。
     """
     from collections import Counter
