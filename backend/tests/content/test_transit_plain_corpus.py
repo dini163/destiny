@@ -145,7 +145,7 @@ LAYER_IN_OPENER = {
 #: `set == universe` 只有 T23 之后才存在，而多建出来的键会漂到引擎永远不触发的位置上
 #: （spec §5.3），没人校对得到。
 ROSTER_TARGETS: dict[str, int] = {
-    "aspect": 210,
+    "aspect": 225,
     "progressed_moon_sign": 0,
     "progressed_moon_house": 0,
     "progressed_axis": 0,
