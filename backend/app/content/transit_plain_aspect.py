@@ -57,7 +57,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Sun", "Mercury", "conjunction"): "太阳与本命水星成合相，想的事与说的话走在同一个方向，你开口前已经知道要讲哪一句，绕弯的那部分不在话里。",
     aspect_key("Sun", "Mercury", "sextile"): "太阳与本命水星成六合，心里攒着的意思肯借你的嘴出来走走，你写几行就能把散开的东西收拢，收拢也不觉得勉强。",
     aspect_key("Sun", "Mercury", "square"): "太阳与本命水星成刑相，认真的那面与嘴上轻的那面对不上，你落话前多半要慢半拍，快起来时留下的常是一个壳。",
-    aspect_key("Sun", "Mercury", "trine"): "太阳与本命水星成拱相，心里的事与说出来的话之间没有门槛，你随口一讲就把这盘棋摆给外人看，摆出来也不显摆。",
+    aspect_key("Sun", "Mercury", "trine"): "太阳与本命水星成拱相，心里的事和说出来的话之间没有门槛，你想说的自己就走到嘴边，外人听着也不费劲。",
     aspect_key("Sun", "Mercury", "opposition"): "太阳与本命水星成冲相，心里明白与嘴上说的隔着一条街口，你越想让两边对齐越容易先说错，说漏出口的部分反倒更接近真话。",
     # 本命金星
     aspect_key("Sun", "Venus", "conjunction"): "太阳与本命金星成合相，好看的和想立起来的那一面长在一处，你一动手就把事做成别人愿意看的样式，解释的话留在后头。",
