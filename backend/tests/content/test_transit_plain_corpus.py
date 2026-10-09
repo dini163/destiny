@@ -501,9 +501,9 @@ def test_roster_counts_and_no_key_outside_universe() -> None:
 
     两道并一条是有意的：它们判的是同一件事的两面——多建的键一定落在 `universe()` 里或外面，
     只数数量会放过「族数对但键写歪」，只比全集会放过「全集内多建一条同族的键」。
-    当前数 = `aspect` **225 条**（移动星 Sun、Moon、Mercury 各整批十二个本命点 = 各 60 条；Mercury 那 60 条
-    = T6-A/T6-B/T7-A/T7-B 四派 × 15，每派三个本命点，两派合起来才是「一批」；Venus 45 条 = T8-A（本命 Sun/Moon/Mercury）
-    + T8-B（本命 Venus/Mars/Jupiter）+ T9-A（本命 Saturn/Uranus/Neptune）三派 × 15，另三个本命点 Pluto/上升/天顶 15 条归 T9-B），三族推运归 T22，所以是 0；`ROSTER_TARGETS` 只许改那一行的数字（通用循环 Step 3，本 docstring 跟着数走）。
+    当前数 = `aspect` **240 条**（移动星 Sun、Moon、Mercury 各整批十二个本命点 = 各 60 条；Mercury 那 60 条
+    = T6-A/T6-B/T7-A/T7-B 四派 × 15，每派三个本命点，两派合起来才是「一批」；Venus 60 条 = T8-A（本命 Sun/Moon/Mercury）
+    + T8-B（本命 Venus/Mars/Jupiter）+ T9-A（本命 Saturn/Uranus/Neptune）+ T9-B（本命 Pluto/上升/天顶）四派 × 15），三族推运归 T22，所以是 0；`ROSTER_TARGETS` 只许改那一行的数字（通用循环 Step 3，本 docstring 跟着数走）。
     """
     from collections import Counter
 

@@ -1,16 +1,16 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
-键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**三颗整移动星加 Venus 的前九个本命点**——
+键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**四颗整移动星**——
 Sun（T2 前半批 30 + T3 后半批 30）与 Moon（T4 六个内点 30 + T5 六个外点含上升/天顶 30）与
 Mercury（T6-A 本命 Sun/Moon/Mercury 15 + T6-B 本命 Venus/Mars/Jupiter 15 + T7-A 本命
 Saturn/Uranus/Neptune 15 + T7-B 本命 Pluto/上升/天顶 15）与
-Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15）= **225 条**，
-其余 375 条归 T9-B-T21 的**十二批半**（Venus 最后三个本命点 Pluto/上升/天顶 15 条 = 半批归 T9-B；其后六颗移动星 Mars/Jupiter/Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派）。
+Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15 + T9-B 本命 Pluto/上升/天顶 15）= **240 条**，
+其余 360 条归 T10-T21 的**十二批整**（其后六颗移动星 Mars/Jupiter/Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派）。
 **自 T6 起一批分两派落地**（每派 15 句 = 三个本命点 × 五相，见计划口径裁定第 27 条）：ROSTER 与本地门
 停在真实落地数，两派合成一个语料批，头注这一支笔在两派之间不落。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 225 375`。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 240 360`。
 **已落地的行一字不改**（改一行就等于改动别批已评审过的内容，那要走裁定）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 225。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 240。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
 **不许含层名**（`行运/次限/太阳弧/推运` 四字由 G37 判红），也不许含日历词与把尺度说成反复发生的频率词——
@@ -36,7 +36,7 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的（2026-10-07 逐条复测）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 225（Sun/Moon/Mercury 三颗各十二个本命点已落齐，Venus 落了九个点——T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune，剩三个点 Pluto/上升/天顶归 T9-B；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 240（Sun/Moon/Mercury/Venus 四颗各十二个本命点已落齐；Venus 那 60 条 = T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune、T9-B 本命 Pluto/上升/天顶 四派 × 15；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
 """
 
 from app.content.transit_plain import aspect_key
