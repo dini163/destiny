@@ -1,16 +1,16 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
-键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**四颗整移动星**——
+键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**四颗整移动星加 Mars 的前六个本命点**——
 Sun（T2 前半批 30 + T3 后半批 30）与 Moon（T4 六个内点 30 + T5 六个外点含上升/天顶 30）与
 Mercury（T6-A 本命 Sun/Moon/Mercury 15 + T6-B 本命 Venus/Mars/Jupiter 15 + T7-A 本命
 Saturn/Uranus/Neptune 15 + T7-B 本命 Pluto/上升/天顶 15）与
-Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15 + T9-B 本命 Pluto/上升/天顶 15）= **240 条**，
-其余 360 条归 T10-T21 的**十二批整**（其后六颗移动星 Mars/Jupiter/Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派）。
+Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15 + T9-B 本命 Pluto/上升/天顶 15）与 Mars（T10-A 本命 Sun/Moon/Mercury 15 + T10-B 本命 Venus/Mars/Jupiter 15）= **270 条**，
+其余 330 条归 T11-T21 的**十一批整**（Mars 余六个本命点 Saturn/Uranus/Neptune/Pluto/上升/天顶 30 条 = 一整批归 T11；其后五颗移动星 Jupiter/Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派）。
 **自 T6 起一批分两派落地**（每派 15 句 = 三个本命点 × 五相，见计划口径裁定第 27 条）：ROSTER 与本地门
 停在真实落地数，两派合成一个语料批，头注这一支笔在两派之间不落。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 240 360`。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 270 330`。
 **已落地的行一字不改**（改一行就等于改动别批已评审过的内容，那要走裁定）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 240。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 270。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
 **不许含层名**（`行运/次限/太阳弧/推运` 四字由 G37 判红），也不许含日历词与把尺度说成反复发生的频率词——
@@ -19,7 +19,7 @@ Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9
 每批自我上限 3**（先例见本计划执行工作区 `.superpowers/sdd/2026-10-07-wu-group-plain-reading-plan-g/task-2-report.md:246`，
 该目录按 `.superpowers/sdd/.gitignore` 不进 git，所以这条引用对仓库外的读者是悬空的，登记于此），门侧没有这一族的名单，所以它是手读项。
 复测（**两种单位都要写**：裸 grep 把注释算进语料，这是本表每一族载体的共同陷阱）：`cd backend && grep -c "一直" app/content/transit_plain_aspect.py` → **6 行**（含本头注自己与一条族注释），语料行口径只 **4 行** = `:61`/`:102`/`:188`/`:285`（复测 = 只 parse `aspect_key(...)` 行再数，见工作区 `g_t9b_pre_census.py` 的口径）。
-同口径现读（HEAD `5b3baae`）：`随时` 1 行 `:80`、`自然` 1 行 `:74`、`总是` 1 行 `:299`，`天天`/`常常`/`经常`/`每次`/`有时` 各 0 行；**每批自我上限 3 数的是本批新增的语料行**，不是文件里的出现次数。日历词廿六串——原十四串自整改
+同口径现读（HEAD `79a85a5` 复验）：`随时` 1 行 `:80`、`自然` 1 行 `:74`、`总是` 1 行 `:299`，`天天`/`常常`/`经常`/`每次`/`有时` 各 0 行（裸 grep 侧有头注自己与族注释的避用名单掺数，解析口径才是本数）；**每批自我上限 3 数的是本批新增的语料行**，不是文件里的出现次数。日历词廿六串——原十四串自整改
 轮 1（A2）有机检，序数日那十二串由口径裁定第 39 条在 T8-A 整改轮进门——`CALENDAR_WORDS` 与层名同住一条门
 `test_no_layer_word_and_no_calendar_word_inside_an_entry`，上一轮头注写的「机检没有日历词门、
 本批唯一的例外」在那一轮作废——钦定标准件的第四拍按控制器裁定（A1）改写，例外不复存在。
@@ -36,7 +36,7 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的（2026-10-07 逐条复测）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 240（Sun/Moon/Mercury/Venus 四颗各十二个本命点已落齐；Venus 那 60 条 = T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune、T9-B 本命 Pluto/上升/天顶 四派 × 15；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 270（Sun/Moon/Mercury/Venus 四颗各十二个本命点已落齐；Venus 那 60 条 = T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune、T9-B 本命 Pluto/上升/天顶 四派 × 15；Mars 落了前六个本命点 30 条 = T10-A 本命 Sun/Moon/Mercury、T10-B 本命 Venus/Mars/Jupiter 两派 × 15，余六点 Saturn/Uranus/Neptune/Pluto/上升/天顶 归 T11；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
 """
 
 from app.content.transit_plain import aspect_key
@@ -343,19 +343,19 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     aspect_key("Venus", "MC", "square"): "金星与本命天顶成刑相，你把偏爱摆开由着人评，人评一句你心里沉一句，最疼的那件反倒收去角落搁着。",
     aspect_key("Venus", "MC", "trine"): "金星与本命天顶成拱相，你亲手做的这件有人看着，你手上不紧，选哪样下哪刀都干脆，看着的人自己照着它说喜好。",
     aspect_key("Venus", "MC", "opposition"): "金星与本命天顶成冲相，私下那一件与摊开的那件对不上，这两件你都认，从不肯先替哪边把话遮严。",
-    # 本命太阳（5 条，T10-A 建，Task 10；本派镜子 = Sun/Moon/Mercury/Venus×本命太阳 四切片（`:51`-`:55`/`:129`-`:133`/`:203`-`:207`/`:275`-`:279`，自对片逐枚分家见 §5）；反向 `Sun.Mars.*`（`:79`-`:83`）⇒ G38(b) 活着（断言 `:407`/`:366`/`:496`）；这里改的是劲抢在话前——头起先按、后件先提、做完再调、出汗与要立同面、清完才轮到说——不写互压（`:137`），不写缠架子（`:205`），不写样子裹修饰（`:275`）；`那` 本切片 2 行、全批 7 行（上限 8），`之间` 本切片 1 行带谓语（`:351`），`汗` 1 行（`:350`，限 1），比较句全批唯一 `:361`；`使力/旁人/给出去/往回收/第三回/说X就X`、G31 十七串与裸 `该`、G36 八串本派 0（`tests/plain_wording.py:54`/`:63`）；无第三颗星名（门 `:196`），层词日历词 `:331` 绿）
+    # 本命太阳（5 条，T10-A 建，Task 10；镜子 = Sun/Moon/Mercury/Venus×本命太阳（`:51`-`:55`/`:129`-`:133`/`:203`-`:207`/`:275`-`:279`，自对片分家见 §5）；反向 `Sun.Mars.*`（`:79`-`:83`）⇒ G38(b) 活着（`:407`/`:366`/`:496`）；这里改的是劲抢在话前——头起先按、后件先提、做完再调、出汗与要立同面、清完才轮到说——不写互压 `:137`、缠架子 `:205`、样子裹修饰 `:275`；`那` 切片 2/全批 8（限 15，`:369` 属 T10-B），`之间` 切片 1 带谓语（`:351`；块另 `:353`），`汗` 切片 1（`:350`），比较拍 `:361`（`比` 全批唯一；对举二枚=钦定件 `:380`）；`使力/旁人/给出去/往回收/第三回/说X就X`、G31 十七串、裸 `该`、G36 八串本派 0（`plain_wording.py:54`/`:63`）；无第三颗星名（`:196`），层词日历词 `:331` 绿）
     aspect_key("Mars", "Sun", "conjunction"): "火星与本命太阳成合相，那件事你嘴上才起了个头，手已经把它按下去了，按下去才要讲缘由，缘由却没跟人讲过。",
     aspect_key("Mars", "Sun", "sextile"): "火星与本命太阳成六合，你把排在后头的一件先提上来做，前头的账仍排着没清，手上却一点没有停过。",
     aspect_key("Mars", "Sun", "square"): "火星与本命太阳成刑相，想立的与手上正做的对不上，你先做完了手上这件，再回头调后头的，不问对错。",
     aspect_key("Mars", "Sun", "trine"): "火星与本命太阳成拱相，你出的汗落在哪面，那面本来就是要立的，不用两头来回倒，做完一件肩上仍是轻的。",
     aspect_key("Mars", "Sun", "opposition"): "火星与本命太阳成冲相，手上的活与嘴上的解释对不齐，你先清完手上，其余的还在做与说之间等着落地。",
-    # 本命月亮（5 条，T10-A 建，Task 10；本派镜子 = Sun/Moon/Mercury/Venus×本命月亮 四切片（`:57`-`:61`/`:135`-`:139`/`:209`-`:213`/`:281`-`:285`，自对片分家见 §5）；反向 `Moon.Mars.*`（`:153`-`:157`，T4 建）⇒ G38(b) 活着，分家逐句见命题对照表（剥名断言 `:407`）；这里改的是心气的劲走在嘴上——火全落进手里那件活、顺的时候手快而整齐、那口气顶上来先按住房、活做完才觉出肚里空、没热的那件咬一口跟着做完——不是心情渗进话的调门（`:141` 那一格），冷暖并股在 `:129`（Moon×本命太阳），不是身上松不松（Venus 镜 `:281`）；`心情` 与 `情绪` 同现一行（`:354`，全批唯此一行），`凉` 1 行（`:356`，上限 1），`退` 1 行（`:353`，上限 1）；G36 八串、许可尾与裸 `该` 本派现测 0（谓词 `tests/plain_wording.py:85`，append 位 `:100`/`:144`））
+    # 本命月亮（5 条，T10-A 建，Task 10；本派镜子 = Sun/Moon/Mercury/Venus×本命月亮 四切片（`:57`-`:61`/`:135`-`:139`/`:209`-`:213`/`:281`-`:285`，自对片分家见 §5）；反向 `Moon.Mars.*`（`:153`-`:157`，T4 建）⇒ G38(b) 活着，分家见命题对照表（剥名断言 `:407`）；这里改的是心气的劲走在嘴上——火全落进手里那件活、顺的时候手快而整齐、那口气顶上来先按住房、活做完才觉出肚里空、没热的那件咬一口跟着做完——不是心情渗进话的调门（`:141`），冷暖并股在 `:129`（本命太阳片），不是身上松不松（镜 `:281`）；`心情` 与 `情绪` 同现一行（`:354`，全批唯一），`凉` 本派 1 行（`:356`，全批同数），`退` 本派 1 行（`:353`；`:369` 系 T10-B）；G36 八串、许可尾与裸 `该` 本派现测 0（谓词 `tests/plain_wording.py:85`，append 位 `:100`/`:144`））
     aspect_key("Mars", "Moon", "conjunction"): "火星与本命月亮成合相，你心里那股火没朝嘴上去，全落进手里那件活，火与活之间没有第二道工序，活交完才退。",
     aspect_key("Mars", "Moon", "sextile"): "火星与本命月亮成六合，心情顺的时候你手上的又快又整齐，做的过程里手就不觉得紧，情绪也没被跟着拖。",
     aspect_key("Mars", "Moon", "square"): "火星与本命月亮成刑相，那口气一顶上来，你先把手里的活按住，按住的仍搁在原处，等心气转过来才续。",
     aspect_key("Mars", "Moon", "trine"): "火星与本命月亮成拱相，费力的活做完你才觉出肚里空了，空归空，灶上则仍留着一碗热饭，没凉。",
     aspect_key("Mars", "Moon", "opposition"): "火星与本命月亮成冲相，你顾着没热的那件，咬一口再回去跟着那件做完，桌上的那件由它去，你不唤它也不挪。",
-    # 本命水星（5 条，T10-A 建，Task 10；本派镜子 = Sun/Moon/Mercury/Venus×本命水星 四切片（`:67`-`:71`/`:141`-`:145`/`:215`-`:219`/`:287`-`:291`，自对片分家见 §5）；反向 `Mercury.Mars.*`（`:227`-`:231`，T6-B 建）⇒ G38(b) 活着，剥名不同样（`:407`），尾十二字五样（`:366`）；这里改的是劲催着话走——接半句自己圆、出去一遍回来删改、咬的字比意思重、嗓门先起意思才跟着顺、含糊先出口讲透待盖——不是问答贴心动（`:209`，本命月亮片），不是嘴替开路（`:206`，本命太阳片），不挑字眼合不合耳（`:287`，Venus 镜）；`嗓门` 1 行（`:362`），`字` 本切片 2 行（`:360`/`:361`，上限 2），比较句 `:361`（`比` 全批唯一）；G31 十七串、G36 八串与层词日历词本派 0（`tests/plain_wording.py:54`/`:63`，门 `:196`/`:331`））
+    # 本命水星（5 条，T10-A 建，Task 10；本派镜子 = Sun/Moon/Mercury/Venus×本命水星 四切片（`:67`-`:71`/`:141`-`:145`/`:215`-`:219`/`:287`-`:291`，自对片分家见 §5）；反向 `Mercury.Mars.*`（`:227`-`:231`，T6-B 建）⇒ G38(b) 活着，剥名不同样（`:407`），尾十二字五样（`:366`）；这里改的是劲催着话走——接半句自己圆、出去一遍回来删改、咬的字比意思重、嗓门先起意思才跟着顺、含糊先出口讲透待盖——不是问答贴心动（`:209` 月亮片），不是嘴替开路（`:206` 太阳片），不挑字眼合不合耳（`:287` 镜）；`嗓门` 本派 1 行（`:362`，全批同数），`字` 本切片 2 行（`:360`/`:361`，上限 2），比较句 `:361`（`比` 全批唯一，对举第二枚 `:380`）；G31 十七串、G36 八串与层词日历词本派 0（`tests/plain_wording.py:54`/`:63`，门 `:196`/`:331`））
     aspect_key("Mars", "Mercury", "conjunction"): "火星与本命水星成合相，人还没开讲，你先接上人的半句，接上的半句自己就圆了，尾音却还悬在半空。",
     aspect_key("Mars", "Mercury", "sextile"): "火星与本命水星成六合，你让话先顺溜地出去一遍，回来删改两三个字，改完意思仍是原先句，只是听着松了些。",
     aspect_key("Mars", "Mercury", "square"): "火星与本命水星成刑相，你咬的字比心里那层意思要重，人接话前先顿一顿，那一顿就是你那句话的果。",
