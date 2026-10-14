@@ -1,16 +1,16 @@
 """行运三层：移动点与本命点之间 600 条相位的白话判语表（T2-T21 按移动星二十批填入）。
 
-键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**五颗整移动星**（Sun/Moon/Mercury/Venus/Mars 各十二个本命点）**＋ Jupiter 的前六个本命点**（Sun/Moon/Mercury/Venus/Mars/Jupiter，T12 前半批）——
+键由 `transit_plain.aspect_key` 拼，所以本文件只有句子，没有键式；已落地**六颗整移动星**（Sun/Moon/Mercury/Venus/Mars/Jupiter 各十二个本命点；Jupiter 那十二点由 T12-A/T12-B/T13-A/T13-B 四派落齐）——
 Sun（T2 前半批 30 + T3 后半批 30）与 Moon（T4 六个内点 30 + T5 六个外点含上升/天顶 30）与
 Mercury（T6-A 本命 Sun/Moon/Mercury 15 + T6-B 本命 Venus/Mars/Jupiter 15 + T7-A 本命
 Saturn/Uranus/Neptune 15 + T7-B 本命 Pluto/上升/天顶 15）与
-Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15 + T9-B 本命 Pluto/上升/天顶 15）与 Mars（T10-A 本命 Sun/Moon/Mercury 15 + T10-B 本命 Venus/Mars/Jupiter 15 + T11-A 本命 Saturn/Uranus/Neptune 15 + T11-B 本命 Pluto/上升/天顶 15）与 Jupiter（T12-A 本命 Sun/Moon/Mercury 15 + T12-B 本命 Venus/Mars/Jupiter 15）= **330 条**，
-其余 270 条归 T13-T21 的**九批整**（Mars 十二个本命点已由 T10-A/T10-B/T11-A/T11-B 四派落齐；Jupiter 只落了前六个本命点，后半批 30 条（本命 Saturn/Uranus/Neptune ＋ Pluto/上升/天顶）归 T13；其后四颗移动星 Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派）。
+Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9-A 本命 Saturn/Uranus/Neptune 15 + T9-B 本命 Pluto/上升/天顶 15）与 Mars（T10-A 本命 Sun/Moon/Mercury 15 + T10-B 本命 Venus/Mars/Jupiter 15 + T11-A 本命 Saturn/Uranus/Neptune 15 + T11-B 本命 Pluto/上升/天顶 15）与 Jupiter（T12-A 本命 Sun/Moon/Mercury 15 + T12-B 本命 Venus/Mars/Jupiter 15 + T13-A 本命 Saturn/Uranus/Neptune 15 + T13-B 本命 Pluto/上升/天顶 15）= **360 条**，
+其余 240 条归 T14-T21 的**八批整**（Mars 十二个本命点已由 T10-A/T10-B/T11-A/T11-B 四派落齐；Jupiter 十二个本命点已由 T12-A/T12-B/T13-A/T13-B 四派落齐；余下四颗移动星 Saturn/Uranus/Neptune/Pluto 各两批，每批 30 条 = 两个 15 句派，自 T14 起接）。
 **自 T6 起一批分两派落地**（每派 15 句 = 三个本命点 × 五相，见计划口径裁定第 27 条）：ROSTER 与本地门
 停在真实落地数，两派合成一个语料批，头注这一支笔在两派之间不落。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 330 270`。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT as C; k=[x for x in C.universe() if '.aspect.' in x]; l=[x for x in C.entries if '.aspect.' in x]; print(len(k), len(l), len(k)-len(l))"` → `600 360 240`。
 **已落地的行一字不改**（改一行就等于改动别批已评审过的内容，那要走裁定）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 330。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain_aspect as t; print(len(t.TRANSIT_ASPECT_READINGS))"` → 360。
 
 一张表同时被三层读：同一个键会在同一份响应里被印到行运、次限、太阳弧三个小节，所以句子
 **不许含层名**（`行运/次限/太阳弧/推运` 四字由 G37 判红），也不许含日历词与把尺度说成反复发生的频率词——
@@ -18,7 +18,7 @@ Venus（T8-A 本命 Sun/Moon/Mercury 15 + T8-B 本命 Venus/Mars/Jupiter 15 + T9
 `自然`/`总是`）不是硬禁：它不含日尺度单位，三层读法下都可以为真，按口径裁定第 16 条的延伸走**逐枚登记 +
 每批自我上限 3**（先例见本计划执行工作区 `.superpowers/sdd/2026-10-07-wu-group-plain-reading-plan-g/task-2-report.md:246`，
 该目录按 `.superpowers/sdd/.gitignore` 不进 git，所以这条引用对仓库外的读者是悬空的，登记于此），门侧没有这一族的名单，所以它是手读项。
-复测（**两种单位都要写**：裸 grep 把注释算进语料，这是本表每一族载体的共同陷阱）：`cd backend && grep -c "一直" app/content/transit_plain_aspect.py` → **9 行**（头注自己 `:17`/`:21` 两处，语料 5 枚，族注释的避用名单 `:418`/`:436` 两处），语料行口径 **5 行** = `:61`/`:102`/`:188`/`:285`/`:438`（第 5 枚由 T12-B 带入，逐枚登记见该批报告 §8）（复测 = 只 parse `aspect_key(...)` 行再数，见工作区 `g_t9b_pre_census.py` 的口径）。
+复测（**两种单位都要写**：裸 grep 把注释算进语料，这是本表每一族载体的共同陷阱）：`cd backend && grep -c "一直" app/content/transit_plain_aspect.py` → **10 行**（头注自己 `:17`/`:21` 两处，语料 5 枚，族注释的避用名单 `:418`/`:436`/`:460` 三处），语料行口径 **5 行** = `:61`/`:102`/`:188`/`:285`/`:438`（第 5 枚由 T12-B 带入，逐枚登记见该批报告 §8）（复测 = 只 parse `aspect_key(...)` 行再数，见工作区 `g_t9b_pre_census.py` 的口径）。
 同口径现读（HEAD `79a85a5` 复验）：`随时` 1 行 `:80`、`自然` 1 行 `:74`、`总是` 1 行 `:299`，`天天`/`常常`/`经常`/`每次`/`有时` 各 0 行（裸 grep 侧有头注自己与族注释的避用名单掺数，解析口径才是本数）；**每批自我上限 3 数的是本批新增的语料行**，不是文件里的出现次数。日历词廿六串——原十四串自整改
 轮 1（A2）有机检，序数日那十二串由口径裁定第 39 条在 T8-A 整改轮进门——`CALENDAR_WORDS` 与层名同住一条门
 `test_no_layer_word_and_no_calendar_word_inside_an_entry`，上一轮头注写的「机检没有日历词门、
@@ -36,7 +36,7 @@ content import 段与 `tests/content/test_transit_plain_corpus.py`）都从聚�
 自己也 import 聚合面模块，包初始化先把环走完，所以直接 import 分表是绿的（2026-10-07 逐条复测）。
 这段理由在 `transit_plain.py` 的 import 行上方另有一份（Plan F 的同一处也是两份：
 `content/western_plain.py:74-78` 与 `content/western_plain_placement.py:7-13`）。
-复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 330（五颗整移动星 Sun/Moon/Mercury/Venus/Mars 各十二个本命点已落齐，另加 Jupiter 前半批 30 条＝六个本命点；Venus 那 60 条 = T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune、T9-B 本命 Pluto/上升/天顶 四派 × 15；Mars 那 60 条 = T10-A 本命 Sun/Moon/Mercury、T10-B 本命 Venus/Mars/Jupiter、T11-A 本命 Saturn/Uranus/Neptune、T11-B 本命 Pluto/上升/天顶 四派 × 15；Jupiter 那 30 条 = T12-A 本命 Sun/Moon/Mercury、T12-B 本命 Venus/Mars/Jupiter 两派 × 15，后半批（本命 Saturn/Uranus/Neptune ＋ Pluto/上升/天顶）归 T13；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
+复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import transit_plain, transit_plain_aspect; print(len(transit_plain.TRANSIT_READINGS))"` → 360（六颗整移动星 Sun/Moon/Mercury/Venus/Mars/Jupiter 各十二个本命点已落齐；Venus 那 60 条 = T8-A 本命 Sun/Moon/Mercury、T8-B 本命 Venus/Mars/Jupiter、T9-A 本命 Saturn/Uranus/Neptune、T9-B 本命 Pluto/上升/天顶 四派 × 15；Mars 那 60 条 = T10-A 本命 Sun/Moon/Mercury、T10-B 本命 Venus/Mars/Jupiter、T11-A 本命 Saturn/Uranus/Neptune、T11-B 本命 Pluto/上升/天顶 四派 × 15；Jupiter 那 60 条 = T12-A 本命 Sun/Moon/Mercury、T12-B 本命 Venus/Mars/Jupiter、T13-A 本命 Saturn/Uranus/Neptune、T13-B 本命 Pluto/上升/天顶 四派 × 15，十二个本命点自此落齐；聚合面与本表同数，因为今天 `TRANSIT_READINGS` 里只有相位列，三族推运归 T22）。
 """
 
 from app.content.transit_plain import aspect_key
@@ -522,7 +522,7 @@ TRANSIT_ASPECT_READINGS: dict[str, str] = {
     # 字数（口径与钦定件 `:468` 的「51 字」同形＝含标点全长，件 `tmp_t13b_fix1_ids.txt:67`）min 46 `:529`／max 60 `:489`／总 792／平均 52.8（fix 轮 `:507` 由 47→51，总数 788→792）⇒ 40–43 白名单档 0 枚；**这条 ≥44 是附加件 §3 的人为文案尺，仓内无机器上限**（全表现读最长 `:439`＝69 字），`:489` 的 60 字对全表峰值是余量而不是压线；十五枚落点类两两不同、同一相位跨三片亦不同名（附加件 §1 第 3 行：本派**没有钦定件**，故无豁免位）；**四门现跑**（控制器落地笔，重定向落档后数进度点、exit 取自命令本体，快照 `tmp_t13b_fix3_gate_*.txt`——首版 `tmp_t13b_gate_*.txt` 只有点数、没有 `EXIT=` 行，exit 是第 2 轮补跑才落档的）：语料 `tests/content/test_transit_plain_corpus.py` **2529** ＝ 7×360+9、工厂 `tests/test_plain_corpora.py` **1406**、
     # 架构 `tests/test_architecture.py` **42**、API `tests/test_transit_api.py` **14**，失败 0 ⇒ 本派八道可及门（`:196`/`:267`/`:298`/`:311`/`:321`/`:331`/`:348`/`:476`）全绿，另 `:410`（断言 `:429`/`:430`，自对跳过名单）本派**分母 0／不适用**——本派三片没有自对切片（自对片只有 T12-B 的木星③），故既未列绿也未列不可达，按 T13-A `:466` 的体例明写归类，免得读者当成漏账，
     # 第九道反向键门 `test_a_reversed_key_is_not_a_copy`（`:381`，断言 `:407`）本派 0/5 落地、结构性不可达，`:348` 的机器口径（末十二字与末句三片各自互异）在 `tmp_t13b_probe4.txt` 现读 True；`ROSTER_TARGETS["aspect"]` 360 由花名册门 `:499`（断言 `:511`）现读相等；
-    # 头注 `:3`/`:7`/`:8`/`:11`/`:13`/`:39` 那几个 330／270／九批整之数本派**不动**（头注 `:10`：这一支笔在两派之间不落），归控制器的 `docs(transit):` 一笔）
+    # 头注 `:3`/`:7`/`:8`/`:11`/`:13`/`:39` 那几个 330／270／九批整之数本派**不动**（头注 `:10`：这一支笔在两派之间不落），改由控制器的 `docs(transit):` 地图笔落地——Jupiter 十二点齐之后头注现为 360／240／八批整（T14-T21），本行留档的是「批内不落头注」这条纪律本身，不是那几个旧数）
     aspect_key("Jupiter", "MC", "conjunction"): "木星与本命天顶成合相，你只把那件起了个头，接手的几个人各自把它办完了，办出来的几样都不在你原先想到的路上。",
     aspect_key("Jupiter", "MC", "sextile"): "木星与本命天顶成六合，你往台面上站定的时候，心里悬着的先落了下去，落到几分你看得见，剩下的半分也不催它。",
     aspect_key("Jupiter", "MC", "square"): "木星与本命天顶成刑相，你越想把那件抓牢，手上越空，等到真松了手，它反倒自己凑齐了摆回来，摆得比你摆过的还整。",
