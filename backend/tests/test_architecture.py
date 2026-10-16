@@ -181,12 +181,12 @@ NON_SYSTEM_ROUTERS = {"__init__", "router", "meta"}
 #: 语料文件用单数词干的已登记别名（`content/rune_futhark.py`、`content/rune_spreads.py`）。
 CONTENT_STEM_ALIAS: dict[str, str] = {"runes": "rune"}
 
-#: 无 `content/` 语料的已裁定例外（ledger F-A2-2）：transit 的"表"刻意复用
-#: `app.engines.western` 而不双份维护（`app/engines/transit.py:16` 头注）。
-#: `western` 已于 Plan F（T17）从本名单摘除：它从 T1 起就有三个自维护白话语料模块
-#: （`content/western_plain*.py`），豁免留着不会红、只会静默放宽（`:212` 只在
-#: `system not in CONTENT_LESS_SYSTEMS` 时才查 content 件）。
-CONTENT_LESS_SYSTEMS = {"transit"}
+#: 两家豁免都已随各自语料上线摘除；空集合仍保留，它是「新系统必须显式豁免」这一机制的接口，
+#: 不是待还的债（照 §1 里 `BASELINE` 空表的那段先例措辞）。`western` 于 Plan F（T17）、
+#: `transit` 于 Plan G（T25）各自长出 `content/western_plain*.py` / `content/transit_plain*.py`
+#: 两张自维护白话语料表后摘除（`content/transit_plain*.py` 648 条，复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import TRANSIT; print(len(TRANSIT.entries))"` → `648`）。
+CONTENT_LESS_SYSTEMS = frozenset()
 
 
 def _system_names() -> list[str]:
