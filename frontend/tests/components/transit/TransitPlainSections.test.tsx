@@ -163,3 +163,12 @@ it('the provenance panel is handed the three overlay tables with their distinct 
     expect(table.source).not.toContain('依');
   }
 });
+
+it('the page renders those three tables through the shared provenance panel', () => {
+  /** 走查三（T27 Step 4）的实录：页面原本只印 `note` 与 ENGINE 行，三行表永远到不了用户眼前——
+   *  数据层（上一组）、类型层（T26）都齐了，独缺渲染。用与本命页同一条「数据进来、面板出去」的
+   *  形态钉住：`TransitPage.tsx` 必须把 `chart.provenance.tables` 递进共享的 `ProvenancePanel`。
+   *  复测：把下面这行换成 `tables={chart.provenance.tables.slice(0, 2)}` 或删掉它，本测即红。 */
+  const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
+  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+});

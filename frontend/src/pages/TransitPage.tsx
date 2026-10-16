@@ -11,6 +11,7 @@ import { SelectMenu } from '../components/ui/SelectMenu';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useTransit } from '../hooks/useTransit';
 import { aspectStyle } from '../lib/astro';
@@ -357,6 +358,7 @@ function Provenance({ chart }: { chart: TransitChart }) {
         </span>
         <span className="text-xs text-ink-muted">星盘与推运仅供文化参考，不构成任何决策建议。</span>
       </div>
+      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }
