@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "cups-02",
-      "name": "Two of Cups",
-      "name_zh": "圣杯二",
-      "arcana": "minor",
-      "number": 2,
-      "suit": "cups",
+      "card_id": "major-21",
+      "name": "The World",
+      "name_zh": "世界",
+      "arcana": "major",
+      "number": 21,
+      "suit": null,
       "rank": null,
-      "element": "water",
+      "element": null,
       "orientation": "reversed",
       "keywords": [
-        "imbalance",
-        "broken communication",
-        "tension",
-        "separation"
+        "seeking closure",
+        "shortcuts",
+        "delays",
+        "incompleteness"
       ],
       "keywords_zh": [
-        "失衡",
-        "沟通中断",
-        "紧绷",
-        "分离"
+        "讨一个了结",
+        "走捷径",
+        "拖延",
+        "未竟"
       ],
-      "meaning": "Reversed, the exchange falters as imbalance or miscommunication strains the bond.",
-      "meaning_zh": "逆位时，交换卡住，失衡或沟通失真把这条纽带绷紧。"
+      "meaning": "Reversed, closure remains elusive and loose ends linger; a cycle is nearly, but not yet, complete.",
+      "meaning_zh": "逆位时，了结迟迟不到、松散的头绪还留着，这个循环差一点就完成，但还没完成。"
     },
     {
       "position_index": 1,
@@ -44,29 +44,31 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "wands-09",
-      "name": "Nine of Wands",
-      "name_zh": "权杖九",
+      "card_id": "wands-04",
+      "name": "Four of Wands",
+      "name_zh": "权杖四",
       "arcana": "minor",
-      "number": 9,
+      "number": 4,
       "suit": "wands",
       "rank": null,
       "element": "fire",
       "orientation": "upright",
       "keywords": [
-        "courage",
-        "persistence",
-        "test of faith",
-        "resilience"
+        "celebration",
+        "harmony",
+        "marriage",
+        "home",
+        "community"
       ],
       "keywords_zh": [
-        "勇气",
-        "持续不懈",
-        "信念的考验",
-        "韧性"
+        "庆祝",
+        "和谐",
+        "婚姻",
+        "家",
+        "群体"
       ],
-      "meaning": "A weary guardian leans on his wand, bandaged yet standing, almost through the final test of endurance.",
-      "meaning_zh": "疲惫的守护者靠在他的权杖上，缠着绷带却仍然站着，最后一场耐力的考验已近尾声。"
+      "meaning": "Beneath a garlanded arch of four wands a community rejoices, marking stable homecoming and shared celebration.",
+      "meaning_zh": "四根权杖扎成的拱门之下，一个群体在欢庆，标记着安稳的归家与共享的庆祝。"
     },
     {
       "position_index": 2,
@@ -75,40 +77,40 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "cups-09",
-      "name": "Nine of Cups",
-      "name_zh": "圣杯九",
+      "card_id": "pentacles-08",
+      "name": "Eight of Pentacles",
+      "name_zh": "星币八",
       "arcana": "minor",
-      "number": 9,
-      "suit": "cups",
+      "number": 8,
+      "suit": "pentacles",
       "rank": null,
-      "element": "water",
-      "orientation": "upright",
+      "element": "earth",
+      "orientation": "reversed",
       "keywords": [
-        "contentment",
-        "satisfaction",
-        "gratitude",
-        "wish come true"
+        "perfectionism",
+        "misdirected activity",
+        "low standards",
+        "tedium"
       ],
       "keywords_zh": [
-        "知足",
-        "满意",
-        "感恩",
-        "如愿以偿"
+        "完美主义",
+        "力气用错方向",
+        "标准松散",
+        "枯燥重复"
       ],
-      "meaning": "A satisfied figure sits with arms crossed before nine golden cups, the very picture of a wish fulfilled.",
-      "meaning_zh": "一个心满意足的人抱臂坐在九只金杯前，正是如愿以偿的那副模样。"
+      "meaning": "Reversed, diligence tips into perfectionism, or effort is misdirected and half-hearted.",
+      "meaning_zh": "逆位时，勤勉滑向完美主义，或者力气用错了方向、做得三心二意。"
     }
   ],
   "drawn_ids": [
-    "cups-02",
-    "wands-09",
-    "cups-09"
+    "major-21",
+    "wands-04",
+    "pentacles-08"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 圣杯二（Two of Cups），逆位，取的是 失衡、沟通中断、紧绷。 现在（Present）抽出 权杖九（Nine of Wands），正位，取的是 勇气、持续不懈、信念的考验。 未来（Future）抽出 圣杯九（Nine of Cups），正位，取的是 知足、满意、感恩。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 1 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
-  "major_arcana_count": 0,
-  "reversed_count": 1,
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 世界（The World），逆位，取的是 讨一个了结、走捷径、拖延。 现在（Present）抽出 权杖四（Four of Wands），正位，取的是 庆祝、和谐、婚姻。 未来（Future）抽出 星币八（Eight of Pentacles），逆位，取的是 完美主义、力气用错方向、标准松散。 1 张大牌在这份日常处境里标出分量更重、由不得你选的线索。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "major_arcana_count": 1,
+  "reversed_count": 2,
   "provenance": {
     "engine": "tarot-content-library",
     "content_version": "2026.09",
