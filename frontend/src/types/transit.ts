@@ -5,6 +5,7 @@
  * bi-wheel overlay is fully self-contained in one response.
  */
 
+import type { PlainSection, ProvenanceTable } from './common';
 import type { WesternChart } from './western';
 
 /** Input: natal birth data (as for the natal chart) plus the target date. */
@@ -108,6 +109,8 @@ export interface SolarArcBlock {
 export interface TransitProvenance {
   engine: string;
   note: string;
+  /** 行运一页真正读到的三张表（自撰白话两半 + 相位属性表）。 */
+  tables: ProvenanceTable[];
 }
 
 /** Complete transit / progression reading over the natal chart. */
@@ -122,6 +125,8 @@ export interface TransitChart {
   transit_aspects: CrossAspect[];
   progression: ProgressionBlock;
   solar_arc: SolarArcBlock;
+  /** 页尾「白话详解」五段，序固定为 行运 / 次限 / 太阳弧 / 次限月亮 / 次限两轴。 */
+  plain: PlainSection[];
   provenance: TransitProvenance;
   engine: string;
 }

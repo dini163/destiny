@@ -10,6 +10,7 @@ import { ChineseDateField } from '../components/ui/DateTimeField';
 import { SelectMenu } from '../components/ui/SelectMenu';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useTransit } from '../hooks/useTransit';
 import { aspectStyle } from '../lib/astro';
@@ -208,6 +209,16 @@ function TransitResults({ chart }: { chart: TransitChart }) {
         </div>
       </div>
 
+      <ResultCard
+        title="白话详解"
+        eyebrow="PLAIN READING"
+        icon="sparkle"
+        actions={<span className="label-caps text-ink-muted">五段 · 逐条转述已算出的相位与标志位</span>}
+        elevated
+      >
+        <PlainSectionList sections={chart.plain} />
+      </ResultCard>
+
       <Provenance chart={chart} />
     </>
   );
@@ -265,7 +276,7 @@ function ProgressionCard({ progression }: { progression: ProgressionBlock }) {
           {progression.angles.map((angle) => (
             <div key={angle.name} className="flex flex-col gap-0.5 rounded-element border border-rim-soft bg-surface/60 px-3 py-2">
               <span className="label-caps text-ink-muted">
-                推运{angle.name === 'ASC' ? '上升' : '中天'} · {angle.name}
+                推运{angle.name === 'ASC' ? '上升' : '天顶'} · {angle.name}
               </span>
               <span className="text-sm text-ink">
                 {angle.sign_zh} <span className="numeric text-ink-variant">{angle.degree_text}</span>
@@ -292,7 +303,7 @@ function SolarArcCard({ solarArc }: { solarArc: SolarArcBlock }) {
           <span className="numeric text-xs text-ink-muted">({solarArc.arc_degrees.toFixed(2)}°)</span>
         </div>
         <p className="text-xs leading-relaxed text-ink-muted">
-          太阳弧以次限太阳相对本命太阳行过的弧度，同步推进本命每一颗星（约每年 1°）。切换到「太阳弧」层可在双轮盘与相位表中查看推进星对本命的相位——弧相位常标志人生重大节点。
+          太阳弧把本命每一颗星往前推同一段弧度，相位表列的是推后之星与本命的关系，读的时候要连着前两层一起看。切换到「太阳弧」层可在双轮盘与相位表中查看推进星对本命的相位。
         </p>
       </div>
     </ResultCard>
