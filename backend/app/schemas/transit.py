@@ -19,6 +19,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import PlainSection
 from app.schemas.western import WesternChart
 
 
@@ -123,6 +124,8 @@ class TransitChart(BaseModel):
 
     progression: ProgressionBlock
     solar_arc: SolarArcBlock
+
+    plain: list[PlainSection] = Field(description="页尾「白话详解」五段，序固定为 行运 / 次限 / 太阳弧 / 次限月亮 / 次限两轴。")
 
     provenance: TransitProvenance
     engine: str = Field(default="pyswisseph")

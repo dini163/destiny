@@ -24,7 +24,17 @@ from datetime import date, time
 import swisseph as swe
 
 from app.content.aspects_nature import ASPECT_NATURE
+from app.content.transit_plain import (
+    TRANSIT_NONE_BRANCHES,
+    TRANSIT_SECTION_TITLES,
+    aspect_key,
+    progressed_axis_key,
+    progressed_moon_house_key,
+    progressed_moon_sign_key,
+)
 from app.core.errors import EphemerisError, UnsupportedMethodError
+from app.engines.plain_compose import compose
+from app.engines.plain_corpora import TRANSIT
 from app.engines.western import (  # shared, golden-tested astrology primitives
     ASPECTS,
     PLANETS,
@@ -39,6 +49,7 @@ from app.engines.western import (  # shared, golden-tested astrology primitives
     _sign_index,
     compute_western_chart,
 )
+from app.schemas.common import PlainSection
 from app.schemas.transit import (
     AnglePoint,
     CrossAspect,
@@ -141,6 +152,52 @@ def _cross_aspects(
     return aspects
 
 
+def build_plain(
+    *,
+    transit_aspects: list[CrossAspect],
+    progression_aspects: list[CrossAspect],
+    arc_aspects: list[CrossAspect],
+    moon_sign: str,
+    moon_house: int,
+    prog_angles: list[AnglePoint],
+) -> list[PlainSection]:
+    """按三层盘面已经算出的相位与次限标志位逐条选句，拼成页尾「白话详解」的五段。
+
+    只选句，不现编（`plain_compose.compose` 的立身规矩，也是 `TRANSIT_PLAIN_NOTE` 那句
+    「请求时不生成任何中文」的唯一兑现点）。段的次序是产品决定，由
+    `tests/golden/test_transit_golden.py::test_the_plain_block_is_five_sections_in_the_declared_order`
+    钉成字面量。
+
+    六个入参全是关键字：`plain` 是 `TransitChart` 的字段，装配时那个对象还没造出来
+    （spec §8 的原签名 `build_plain(chart)` 在这一点上不成立，Plan F 偏差 10 的同一裁定）。
+    """
+
+    def emit(section: str, keys: list[str]) -> PlainSection:
+        # `keep` 分组不看符号（`plain_compose.py:70-71`），符号位一律传 0；传 0 而不是省略
+        # 是为了保住 `compose` 的签名形状，与其余九个系统的调用一致（F 的同一段注释）。
+        if not keys and section not in TRANSIT_NONE_BRANCHES:
+            # 崩而不静默：一张恒非空的段收不到键是编程错误，不是用户输入。理由与钉名见
+            # `engines/western.py:210-218` 的同一段注释（F 的 `999db61` 那颗钉的同类）。
+            raise ValueError(
+                f"transit 段 {section!r} 收不到任何键，"
+                f"且它不在 TRANSIT_NONE_BRANCHES 里：{TRANSIT_NONE_BRANCHES}"
+            )
+        opener = TRANSIT_NONE_BRANCHES[section] if not keys else section
+        return PlainSection(
+            title=TRANSIT_SECTION_TITLES[section],
+            text=compose(TRANSIT, opener, [(key, 0) for key in keys]),
+        )
+
+    return [
+        emit("transit_aspect", [aspect_key(a.moving, a.natal, a.type) for a in transit_aspects]),
+        emit("progressed_aspect", [aspect_key(a.moving, a.natal, a.type) for a in progression_aspects]),
+        emit("directed_aspect", [aspect_key(a.moving, a.natal, a.type) for a in arc_aspects]),
+        emit("progressed_moon", [progressed_moon_sign_key(moon_sign), progressed_moon_house_key(moon_house)]),
+        # 页面印这两根轴，白话按 `AnglePoint.name`（`ASC`/`MC`）各取一句；次序即 `prog_angles` 的序。
+        emit("progressed_axis", [progressed_axis_key(angle.name, angle.sign) for angle in prog_angles]),
+    ]
+
+
 def compute_transits(
     *,
     birth_date: date,
@@ -213,11 +270,21 @@ def compute_transits(
         _moving(p.name, p.glyph, p.name_zh, _normalize_longitude(p.longitude + arc), natal_cusps, p.retrograde, 0.0)
         for p in natal.planets
     ]
+    arc_aspects = _cross_aspects(directed_positions, natal_points)
     solar_arc = SolarArcBlock(
         arc_degrees=round(arc, 4),
         arc_text=_format_absolute(arc),
         positions=directed_positions,
-        aspects=_cross_aspects(directed_positions, natal_points),
+        aspects=arc_aspects,
+    )
+
+    plain = build_plain(
+        transit_aspects=transit_aspects,
+        progression_aspects=prog_aspects,
+        arc_aspects=arc_aspects,
+        moon_sign=prog_moon.sign,
+        moon_house=prog_moon.natal_house,
+        prog_angles=prog_angles,
     )
 
     return TransitChart(
@@ -228,5 +295,6 @@ def compute_transits(
         transit_aspects=transit_aspects,
         progression=progression,
         solar_arc=solar_arc,
+        plain=plain,
         provenance=TransitProvenance(engine="pyswisseph", note=NOTE),
     )

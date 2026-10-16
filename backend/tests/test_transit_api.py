@@ -224,3 +224,18 @@ def test_a_missing_location_is_an_envelope(client: TestClient) -> None:
     body = response.json()
     assert "detail" not in body
     assert body["error"]["code"] == "invalid_birth_data"
+
+
+# ------------------------------------------------------------------ 白话五段（T24）
+
+def test_the_plain_block_arrives_in_the_declared_section_order(client: TestClient) -> None:
+    """响应 `plain` 五段的标题字面序（T24 Step 6；`build_plain` 的发射序钉成 API 契约）。
+
+    `len(plain[0].text) > len(plain[3].text)` 抓「段序写反」：相位段恒多于月亮段（相位段
+    行数 == 条数 + 1，fixture 那手 36 条 vs 月亮段恒 2 条），若装配把 `progressed_moon`
+    排到 `transit_aspect` 前，长度断言立刻红。
+    """
+    body = _body(client)
+    titles = [s["title"] for s in body["plain"]]
+    assert titles == ["行运对本命相位", "次限对本命相位", "太阳弧对本命相位", "次限月亮", "次限上升与天顶"]
+    assert len(body["plain"][0]["text"]) > len(body["plain"][3]["text"])

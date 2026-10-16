@@ -23,7 +23,8 @@ value copied out of the engine could only self-confirm it, so every anchor above
 hand-derivable arithmetic instead.
 
 Recount this file's tests: `cd backend && PYTHONIOENCODING=utf-8
-.venv/Scripts/python.exe -m pytest tests/golden/test_transit_golden.py -v`.
+.venv/Scripts/python.exe -m pytest tests/golden/test_transit_golden.py -v`
+(现 19 条；T24 追加了白话五段的五条：段序、行数、第二盘、空态三层、无 none 分支即崩。)
 """
 
 from datetime import date, time
@@ -31,8 +32,9 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content import transit_plain
 from app.core.errors import UnsupportedMethodError
-from app.engines.transit import _cross_aspects, compute_transits
+from app.engines.transit import _cross_aspects, build_plain, compute_transits
 from app.engines.western import ASPECTS
 from app.schemas.transit import MovingPoint
 
@@ -235,3 +237,90 @@ def test_every_aspect_row_labels_its_nature_from_the_shared_table() -> None:
     assert rows, "三层相位全空——本条会静默通过"
     for row in rows:
         assert (row.nature, row.nature_zh) == ASPECT_NATURE[row.type], row
+
+
+# ------------------------------------------------------- 白话五段（T24 追加）
+
+PLAIN_TITLES = ["行运对本命相位", "次限对本命相位", "太阳弧对本命相位", "次限月亮", "次限上升与天顶"]
+
+
+def test_the_plain_block_is_five_sections_in_the_declared_order() -> None:
+    """页尾「白话详解」五段的标题字面序（产品决定，`build_plain` 的发射序）。"""
+    chart = _chart()
+    assert [s.title for s in chart.plain] == PLAIN_TITLES
+
+
+def test_each_plain_section_has_one_line_per_key_plus_the_opener() -> None:
+    """fixture 那手：段行数 == 该段条数 + 1；三层 36/39/36，后两段各 2 条。
+
+    跨层复用是设计（同一键在三层各印一次），所以前段行数 37/40/37 而**不去重**。
+    """
+    chart = _chart()
+    counts = [len(chart.transit_aspects), len(chart.progression.aspects), len(chart.solar_arc.aspects)]
+    assert counts == [36, 39, 36], counts
+    for section, expected_keys in zip(chart.plain[:3], counts):
+        assert len(section.text.splitlines()) == expected_keys + 1, section.title
+    for section in chart.plain[3:]:
+        assert len(section.text.splitlines()) == 2 + 1, section.title
+
+
+def test_a_second_real_chart_lands_the_progression_sections_on_different_keys() -> None:
+    """第二张真盘：次限两段落在不同键上（35/40/35、巨蟹 11 宫、摩羯/天秤）。
+
+    期望串**从登记表本身拼、不从响应拼**：语料改字不必改测，而取错键、串段、多空行都会红。
+    """
+    chart = compute_transits(
+        birth_date=date(1990, 6, 15), birth_time=time(10, 30),
+        latitude=30.25, longitude=120.17, utc_offset_hours=8.0,
+        house_system="P", target_date=date(2026, 9, 25), ephemeris_path=None,
+    )
+    counts = [len(chart.transit_aspects), len(chart.progression.aspects), len(chart.solar_arc.aspects)]
+    assert counts == [35, 40, 35], counts
+    for section, expected_keys in zip(chart.plain[:3], counts):
+        assert len(section.text.splitlines()) == expected_keys + 1, section.title
+    moon_expect = "\n".join([
+        transit_plain.TRANSIT_OPENERS["progressed_moon"],
+        transit_plain.TRANSIT_READINGS[transit_plain.progressed_moon_sign_key("Cancer")],
+        transit_plain.TRANSIT_READINGS[transit_plain.progressed_moon_house_key(11)],
+    ])
+    assert chart.plain[3].text == moon_expect
+    axis_expect = "\n".join([
+        transit_plain.TRANSIT_OPENERS["progressed_axis"],
+        transit_plain.TRANSIT_READINGS[transit_plain.progressed_axis_key("ASC", "Capricorn")],
+        transit_plain.TRANSIT_READINGS[transit_plain.progressed_axis_key("MC", "Libra")],
+    ])
+    assert chart.plain[4].text == axis_expect
+
+
+def test_an_empty_layer_fires_its_none_branch_and_nothing_else() -> None:
+    """三层各测一次空态：空的那段只有开篇句（`TRANSIT_NONE_BRANCHES`），其余照发。"""
+    chart = _chart()
+    moon_sign = next(p.sign for p in chart.progression.positions if p.name == "Moon")
+    for empty_name in ("transit_aspect", "progressed_aspect", "directed_aspect"):
+        plain = build_plain(
+            transit_aspects=[] if empty_name == "transit_aspect" else chart.transit_aspects,
+            progression_aspects=[] if empty_name == "progressed_aspect" else chart.progression.aspects,
+            arc_aspects=[] if empty_name == "directed_aspect" else chart.solar_arc.aspects,
+            moon_sign=moon_sign,
+            moon_house=chart.progression.moon_natal_house,
+            prog_angles=chart.progression.angles,
+        )
+        none_opener = transit_plain.TRANSIT_NONE_BRANCHES[empty_name]
+        index = {"transit_aspect": 0, "progressed_aspect": 1, "directed_aspect": 2}[empty_name]
+        assert plain[index].text == transit_plain.TRANSIT_OPENERS[none_opener], empty_name
+        for other in plain[:3]:
+            assert other.text, other.title
+
+
+def test_a_section_that_goes_empty_without_a_declared_none_branch_crashes() -> None:
+    """`prog_angles=[]` ⇒ `progressed_axis` 段收不到键，而该段不在 `TRANSIT_NONE_BRANCHES` 里 ⇒ 崩。"""
+    chart = _chart()
+    with pytest.raises(ValueError):
+        build_plain(
+            transit_aspects=chart.transit_aspects,
+            progression_aspects=chart.progression.aspects,
+            arc_aspects=chart.solar_arc.aspects,
+            moon_sign=next(p.sign for p in chart.progression.positions if p.name == "Moon"),
+            moon_house=chart.progression.moon_natal_house,
+            prog_angles=[],
+        )
