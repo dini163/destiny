@@ -120,10 +120,76 @@ TRANSIT_OPENERS: dict[str, str] = {
     "progressed_axis": "次限上升与次限天顶是你推运盘的两根轴，它们不由出生时刻锁死，会随年月一点点挪，这两格讲的是方向上的变化。",
 }
 
-#: 推运月亮落座 12 + 落本命宫 12 + 次限两轴落座 24 = 48 条，由 T22 填。留空是刻意的：
+#: 推运月亮落座 12 + 落本命宫 12 + 次限两轴落座 24 = 48 条，由 T22 填（键籍序＝`SIGNS` 序 →
+#: 1→12 → ASC 十二座然后 MC 十二座，计划 Task 22 Step 1）。留空是刻意的：
 #: 聚合面与九道本地门从 T2 就要能跑完整形状，不然门在第一批就被绕过去（Plan F 的同一句
 #: 理由，`content/western_plain.py:112-113`）。
-TRANSIT_PROGRESSION_READINGS: dict[str, str] = {}
+#: 三族纪律（与相位族是三副不同的身体，计划 Task 22 Step 3）：`progressed_moon_sign` 键上有
+#: 星座 ⇒ G34 的 `"sign" in arg` 分支生效，讲元素/形态必须等于键上那一格，一句两类并现即红；
+#: 主语必须是「月亮」，只禁别的点名。`progressed_moon_house` 键上没有星座 ⇒ 任何元素/形态词
+#: 即红；宫号必须恰好是键上那一宫且中文写法（`第九宫`），阿拉伯数字被 G35 与命名门同时抓；
+#: 禁写「月亮逆行」（`OUT_OF_SCOPE_WORDS` 十五串）与「月亮入庙」（响应里没有的结构事实）。
+#: `progressed_axis` 键上有 `axis` 与 `sign` ⇒ 自己的轴名（`上升`/`天顶`）必须在文中，别的点名
+#: 不许出现（变异红串＝`['四轴条目里出现别的点名「太阳」']`）；`中天` 一律不许（十五串里，
+#: 与 T25 页面统一后的字面冲突）；元素/形态可以说但必须等于键上那一格。三族共同：都不许带层名
+#: （G37 对 648 条一体适用）；这三族讲的是**次限**，次限一格走一年——`这段日子`/`这一格` 合法，
+#: `这几天`/`今天`/`今年` 是假话（日历词廿六串只挡得住已列的部分，写任何日/月尺度先按口径
+#: 裁定第 16 条自问次限层读到是否仍为真）。
+#: 三条标准件（T2 门验里已过门的样例，计划 Task 22 Step 2，逐字节照抄）＝
+#: `progressed_moon_sign.Gemini`、`progressed_moon_house.9`、`progressed_axis.MC.Virgo`。
+TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
+    # 推运月亮落座（12，`SIGNS` 序；主语「月亮」＋键上那一座，无元素/形态词）
+    "transit.progressed_moon_sign.Aries": "月亮走到白羊座这一格，你想要的先于想清楚的冒出来，话赶着话往外出，慢半拍的那点思量只能事后补。",
+    "transit.progressed_moon_sign.Taurus": "月亮走到金牛座这一格，你守着的那份安稳比新机会更实，动起来要先把脚下踩实，踩实了才肯挪下一步。",
+    "transit.progressed_moon_sign.Gemini": "月亮走到双子座这一格，你想说的与想听的都多起来，一件事还没讲完，另一件已经顺口带出来，冷掉的场子到你嘴里能重新转起来。",
+    "transit.progressed_moon_sign.Cancer": "月亮走到巨蟹座这一格，你心里那口旧的井比往日更深，亲近的人一句顶外面十句，说开的事转头又想捡回来。",
+    "transit.progressed_moon_sign.Leo": "月亮走到狮子座这一格，你站出来的时刻比躲着的时刻多，场面越大越拿得出样子，一个人的时候反倒歇得住。",
+    "transit.progressed_moon_sign.Virgo": "月亮走到处女座这一格，你经手的事都要过一遍细处，过了眼才放心往外递，递出去之后又回头核一遍。",
+    "transit.progressed_moon_sign.Libra": "月亮走到天秤座这一格，你两头掂量的劲比往日足，先把话说平了才肯落定，落定前又替别人想一遍。",
+    "transit.progressed_moon_sign.Scorpio": "月亮走到天蝎座这一格，你放进心里的话比说出口的多，深浅自己知道，旁人问到也只肯露一半。",
+    "transit.progressed_moon_sign.Sagittarius": "月亮走到射手座这一格，你望向远处的劲比守在近处足，路一开就想着往前，近处的琐碎先放一放。",
+    "transit.progressed_moon_sign.Capricorn": "月亮走到摩羯座这一格，你按部就班的稳比临时起意更靠得住，事情要一层一层码上去，码上去的才作数。",
+    "transit.progressed_moon_sign.Aquarius": "月亮走到水瓶座这一格，你离人群半步站着更自在，合群那套自己会做，做的时候心里仍留着一段距离。",
+    "transit.progressed_moon_sign.Pisces": "月亮走到双鱼座这一格，你听人说话时容易听出弦外那层，接话慢半拍，慢下来的那半拍恰好接得住。",
+    # 推运月亮落本命宫（12，1→12；宫号中文恰好＝键上那一宫，无星座/元素/形态词）
+    "transit.progressed_moon_house.1": "月亮移进本命第一宫，你这段日子把自己摆在头里，先顾自己那口气，顾完了才轮得到外头的事。",
+    "transit.progressed_moon_house.2": "月亮移进本命第二宫，你手头的东西开始算得清，进出的数自己心里有本账，账面上的安稳让你踏实。",
+    "transit.progressed_moon_house.3": "月亮移进本命第三宫，你开口的次数比往日多，路上遇见的、书里读到的都往话里带，说完了还想再说一遍。",
+    "transit.progressed_moon_house.4": "月亮移进本命第四宫，你往家里待的劲比出门足，屋里那点熟惯的声响让你安心，外头的热闹反倒隔了一层。",
+    "transit.progressed_moon_house.5": "月亮移进本命第五宫，你想玩想闹的那股劲回来了，拿得起也放得下，放下的那刻比拿着时更自在。",
+    "transit.progressed_moon_house.6": "月亮移进本命第六宫，你手上的活计比往日细，一件做完接一件，做完的那件再回头看看有没有漏。",
+    "transit.progressed_moon_house.7": "月亮移进本命第七宫，你与人往来时把对方摆得平，先听人把话说完，自己那半句等人家讲完才接。",
+    "transit.progressed_moon_house.8": "月亮移进本命第八宫，你心里那层深的自己不太往外翻，翻也只翻一半，另一半留着等真正信的人。",
+    "transit.progressed_moon_house.9": "月亮移进本命第九宫，你注意力的落点挪到远处，路、学问与陌生场合这几样在这段日子里变得亲近，日常琐事反倒容易放一放。",
+    "transit.progressed_moon_house.10": "月亮移进本命第十宫，你站在人前的那副样子变得要紧，做事先想怎么收尾，收尾的样子旁人都看得见。",
+    "transit.progressed_moon_house.11": "月亮移进本命第十一宫，你合得来的人多起来，话说到半路有人接，接住的那头让你觉得不是自己一个人。",
+    "transit.progressed_moon_house.12": "月亮移进本命第十二宫，你愿意收着的那部分比往日多，有些话不说出来，留在心里反而更稳当。",
+    # 次限两轴落座（24，ASC 十二座然后 MC 十二座；自己的轴名在文中，无别的点名）
+    "transit.progressed_axis.ASC.Aries": "上升挪到白羊座这一格，你给人的第一印象是往前冲的那股劲，话不多但起脚快，旁人一眼就记住你。",
+    "transit.progressed_axis.ASC.Taurus": "上升挪到金牛座这一格，你站出去的样子稳稳的，不急着表态，慢一点反倒让旁人觉得你靠得住。",
+    "transit.progressed_axis.ASC.Gemini": "上升挪到双子座这一格，你给人的样子是话多的那面，见人先开口，接话快，旁人对你的印象转得快。",
+    "transit.progressed_axis.ASC.Cancer": "上升挪到巨蟹座这一格，你给人的第一面带着一层护着的温，熟的人近，生的人要等一阵才走得近。",
+    "transit.progressed_axis.ASC.Leo": "上升挪到狮子座这一格，你站出来时自带一段分量，旁人愿意把话头交给你，你也接得住那个场面。",
+    "transit.progressed_axis.ASC.Virgo": "上升挪到处女座这一格，你给人看到的先是仔细那面，东西摆得齐整，事情过得细，旁人对你放心。",
+    "transit.progressed_axis.ASC.Libra": "上升挪到天秤座这一格，你与人相处先求个平字，话不往急处说，旁人在你跟前觉得被顾到。",
+    "transit.progressed_axis.ASC.Scorpio": "上升挪到天蝎座这一格，你给人的印象带着一层深，轻易不把底露出来，旁人知道你藏着话但不敢问。",
+    "transit.progressed_axis.ASC.Sagittarius": "上升挪到射手座这一格，你露出来的样子是直来直去的那面，话往宽处说，旁人觉得你敞亮。",
+    "transit.progressed_axis.ASC.Capricorn": "上升挪到摩羯座这一格，你给人的第一面是沉得住的那样，话少事稳，旁人把要紧的事愿意托给你。",
+    "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你与人隔着一段刚好够呼吸的距离，合得来但不黏，旁人对你摸不准又愿意信。",
+    "transit.progressed_axis.ASC.Pisces": "上升挪到双鱼座这一格，你给人的样子带着一层软的边，旁人说到一半就愿意把话交给你接住。",
+    "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外那条路往快处走，先起头再补周全，旁人看着你觉得风风火火。",
+    "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，你对外立住的那副样子是稳的，一件事做到实在处才肯拿出去，急不来。",
+    "transit.progressed_axis.MC.Gemini": "天顶挪到双子座这一格，你对外讲的那套变得活泛，见什么人说什么话，接得住也转得快，旁人跟得上你的换法。",
+    "transit.progressed_axis.MC.Cancer": "天顶挪到巨蟹座这一格，你对外呈现的那面带着护，把身边的人顾好了才谈别的，旁人觉得你有心。",
+    "transit.progressed_axis.MC.Leo": "天顶挪到狮子座这一格，你对外拿出来的样子带了分量，走到台前不怯，旁人认你这副担当。",
+    "transit.progressed_axis.MC.Virgo": "天顶挪到处女座这一格，你对外呈现的那条方向变得仔细，把流程理顺再往外走成了默认做法，急功近利反倒不像你。",
+    "transit.progressed_axis.MC.Libra": "天顶挪到天秤座这一格，你对外那条路先求两边都过得去，话摆平了才往前走，旁人觉得你公道。",
+    "transit.progressed_axis.MC.Scorpio": "天顶挪到天蝎座这一格，你对外呈现的那层深下去，底不轻易露，旁人知道你手里攥着要紧的东西。",
+    "transit.progressed_axis.MC.Sagittarius": "天顶挪到射手座这一格，你对外指的方向往远处，先画大处再落细处，旁人跟着你往前看。",
+    "transit.progressed_axis.MC.Capricorn": "天顶挪到摩羯座这一格，你对外立的那副样子一层一层往上码，不图快，旁人看着觉得你沉得住。",
+    "transit.progressed_axis.MC.Aquarius": "天顶挪到水瓶座这一格，你对外走的那条路带点独，不跟着现成的走，旁人一时看不懂但愿意等。",
+    "transit.progressed_axis.MC.Pisces": "天顶挪到双鱼座这一格，你对外呈现的那面带着一层软，方向不定得那么死，旁人觉得你有余地。",
+}
 
 #: 648 条的唯一聚合面（工厂与 `build_plain` 都只吃这一张）。两张分表按族拆开是为了给 21 个
 #: 语料批各自的编辑边界与可读的评审 diff；**`dict` 合并会静默覆盖同名键**，所以覆盖的代价由
