@@ -239,3 +239,17 @@ def test_the_plain_block_arrives_in_the_declared_section_order(client: TestClien
     titles = [s["title"] for s in body["plain"]]
     assert titles == ["行运对本命相位", "次限对本命相位", "太阳弧对本命相位", "次限月亮", "次限上升与天顶"]
     assert len(body["plain"][0]["text"]) > len(body["plain"][3]["text"])
+
+
+def test_the_provenance_declares_exactly_the_three_overlay_tables(client: TestClient) -> None:
+    """`provenance.tables` 三行按 `TRANSIT_OVERLAY_CONTENT_SOURCES` 的字面序回显（T25）。
+
+    序以名单为准（`app/content/__init__.py` 的 `TRANSIT_OVERLAY_CONTENT_SOURCES`），两边必须
+    一致——这里钉的是「响应如实回显登记」，登记表自身那一半由本地门那颗逐字钉负责。
+    """
+    body = _body(client)
+    tables = body["provenance"]["tables"]
+    assert [t["name"] for t in tables] == ["transit_plain", "transit_plain_aspect", "aspects_nature"]
+    assert len(tables) == 3
+    assert all(t["version"] for t in tables)
+    assert len({t["version"] for t in tables}) == 1

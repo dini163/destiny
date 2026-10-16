@@ -23,6 +23,7 @@ from datetime import date, time
 
 import swisseph as swe
 
+from app.content import CONTENT_VERSION, TRANSIT_OVERLAY_CONTENT_SOURCES
 from app.content.aspects_nature import ASPECT_NATURE
 from app.content.transit_plain import (
     TRANSIT_NONE_BRANCHES,
@@ -49,7 +50,7 @@ from app.engines.western import (  # shared, golden-tested astrology primitives
     _sign_index,
     compute_western_chart,
 )
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.transit import (
     AnglePoint,
     CrossAspect,
@@ -66,7 +67,9 @@ NOTE = (
     "次限（Secondary Progressions）依「一日当一年」，把本命时刻按周岁天数推进得推运盘，含推运行星与推运上升/中天；"
     "太阳弧（Solar Arc）以次限太阳相对本命太阳行过的弧度（约每年 1°）推进本命诸星，再看其与本命的相位。"
     "行星黄经、四轴与宫头皆由瑞士星历实时计算，相位按经典容许度（合 8°/六合 6°/刑 7°/拱 8°/冲 8°）检测，"
-    "并仅以合相=融合、六合与拱=和谐、刑与冲=挑战的标准属性归类，未作任何主观吉凶或个人运势的虚构演绎。"
+    "并仅以合相=融合、六合与拱=和谐、刑与冲=挑战的标准属性归类。"
+    "页面下方的白话逐条转述以上已经算出的相位与推运标志位，句子全部预先写在平台自撰的语料表里，"
+    "不署任何书名，不构成医疗、法律或财务建议，也不预测具体事件。"
     "移动层的落宫指该行运/推运/太阳弧之星落入本命十二宫的哪一宫。"
 )
 
@@ -198,6 +201,25 @@ def build_plain(
     ]
 
 
+def _transit_tables() -> list[ProvenanceTable]:
+    """`TRANSIT_OVERLAY_CONTENT_SOURCES` 的第一次被消费（AGENTS §7「读了就列」）。
+
+    复测（行号随本注一起漂，改动常量后重跑这条即得）：
+    `cd backend && grep -rn "TRANSIT_OVERLAY_CONTENT_SOURCES" app/ tests/ --include=*.py` → 定义在
+    `content/__init__.py:49`、本模块 import 一处（`:24`）、消费一处（本函数 `:309`），
+    测侧只有 `tests/content/test_transit_plain_corpus.py` 两颗钉与
+    `tests/test_transit_api.py` 的 `tables` 三行断言。
+    **golden 里刻意零命中**：它钉的是字面量清单（三个模块名逐字 + `len(tables) == 3`），
+    不 import 这个常量——否则登记表加行时测与被测同动，钉的只是「引擎如实复现登记」。
+    登记表自身那一半由上面那颗逐字钉负责。
+    引擎不在此另列表名、不抄书名（照 `engines/western.py:244-259` 的写法）。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in TRANSIT_OVERLAY_CONTENT_SOURCES
+    ]
+
+
 def compute_transits(
     *,
     birth_date: date,
@@ -296,5 +318,5 @@ def compute_transits(
         progression=progression,
         solar_arc=solar_arc,
         plain=plain,
-        provenance=TransitProvenance(engine="pyswisseph", note=NOTE),
+        provenance=TransitProvenance(engine="pyswisseph", note=NOTE, tables=_transit_tables()),
     )

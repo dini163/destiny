@@ -38,12 +38,6 @@ from app.content.synastry import SYNASTRY_SOURCE
 from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
-
-#: 今天只有 import、没有清单行：`TRANSIT_OVERLAY_CONTENT_SOURCES`（三行：`transit_plain` /
-#: `transit_plain_aspect` / `aspects_nature`）归 T25，那时行运响应才真的读到这两张白话表。
-#: 先把出处串接进来是为了让 T2-T24 的语料批与 T25 的清单行**共用同一个正主**——在清单行里
-#: 重抄一遍这串文案，就是给「同一条凭据有两个会漂的副本」开门（AGENTS §7 的诚实纪律）。
-#: 本行也因此是 `app/content/__init__.py` 里唯一一处「引而暂未用」的 import，别把它当孤儿删掉。
 from app.content.transit_plain import TRANSIT_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.western_plain import WESTERN_PLAIN_NOTE, WESTERN_PLAIN_SOURCE
@@ -55,6 +49,18 @@ from app.content.zhouyi_trigrams import ZHOUYI_TRIGRAMS_SOURCE
 from app.content.ziwei import ZIWEI_SOURCE
 from app.content.ziwei_plain import ZIWEI_PLAIN_SOURCE
 from app.core.provenance import MODEL_PARAM_SOURCE
+
+#: 行运一页真正读到的三张表：三层相位的白话表（600 条）、次限月亮与四轴的白话表（48 条）、
+#: 相位属性表。单列理由同 `WESTERN_CONTENT_SOURCES`：混进 `TRANSIT_CONTENT_SOURCES`
+#: 等于让**八字岁运**响应声称引用了西洋语料（那两个名字撞车，本名单必须与之分开维护）。
+#: 前两张共用 `TRANSIT_PLAIN_SOURCE`：它们是同一张自撰表的两半，串里讲的正是这两半共同做的事。
+#: 第三行用它自己的串：`aspects_nature` 讲的是通行归类不是自撰判语，共用那串等于把
+#: 「不署书名是因为没有古籍可引」的理由安到一张本来就不是判语的表上。
+TRANSIT_OVERLAY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("transit_plain", TRANSIT_PLAIN_SOURCE),
+    ("transit_plain_aspect", TRANSIT_PLAIN_SOURCE),
+    ("aspects_nature", ASPECT_NATURE_SOURCE),
+)
 
 CONTENT_VERSION = "2026.09"
 

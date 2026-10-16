@@ -17,11 +17,10 @@
 让别的系统吃上与自己无关的闸）。
 
 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/content/test_transit_plain_corpus.py -o addopts=""`。
-用例数 = **7×已落地条数 + 9**（每条键七道：共享契约、命名对账、结构事实、禁数字、越界具名、建议词、
-层名与日历词——两族同住第七道，整改轮 1 A2 折进门内而不开新 parametrize；另加九条单例）。
-T2 落地 30 条 ⇒ 219；T22 收尾 648 条 ⇒ 4545；T23 登记后 ⇒ 4549（那四条
-是本文件 `test_the_corpus_is_not_registered_while_batches_land` 换成登记钉之后新增的工厂侧用例，
-见该条 docstring）。
+用例数 = **7×已落地条数 + 12**（每条键七道：共享契约、命名对账、结构事实、禁数字、越界具名、建议词、
+层名与日历词——两族同住第七道，整改轮 1 A2 折进门内而不开新 parametrize；另加十二条单例）。
+T2 落地 30 条 ⇒ 219；T22 收尾 648 条 ⇒ 4545；T23 登记后 ⇒ 4548（删 `test_the_corpus_is_not_registered`
+那条、加四颗登记钉，净增 3；T25 再加两颗出处钉 ⇒ 4550）。
 """
 
 import re
@@ -637,3 +636,46 @@ def test_the_source_string_is_a_provenance_string_not_a_sentence() -> None:
     assert "自撰" in note, note
     assert "请求时不生成" in note, note
     assert "不预测具体事件" in note, note
+
+
+# ------------------------------------------------------- T25 出处登记（两颗钉）
+
+def test_the_provenance_tables_name_modules_that_exist_on_disk() -> None:
+    """`TRANSIT_OVERLAY_CONTENT_SOURCES` 的三个 name 各自对应 `app/content/<name>.py` 存在。
+
+    照 Plan F 的同名钉（`test_western_plain_corpus.py`）：登记表里写错一个模块名（拼错、改名
+    没同步），引擎会按它回显 `tables`，页面就声称读过一张不存在的表——AGENTS §7「只列真读过的
+    表」的反面。这颗钉让「登记了不存在的模块」在登记表这一侧就红，不用等响应。
+    """
+    from pathlib import Path
+
+    from app.content import TRANSIT_OVERLAY_CONTENT_SOURCES
+
+    content_dir = Path(__file__).resolve().parents[2] / "app" / "content"
+    names = [name for name, _source in TRANSIT_OVERLAY_CONTENT_SOURCES]
+    assert names == ["transit_plain", "transit_plain_aspect", "aspects_nature"], names
+    for name in names:
+        assert (content_dir / f"{name}.py").is_file(), name
+
+
+def test_the_registration_names_the_three_tables_in_the_declared_order() -> None:
+    """`TRANSIT_OVERLAY_CONTENT_SOURCES` 三行的字面序逐字节钉。
+
+    名单加/换行必须显式改这条——「登记表与引擎互相说谎」的机器防线：引擎 `_transit_tables()`
+    原样映射这份名单（`app/engines/transit.py`），响应 `provenance.tables` 的字面序由此而来，
+    api 测再钉一遍响应侧。两张自撰白话表共用 `TRANSIT_PLAIN_SOURCE`、属性表单独用
+    `ASPECT_NATURE_SOURCE`——前两行 source 逐字节相同是「同一张自撰表的两半」的形状证明。
+    """
+    from app.content import (
+        ASPECT_NATURE_SOURCE,
+        TRANSIT_OVERLAY_CONTENT_SOURCES,
+        TRANSIT_PLAIN_SOURCE,
+    )
+
+    rows = list(TRANSIT_OVERLAY_CONTENT_SOURCES)
+    assert [name for name, _source in rows] == ["transit_plain", "transit_plain_aspect", "aspects_nature"]
+    assert rows[0][1] == TRANSIT_PLAIN_SOURCE, rows[0]
+    assert rows[1][1] == TRANSIT_PLAIN_SOURCE, rows[1]
+    assert rows[0][1] == rows[1][1], "两张自撰白话表共用同一份出处串"
+    assert rows[2][1] == ASPECT_NATURE_SOURCE, rows[2]
+    assert rows[2][1] != rows[0][1], "属性表不是自撰判语，不得共用那串"

@@ -19,7 +19,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.western import WesternChart
 
 
@@ -110,6 +110,7 @@ class TransitProvenance(BaseModel):
 
     engine: str
     note: str
+    tables: list[ProvenanceTable] = Field(description="行运一页真正读到的三张表（自撰白话两半 + 相位属性表）。")
 
 
 class TransitChart(BaseModel):
