@@ -145,7 +145,7 @@ LAYER_IN_OPENER = {
 #: `set == universe` 只有 T23 之后才存在，而多建出来的键会漂到引擎永远不触发的位置上
 #: （spec §5.3），没人校对得到。
 ROSTER_TARGETS: dict[str, int] = {
-    "aspect": 585,
+    "aspect": 600,
     "progressed_moon_sign": 0,
     "progressed_moon_house": 0,
     "progressed_axis": 0,
@@ -501,9 +501,9 @@ def test_roster_counts_and_no_key_outside_universe() -> None:
 
     两道并一条是有意的：它们判的是同一件事的两面——多建的键一定落在 `universe()` 里或外面，
     只数数量会放过「族数对但键写歪」，只比全集会放过「全集内多建一条同族的键」。
-    当前数 = `aspect` **570 条**（移动星 Sun、Moon、Mercury 各整批十二个本命点 = 各 60 条；Mercury 那 60 条
+    当前数 = `aspect` **600 条**（移动星 Sun、Moon、Mercury 各整批十二个本命点 = 各 60 条；Mercury 那 60 条
     = T6-A/T6-B/T7-A/T7-B 四派 × 15，每派三个本命点，两派合起来才是「一批」；Venus 60 条 = T8-A（本命 Sun/Moon/Mercury）
-    + T8-B（本命 Venus/Mars/Jupiter）+ T9-A（本命 Saturn/Uranus/Neptune）+ T9-B（本命 Pluto/上升/天顶）四派 × 15；Mars 60 条 = T10-A（本命 Sun/Moon/Mercury）+ T10-B（本命 Venus/Mars/Jupiter）+ T11-A（本命 Saturn/Uranus/Neptune）+ T11-B（本命 Pluto/上升/天顶）四派 × 15，Mars 十二个本命点自此落齐；Jupiter 60 条 = T12-A（本命 Sun/Moon/Mercury）+ T12-B（本命 Venus/Mars/Jupiter）+ T13-A（本命 Saturn/Uranus/Neptune）+ T13-B（本命 Pluto/上升/天顶）四派 × 15，Jupiter 十二个本命点自此落齐；Saturn 60 条 = T14-A（本命 Sun/Moon/Mercury）+ T14-B（本命 Venus/Mars/Jupiter）+ T15-A（本命 Saturn/Uranus/Neptune）+ T15-B（本命 Pluto/上升/天顶）四派 × 15，Saturn 十二个本命点自此落齐；Uranus 60 条 = T16-A（本命 Sun/Moon/Mercury）+ T16-B（本命 Venus/Mars/Jupiter）+ T17-A（本命 Saturn/Uranus/Neptune）+ T17-B（本命 Pluto/上升/天顶）四派 × 15，Uranus 十二个本命点自此落齐；Neptune 60 条 = T18-A（本命 Sun/Moon/Mercury）+ T18-B（本命 Venus/Mars/Jupiter）+ T19-A（本命 Saturn/Uranus/Neptune）+ T19-B（本命 Pluto/上升/天顶）四派 × 15，Neptune 十二个本命点自此落齐；Pluto 30 条 = T20-A（本命 Sun/Moon/Mercury）+ T20-B（本命 Venus/Mars/Jupiter）两派 × 15，Pluto 内点六枚自此落齐、外点六枚 30 条归 T21），三族推运归 T22，所以是 0；`ROSTER_TARGETS` 只许改那一行的数字（通用循环 Step 3，本 docstring 跟着数走）。
+    + T8-B（本命 Venus/Mars/Jupiter）+ T9-A（本命 Saturn/Uranus/Neptune）+ T9-B（本命 Pluto/上升/天顶）四派 × 15；Mars 60 条 = T10-A（本命 Sun/Moon/Mercury）+ T10-B（本命 Venus/Mars/Jupiter）+ T11-A（本命 Saturn/Uranus/Neptune）+ T11-B（本命 Pluto/上升/天顶）四派 × 15，Mars 十二个本命点自此落齐；Jupiter 60 条 = T12-A（本命 Sun/Moon/Mercury）+ T12-B（本命 Venus/Mars/Jupiter）+ T13-A（本命 Saturn/Uranus/Neptune）+ T13-B（本命 Pluto/上升/天顶）四派 × 15，Jupiter 十二个本命点自此落齐；Saturn 60 条 = T14-A（本命 Sun/Moon/Mercury）+ T14-B（本命 Venus/Mars/Jupiter）+ T15-A（本命 Saturn/Uranus/Neptune）+ T15-B（本命 Pluto/上升/天顶）四派 × 15，Saturn 十二个本命点自此落齐；Uranus 60 条 = T16-A（本命 Sun/Moon/Mercury）+ T16-B（本命 Venus/Mars/Jupiter）+ T17-A（本命 Saturn/Uranus/Neptune）+ T17-B（本命 Pluto/上升/天顶）四派 × 15，Uranus 十二个本命点自此落齐；Neptune 60 条 = T18-A（本命 Sun/Moon/Mercury）+ T18-B（本命 Venus/Mars/Jupiter）+ T19-A（本命 Saturn/Uranus/Neptune）+ T19-B（本命 Pluto/上升/天顶）四派 × 15，Neptune 十二个本命点自此落齐；Pluto 60 条 = T20-A（本命 Sun/Moon/Mercury）+ T20-B（本命 Venus/Mars/Jupiter）+ T21-A（本命 Saturn/Uranus/Neptune）+ T21-B（本命 Pluto/上升/天顶）四派 × 15，Pluto 十二个本命点自此落齐，相位族 600/600 收尾），三族推运归 T22，所以是 0；`ROSTER_TARGETS` 只许改那一行的数字（通用循环 Step 3，本 docstring 跟着数走）。
     """
     from collections import Counter
 
