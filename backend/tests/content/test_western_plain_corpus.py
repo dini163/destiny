@@ -411,10 +411,10 @@ def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
     `KeyError` 是把「字典里确实没有这一键」写成不依赖取值路径的那一种。这一条是**给 Plan G/H 的握手件**
     ——他们登记时本条当场变红，逼那两次实施来改这一行并写下自己的裁定，而不是悄悄多一行
     （同 `test_plain_corpora.py::SECTIONLESS` 那条「例外要写得出名字」的机制）。
+    Plan G 的 T23 登记了 `transit`，故本条收缩为只钉 `vedic`——收缩而非删除，是因为它仍是 H 的握手件。
     """
-    for system in ("transit", "vedic"):
-        with pytest.raises(KeyError):
-            PLAIN_CORPORA[system]
+    with pytest.raises(KeyError):
+        PLAIN_CORPORA["vedic"]
 
 
 def test_the_provenance_tables_name_modules_that_exist_on_disk() -> None:

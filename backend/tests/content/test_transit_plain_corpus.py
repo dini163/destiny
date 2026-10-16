@@ -430,22 +430,66 @@ def test_the_self_pair_is_the_only_skipped_shape() -> None:
     assert skipped == mirrored, sorted(skipped ^ mirrored)
 
 
-def test_the_corpus_is_not_registered_while_batches_land() -> None:
-    """`TRANSIT` 今天**不许**在 `PLAIN_CORPORA` 里，而戊组的措辞闸今天就已经吃得到它。
+def test_the_corpus_is_registered_under_its_own_system_name() -> None:
+    """登记行在，且登记的对象就是本地门逐条跑过的那一个。
 
-    两半合一条是有原因的，它们是同一处形状的两侧：登记行若在 T2-T22 之间被顺手加上，工厂的
-    `set(entries) == universe()` 立刻红（语料还只建了一部分），于是有人会把**语料**改成假满用以
-    让工厂绿；而 `transit` 若从 `PREDICTION_GATED_SYSTEMS`（`tests/plain_wording.py:66`）里丢了，
-    本文件 `test_every_plain_text_meets_the_shared_factory_contract` 的 30 例会继续全绿而**一条
-    时态禁串也没查过**——那是这套东西最省事的假绿。两颗钉同进同退，才既拦早登记也拦漏分流。
-
-    T23 的处置：删掉第一半（`assert "transit" not in PLAIN_CORPORA`），换成 Plan F 那一对登记钉
-    （`"western" in PLAIN_CORPORA` 与 `PLAIN_CORPORA["western"] is WESTERN` 的行运版），并把
-    `test_western_plain_corpus.py:405-417` 那条「另两家未登记」的钉改写成只指 `vedic`。
+    `key == corpus.system` 这一条工厂自己也查（`test_plain_corpora.py:40-50`），但工厂查的是
+    「键与它指向的对象同值」，查不出「这张表整个不在字典里」——少一行时工厂只是用例变少，
+    全绿。所以同值这条必须在**这里**也钉一遍，两边的失败形状才互补。
     """
-    assert "transit" not in PLAIN_CORPORA, "登记行提前出现了：工厂的 set==universe 会从 T2 红到 T22"
-    assert "transit" in PREDICTION_GATED_SYSTEMS, "分流丢了：G31 十七串与 G36 八串会静默不查这 648 条"
+    assert "transit" in PLAIN_CORPORA, "登记行丢了：工厂从此静默不查这 648 条"
+    assert PLAIN_CORPORA["transit"] is TRANSIT, "登记的对象与本地门吃的不是同一个 corpus"
     assert TRANSIT.system == "transit", TRANSIT.system
+
+
+def test_the_wu_group_gates_are_routed_to_this_system() -> None:
+    """G31 与 G36 只对 `PREDICTION_GATED_SYSTEMS` 生效，所以「本家在名单里」本身就是一条门。
+
+    这一颗钉的不是登记，是**分流**：`wording_violations` 里那句 `if corpus.system in
+    PREDICTION_GATED_SYSTEMS` 一旦把 `transit` 丢掉（改名、拼错、或有人为了别的系统动这张表），
+    648 条会继续全绿而**一条时态禁串也没查过**——这是本期最省事的一条假绿，也是唯一能把它
+    抓出来的写法。648 这个数由下一颗钉现算，本条只管分流。
+    """
+    assert "transit" in PREDICTION_GATED_SYSTEMS
+
+
+def test_the_key_universe_is_the_declared_648_and_the_table_covers_it() -> None:
+    """键全集基数 648 与「已建集合 == 全集」两半并一条：批次期的 `⊆` 在这里补成 `==`。
+
+    `test_roster_counts_and_no_key_outside_universe` 断的是 `set(entries) <= universe()`，配合
+    花名册的四个数加起来是 648 才等价于全等；但那条只数**已建**，不数**应有**。工厂的
+    `test_entry_keys_mirror_the_source_tables_exactly` 登记后会查这一等式，可它依赖登记行本身
+    ——这颗钉把同一件事从「靠登记」里解出来，与上一颗同一个立意。基数与 `universe()` 的式子
+    都住在本计划偏差表与 T1 Step 4，不在这里重算。
+    """
+    universe = TRANSIT.universe()
+    assert len(universe) == 648, len(universe)
+    assert set(TRANSIT.entries) == universe, sorted(universe ^ set(TRANSIT.entries))[:12]
+
+
+def test_the_provenance_note_is_the_self_authored_declaration() -> None:
+    """出处 note：`FORBIDDEN` 全禁（含「；」）、禁书名、含「预先写在自撰语料表里」。
+
+    note 不进 `wording_violations`（工厂只遍历 `entries`/`openers`/`closers`），所以它的禁字由本条
+    自守——与 Plan F 那条同名钉（`test_western_plain_corpus.py:441`）同一个路子：
+    **不出现在遍历里的串，谁用谁自守**。「；」也禁：note 不是判语，门本来管不到它，但它要与
+    648 条判语**同屏印在同一个 `<p>` 里**，读者无法知道哪一句走哪套口径，两套口径在这里并成
+    一套（这是裁定，不是抄近路）。R50 三件事逐件钉关键词而不是整串逐字：整串逐字在 golden 里钉
+    （归 T25），本条要的是「日后有人改写这句时，诚实的那几点不许被改掉」。
+    """
+    from tests.plain_wording import FORBIDDEN
+
+    note = transit_plain.TRANSIT_PLAIN_NOTE
+    for token in FORBIDDEN:
+        assert token not in note, token
+    assert "；" not in note, note
+    assert "《" not in note and "依" not in note, note
+    assert "预先写在自撰语料表里" in note, note
+    assert "自撰" in note, note
+    assert "请求时不生成" in note, note
+    assert "不预测具体事件" in note, note
+    assert note.count("。") == 3, note
+    assert note.endswith("。"), note
 
 
 def test_the_key_builders_are_the_only_key_source() -> None:

@@ -408,4 +408,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     LENORMAND.system: LENORMAND,
     ZHOUYI.system: ZHOUYI,
     WESTERN.system: WESTERN,
+    TRANSIT.system: TRANSIT,
 }
