@@ -17,8 +17,8 @@
 让别的系统吃上与自己无关的闸）。
 
 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/content/test_transit_plain_corpus.py -o addopts=""`。
-用例数 = **7×已落地条数 + 12**（每条键七道：共享契约、命名对账、结构事实、禁数字、越界具名、建议词、
-层名与日历词——两族同住第七道，整改轮 1 A2 折进门内而不开新 parametrize；另加十二条单例）。
+用例数 = **7×已落地条数 + 14**（每条键七道：共享契约、命名对账、结构事实、禁数字、越界具名、建议词、
+层名与日历词——两族同住第七道，整改轮 1 A2 折进门内而不开新 parametrize；另加十四条单例）。
 T2 落地 30 条 ⇒ 219；T22 收尾 648 条 ⇒ 4545；T23 登记后 ⇒ 4548（删 `test_the_corpus_is_not_registered`
 那条、加四颗登记钉，净增 3；T25 再加两颗出处钉 ⇒ 4550）。
 """
