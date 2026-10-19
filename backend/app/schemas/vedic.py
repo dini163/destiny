@@ -11,6 +11,8 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
+from app.schemas.common import PlainSection
+
 #: How the UTC offset was resolved (shared convention with the Western chart).
 UtcOffsetSource = str
 
@@ -157,6 +159,10 @@ class VedicChart(BaseModel):
     planets: list[VedicPlanet] = Field(description="Nine grahas (Navagraha), sidereal.")
     rashis: list[RashiCell] = Field(description="Twelve signs in zodiac order, with occupants and house.")
     vimshottari: Vimshottari
+
+    plain: list[PlainSection] = Field(
+        description="页尾「白话详解」四段，序固定为 九曜落座 / 九曜落宫 / 星宿落点 / 现行大运与小运。"
+    )
 
     provenance: VedicProvenance
     engine: str = Field(default="pyswisseph")

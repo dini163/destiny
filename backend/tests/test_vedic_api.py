@@ -62,7 +62,7 @@ TOP_LEVEL_KEYS = {
     "lagna_degree_text", "lagna_nakshatra", "lagna_nakshatra_zh",
     "moon_sign", "moon_sign_zh", "moon_nakshatra", "moon_nakshatra_zh",
     "moon_nakshatra_lord", "moon_nakshatra_lord_zh", "moon_pada",
-    "planets", "rashis", "vimshottari", "provenance", "engine",
+    "planets", "rashis", "vimshottari", "plain", "provenance", "engine",
 }
 
 PLANET_KEYS = {
@@ -92,7 +92,7 @@ REQUEST_KEYS = {
 }
 
 KEY_SIZES = {
-    "TOP_LEVEL_KEYS": (TOP_LEVEL_KEYS, 29),
+    "TOP_LEVEL_KEYS": (TOP_LEVEL_KEYS, 30),
     "PLANET_KEYS": (PLANET_KEYS, 20),
     "RASHI_KEYS": (RASHI_KEYS, 7),
     "VIMSHOTTARI_KEYS": (VIMSHOTTARI_KEYS, 9),
@@ -114,7 +114,7 @@ FRONTEND_CHART_KEYS = {
     "lagna_degree_text", "lagna_nakshatra", "lagna_nakshatra_zh",
     "moon_sign", "moon_sign_zh", "moon_nakshatra", "moon_nakshatra_zh",
     "moon_nakshatra_lord", "moon_nakshatra_lord_zh", "moon_pada",
-    "planets", "rashis", "vimshottari", "provenance", "engine",
+    "planets", "rashis", "vimshottari", "plain", "provenance", "engine",
 }
 
 FRONTEND_PLANET_KEYS = {
@@ -210,7 +210,7 @@ def test_the_chart_comes_back_with_exactly_the_hand_written_contract(client: Tes
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 29  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
+    assert len(TOP_LEVEL_KEYS) == 30  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
     assert body["engine"] == "pyswisseph"  # 引擎名在两处出现，见出处那一条测
     assert body["zodiac"] == "sidereal"
     assert body["ayanamsa_name"] == "Lahiri (Chitrapaksha)"
@@ -610,3 +610,16 @@ def test_the_frontend_declares_no_field_the_response_never_sends(client: TestCli
         assert declared == frontend, f"{path} 的手写契约与前端抄本不同"
     assert TOP_LEVEL_KEYS == FRONTEND_CHART_KEYS
     assert REQUEST_KEYS == FRONTEND_REQUEST_KEYS
+
+
+def test_the_plain_block_arrives_in_the_declared_section_order(client: TestClient) -> None:
+    """响应 `plain` 四段标题字面序与行数（T9；`build_plain` 的发射序钉成 API 契约）。
+
+    `PAYLOAD` 与 golden 的 A 手同一张盘，所以行数同为 `[10, 10, 10, 3]`。这条与 golden
+    重复是刻意的：golden 直调引擎，本条走 HTTP 装配，两处一起红才说明问题不在传输层。
+    """
+    body = _body(client)
+    assert [section["title"] for section in body["plain"]] == [
+        "九曜落座", "九曜落宫", "星宿落点", "现行大运与小运"
+    ]
+    assert [len(section["text"].splitlines()) for section in body["plain"]] == [10, 10, 10, 3]

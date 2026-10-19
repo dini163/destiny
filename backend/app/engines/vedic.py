@@ -21,7 +21,7 @@ from datetime import date, datetime, time, timedelta
 
 import swisseph as swe
 
-from app.content import CONTENT_VERSION
+from app.content import CONTENT_VERSION, vedic_plain
 from app.content.vedic import (
     DASHA_ORDER,
     DASHA_SPANS_BY_ORDER,
@@ -38,7 +38,10 @@ from app.content.vedic import (
     pada_of,
 )
 from app.core.errors import EphemerisError
+from app.engines.plain_compose import compose
+from app.engines.plain_corpora import VEDIC
 from app.engines.western import _degree_in_sign, _format_degree, _normalize_longitude, _sign_index
+from app.schemas.common import PlainSection
 from app.schemas.vedic import (
     Antardasha,
     CurrentDasha,
@@ -209,6 +212,64 @@ def _vimshottari(base_dt: datetime, moon_longitude: float, target_date: date) ->
     )
 
 
+def build_plain(
+    *,
+    planets: list[VedicPlanet],
+    lagna_nakshatra: str,
+    current: CurrentDasha | None,
+) -> list[PlainSection]:
+    """按已经算出的九曜位置、宿位与现行主事星逐条选句，拼成页尾「白话详解」的四段。
+
+    只选句，不现编（`plain_compose.compose` 的立身规矩，也是 `VEDIC_PLAIN_NOTE` 那句
+    「请求时不生成任何中文」的唯一兑现点）。段的次序是产品决定，由
+    `tests/golden/test_vedic_golden.py::test_the_plain_block_is_four_sections_in_the_declared_order`
+    钉成字面量。
+
+    三个入参全是关键字：`plain` 是 `VedicChart` 的字段，装配时那个对象还没造出来
+    （与 `engines/transit.py::build_plain` 同形）。
+
+    去重只压**重复**不压内容：九曜可能落在同一宿（C 手实测 Krittika 两颗、D 手 Jyeshtha
+    与 Purva Ashadha 各两颗），大运与小运可能是同一颗主事星；逐条搬运会让同一句在同一段
+    里连说两三遍。命度宿与九曜宿取并集（A 手 9、B 手 10）。
+    """
+
+    def emit(section: str, keys: list[str]) -> PlainSection:
+        if not keys and section not in vedic_plain.VEDIC_NONE_BRANCHES:
+            # 崩而不静默：一张恒非空的段收不到键是编程错误。`dasha` 是唯一可达的空态。
+            raise ValueError(
+                f"vedic 段 {section!r} 收不到任何键，"
+                f"且它不在 VEDIC_NONE_BRANCHES 里：{vedic_plain.VEDIC_NONE_BRANCHES}"
+            )
+        opener = vedic_plain.VEDIC_NONE_BRANCHES[section] if not keys else section
+        return PlainSection(
+            title=vedic_plain.VEDIC_SECTION_TITLES[section],
+            text=compose(VEDIC, opener, [(key, 0) for key in keys]),
+        )
+
+    dasha_keys: list[str] = []
+    if current is not None:
+        dasha_keys.append(vedic_plain.dasha_lord_key(current.mahadasha_lord))
+        if current.antardasha_lord is not None:
+            dasha_keys.append(vedic_plain.dasha_lord_key(current.antardasha_lord))
+        dasha_keys = list(dict.fromkeys(dasha_keys))
+
+    nakshatras = list(
+        dict.fromkeys([planet.nakshatra for planet in planets] + [lagna_nakshatra])
+    )
+    return [
+        emit(
+            "gruha_sign",
+            [vedic_plain.gruha_sign_key(planet.name, planet.sign) for planet in planets],
+        ),
+        emit(
+            "gruha_house",
+            [vedic_plain.gruha_house_key(planet.name, planet.house) for planet in planets],
+        ),
+        emit("nakshatra", [vedic_plain.nakshatra_key(nakshatra) for nakshatra in nakshatras]),
+        emit("dasha", dasha_keys),
+    ]
+
+
 def compute_vedic_chart(
     *,
     birth_date: date,
@@ -279,6 +340,11 @@ def compute_vedic_chart(
 
     moon = next(p for p in planets if p.name == "Moon")
     vimshottari = _vimshottari(local_dt, moon.longitude, target_date)
+    plain = build_plain(
+        planets=planets,
+        lagna_nakshatra=lagna_nak.name_en,
+        current=vimshottari.current,
+    )
 
     return VedicChart(
         local_datetime=local_dt.strftime("%Y-%m-%d %H:%M"),
@@ -307,6 +373,7 @@ def compute_vedic_chart(
         planets=planets,
         rashis=rashis,
         vimshottari=vimshottari,
+        plain=plain,
         provenance=VedicProvenance(
             engine="pyswisseph", ayanamsa_name=_AYANAMSA_NAME,
             content_version=CONTENT_VERSION, source=VEDIC_SOURCE, note=NOTE,

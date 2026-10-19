@@ -35,8 +35,8 @@ Vimshottari 一侧的独立锚是**体系本身**：九曜值年 7·20·6·10·7
 都同意的定则；安塔尔大运按 `大运值年 × 该曜值年 ÷ 120` 切分，也全部手算得出。
 
 复测本文件测数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest
-tests/golden/test_vedic_golden.py -v` → 28 passed（2026-09-27 实录，原 12 项全留、只收紧，
-修复轮 1 另加一条在星上核 Chitrapaksha 定义的测）。
+tests/golden/test_vedic_golden.py -v` → 31 passed（2026-09-27 实录 28 项，原 12 项全留、只收紧，
+修复轮 1 另加一条在星上核 Chitrapaksha 定义的测；Plan H T9 追加三条）。
 """
 
 from datetime import date, datetime, time
@@ -771,3 +771,49 @@ def test_vedic_natal_requires_location(client: TestClient) -> None:
     )
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "invalid_birth_data"
+
+
+def test_the_plain_block_is_four_sections_in_the_declared_order() -> None:
+    """四段标题字面序 + 本盘实发行数（`build_plain` 的发射序钉成 golden 契约）。
+
+    A 手（J2000 正午格林尼治，目标日 2026-09-25）：落座 9、落宫 9、宿 9（命度宿
+    Ashwini 与水星同宿，九曜 + 命度去重后 9）、主事星 2 ⇒ 文本行 `[10, 10, 10, 3]`
+    （每段 1 条开篇句 + 条目数）。
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date,time; from app.engines.vedic import compute_vedic_chart as f; c=f(birth_date=date(2000,1,1),birth_time=time(12,0),latitude=51.4769,longitude=-0.0005,utc_offset_hours=0.0,target_date=date(2026,9,25)); print([len(s.text.splitlines()) for s in c.plain])"` → `[10, 10, 10, 3]`。
+    """
+    chart = _chart()
+    assert [section.title for section in chart.plain] == [
+        "九曜落座", "九曜落宫", "星宿落点", "现行大运与小运"
+    ]
+    assert [len(section.text.splitlines()) for section in chart.plain] == [10, 10, 10, 3]
+
+
+def test_the_dasha_none_branch_is_reachable_by_real_computation() -> None:
+    """`current is None` 不是构造出来的输入：1900-01-01 伦敦、目标日 2026-10-19 真算为空。
+
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date,time; from app.engines.vedic import compute_vedic_chart as f; c=f(birth_date=date(1900,1,1),birth_time=time(12,0),latitude=51.5074,longitude=-0.1278,utc_offset_hours=0.0,target_date=date(2026,10,19)); print(c.vimshottari.current)"` → `None`。
+    """
+    chart = compute_vedic_chart(
+        birth_date=date(1900, 1, 1),
+        birth_time=time(12, 0),
+        latitude=51.5074,
+        longitude=-0.1278,
+        utc_offset_hours=0.0,
+        target_date=date(2026, 10, 19),
+        ephemeris_path=None,
+    )
+    assert chart.vimshottari.current is None
+    assert chart.plain[3].title == "现行大运与小运"
+    assert len(chart.plain[3].text.splitlines()) == 1
+    assert chart.plain[3].text.splitlines()[0].startswith("目标日已经落在这一百二十年的运程之外")
+
+
+def test_every_plain_line_is_a_prewritten_corpus_line() -> None:
+    """每一行（含开篇句）都能在语料表里逐字找到：请求时不生成任何中文。"""
+    from app.engines.plain_corpora import VEDIC
+
+    known = set(VEDIC.entries.values()) | set(VEDIC.openers.values())
+    chart = _chart()
+    for section in chart.plain:
+        for line in section.text.splitlines():
+            assert line in known, line
