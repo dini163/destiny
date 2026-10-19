@@ -152,7 +152,7 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_moon_sign.Aquarius": "月亮走到水瓶座这一格，你离人群半步站着更自在，合群那套自己会做，做的时候心里仍留着一段距离。",
     "transit.progressed_moon_sign.Pisces": "月亮走到双鱼座这一格，你听人说话时容易听出弦外那层，接话慢半拍，慢下来的那半拍恰好接得住。",
     # 推运月亮落本命宫（12，1→12；宫号中文恰好＝键上那一宫，无星座/元素/形态词）
-    "transit.progressed_moon_house.1": "月亮移进本命第一宫，你把自己放到事情最前，旁人的招呼等一等再接，嘴里只讲自己的打算。",
+    "transit.progressed_moon_house.1": "月亮移进本命第一宫，你把自己放到事情最前，劲先往自己身上使，零碎的事等你舒展了再理。",
     "transit.progressed_moon_house.2": "月亮移进本命第二宫，你手头的东西开始算得清，进出的数自己心里有本账，账面上的安稳让你踏实。",
     "transit.progressed_moon_house.3": "月亮移进本命第三宫，你一句话刚落又接三句，路上听来的、书里看来的都带进话里，讲完还想拉着人再讲。",
     "transit.progressed_moon_house.4": "月亮移进本命第四宫，你往家里待的劲比出门足，屋里那点熟惯的声响让你安心，外头的热闹反倒隔了一层。",
@@ -177,8 +177,8 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_axis.ASC.Capricorn": "上升挪到摩羯座这一格，手里的活计你先码齐在案头，上头一桩收完了，手才伸向底下的第二桩。",
     "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你跟人之间有空当，多熟的人都不往跟前挤，旁人摸不准你，却愿意信你。",
     "transit.progressed_axis.ASC.Pisces": "上升挪到双鱼座这一格，你把话锋放缓，遇着迎面顶回来的事，你先由着它软一会儿再轻轻接住。",
-    "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外花的力气先落在起头，周全的话留到后头补，旁人提到你只说风风火火。",
-    "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，你对外立的是厚道，做实的部分才端出去，凡经你手的人都讲实在。",
+    "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外花的力气先落在起头，周全的话留到后头补，摊子支起来人才听见你的动静。",
+    "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，你对外立的是厚道，做实的部分才端出去，接手过的人都说你为人实在。",
     "transit.progressed_axis.MC.Gemini": "天顶挪到双子座这一格，你对外讲的东西活泛起来，见着什么人讲什么话，腔调也跟着人变。",
     "transit.progressed_axis.MC.Cancer": "天顶挪到巨蟹座这一格，跟你打过交道的人说，你头一句先问屋里的人吃饭没有，问完了才把别的事摆上桌。",
     "transit.progressed_axis.MC.Leo": "天顶挪到狮子座这一格，你对外拿出来的样子带了分量，走到台前不怯，旁人认你这副担当。",
@@ -186,7 +186,7 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_axis.MC.Libra": "天顶挪到天秤座这一格，谁递来的话你都先接住，不把哪一头压下去，往来的人因此服你一句公道。",
     "transit.progressed_axis.MC.Scorpio": "天顶挪到天蝎座这一格，你把对外的深浅往下压，要紧的东西攥在手里不松，旁人只见你护着它的架势。",
     "transit.progressed_axis.MC.Sagittarius": "天顶挪到射手座这一格，你对外指的方向往远处，先画大处再落细处，旁人跟着你往前看。",
-    "transit.progressed_axis.MC.Capricorn": "天顶挪到摩羯座这一格，场面里的人认你先看地基，一句多余的话不说，一层压一层往上垒到多高也只说还早。",
+    "transit.progressed_axis.MC.Capricorn": "天顶挪到摩羯座这一格，场面里的人先认你的地基，一句多余的话不说，一层压一层往上垒到多高也只说还早。",
     "transit.progressed_axis.MC.Aquarius": "天顶挪到水瓶座这一格，你对外走的路带点独，别人画好的圈你绕着走，一时看不明白，他们也愿意等你。",
     "transit.progressed_axis.MC.Pisces": "天顶挪到双鱼座这一格，你对外露出的边带着软，方向说到哪儿都不钉死，跟你来往的人不至于碰硬。",
 }
