@@ -107,8 +107,8 @@ TRANSIT_NONE_BRANCHES: dict[str, str] = {
 #: 开篇句与条目一样不吃 `CALENDAR_WORDS` 廿六串（本地门 `test_sections_and_openers_cover_the_declared_shape` 判）。
 #: 「推运」在 `progressed_*` 两句里
 #: 作为「推运盘」这一整体称呼出现是合法的——它是次限层在页面上的用户可见总称
-#: （`frontend/src/pages/TransitPage.tsx:252` 的「次限推运要点」、`:256` 的「推运太阴」、
-#: `:268` 的「推运上升/中天」），不是另一个层的名字。
+#: （`frontend/src/pages/TransitPage.tsx:264` 的「次限推运要点」、`:268` 的「推运太阴」、
+#: `:280` 的「推运上升/天顶」），不是另一个层的名字。
 TRANSIT_OPENERS: dict[str, str] = {
     "transit_aspect": "先说行运这一层：目标日那天的十颗星此刻压在你本命盘的哪些点上，下面逐条说的是那一天哪股力气被外面的天带动。",
     "transit_aspect_none": "行运这一层在目标日没有任何一条达到经典容许度的相位，这一段没有可逐条说的话，你本命盘的落座与宫位仍是它的事实。",

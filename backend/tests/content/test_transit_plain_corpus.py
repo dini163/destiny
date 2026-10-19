@@ -40,14 +40,14 @@ from tests.plain_wording import (
 PLANET_NAMES = [name for name, *_ in PLANETS]
 PLANET_ZH = [zh for _name, _glyph, zh, _swe in PLANETS]
 
-#: 两轴的中文名。字面与 `engines/transit.py:62` 的 `_AXIS_ZH` 同值（复测：`cd backend && grep -n "_AXIS_ZH = " app/engines/transit.py`）。
+#: 两轴的中文名。字面与 `engines/transit.py:76` 的 `_AXIS_ZH` 同值（复测：`cd backend && grep -n "_AXIS_ZH = " app/engines/transit.py`）。
 #: 对账钉住在本文件 `test_the_key_builders_are_the_only_key_source`（整改轮 1 B1 补上）：测试为对账
 #: 而 import 引擎私有量与生产模块的依赖方向（AGENTS §1）无关，`plain_corpora.py` 因此仍不引它。
 #: 整改前这里写的「一致性由 `tests/golden/test_transit_golden.py` 已有的轴对账钉守住」是假话——该文件
 #: 今天没有任何一条轴测（复测：`cd backend && grep -nEi "axis|上升|天顶" tests/golden/test_transit_golden.py` → 空输出）。
 AXIS_ZH = {"ASC": "上升", "MC": "天顶"}
 
-#: 行运一侧的「点名」全集 = 十星 + 两轴 = `_natal_points` 的十二枚（`app/engines/transit.py:108-114`：
+#: 行运一侧的「点名」全集 = 十星 + 两轴 = `_natal_points` 的十二枚（`app/engines/transit.py:122-128`：
 #: 十个行星点位再并上 `axis.name in _AXIS_ZH` 的两枚）。命名对账门吃这张表，移动侧与本命侧同表。
 POINT_ZH = [*PLANET_ZH, *AXIS_ZH.values()]
 
@@ -72,7 +72,7 @@ SIGN_TO_MODALITY = dict(zip(SIGNS, SIGN_MODALITY))
 #: 不在 648 的键式里（页面 `MovingPointTable` 印了它），白话不讲也不点名，于是读者不会
 #: 遇到「表格印了而白话漏了」的裂缝（与 Plan F 偏差 17 处理「宫头」同法）。
 #: `三合/对冲` 是另派的相位词，页面图例只有五个词（`src/lib/astro.ts:39-43`）；
-#: `中天` 是 `TransitPage.tsx:268` 那处待统一的说法，语料一律采 `AXIS_ZH` 的「天顶」。
+#: `中天` 是与 `AXIS_ZH` 并列的同义词；页面（`TransitPage.tsx:280`）已统一为「天顶」，语料沿用同一词。
 #: `计都/罗睺` 是吠陀交点名，防止把 H 的词汇提前写进 G。
 #: 复测条数：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import ast,pathlib; m=ast.parse(pathlib.Path('tests/content/test_transit_plain_corpus.py').read_text(encoding='utf-8')); print([len(n.value.elts) for n in m.body if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='OUT_OF_SCOPE_WORDS'])"` → [15]。
 OUT_OF_SCOPE_WORDS = (
@@ -96,8 +96,8 @@ _FORBIDDEN_FOR_TITLES = ("；", "（《", "』", "（", "）", "、")
 
 #: 一张表三层共用，所以层名是**开篇句的词**而不是条目的词（本文头注第一段与 spec 全局约束第二条）。
 #: 这四个串出现在任何一条条目里即红（G37）。第四个 `推运` 也禁：它是次限层在页面上的用户可见
-#: 总称（`frontend/src/pages/TransitPage.tsx:252`「次限推运要点」、`:256`「推运太阴」、`:268`
-#: 「推运上升/中天」——2026-10-07 按内容复测，派单引的 `schemas/transit.py:96` 那句 field description
+#: 总称（`frontend/src/pages/TransitPage.tsx:264`「次限推运要点」、`:268`「推运太阴」、`:280`
+#: 「推运上升/天顶」——2026-10-07 按内容复测，派单引的 `schemas/transit.py:96` 那句 field description
 #: 实为英文且不含「推运」，见本报告），条目写「推运月亮」就把次限层的名字偷带进了共享句。
 LAYER_WORDS = ("行运", "次限", "太阳弧", "推运")
 
@@ -197,7 +197,7 @@ def test_the_naming_reconciliation_holds(key) -> None:
 
     这一条同时管五件事，因为它们都是「键 vs 句子」的同一类谎言：
     ①点名（十星 + 两轴共十二枚）出现与否必须等于键所载——移动侧与本命侧**同表**，这是行运版
-      与本命版的第一个不同：`_natal_points` 的十二枚都能做本命点（`app/engines/transit.py:108-114`）；
+      与本命版的第一个不同：`_natal_points` 的十二枚都能做本命点（`app/engines/transit.py:122-128`）；
     ②星座中文名（十二个）：相位族与月亮落宫族键上没有，出现即红；
     ③宫号（`HOUSE_RE` 抓到的每一个）必须恰好是键上那一个——只有 `progressed_moon_house` 键上有；
     ④相位词恰好只等于键上那一个（五个词互相不是子串，所以能逐词判）；

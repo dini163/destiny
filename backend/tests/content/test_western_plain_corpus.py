@@ -420,7 +420,7 @@ def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
 def test_the_provenance_tables_name_modules_that_exist_on_disk() -> None:
     """`tables` 印的是**模块名**，读者可以拿去 grep；列一个不存在的模块就是假出处（AGENTS §7）。
 
-    工厂与架构门都不查这件事：架构门只 glob `content/western*.py` 存不存在（`test_architecture.py:210`），
+    工厂与架构门都不查这件事：架构门只 glob `content/western*.py` 存不存在（`test_architecture.py:212`），
     它对 `WESTERN_CONTENT_SOURCES` 里写错一个名字毫无感知。本条用 `Path` 查而不是 `importlib`，
     因为「模块能 import」不等于「它是这张表」——查文件名的那条 glob 与架构门用的那条同形，
     两边漂开时至少有一边红。

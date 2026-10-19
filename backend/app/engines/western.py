@@ -246,8 +246,8 @@ def _western_tables() -> list[ProvenanceTable]:
 
     复测（行号随本注一起漂，改动常量后重跑这条即得）：
     `cd backend && grep -rn "WESTERN_CONTENT_SOURCES" app/ tests/ --include=*.py` → 定义在
-    `content/__init__.py:165`、本模块 import 一处（`:20`）、消费一处（本函数 `:257`），
-    测侧只有 `tests/content/test_western_plain_corpus.py:411` 一处。
+    `content/__init__.py:179`、本模块 import 一处（`:20`）、消费一处（本函数 `:258`），
+    测侧只有 `tests/content/test_western_plain_corpus.py:420` 一处。
     **golden 里刻意零命中**：它钉的是字面量清单（三个模块名逐字 + `len(tables) == 3`），
     不 import 这个常量——否则登记表加行时测与被测同动，钉的只是「引擎如实复现登记」。
     登记表自身那一半由上面那条逐字钉负责。

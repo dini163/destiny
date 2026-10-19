@@ -180,7 +180,7 @@ def build_plain(
         # 是为了保住 `compose` 的签名形状，与其余九个系统的调用一致（F 的同一段注释）。
         if not keys and section not in TRANSIT_NONE_BRANCHES:
             # 崩而不静默：一张恒非空的段收不到键是编程错误，不是用户输入。理由与钉名见
-            # `engines/western.py:210-218` 的同一段注释（F 的 `999db61` 那颗钉的同类）。
+            # `engines/western.py:211-217` 的同一段注释（F 的 `999db61` 那颗钉的同类）。
             raise ValueError(
                 f"transit 段 {section!r} 收不到任何键，"
                 f"且它不在 TRANSIT_NONE_BRANCHES 里：{TRANSIT_NONE_BRANCHES}"
@@ -206,7 +206,7 @@ def _transit_tables() -> list[ProvenanceTable]:
 
     复测（行号随本注一起漂，改动常量后重跑这条即得）：
     `cd backend && grep -rn "TRANSIT_OVERLAY_CONTENT_SOURCES" app/ tests/ --include=*.py` → 定义在
-    `content/__init__.py:49`、本模块 import 一处（`:24`）、消费一处（本函数 `:309`），
+    `content/__init__.py:59`、本模块 import 一处（`:26`）、消费一处（本函数 `:219`），
     测侧只有 `tests/content/test_transit_plain_corpus.py` 两颗钉与
     `tests/test_transit_api.py` 的 `tables` 三行断言。
     **golden 里刻意零命中**：它钉的是字面量清单（三个模块名逐字 + `len(tables) == 3`），
