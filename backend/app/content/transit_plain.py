@@ -178,7 +178,7 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你跟人之间有空当，多熟的人都不往跟前挤，旁人摸不准你，却愿意信你。",
     "transit.progressed_axis.ASC.Pisces": "上升挪到双鱼座这一格，你把话锋放缓，遇着迎面顶回来的事，你先由着它软一会儿再轻轻接住。",
     "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外花的力气先落在起头，周全的话留到后头补，旁人提到你只说风风火火。",
-    "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，旁人提起你只说结实，凡经过你手的东西先把细处过完才肯点头，核过的才往外递。",
+    "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，你对外立的是厚道，做实的部分才端出去，凡经你手的人都讲实在。",
     "transit.progressed_axis.MC.Gemini": "天顶挪到双子座这一格，你对外讲的东西活泛起来，见着什么人讲什么话，腔调也跟着人变。",
     "transit.progressed_axis.MC.Cancer": "天顶挪到巨蟹座这一格，跟你打过交道的人说，你头一句先问屋里的人吃饭没有，问完了才把别的事摆上桌。",
     "transit.progressed_axis.MC.Leo": "天顶挪到狮子座这一格，你对外拿出来的样子带了分量，走到台前不怯，旁人认你这副担当。",
