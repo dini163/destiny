@@ -402,19 +402,14 @@ def test_the_key_universe_is_the_declared_542_and_the_table_covers_it() -> None:
     assert set(WESTERN.entries) == universe, sorted(universe ^ set(WESTERN.entries))[:12]
 
 
-def test_the_other_two_wu_systems_are_not_registered_by_this_plan() -> None:
-    """Plan F 只交付本命盘：`transit` 与 `vedic` 两键今天必须取不到。
+def test_the_wu_siblings_are_registered_under_their_own_systems() -> None:
+    """Plan F 只交付本命盘；`transit`（G）与 `vedic`（H）各自在登记表里。
 
-    用 `pytest.raises(KeyError)` 而不是 `PLAIN_CORPORA.get(system) is None`：后者在一行为
-    `{"transit": None}` 的占位行下**照样绿**，而 `not in` 在同一行下会红（实测 `'transit' not in
-    {"transit": None}` → `False`）——所以真正会假绿的是 `is None` 那一种，`not in` 已经够用，
-    `KeyError` 是把「字典里确实没有这一键」写成不依赖取值路径的那一种。这一条是**给 Plan G/H 的握手件**
-    ——他们登记时本条当场变红，逼那两次实施来改这一行并写下自己的裁定，而不是悄悄多一行
-    （同 `test_plain_corpora.py::SECTIONLESS` 那条「例外要写得出名字」的机制）。
-    Plan G 的 T23 登记了 `transit`，故本条收缩为只钉 `vedic`——收缩而非删除，是因为它仍是 H 的握手件。
+    F 交付时本条是 `pytest.raises(KeyError)` 的握手件；G 登记 `transit` 时收缩为只钉
+    `vedic`；H 登记 `vedic` 时翻成正向断言。翻面而不是删除：它仍要能在「登记行被误删」
+    时变红，只是红的方向从「不该在」变成「必须在」。
     """
-    with pytest.raises(KeyError):
-        PLAIN_CORPORA["vedic"]
+    assert PLAIN_CORPORA["vedic"].system == "vedic"
 
 
 def test_the_provenance_tables_name_modules_that_exist_on_disk() -> None:

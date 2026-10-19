@@ -219,13 +219,28 @@ def test_no_role_word_inside_an_entry(key) -> None:
     assert not problems, f"条目 {key}: {problems}"
 
 
-def test_the_corpus_is_not_registered_while_batches_land() -> None:
-    """T1-T7 刻意不登记；提前登记会让工厂的全等闸从第一批红到第七批。
-
-    `VEDIC` 对象与本地门吃的必须是同一个；登记行归 T8，届时本条删除、换成三颗登记钉。
-    """
-    assert "vedic" not in PLAIN_CORPORA, "登记行提前落地了：工厂会在语料建完前全等红"
+def test_the_corpus_is_registered_under_its_own_system_name() -> None:
+    """登记行在，且登记的对象就是本地门逐条跑过的那一个。"""
+    assert "vedic" in PLAIN_CORPORA, "登记行丢了：工厂从此静默不查这 252 条"
+    assert PLAIN_CORPORA["vedic"] is VEDIC, "登记的对象与本地门吃的不是同一个 corpus"
     assert VEDIC.system == "vedic", VEDIC.system
+
+
+def test_the_wu_group_gates_are_routed_to_this_system() -> None:
+    """G31 与 G36 只对 `PREDICTION_GATED_SYSTEMS` 生效，所以「本家在名单里」本身就是一条门。
+
+    这一颗钉的不是登记，是**分流**：谓词里的 `if corpus.system in PREDICTION_GATED_SYSTEMS`
+    一旦把 `vedic` 丢掉（改名、拼错、或有人为了别的系统动这张表），252 条会继续全绿而
+    一条时态禁串也没查过。
+    """
+    assert "vedic" in PREDICTION_GATED_SYSTEMS
+
+
+def test_the_key_universe_is_the_declared_252_and_the_table_covers_it() -> None:
+    """键全集基数 252 与「已建集合 == 全集」两半并一条：批次期的 ⊆ 在这里补成 ==。"""
+    universe = VEDIC.universe()
+    assert len(universe) == 252, len(universe)
+    assert set(VEDIC.entries) == universe, sorted(universe ^ set(VEDIC.entries))[:12]
 
 
 def test_roster_counts_and_no_key_outside_universe() -> None:
