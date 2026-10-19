@@ -70,7 +70,7 @@ ROLE_WORDS = ("大运", "小运", "安塔尔", "bhukti", "值年", "流年")
 #: 批次花名册：各族**已建**条数。T1 落座 36；T2 宿 27 + 主事星 9；T3/T4 落座到 108；
 #: T5-T7 落宫到 108。只许改这一行（通用循环 Step 3）。
 ROSTER_TARGETS: dict[str, int] = {
-    "gruha_sign": 36,
+    "gruha_sign": 72,
     "gruha_house": 0,
     "nakshatra": 27,
     "dasha_lord": 9,
