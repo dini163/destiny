@@ -20,6 +20,8 @@ from app.content import (
     zhouyi_plain,
     ziwei_plain,
 )
+from app.content import vedic_plain
+from app.content.vedic import GRAHAS, NAKSHATRAS, SIGNS_EN
 from app.content.bazi_dimensions import DIMENSION_RULES
 from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
 from app.content.kabbalah import DAATH, PATHS, SEPHIROTH
@@ -392,6 +394,41 @@ TRANSIT = PlainCorpus(
     # `keep` 分支不看符号，所以 `items` 的符号位一律传 `0`——这条形状写在 spec 裁定 R48）。
     grouping="keep",
     universe=_transit_universe,
+)
+
+
+def _vedic_universe() -> set[str]:
+    """吠陀键全集 = spec §5.3 那四行键式，基数全部从 content 现算。
+
+    252 = 108（9 曜 × 12 座）+ 108（9 曜 × 12 宫）+ 27（宿）+ 9（主事星）。
+    宿键与主事星键都**不乘曜数**：一宿服务九曜 + 命度，一颗主事星服务大运与小运
+    （`vedic_plain` 头注的「一张表服务多行」）。复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import VEDIC; print(len(VEDIC.universe()))"` → 252。
+    """
+    grahas = [graha.name for graha in GRAHAS]
+    return (
+        {vedic_plain.gruha_sign_key(graha, sign) for graha, sign in product(grahas, SIGNS_EN)}
+        | {
+            vedic_plain.gruha_house_key(graha, house)
+            for graha, house in product(grahas, range(1, 13))
+        }
+        | {vedic_plain.nakshatra_key(nak.name_en) for nak in NAKSHATRAS}
+        | {vedic_plain.dasha_lord_key(graha) for graha in grahas}
+    )
+
+
+#: 吠陀白话的登记表：252 条自撰判语（spec 裁定 R46/R47/R48，与 WESTERN/TRANSIT 同一条
+#: 诚实形状）。**从 T1 到 T7 刻意不进 `PLAIN_CORPORA`，登记行在 T8 补上**——提前登记会让
+#: 工厂的 `set(entries) == universe()` 从 T1 红到 T7。那七批的口径由
+#: `tests/content/test_vedic_plain_corpus.py` 逐条守着；「早登记」与「漏分流」两侧由同文件的
+#: `test_the_corpus_is_not_registered_while_batches_land` 一颗钉守住。
+VEDIC = PlainCorpus(
+    system="vedic",
+    entries=vedic_plain.VEDIC_READINGS,
+    openers=vedic_plain.VEDIC_OPENERS,
+    closers=None,
+    grouping="keep",
+    universe=_vedic_universe,
 )
 
 

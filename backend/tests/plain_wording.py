@@ -43,6 +43,20 @@ VERDICT_TOKENS: tuple[str, ...] = ("宜", "忌", "吉", "凶")
 #: `tests/content/test_qimen_plain_corpus.py::test_no_retelling_borrows_the_source_tables_orientation_word`）。
 NON_ADVICE_FORMS: tuple[str, ...] = ("对应", "反应", "适应")
 
+#: 按系统分域的**具名非决策词**：完整的专名撞上 G36 的决策词时，先抹掉这个专名再跑禁串。
+#: 今天的唯一成员是吠陀二十七宿里的「百药」（`app/content/vedic.py` 的 `NAKSHATRAS`，
+#: `Shatabhisha`）——它是宿名，不是药材或决策。掩码的边界刻意写成两条：
+#: ①只抹**完整词形**（裸「药」仍红；把「百药」拆开写仍红）；
+#: ②只对列出的系统生效（同一个串在别的系统下仍红）。三条都由本节的本地自测钉住。
+NON_DECISION_FORMS: dict[str, tuple[str, ...]] = {"vedic": ("百药",)}
+
+
+def mask_non_decision_forms(system: str, text: str) -> str:
+    """抹掉该系统的具名非决策词，返回可跑禁串的文本。"""
+    for form in NON_DECISION_FORMS.get(system, ()):
+        text = text.replace(form, "")
+    return text
+
 #: 戊组三系统（西洋本命 / 行运 / 吠陀）的时态门：本期出处口径是**平台自撰**（spec 裁定 R46），
 #: 没有古籍可挡在句子前面，所以「这句在替用户预告事件」这一类必须由机器兜住最刺眼的一段。
 #: 用户 2026-10-04 的第 4 条裁定把它写成硬要求（spec §7 G31）。清单**可增不可减**，减要走裁定。
@@ -95,8 +109,9 @@ def wording_violations(corpus, key: str) -> list[str]:
         if token in text:
             violations.append(f"FORBIDDEN 禁字「{token}」")
     if corpus.system in PREDICTION_GATED_SYSTEMS:
+        gated_text = mask_non_decision_forms(corpus.system, text)
         for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN:
-            if token in text:
+            if token in gated_text:
                 violations.append(f"戊组禁字「{token}」")
     if is_slot_key(corpus, key):
         if not text.strip():
@@ -139,8 +154,9 @@ def frame_violations(system: str, text: str) -> list[str]:
         if token in text:
             violations.append(f"FORBIDDEN 禁字「{token}」")
     if system in PREDICTION_GATED_SYSTEMS:
+        gated_text = mask_non_decision_forms(system, text)
         for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN:
-            if token in text:
+            if token in gated_text:
                 violations.append(f"戊组禁字「{token}」")
     if len(text) < 20:
         violations.append(f"框架句 {len(text)} 字，不足 20 字")
@@ -149,6 +165,12 @@ def frame_violations(system: str, text: str) -> list[str]:
     if "你" not in text:
         violations.append("框架句缺「你」")
     return violations
+
+
+def test_non_decision_forms_are_scoped_and_narrow() -> None:
+    assert mask_non_decision_forms("vedic", "百药这一宿") == "这一宿"
+    assert mask_non_decision_forms("western", "百药这一宿") == "百药这一宿"
+    assert mask_non_decision_forms("vedic", "百药与药") == "与药"
 
 
 def test_advice_hits_masks_named_word_forms() -> None:
