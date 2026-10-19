@@ -71,7 +71,7 @@ ROLE_WORDS = ("大运", "小运", "安塔尔", "bhukti", "值年", "流年")
 #: T5-T7 落宫到 108。只许改这一行（通用循环 Step 3）。
 ROSTER_TARGETS: dict[str, int] = {
     "gruha_sign": 108,
-    "gruha_house": 72,
+    "gruha_house": 108,
     "nakshatra": 27,
     "dasha_lord": 9,
 }
