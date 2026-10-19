@@ -175,7 +175,7 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_axis.ASC.Scorpio": "上升挪到天蝎座这一格，你给人的印象带着一层深，轻易不把底露出来，旁人知道你藏着话但不敢问。",
     "transit.progressed_axis.ASC.Sagittarius": "上升挪到射手座这一格，你露出来的样子是直来直去的那面，话往宽处说，旁人觉得你敞亮。",
     "transit.progressed_axis.ASC.Capricorn": "上升挪到摩羯座这一格，你给人的第一面是沉得住的那样，话少事稳，旁人把要紧的事愿意托给你。",
-    "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你身侧留着松快的余地，再熟的人你不往跟前凑，旁人摸不准你，却愿意信你。",
+    "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你跟人之间有空当，熟到怎样都不往跟前挤，旁人摸不准你，却愿意信你。",
     "transit.progressed_axis.ASC.Pisces": "上升挪到双鱼座这一格，你给人的样子带着一层软的边，旁人说到一半就愿意把话交给你接住。",
     "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外那条路往快处走，先起头再补周全，旁人看着你觉得风风火火。",
     "transit.progressed_axis.MC.Taurus": "天顶挪到金牛座这一格，你对外立住的那副样子是稳的，一件事做到实在处才肯拿出去，急不来。",
