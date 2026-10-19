@@ -72,8 +72,8 @@ ROLE_WORDS = ("大运", "小运", "安塔尔", "bhukti", "值年", "流年")
 ROSTER_TARGETS: dict[str, int] = {
     "gruha_sign": 36,
     "gruha_house": 0,
-    "nakshatra": 0,
-    "dasha_lord": 0,
+    "nakshatra": 27,
+    "dasha_lord": 9,
 }
 
 _FORBIDDEN_FOR_TITLES = ("；", "（《", "』", "（", "）", "、")
