@@ -86,7 +86,7 @@ ANTARDASHA_KEYS = {"lord", "lord_zh", "glyph", "start_date", "end_date", "years"
 CURRENT_KEYS = {
     "target_date", "mahadasha_lord", "mahadasha_lord_zh", "antardasha_lord", "antardasha_lord_zh",
 }
-PROVENANCE_KEYS = {"engine", "ayanamsa_name", "content_version", "source", "note"}
+PROVENANCE_KEYS = {"engine", "ayanamsa_name", "content_version", "source", "note", "tables"}
 REQUEST_KEYS = {
     "birth_date", "birth_time", "city", "latitude", "longitude", "utc_offset_hours", "target_date",
 }
@@ -99,7 +99,7 @@ KEY_SIZES = {
     "MAHADASHA_KEYS": (MAHADASHA_KEYS, 8),
     "ANTARDASHA_KEYS": (ANTARDASHA_KEYS, 7),
     "CURRENT_KEYS": (CURRENT_KEYS, 5),
-    "PROVENANCE_KEYS": (PROVENANCE_KEYS, 5),
+    "PROVENANCE_KEYS": (PROVENANCE_KEYS, 6),
 }
 
 # ------------------------------------------------------------------ 前端声明（手抄）
@@ -144,7 +144,7 @@ FRONTEND_CURRENT_KEYS = {
     "target_date", "mahadasha_lord", "mahadasha_lord_zh", "antardasha_lord", "antardasha_lord_zh",
 }
 
-FRONTEND_PROVENANCE_KEYS = {"engine", "ayanamsa_name", "content_version", "source", "note"}
+FRONTEND_PROVENANCE_KEYS = {"engine", "ayanamsa_name", "content_version", "source", "note", "tables"}
 
 FRONTEND_REQUEST_KEYS = {
     "birth_date", "birth_time", "city", "latitude", "longitude", "utc_offset_hours", "target_date",
@@ -523,7 +523,8 @@ def test_provenance_names_the_frame_the_spans_and_the_no_fortune_clause(client: 
         assert declared in source, declared
     note = provenance["note"]
     for declared in ("恒星黄道", "整宫制", "不含天王、海王、冥王三王星",
-                     "计都·金星·太阳·太阴·火星·罗睺·木星·土星·水星", "未作任何主观吉凶"):
+                     "计都·金星·太阳·太阴·火星·罗睺·木星·土星·水星",
+                     "预先写在自撰语料表里", "不预测具体事件"):
         assert declared in note, declared
 
 
@@ -623,3 +624,17 @@ def test_the_plain_block_arrives_in_the_declared_section_order(client: TestClien
         "九曜落座", "九曜落宫", "星宿落点", "现行大运与小运"
     ]
     assert [len(section["text"].splitlines()) for section in body["plain"]] == [10, 10, 10, 3]
+
+
+def test_the_provenance_declares_exactly_the_three_vedic_tables(client: TestClient) -> None:
+    """`provenance.tables` 三行按 `VEDIC_CONTENT_SOURCES` 的字面序回显（T10）。
+
+    序以名单为准，两边必须一致——这里钉的是「响应如实回显登记」，登记表自身那一半由
+    本地门 `test_the_provenance_registration_names_the_three_tables_in_order` 负责。
+    """
+    body = _body(client)
+    tables = body["provenance"]["tables"]
+    assert [table["name"] for table in tables] == ["vedic", "vedic_plain", "vedic_plain_gruha"]
+    assert len(tables) == 3
+    assert all(table["version"] for table in tables)
+    assert len({table["version"] for table in tables}) == 1

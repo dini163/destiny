@@ -3,6 +3,8 @@
  * `backend/app/schemas/vedic.py`. snake_case is preserved end-to-end.
  */
 
+import type { PlainSection, ProvenanceTable } from './common';
+
 /** How the UTC offset was resolved (shared convention with the Western chart). */
 export type UtcOffsetSource = 'explicit' | 'longitude_approximation';
 
@@ -110,6 +112,7 @@ export interface VedicProvenance {
   content_version: string;
   source: string;
   note: string;
+  tables: ProvenanceTable[];
 }
 
 /** Complete Vedic (sidereal) natal chart with the Vimshottari timeline. */
@@ -146,6 +149,8 @@ export interface VedicChart {
   planets: VedicPlanet[];
   rashis: RashiCell[];
   vimshottari: Vimshottari;
+
+  plain: PlainSection[];
 
   provenance: VedicProvenance;
   engine: string;

@@ -10,6 +10,8 @@ import type { BirthInputValues } from '../components/ui/InputBar';
 import { ChineseDateField } from '../components/ui/DateTimeField';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useVedic } from '../hooks/useVedic';
 import { CHART_STYLES } from '../lib/vedic';
@@ -180,6 +182,16 @@ function VedicResults({ chart }: { chart: VedicChart }) {
         <DashaTimeline vimshottari={chart.vimshottari} />
       </ResultCard>
 
+      <ResultCard
+        title="白话详解"
+        eyebrow="PLAIN READING"
+        icon="sparkle"
+        actions={<span className="label-caps text-ink-muted">四段 · 逐条转述已算出的落座、落宫、宿与主事星</span>}
+        elevated
+      >
+        <PlainSectionList sections={chart.plain} />
+      </ResultCard>
+
       <Provenance chart={chart} />
     </>
   );
@@ -248,6 +260,7 @@ function Provenance({ chart }: { chart: VedicChart }) {
         </span>
         <span className="text-xs text-ink-muted">星盘与大运仅供文化参考，不构成任何决策建议。</span>
       </div>
+      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }

@@ -11,7 +11,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 
 #: How the UTC offset was resolved (shared convention with the Western chart).
 UtcOffsetSource = str
@@ -123,6 +123,9 @@ class VedicProvenance(BaseModel):
     content_version: str
     source: str
     note: str
+    tables: list[ProvenanceTable] = Field(
+        description="吠陀一页真正读到的三张表（恒星盘语料 + 自撰白话两半）。"
+    )
 
 
 class VedicChart(BaseModel):

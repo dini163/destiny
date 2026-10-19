@@ -21,7 +21,7 @@ from datetime import date, datetime, time, timedelta
 
 import swisseph as swe
 
-from app.content import CONTENT_VERSION, vedic_plain
+from app.content import CONTENT_VERSION, VEDIC_CONTENT_SOURCES, vedic_plain
 from app.content.vedic import (
     DASHA_ORDER,
     DASHA_SPANS_BY_ORDER,
@@ -41,7 +41,7 @@ from app.core.errors import EphemerisError
 from app.engines.plain_compose import compose
 from app.engines.plain_corpora import VEDIC
 from app.engines.western import _degree_in_sign, _format_degree, _normalize_longitude, _sign_index
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.vedic import (
     Antardasha,
     CurrentDasha,
@@ -54,13 +54,14 @@ from app.schemas.vedic import (
 )
 
 NOTE = (
-    "吠陀占星用恒星黄道（Sidereal），以 Lahiri（Chitrapaksha）岁差把热带黄经减去约 23–24° 得恒星黄经；"
+    "吠陀占星用恒星黄道（Sidereal），以 Lahiri（Chitrapaksha）岁差把热带黄经减去约 23–24° 得恒星黄经。"
     "分宫采整宫制（一星座即一宫），以命度（Lagna，恒星上升点）所在星座为第一宫顺布十二宫。"
     "九曜（Navagraha）为日、月、火、水、木、金、土，加罗睺（北交点）与计都（南交点，罗睺对冲 180°），"
     "不含天王、海王、冥王三王星。每曜定其所在 27 宿（Nakshatra，各 13°20'）与四足（pada）。"
     "Vimshottari 大运以太阴（月亮）所在宿起运：该宿守护曜为第一大运主，其于出生时的剩余年数按太阴已行过该宿的比例折算，"
-    "此后九曜依固定序（计都·金星·太阳·太阴·火星·罗睺·木星·土星·水星）值年，共 120 年；每大运再分九个安塔尔大运（bhukti）。"
-    "行星黄经、命度与岁差皆由瑞士星历实时计算，大运按标准值年数确定性排布，未作任何主观吉凶或个人运势的虚构演绎。"
+    "此后九曜依固定序（计都·金星·太阳·太阴·火星·罗睺·木星·土星·水星）值年，共 120 年。"
+    "每大运再分九个安塔尔大运（bhukti）。行星黄经、命度与岁差皆由瑞士星历实时计算，大运按标准值年数确定性排布，"
+    "句子全部预先写在自撰语料表里，请求时不生成任何中文，也不预测具体事件。"
 )
 
 _AYANAMSA_NAME = "Lahiri (Chitrapaksha)"
@@ -210,6 +211,18 @@ def _vimshottari(base_dt: datetime, moon_longitude: float, target_date: date) ->
         mahadashas=mahadashas,
         current=current,
     )
+
+
+def _vedic_tables() -> list[ProvenanceTable]:
+    """`VEDIC_CONTENT_SOURCES` 的第一次被消费（AGENTS §7「读了就列」）。
+
+    三行就是端点真读过的三张表：恒星盘语料，加自撰白话的两半（同一张表、两种键面）。
+    表名与版本集中在 `content/__init__.py`，本函数只做搬运，不另立清单。
+    """
+    return [
+        ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
+        for module, source in VEDIC_CONTENT_SOURCES
+    ]
 
 
 def build_plain(
@@ -377,5 +390,6 @@ def compute_vedic_chart(
         provenance=VedicProvenance(
             engine="pyswisseph", ayanamsa_name=_AYANAMSA_NAME,
             content_version=CONTENT_VERSION, source=VEDIC_SOURCE, note=NOTE,
+            tables=_vedic_tables(),
         ),
     )

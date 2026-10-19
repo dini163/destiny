@@ -40,6 +40,7 @@ from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.transit_plain import TRANSIT_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
+from app.content.vedic_plain import VEDIC_PLAIN_SOURCE
 from app.content.western_plain import WESTERN_PLAIN_NOTE, WESTERN_PLAIN_SOURCE
 from app.content.zhouyi_hexagrams import ZHOUYI_HEXAGRAMS_SOURCE
 from app.content.zhouyi_najia import ZHOUYI_NAJIA_SOURCE
@@ -223,11 +224,15 @@ KABBALAH_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kabbalah_plain", KABBALAH_PLAIN_SOURCE),
 )
 
-#: 吠陀占星一页真正读到的一张表：恒星黄道十二星座、九曜（Navagraha）、27 宿
-#: （Nakshatra，各含守护曜与主神）与 Vimshottari 大运值年序。单列理由同
+#: 吠陀占星一页真正读到的三张表：恒星黄道十二星座、九曜（Navagraha）、27 宿
+#: （Nakshatra，各含守护曜与主神）与 Vimshottari 大运值年序；外加自撰白话表的两半
+#: （落座/宿/主事星与落宫分住 `vedic_plain`、`vedic_plain_gruha`，同一张自撰表的两半，
+#: 与行运页的 `TRANSIT_OVERLAY_CONTENT_SOURCES` 同形）。单列理由同
 #: `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它们。
 VEDIC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("vedic", VEDIC_SOURCE),
+    ("vedic_plain", VEDIC_PLAIN_SOURCE),
+    ("vedic_plain_gruha", VEDIC_PLAIN_SOURCE),
 )
 
 #: 西洋合盘一页真正读到的三张表：相契度赋分权重（相位基准分、核心羁绊强调、
