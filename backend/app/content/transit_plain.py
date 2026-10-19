@@ -174,7 +174,7 @@ TRANSIT_PROGRESSION_READINGS: dict[str, str] = {
     "transit.progressed_axis.ASC.Libra": "上升挪到天秤座这一格，开口之前先替人求个平字，话不往急处说，气头上你先咽下去，缓一缓再讲。",
     "transit.progressed_axis.ASC.Scorpio": "上升挪到天蝎座这一格，话到嘴边你先掂轻重，掂轻了的顺嘴说走，掂重的压在舌根底下不往外翻。",
     "transit.progressed_axis.ASC.Sagittarius": "上升挪到射手座这一格，你绕开的话直着说，说完也不回头补，补的工夫不如省下来往前走。",
-    "transit.progressed_axis.ASC.Capricorn": "上升挪到摩羯座这一格，手里的活计你一件一件码齐，头一件收了口，后一件才伸一只手去接。",
+    "transit.progressed_axis.ASC.Capricorn": "上升挪到摩羯座这一格，手里的活计你先码齐在案头，上头一桩收完了，手才伸向底下的第二桩。",
     "transit.progressed_axis.ASC.Aquarius": "上升挪到水瓶座这一格，你跟人之间有空当，多熟的人都不往跟前挤，旁人摸不准你，却愿意信你。",
     "transit.progressed_axis.ASC.Pisces": "上升挪到双鱼座这一格，你把话锋放缓，遇着迎面顶回来的事，你先由着它软一会儿再轻轻接住。",
     "transit.progressed_axis.MC.Aries": "天顶挪到白羊座这一格，你对外那条路往快处走，先起头再补周全，旁人看着你觉得风风火火。",
