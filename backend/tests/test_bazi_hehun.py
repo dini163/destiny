@@ -27,6 +27,9 @@ from app.content.bazi_hehun_rules import (
 )
 from app.content.bazi_nayin import nayin_meaning
 from app.content.hehun_plain import (
+    HEHUN_AXIS_FRAME,
+    HEHUN_COMPLEMENT_FRAME,
+    HEHUN_SCORE_FRAME,
     HEHUN_SECTION_TITLES,
     HEHUN_SYNC_KEYS,
     HEHUN_TONE_KEYS,
@@ -45,11 +48,13 @@ from app.engines.bazi_hehun import (
     YONGSHEN_QUADRANT,
     YONGSHEN_QUADRANTS,
     YONGSHEN_VIEWS,
+    _SYNC_ORDER,
     GroupMember,
     HehunAxisRange,
     HehunAxisWindow,
     HehunChartPair,
     _best_aligned_segment,
+    _sign_sums,
     axis_segments,
     axis_sync,
     axis_window,
@@ -91,10 +96,13 @@ from app.engines.plain_compose import num, reading
 from app.engines.plain_corpora import HEHUN
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_hehun import (
+    AxisSync,
     BaziHehunRequest,
     BaziHehunResult,
     HehunAxis,
+    HehunAxisRow,
     HehunAxisSegment,
+    HehunAxisSide,
     HehunProfile,
 )
 from app.schemas.common import Gender
@@ -1385,6 +1393,22 @@ def test_the_axis_length_default_has_exactly_one_home() -> None:
     assert BaziHehunRequest(male=MALE_PROFILE, female=SAME_PROFILE).axis_years == 21
 
 
+def _slot_value(line: str, frame: str, name: str) -> str:
+    """按框架常量里 `{name}` 的位置，从渲染好的句子里取出该槽**实际印进去**的那一串。
+
+    拿框架本身当尺（而不是把句子里的连接词重抄一遍进测）是评审轮 M-5「字面量重抄」的解法：
+    槽前槽后那两段字面量只长在 `content/hehun_plain.py` 里，抄一份到测里就有第二套口径，
+    语料改一个字这条测会以「找不到锚点」的形态红，而不是悄悄空转。
+    取到的必须是**这一段**而不是「整句里有没有」——后者在 `plus == minus` 的那一页
+    根本分不开加减两边（评审轮 I-1）。
+    """
+    head, tail = frame.split("{" + name + "}", 1)
+    prefix = head.split("}")[-1]
+    suffix = tail.split("{")[0]
+    start = line.index(prefix) + len(prefix)
+    return line[start : line.index(suffix, start)]
+
+
 def test_the_plain_block_is_three_sections_in_the_declared_order() -> None:
     result = compute_hehun(
         male=MALE_PROFILE, female=SAME_PROFILE,
@@ -1394,58 +1418,217 @@ def test_the_plain_block_is_three_sections_in_the_declared_order() -> None:
     assert len(result.plain) == 3
 
 
-def test_the_plain_block_quotes_the_corpus_and_the_ledger() -> None:
+@pytest.mark.parametrize(
+    "female",
+    [SAME_PROFILE, COMPLEMENT_PROFILE],
+    ids=["plus-equals-minus", "plus-not-minus"],
+)
+def test_the_plain_block_quotes_the_corpus_and_fills_its_slots(female: HehunProfile) -> None:
+    """白话节逐字引用语料 + 分数、两个合计、三档计数**按位置**入槽（评审轮 I-1 / M-1 的前一半）。
+
+    槽值在这里由测自己从 `score.factors` 复算，不借装配用的 `_sign_sums`：借了就等于拿被钉的那份
+    实现当尺，实现把返回值顺序写反（评审席 3a 号变异）测也跟着改，永远绿。
+    两页夹具都是它的牙：`plus == minus` 那一页上「加减对调」这类假实现印出的句子一模一样，
+    `97 / 59` 那一页才分得开（数字复测见下一条的 docstring）；而袋子式的 `in` 判定在两页上都
+    分不开，所以这里一律按位置取数（评审轮 I-1 给的两种改法里，取强的那一种）。
+    """
     result = compute_hehun(
-        male=MALE_PROFILE, female=SAME_PROFILE,
+        male=MALE_PROFILE, female=female,
         reference_date=date(2026, 9, 22), axis_years=1,
     )
     first, second, third = (section.text for section in result.plain)
     frame_line, tone_line = first.split("\n")
-    assert tone_line == reading(HEHUN, HEHUN_TONE_KEYS[result.score.tier])
-    assert num(result.score.value) in frame_line
-    plus = round(sum(f.delta for f in result.score.factors if f.delta > 0), 2)
-    minus = round(sum(-f.delta for f in result.score.factors if f.delta < 0), 2)
-    assert num(plus) in frame_line and num(minus) in frame_line
-    assert plus - minus == result.score.value          # spec §4.3 的截断行不变式
-    assert plus >= HEHUN_BASE                          # 起点那一笔只进加的这一边（round 2 A 改的注释理由）
+    assert tone_line == reading(HEHUN, HEHUN_TONE_KEYS[result.score.tier])   # 档位句逐字取语料
+    plus = round(sum(factor.delta for factor in result.score.factors if factor.delta > 0), 2)
+    minus = round(sum(-factor.delta for factor in result.score.factors if factor.delta < 0), 2)
+    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "value") == num(result.score.value)
+    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "plus") == num(plus)
+    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "minus") == num(minus)
     assert "\n" not in second                       # 本节一行，不硬凑第二行（spec §5.2）
     assert result.nayin.phrase in second            # 三字生克句逐字入槽，不在别处重述
     assert second.count("。") == 1
-    for view in result.complement.views:            # 两视角的 补 / 阙 格五行逐个真出现在句子里
-        for cell in view.cells:
-            if cell.name in ("补", "阙"):
-                assert all(element.element in second for element in cell.elements)
+    third_line = third.split("\n")[0]
+    band_counts = Counter(row.sync for row in result.axis.rows)
+    # 三个计数槽与 `_SYNC_ORDER` 三档一一对位（评审席指出 {aligned}/{half}/{apart} 三槽无人钉）。
+    # 守卫 `len` 是为了将来加第四档时这条先红，而不是 `zip` 静默少钉一槽。
+    assert len(_SYNC_ORDER) == 3
+    for slot, band in zip(("aligned", "half", "apart"), _SYNC_ORDER):
+        assert _slot_value(third_line, HEHUN_AXIS_FRAME, slot) == num(band_counts[band])
+
+
+@pytest.mark.parametrize(
+    "female",
+    [SAME_PROFILE, COMPLEMENT_PROFILE],
+    ids=["plus-equals-minus", "plus-not-minus"],
+)
+def test_the_ledger_identity_is_pinned_on_both_sum_pages(female: HehunProfile) -> None:
+    """`plus − minus == value` 与 `plus >= HEHUN_BASE` 这两条账本构造等式，钉在装配取数的那一侧。
+
+    正主是 `build_ledger`（`app/schemas/scoring.py:46`，复测：
+    `cd backend && grep -n "def build_ledger" app/schemas/scoring.py`），本仓已有两处钉它：
+    `tests/test_scoring.py::test_ledger_clamps_to_range_and_records_the_clamp`（合成 contributions，
+    跨系统）与 `tests/content/test_hehun_plain_corpus.py::test_score_samples_obey_the_ledger_identity`
+    （三组手写样例槽值）。这一条与它们**有意重复**，理由是它钉的不是同一件事：
+    框架句里的两个合计取的是 `_sign_sums(score.factors)` 的返回值顺序，那条路径在以上两处之外，
+    把它的 `return minus, plus` 写反只有本条的第二页会红（评审席 3a 号变异，`63 passed` 就是
+    缺这一口的现场）。删掉它 = 装配那半边重新变回无人看。
+
+    两页各钉一边（现跑复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_hehun import _sign_sums, compute_hehun; from tests.test_bazi_hehun import COMPLEMENT_PROFILE, MALE_PROFILE, SAME_PROFILE; print([_sign_sums(compute_hehun(male=MALE_PROFILE, female=q, reference_date=date(2026, 9, 22), axis_years=1).score.factors) for q in (SAME_PROFILE, COMPLEMENT_PROFILE)])"`
+    → `[(89.0, 89.0), (97.0, 59.0)]`）：第一页两边相等，任何「加减对调」在它身上都印出同一句话；
+    第二页 `value = 38.0` 由 97 − 59 而来，对调后等式成了 `59 − 97 == 38` ⇒ 直接红。
+    """
+    result = compute_hehun(
+        male=MALE_PROFILE, female=female,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    frame_line = result.plain[0].text.split("\n")[0]
+    plus, minus = _sign_sums(result.score.factors)
+    assert num(plus) in frame_line and num(minus) in frame_line
+    assert plus - minus == result.score.value, f"{plus} - {minus} != {result.score.value}"
+    assert plus >= HEHUN_BASE                        # 起点那一笔只进加的这一边（round 2 A 定的注释理由）
 
 
 def test_the_complement_frame_says_who_gives_to_whom() -> None:
-    """J-T1 评审轮 C1 的机器半边：句子里「坤递过来」那一组确实是 `viewer == "male"` 的 补 格。
+    """J-T1 评审轮 C1 的机器半边：句子里「坤递过来」那一组确实是 `viewer == "male"` 的 补 格，
+    「乾想要而坤给不出」那一组确实是**同一视角**的 阙 格（评审轮 M-2 补上的后半句）。
 
     象限纵轴是**观看方**的喜忌、横轴量**对方**盘的旺弱（`engines/bazi_hehun.py:_one_view_facts`），
     所以「乾这一侧看过去，坤递过来的那组」只能落在 `views["male"]` 的 补 格上。框架门只数槽名，
     看不见主语与宾语的先后——这两行是把 J-T1 写在常量旁那条尺搬到机器侧。
+    全文件只有这一条允许把主语那几句字面量抄进锚点串，因为要被钉住的就是主语与格位的对应。
+
+    成员判定改按**槽位**，不再用「整句里找得到这个字」的袋子判定（旧写法两处空转，评审席 1b 号
+    变异即由此漏过）：坤视角的 补 格在这一页是空的，`all(… in second …)` 在空集合上恒真；而乾视角
+    阙 格那枚 土 即便被改取坤视角的金，纳音三字句「木克土」也还会把 土 留在句子里。
+    先 `assert` 格在、内容非空（这一页乾造两格各有 1 枚，复测见下），再逐元素比内容。
     """
     result = compute_hehun(
         male=MALE_PROFILE, female=SAME_PROFILE,
         reference_date=date(2026, 9, 22), axis_years=1,
     )
-    male_view = next(view for view in result.complement.views if view.viewer == "male")
-    give = "、".join(
-        element.element for cell in male_view.cells if cell.name == "补" for element in cell.elements
-    ) or "没有"
-    assert f"坤递过来的那组五行是 {give}，乾想要而坤给不出的是" in result.plain[1].text
+    second = result.plain[1].text
+    views = {view.viewer: view for view in result.complement.views}
+    cells = {
+        viewer: {cell.name: cell for cell in views[viewer].cells if cell.name in ("补", "阙")}
+        for viewer in ("male", "female")
+    }
+    for viewer in ("male", "female"):
+        assert set(cells[viewer]) == {"补", "阙"}, viewer
+    give_cell, thin_cell = cells["male"]["补"], cells["male"]["阙"]
+    assert give_cell.elements and thin_cell.elements  # 本页两格都非空 ⇒ 下面的逐元素比对不空转
+    # 这一页的四格内容从这几行起由本测自己钉死（乾视角 补=金、阙=土；坤视角 补=空、阙=金——
+    # 后者由下面那条 `assert not cells["female"]["补"].elements` 钉）。语料或取数一改即红；复跑：
+    # cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest -q -o addopts="" \
+    #   tests/test_bazi_hehun.py -k says_who_gives_to_whom
+    give = [element.element for element in give_cell.elements]
+    thin = [element.element for element in thin_cell.elements]
+    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_give").split("、") == give
+    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_thin").split("、") == thin
+    give_str, thin_str = "、".join(give), "、".join(thin)
+    assert f"坤递过来的那组五行是 {give_str}，乾想要而坤给不出的是 {thin_str}，" in second
+    # 反方向那一半同样按视角钉：坤视角的 补 格为空，句子必须印「没有」而不是留下空格。
+    assert not cells["female"]["补"].elements
+    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_give") == "没有"
+    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_thin") == "、".join(
+        element.element for element in cells["female"]["阙"].elements
+    )
 
 
 def test_the_third_section_names_the_dominant_sync_band() -> None:
+    """第三节收尾的那句散文 = 三档里命中最多的那一档的句子（评审轮 M-5：档位表用生产常量）。
+
+    三档次序取 `app.engines.bazi_hehun._SYNC_ORDER`（`:850`，复测：
+    `cd backend && grep -n "_SYNC_ORDER: tuple" app/engines/bazi_hehun.py`），不在测里重抄
+    三个字面量——将来加第四档时重抄那份会悄悄漏掉它。
+    平局口径是实现事实，写在测里也钉不住：`sorted(_SYNC_ORDER, key=lambda name: -counts[name])`
+    是稳定排序，计数相同者按 `_SYNC_ORDER` 的**前列**优先，今天即偏 同频；本夹具这一页是
+    1 / 0 / 0（唯一最大值），所以这一支没有可钉的页，平局那半边由上面那条 tie 测在纯函数上钉。
+    """
     result = compute_hehun(
         male=MALE_PROFILE, female=SAME_PROFILE,
         reference_date=date(2026, 9, 22), axis_years=1,
     )
     frame_line, tone_line = result.plain[2].text.split("\n")
     counts = Counter(row.sync for row in result.axis.rows)
-    dominant = sorted(("同频", "半同步", "背离"), key=lambda name: -counts[name])[0]
+    dominant = sorted(_SYNC_ORDER, key=lambda name: -counts[name])[0]
     assert tone_line == reading(HEHUN, HEHUN_SYNC_KEYS[dominant])
     for year in (result.axis.start_year, result.axis.end_year):
         assert num(year) in frame_line
+
+
+def _axis_row(year: int, sync: AxisSync) -> HehunAxisRow:
+    """纯函数入参用的最小轴行：`_best_aligned_segment` 只读 `year` 与 `sync` 两个字段。
+
+    与下面两条测手搭的 `HehunAxisSegment` 同一性质（评审席 Nit-3 已裁定：函数入参不是假响应，
+    AGENTS §9 管的是「不许造假响应体」），其余字段给的是合法占位值，不参与判据。
+    """
+    side = HehunAxisSide(value=50.0, tier="平", dayun="戊午", dayun_start_age=30)
+    return HehunAxisRow(year=year, ganzhi="戊午", male=side, female=side, gap=0.0, sync=sync)
+
+
+def test_the_axis_ruler_counts_the_aligned_rows_inside_each_segment() -> None:
+    """段选择判据的另一支（评审轮 I-2）：**非平局**时段内 `同频` 行多的取胜，与年份先后无关。
+
+    上面那条 tie 测喂的是 `rows=()`，只走平局那一支，「数 同频 取 max」这一支今天无人看：
+    把生产 `bazi_hehun.py:873` 的计数band `同频` 改成 `半同步`，改前 63 条全绿（评审席 4 号变异）。
+    这里 同频 行全落在最后一段 ⇒ 判据必须返回最后一段；改成数 `半同步` 后三段的计数变成
+    1 / 0 / 0 ⇒ 返回最早那段 ⇒ 本测红。band 名在这里**必须**写成字面量：从 `_SYNC_ORDER` 取
+    就等于跟着实现一起漂移，那一刀照样绿。
+    """
+    segments = [
+        HehunAxisSegment(start_year=2026, end_year=2027, label="乾第一段／坤第一段"),
+        HehunAxisSegment(start_year=2028, end_year=2029, label="乾第二段／坤第二段"),
+        HehunAxisSegment(start_year=2030, end_year=2031, label="乾第三段／坤第三段"),
+    ]
+    rows = [_axis_row(2030, "同频"), _axis_row(2031, "同频"), _axis_row(2026, "半同步")]
+    best = _best_aligned_segment(segments, rows)
+    assert (best.start_year, best.end_year) == (2030, 2031)
+
+
+def test_the_third_section_prints_the_segment_the_ruler_picks() -> None:
+    """第三节那对年份 = 「段内 同频 行最多、平局取最早」这条判据在**本页真实段表**上选出的段。
+
+    评审轮 I-2 的改法要求「不许把期望年份写成硬编码常数」，所以判据在测里按 `result.axis`
+    的段表与逐年 `sync` 值独立复算一遍（升序 + 逐段计数 + `max` 取首个最大值 = 平局取最早），
+    再与 `{best_start}` / `{best_end}` 两槽按位置比。这是对 `_best_aligned_segment` 那条判据的
+    **有意重述**（三行尺，写在 `content/hehun_plain.py` 的 `HEHUN_AXIS_FRAME` 头注里）：
+    直接调生产的 `_best_aligned_segment` 只能钉住装配把返回值印进了句子，钉不住判据本身——
+    评审席 4 号变异正是打在这一层，重抄判据才有牙。
+    分辨力三条守卫（缺一条本测就退化成「钉住今天这一页」）：最大值唯一（⇒ 取胜靠计数不靠平局
+    次序）、赢的那段不是最早那段、且它确实数到了 同频 行。
+    轴长取 21（默认值，`BaziHehunRequest.axis_years`）而不是其它几条用的 1：只有长轴才切得出
+    多段。这一页段表五段、各段 同频 行计数 4 / 1 / 5 / 1 / 1 ⇒ 赢的是 2034-2042 那段。
+    数字复测（同频 ⟺ `gap <= HEHUN_SYNC_CLOSE`，见 `axis_sync`，命令写成 ASCII 只为绕开 GBK 控制台）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.content.bazi_hehun_rules import HEHUN_SYNC_CLOSE; from app.engines.bazi_hehun import compute_hehun; from tests.test_bazi_hehun import MALE_PROFILE, SAME_PROFILE; r = compute_hehun(male=MALE_PROFILE, female=SAME_PROFILE, reference_date=date(2026, 9, 22), axis_years=21); print([(s.start_year, s.end_year, sum(1 for x in r.axis.rows if x.gap <= HEHUN_SYNC_CLOSE and s.start_year <= x.year <= s.end_year)) for s in r.axis.segments])"`
+    → `[(2026, 2032, 4), (2033, 2033, 1), (2034, 2042, 5), (2043, 2043, 1), (2044, 2046, 1)]`。
+    """
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=21,
+    )
+    segments = sorted(result.axis.segments, key=lambda segment: segment.start_year)
+    aligned_counts = {
+        (segment.start_year, segment.end_year): sum(
+            1
+            for row in result.axis.rows
+            if row.sync == "同频" and segment.start_year <= row.year <= segment.end_year
+        )
+        for segment in segments
+    }
+    assert len(segments) > 1
+    expected = max(
+        segments, key=lambda segment: aligned_counts[(segment.start_year, segment.end_year)]
+    )
+    best_count = aligned_counts[(expected.start_year, expected.end_year)]
+    assert sum(1 for count in aligned_counts.values() if count == best_count) == 1  # 最大值唯一
+    assert best_count > 0
+    assert (expected.start_year, expected.end_year) != (
+        segments[0].start_year,
+        segments[0].end_year,
+    )
+    frame_line = result.plain[2].text.split("\n")[0]
+    assert _slot_value(frame_line, HEHUN_AXIS_FRAME, "best_start") == num(expected.start_year)
+    assert _slot_value(frame_line, HEHUN_AXIS_FRAME, "best_end") == num(expected.end_year)
 
 
 def test_the_axis_ruler_gives_the_earliest_segment_on_a_tie() -> None:
