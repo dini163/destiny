@@ -39,7 +39,7 @@ from app.content.name_numerology import NUMBERS
 from app.content.name_sancai import SANCAI_RELATIONS
 from app.content.qimen import EIGHT_DOORS, EIGHT_GODS, NINE_STARS
 from app.content.synastry import SYNASTRY_CORE_BONDS
-from app.content.ziwei import MAJOR_STARS, MINOR_STARS, SIHUA_LABELS
+from app.content.ziwei import MAJOR_STARS, MINOR_STARS, SIHUA_LABELS, ZHI
 from app.engines.plain_compose import PlainCorpus
 
 # `plain_corpora → engines/western` 是 `engines → engines`，AGENTS.md §1 只禁 `engines → api`，
@@ -188,16 +188,18 @@ KABBALAH = PlainCorpus(
 
 
 def _ziwei_universe() -> set[str]:
-    """紫微的键全集 = 14 主星 + 14 乙级 + 4 四化标记 = 32。
+    """紫微的键全集 = 14 主星 + 14 乙级 + 4 四化标记 + 12 整盘 = 44。
 
     宫名不在这里：十二宫的一句是小节开篇句不是条目（G22），出现在 entries 里就是
-    同一个宫在同一段说两遍。条数复测：`cd backend && PYTHONIOENCODING=utf-8
-    .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZIWEI; print(len(ZIWEI.universe()))"` → 32。
+    同一个宫在同一段说两遍。整盘条目的键用地支而不是宫名——盘面宫名随命宫滚，地支
+    不动（`content/ziwei.py` 的 `ZHI`）。条数复测：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZIWEI; print(len(ZIWEI.universe()))"` → 44。
     """
     return (
         {ziwei_plain.star_key(name) for name in MAJOR_STARS}
         | {ziwei_plain.star_key(name) for name in MINOR_STARS}
         | {ziwei_plain.sihua_key(label) for label in SIHUA_LABELS}
+        | {ziwei_plain.overall_key(zhi) for zhi in ZHI}
     )
 
 

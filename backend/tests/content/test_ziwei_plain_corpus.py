@@ -6,20 +6,24 @@
    == set(PALACE_NAMES)`（R31：工厂只验 openers 非空，漏一个宫就有一宫只剩星句）；
 ④ 转述对账（G14）：主星句必须把 `nature` 的字逐个搬进来、把 `element`/`yin_yang`/
    `group` 三样写实；⑤ 结论词整表扫（G24：白话比卡巴拉口径更严，六字全禁，
-   只准抹具名的四化名相）；⑥ 44 句两两互异——工厂按键查覆盖，撞句它看不见。
+   只准抹具名的四化名相）；⑥ 56 句两两互异——工厂按键查覆盖，撞句它看不见。
 """
 
-from app.content.ziwei import MAJOR_STARS, MINOR_STARS, PALACE_NAMES, SIHUA_LABELS
+from app.content.ziwei import MAJOR_STARS, MINOR_STARS, PALACE_NAMES, SIHUA_LABELS, ZHI
 from app.content.ziwei_plain import (
+    ZIWEI_LUCK_FRAME,
+    ZIWEI_MING_FRAME,
+    ZIWEI_OVERALL_READINGS,
     ZIWEI_PALACE_OPENERS,
     ZIWEI_PLAIN_SOURCE,
     ZIWEI_READINGS,
+    overall_key,
     sihua_key,
     star_key,
 )
 from app.engines.plain_compose import reading
 from app.engines.plain_corpora import PLAIN_CORPORA, ZIWEI
-from tests.plain_wording import NON_ADVICE_FORMS, advice_hits
+from tests.plain_wording import NON_ADVICE_FORMS, advice_hits, frame_violations
 
 #: 四化名相是本表唯一需要抹除的词形：`化忌` 里那个「忌」是名相的一部分，不是建议
 #: （G24 的具名登记）。除它以外一个字都不放宽——草稿全表实测不需要第二条（复测见
@@ -50,14 +54,15 @@ def test_ziwei_corpus_is_the_row_the_factory_iterates() -> None:
     assert ZIWEI.slot_prefixes == frozenset()
 
 
-def test_universe_is_fourteen_major_plus_fourteen_minor_plus_four_sihua() -> None:
+def test_universe_is_fourteen_major_plus_fourteen_minor_plus_four_sihua_plus_twelve_overall() -> None:
     assert len(MAJOR_STARS) == 14 and len(MINOR_STARS) == 14
     assert ZIWEI.universe() == (
         {f"ziwei.star.{name}" for name in MAJOR_STARS}
         | {f"ziwei.star.{name}" for name in MINOR_STARS}
         | {f"ziwei.sihua.{label}" for label in SIHUA_LABELS}
+        | {f"ziwei.overall.{zhi}" for zhi in ZHI}
     )
-    assert len(ZIWEI.universe()) == 32
+    assert len(ZIWEI.universe()) == 44
     # 主星与乙级不得有同名星：有的话键集会撞掉一格而条数不变，工厂照样绿。
     assert not (set(MAJOR_STARS) & set(MINOR_STARS))
 
@@ -68,14 +73,14 @@ def test_openers_are_exactly_the_twelve_palace_names() -> None:
     assert set(ZIWEI.openers) == set(PALACE_NAMES)
 
 
-def test_all_forty_four_sentences_are_mutually_distinct() -> None:
-    """44 句（32 转述 + 12 开篇）必须两两不同：golden 的两处位置断言
+def test_all_fifty_six_sentences_are_mutually_distinct() -> None:
+    """56 句（44 转述 + 12 开篇）必须两两不同：golden 的两处位置断言
     （`lines.index(...)` 找星句、段内文本反查回键）都以「一句只对应一个键」为前提，
     而工厂只按**键**查覆盖，撞句它看不见——两句同文只是两个宫说了同一句话，条数照旧。
     """
     texts = [*ZIWEI_READINGS.values(), *ZIWEI_PALACE_OPENERS.values()]
-    assert len(texts) == 44
-    assert len(set(texts)) == 44
+    assert len(texts) == 56
+    assert len(set(texts)) == 56
 
 
 def test_every_star_and_sihua_key_resolves_through_the_assembler() -> None:
@@ -127,3 +132,52 @@ def test_source_line_declares_which_rows_are_self_held() -> None:
     assert "自持" in ZIWEI_PLAIN_SOURCE, "乙级类象/四化词义属自持词表，串里不写就是冒充源表转述"
     for token in FORBIDDEN:
         assert token not in ZIWEI_PLAIN_SOURCE, token
+
+
+# --- 全盘总论 12 条 + 两句动态框架（批次一 spec §5） --------------------------------
+
+def test_overall_table_covers_all_twelve_ziwei_palaces() -> None:
+    assert set(ZIWEI_OVERALL_READINGS) == {overall_key(zhi) for zhi in ZHI}
+    assert len(ZIWEI_OVERALL_READINGS) == 12
+
+
+def test_each_overall_entry_starts_with_ziwei_and_names_all_fourteen_stars_once() -> None:
+    """逐颗点名是事实门：十二盘的位置由 `ZIWEI_SERIES`/`TIANFU_SERIES` 现算，
+    这里只钉「每一颗都在句子里且只出现一次」；配对本身由 golden 的引擎侧盘面反查。"""
+    for zhi in ZHI:
+        text = ZIWEI_OVERALL_READINGS[overall_key(zhi)]
+        assert text.startswith(f"紫微在{zhi}"), zhi
+        for name in MAJOR_STARS:
+            assert text.count(name) == 1, (zhi, name, text.count(name))
+
+
+def test_overall_entries_never_name_a_palace() -> None:
+    """宫名只归动态段：静态气象句一旦报宫名，同一格会在页面上被说两遍（R12）。"""
+    for key, text in ZIWEI_OVERALL_READINGS.items():
+        for name in PALACE_NAMES:
+            assert name not in text, (key, name)
+
+
+def test_overall_entries_carry_no_advice() -> None:
+    for key, text in ZIWEI_OVERALL_READINGS.items():
+        assert advice_hits(text) == [], (key, advice_hits(text))
+
+
+def test_the_two_dynamic_frames_meet_the_frame_contract() -> None:
+    ming = ZIWEI_MING_FRAME.format(
+        ming_zhi="未", ming_stars="紫微", career_stars="天府",
+        travel_stars="太阴", wealth_stars="武曲",
+    )
+    luck = ZIWEI_LUCK_FRAME.format(
+        wuxing_ju="木三局", start_age=3, shen_gong="迁移", year_gan="庚",
+        lu="太阳", quan="武曲", ke="太阴", ji="天同", direction="逆行",
+    )
+    assert frame_violations("ziwei", ming) == []
+    assert frame_violations("ziwei", luck) == []
+
+
+def test_universe_is_forty_four_and_sentences_are_fifty_six_distinct() -> None:
+    assert len(ZIWEI.universe()) == 44
+    texts = list(ZIWEI.entries.values()) + list(ZIWEI.openers.values())
+    assert len(texts) == 56
+    assert len(set(texts)) == 56
