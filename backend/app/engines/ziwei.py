@@ -15,6 +15,7 @@ algorithms reproduce the published 安紫微诀 tables (e.g. 火六局 初一→
 from datetime import date, time
 
 from app.content import CONTENT_VERSION, ZIWEI_CONTENT_SOURCES, ZIWEI_SOURCE, ziwei_plain
+from app.content.ziwei_plain import ZIWEI_LUCK_FRAME, ZIWEI_MING_FRAME, overall_key
 from app.content.bazi_nayin import nayin_meaning
 from app.content.ziwei import (
     GAN,
@@ -38,9 +39,9 @@ from app.content.ziwei import (
     ZIWEI_SERIES,
 )
 from app.engines.bazi_moment import resolve_natal_moment
-from app.engines.plain_compose import compose
+from app.engines.plain_compose import compose, overview, reading
 from app.engines.plain_corpora import ZIWEI
-from app.schemas.common import CalendarType, Gender, ProvenanceTable
+from app.schemas.common import CalendarType, Gender, PlainSection, ProvenanceTable
 from app.schemas.ziwei import (
     Palace,
     SiHuaInfo,
@@ -196,6 +197,41 @@ def compute_ziwei_chart(
     # `app/schemas/bazi_liuri.py:64`。闰与否的机器字段另有 `lunar_leap`。
     lunar_date = f"{year_ganzhi}年{month_cn}月{day_cn}"
 
+    def stars_at(zhi_index: int) -> str:
+        names = [name for name in STAR_ORDER if placements[name] == zhi_index]
+        return "、".join(names) if names else "空宫"
+
+    plain = [
+        PlainSection(
+            title="全盘气象",
+            text=reading(ZIWEI, overall_key(ZHI[ziwei_index])),
+        ),
+        PlainSection(
+            title="命宫与三方四正",
+            text=overview(ZIWEI_MING_FRAME, {
+                "ming_zhi": ZHI[ming_index],
+                "ming_stars": stars_at(ming_index),
+                "career_stars": stars_at((ming_index + 4) % 12),
+                "travel_stars": stars_at((ming_index + 6) % 12),
+                "wealth_stars": stars_at((ming_index + 8) % 12),
+            }),
+        ),
+        PlainSection(
+            title="运限与四化",
+            text=overview(ZIWEI_LUCK_FRAME, {
+                "wuxing_ju": ju_name,
+                "start_age": str(ju_number),
+                "shen_gong": palace_name(shen_index),
+                "year_gan": year_gan,
+                "lu": lu,
+                "quan": quan,
+                "ke": ke,
+                "ji": ji,
+                "direction": "顺行" if forward else "逆行",
+            }),
+        ),
+    ]
+
     return ZiweiChart(
         name=name,
         gender=gender.value,
@@ -224,6 +260,7 @@ def compute_ziwei_chart(
         tianfu_zhi=ZHI[tianfu_index],
         palaces=palaces,
         sihua=SiHuaInfo(year_gan=year_gan, lu=lu, quan=quan, ke=ke, ji=ji),
+        plain=plain,
         dayun_direction="顺行" if forward else "逆行",
         dayun_start_age=ju_number,
         provenance=ZiweiProvenance(

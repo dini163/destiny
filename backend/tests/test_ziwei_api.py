@@ -45,7 +45,7 @@ TOP_LEVEL_KEYS = {
     "tst_offset_minutes", "longitude", "lunar_date", "lunar_year_ganzhi", "lunar_month",
     "lunar_day", "lunar_leap", "time_zhi", "ming_gong_zhi", "ming_gong_ganzhi",
     "ming_gong_nayin", "shen_gong_zhi", "shen_gong_name", "wuxing_ju", "wuxing_ju_number",
-    "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua",
+    "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua", "plain",
     "dayun_direction", "dayun_start_age", "engine", "provenance",
 }
 
@@ -69,7 +69,7 @@ FRONTEND_CHART_KEYS = {
     "tst_offset_minutes", "longitude", "lunar_date", "lunar_year_ganzhi", "lunar_month",
     "lunar_day", "lunar_leap", "time_zhi", "ming_gong_zhi", "ming_gong_ganzhi",
     "ming_gong_nayin", "shen_gong_zhi", "shen_gong_name", "wuxing_ju", "wuxing_ju_number",
-    "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua",
+    "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua", "plain",
     "dayun_direction", "dayun_start_age", "engine", "provenance",
 }
 
@@ -113,7 +113,7 @@ def test_the_chart_comes_back_with_exactly_the_hand_written_contract(client: Tes
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 31  # 抄漏一格会让上面的相等变成自证
+    assert len(TOP_LEVEL_KEYS) == 32  # 抄漏一格会让上面的相等变成自证
     assert body["name"] is None
     assert body["gender"] == "male"
     assert body["calendar"] == "solar"

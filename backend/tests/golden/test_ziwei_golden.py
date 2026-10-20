@@ -13,8 +13,9 @@ from datetime import date, time
 import pytest
 from fastapi.testclient import TestClient
 
-from app.content.ziwei import MAJOR_STARS, MINOR_STARS
-from app.content.ziwei_plain import sihua_key, star_key
+from app.content.ziwei import MAJOR_STARS, MINOR_STARS, ZHI
+from app.content.ziwei_plain import overall_key, sihua_key, star_key
+from app.engines.plain_compose import reading
 from app.engines.plain_corpora import ZIWEI
 from app.engines.ziwei import compute_ziwei_chart
 from app.schemas.common import CalendarType, Gender
@@ -529,3 +530,32 @@ def test_no_palace_paragraph_says_a_star_that_is_not_in_that_palace() -> None:
         }
         printed = {key for key, text in ZIWEI.entries.items() if text in palace.plain.split("\n")}
         assert printed == seated, (palace.name, printed ^ seated)
+
+
+def test_the_chart_carries_three_overall_sections() -> None:
+    chart = _chart()
+    assert [s.title for s in chart.plain] == ["全盘气象", "命宫与三方四正", "运限与四化"]
+    assert chart.plain[0].text == reading(ZIWEI, overall_key(chart.ziwei_zhi))
+
+
+def test_the_ming_section_labels_the_three_other_palaces_correctly() -> None:
+    # 从命宫起：+4 = 官禄，+6 = 迁移，+8 = 财帛（`palace_name` 的 (ming - zhi) % 12 反推）。
+    chart = _chart()
+    by_zhi = {p.zhi: p for p in chart.palaces}
+    ming = chart.ming_gong_zhi
+
+    def stars_at(offset: int) -> str:
+        zhi = ZHI[(ZHI.index(ming) + offset) % 12]
+        return "、".join(s.name for s in by_zhi[zhi].stars) or "空宫"
+
+    text = chart.plain[1].text
+    assert f"官禄宫{stars_at(4)}" in text
+    assert f"迁移宫{stars_at(6)}" in text
+    assert f"财帛宫{stars_at(8)}" in text
+
+
+def test_the_luck_section_names_the_four_sihua() -> None:
+    chart = _chart()
+    text = chart.plain[2].text
+    for star in (chart.sihua.lu, chart.sihua.quan, chart.sihua.ke, chart.sihua.ji):
+        assert star in text

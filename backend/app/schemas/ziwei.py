@@ -9,7 +9,7 @@ walked from the 安星 tables in :mod:`app.content.ziwei`.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import BirthInput, Gender, ProvenanceTable
+from app.schemas.common import BirthInput, Gender, PlainSection, ProvenanceTable
 
 
 class ZiweiRequest(BirthInput):
@@ -115,6 +115,9 @@ class ZiweiChart(BaseModel):
     # Stars, palaces and 四化
     palaces: list[Palace] = Field(description="十二宫，按地支 index 0-11 排列.")
     sihua: SiHuaInfo = Field(description="生年干四化.")
+    plain: list[PlainSection] = Field(
+        description="全盘白话：全盘气象、命宫与三方四正、运限与四化三节（逐字取自 content/ziwei_plain.py）。"
+    )
 
     # 大限
     dayun_direction: str = Field(description="顺行 | 逆行.")
