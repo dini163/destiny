@@ -20,10 +20,11 @@
    所以 top/strong/middle 不许写成「抵掉的那几笔没能…」这种预设它存在的句式（评审轮 round 2 D）；
    `low` 只许说「那几笔确实存在、净额被带到了起点那一笔之下」——那是定理（`value < 45` 而
    `plus ≥ 50` ⇒ `minus > 5`），但**不许**说这一边「占了上风」：`value = plus − minus` 非负
-   ⇒ `plus ≥ minus` 在**每一页**都成立，而同一节上面那行就把这两个合计并排印给读者
-   （round 3 F-2 改的就是这半句）。
+   ⇒ `plus ≥ minus` 在**每一页**都成立，且 `value == 0` 那一页两边**相等**（所以连「更大」也不许说，
+   只许说「不小于」），而同一节上面那行就把这两个合计并排印给读者（round 3 F-2 改的就是这半句）。
    复测（90/0 落最高档）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import hehun_tier; print(hehun_tier(90.0))"` → `天作之合`；
-   复测（最低档里加的那一边仍然更大）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import HehunRow, hehun_ledger; s = hehun_ledger([HehunRow('r1', 'L1', 'f', 'both', 10.0), HehunRow('r2', 'L2', 'f', 'both', -10.0), HehunRow('r3', 'L3', 'f', 'both', -10.0)]); print(s.value, sum(f.delta for f in s.factors if f.delta > 0), sum(-f.delta for f in s.factors if f.delta < 0), s.tier)"` → `40.0 60.0 20.0 欠和宜慎`。
+   复测（最低档里加的那一边仍然不小于抵的那一边）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import HehunRow, hehun_ledger; s = hehun_ledger([HehunRow('r1', 'L1', 'f', 'both', 10.0), HehunRow('r2', 'L2', 'f', 'both', -10.0), HehunRow('r3', 'L3', 'f', 'both', -10.0)]); print(s.value, sum(f.delta for f in s.factors if f.delta > 0), sum(-f.delta for f in s.factors if f.delta < 0), s.tier)"` → `40.0 60.0 20.0 欠和宜慎`；
+   复测（`value == 0` 那一页两边相等 ⇒ 「更大」为假）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import HehunRow, hehun_ledger; s = hehun_ledger([HehunRow('r%d' % i, 'L%d' % i, 'f', 'both', -10.0) for i in range(7)]); print(s.value, sum(f.delta for f in s.factors if f.delta > 0), sum(-f.delta for f in s.factors if f.delta < 0), s.tier)"` → `0.0 70.0 70.0 欠和宜慎`。
 """
 
 HEHUN_PLAIN_SOURCE = (
