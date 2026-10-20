@@ -79,6 +79,22 @@ WU_DECISION_FORBIDDEN: tuple[str, ...] = ("就诊", "体检", "理财", "买房"
 #: 上面两组只对这三家生效。复测：`cd backend && grep -n "PREDICTION_GATED_SYSTEMS" tests/plain_wording.py`。
 PREDICTION_GATED_SYSTEMS: frozenset[str] = frozenset({"western", "transit", "vedic"})
 
+#: 批次二 spec §4.2 的账本词面清单（合婚四档 + 六宜忌组 + 七条规则短名，跨两份语料测与三份
+#: golden 共用）。后五串出自 `content/bazi_transit_rules.TRANSIT_RULES` 的 `label`，与岁运三片同源，
+#: 所以这张表住在这里而不是某个系统的语料测里——清单定义在测模块里再被另一个测模块 import，
+#: 那个文件会在两个模块名下各导一次（`tests/test_plain_corpora.py:71-82` 记的坑）。
+#: **只准增不准删**，删要走裁定——每加一枚就是替某张表挡住一次「把账本短名念进散文」。
+LEDGER_WORDS: tuple[str, ...] = (
+    "天作之合", "相得益彰", "中和可处", "欠和宜慎",
+    "同宜", "乾独宜", "坤独宜", "同忌", "乾独忌", "坤独忌",
+    "我忌彼旺", "我忌彼弱", "半合忌", "三合成忌", "三会忌", "运干入忌", "运支主气入忌",
+)
+
+#: 取向词门（批次二 spec §8 第 5 条，本批**自加**、不是工厂门；口径同
+#: `tests/content/test_kabbalah_plain_corpus.py` 的 `PLAIN_VERDICT_WORDS` 那六串）。
+#: 它们不在 `ADVICE_TOKENS` 里，所以六字表放过、这条拦住：白话只报账本形状，不给盘面定顺逆。
+ORIENTATION_WORDS: tuple[str, ...] = ("顺势", "逆势", "有利", "不利", "好运", "厄运")
+
 
 def advice_hits(
     text: str,
@@ -94,6 +110,18 @@ def advice_hits(
 
 
 _PLACEHOLDER = re.compile(r"\{[a-z][a-z0-9_]*\}")
+
+
+def frame_slots(frame: str) -> list[str]:
+    """框架句声明的槽位名，序即出现序。
+
+    与本文件既有的 `_PLACEHOLDER`（同一条正则，条目门剥占位符用的）必须认同一个形状：
+    分成两份写迟早分家——一份放宽了花括号那段的字符集，另一份就看不见新形状的槽，
+    `overview()` 在页面上 KeyError 而测里全绿。那条正则**不带捕获组**（它只管抹掉占位符），
+    所以这里剥壳取名字而不是 `group(1)`。
+    `tests/content/test_hehun_plain_corpus.py` 与 `test_bazi_transit_plain_corpus.py` 都 import 这一个。
+    """
+    return [match.group(0).strip("{}") for match in _PLACEHOLDER.finditer(frame)]
 
 
 def wording_violations(corpus, key: str) -> list[str]:
@@ -180,3 +208,8 @@ def test_advice_hits_masks_named_word_forms() -> None:
     assert advice_hits("化忌是四化名相本身。", masks=("化禄", "化权", "化科", "化忌")) == []
     assert advice_hits("此格忌反复争执。") == ["忌"]
     assert set(VERDICT_TOKENS) < set(ADVICE_TOKENS)
+
+
+def test_frame_slots_reads_exactly_the_entry_gates_placeholder() -> None:
+    """大括号里带大写的那一槽**不匹配**——这就是「两份正则迟早分家」的现场证据。"""
+    assert frame_slots("甲{x}乙{y_1}丙{A}") == ["x", "y_1"]

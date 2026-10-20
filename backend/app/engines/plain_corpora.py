@@ -10,6 +10,7 @@ from __future__ import annotations
 from itertools import combinations, product
 
 from app.content import (
+    hehun_plain,
     kabbalah_plain,
     lenormand_plain,
     name_plain,
@@ -435,6 +436,32 @@ VEDIC = PlainCorpus(
 )
 
 
+def _hehun_universe() -> set[str]:
+    """合婚键全集 = 4 档 + 3 同频 = 7。基数从 `content/hehun_plain` 的两张键表现算。
+
+    档位名与 `engines/bazi_hehun.hehun_tier` 的一致性**不在这里查**：这一查就要 import 引擎，
+    而引擎反过来 import 本模块，环就成了（Plan F 用 `engines/western.py:205` 那个函数内
+    import 绕过一次；本批不必再绕，改由
+    `tests/content/test_hehun_plain_corpus.py::test_tone_keys_are_what_the_engine_and_the_contract_say`
+    对账）。复测命令：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import HEHUN; print(len(HEHUN.universe()))"` → 7。
+    """
+    return {*hehun_plain.HEHUN_TONE_KEYS.values(), *hehun_plain.HEHUN_SYNC_KEYS.values()}
+
+
+#: 合婚白话的登记表：7 条档位 / 同频散文（批次二 spec §5.3）。三句报事实的框架句**不在**
+#: 这张表里——它们由 `engines/bazi_hehun.hehun_plain()` 用 `overview()` 实例化，进 entries
+#: 会被工厂的 40 字条目门打红（框架句走 `frame_violations` 的 20 字口径）。
+HEHUN = PlainCorpus(
+    system="hehun",
+    entries=hehun_plain.HEHUN_READINGS,
+    openers={},
+    closers=None,
+    grouping="keep",
+    universe=_hehun_universe,
+)
+
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
@@ -450,4 +477,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     WESTERN.system: WESTERN,
     TRANSIT.system: TRANSIT,
     VEDIC.system: VEDIC,
+    HEHUN.system: HEHUN,
 }

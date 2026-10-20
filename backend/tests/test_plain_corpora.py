@@ -65,10 +65,10 @@ def test_universe_is_reproducible_and_non_empty(corpus) -> None:
 #: 「例外要写得出名字」才是接口，「放松断言」不是）。名单内要求 `openers == {}`，
 #: 两个方向都钉——今天多写一句开篇句也红，因为没人会去渲染它。
 #: 复测：`cd backend && grep -n "SECTIONLESS" tests/test_plain_corpora.py`。
-SECTIONLESS = {"kabbalah", "zhouyi"}
+SECTIONLESS = {"hehun", "kabbalah", "zhouyi"}
 
 
-def test_sectionless_roster_is_the_two_named_exceptions_verbatim() -> None:
+def test_sectionless_roster_is_the_named_exceptions_verbatim() -> None:
     """名单逐字钉（丁组 spec §5：「登记表与名单是两处编辑，忘一处会假绿」）。
 
     新系统要进名单，必须在这里改一行、把名字留下——静默加进来就是那张表永远没有开篇句
@@ -80,7 +80,7 @@ def test_sectionless_roster_is_the_two_named_exceptions_verbatim() -> None:
     由 `tests/content/test_zhouyi_plain_corpus.py::test_the_registered_shape_is_sectionless_unclosed_and_unsorted`
     钉。见计划偏差表第 7 行。
     """
-    assert SECTIONLESS == {"kabbalah", "zhouyi"}
+    assert SECTIONLESS == {"hehun", "kabbalah", "zhouyi"}
 
 
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)
