@@ -893,6 +893,10 @@ def hehun_plain(
 ) -> list[PlainSection]:
     """合盘白话三节（spec §5.3）：事实全部取自同一次装配的对象，不重排盘也不重算账本。
 
+    本节名与语料模块 `app.content.hehun_plain` **同名**：本文件只按模块名 `from
+    app.content.hehun_plain import …` 取语料，绝不写 `from app.content import
+    hehun_plain`，否则装配函数会把语料模块遮掉。
+
     第一节与第三节是两行：框架句报数、档位句报形状（spec §4.1）。第二节一行——互补图与
     纳音都是**已经在盘上的事实**，没有第二把尺可报。档位不写进句子，而是用档位挑句子。
     """

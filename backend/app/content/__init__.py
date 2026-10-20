@@ -77,7 +77,10 @@ CONTENT_VERSION = "2026.09"
 #: 认账的兄表列着、把同一条路径上的弟表单列出去，就是 AGENTS.md §7 反过来的那种不诚实
 #: ——「少一行是不认账」（`bazi_liuri.py` 的 `liuri_provenance` 头注，复测：
 #: `cd backend && grep -n "少一行是不认账" app/engines/bazi_liuri.py`）。故白话表随兄表同进本清单，不另立
-#: `PLAIN_CONTENT_SOURCES`；只按页显式列举的清单（`HEHUN_CONTENT_SOURCES`）不跟着加，
+#: `PLAIN_CONTENT_SOURCES`。**这句只管 `CONTENT_SOURCES` 这一侧**：合婚页不靠继承这张表拿到
+#: 白话，它自己读的 `hehun_plain` 是按页清单里逐名列举的第 11 行（见下方
+#: `HEHUN_CONTENT_SOURCES` 头注，复测：`cd backend && grep -n '("hehun_plain", ' app/content/__init__.py`
+#: → 149 行一处，即只按页列举、没有进本清单）。不跟着加的是 `bazi_plain` 那一行——
 #: 合婚页连 `bazi_dimensions` 都不列。
 #: 条目数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import CONTENT_SOURCES; print(len(CONTENT_SOURCES))"` → 9。
 CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
