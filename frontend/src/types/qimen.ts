@@ -5,7 +5,7 @@
  * 天盘九星 / 人盘八门 / 神盘八神 are rotated into the 洛书九宫.
  */
 
-import type { ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable } from './common';
 
 /** Input for a 奇门遁甲 起局. */
 export interface QimenRequest {
@@ -124,6 +124,9 @@ export interface QimenChart {
 
   /** 洛书九宫，按 1-9 排列. */
   palaces: QimenPalace[];
+
+  /** 全局白话：值符主线、值使门线、时干落宫、旬空与驿马四节。 */
+  plain: PlainSection[];
 
   engine: string;
   provenance: QimenProvenance;

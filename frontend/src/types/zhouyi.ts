@@ -3,7 +3,7 @@
  * snake_case is preserved end-to-end.
  */
 
-import type { ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable } from './common';
 
 /** How the hexagram is cast. */
 export type CastMethod = 'three_coin' | 'manual' | 'time';
@@ -129,6 +129,9 @@ export interface ZhouyiCast {
   bian: HexagramInfo | null;
   /** 互卦 — the nuclear hexagram from lines 2-3-4 / 3-4-5. */
   hu: HexagramInfo;
+
+  /** 整卦白话：本卦总论一段；有动爻时再给变卦去向一段。 */
+  plain: PlainSection[];
 
   /** Moving-line positions (1-6, bottom-to-top). */
   moving_positions: number[];

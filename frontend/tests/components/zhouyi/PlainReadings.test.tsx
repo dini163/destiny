@@ -23,6 +23,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { ClassicalText } from '../../../src/components/zhouyi/ClassicalText';
 import { HexagramCard } from '../../../src/components/zhouyi/HexagramCard';
+import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
 import type { ZhouyiCast } from '../../../src/types/zhouyi';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
@@ -82,6 +83,15 @@ describe('周易就地今译与出处块', () => {
       const { container } = render(<HexagramCard hexagram={hexagram} />);
       pinLiteralOrder(container.textContent ?? '', [hexagram.plain_gua_ci, hexagram.gua_ci]);
     }
+  });
+
+  it('整卦白话两节逐字来自夹具，且卡在纳甲盘之前', () => {
+    expect(cast.plain.map((s) => s.title)).toEqual(['本卦总论', '变卦去向']);
+    const { container } = render(<PlainSectionList sections={cast.plain} />);
+    const headings = [...container.querySelectorAll('h3')].map((h) => h.textContent);
+    expect(headings).toEqual(['本卦总论', '变卦去向']);
+    const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
+    pinLiteralOrder(page, ['<CastSummary cast={cast} />', 'title="整卦白话"', 'title="纳甲六亲盘"']);
   });
 
   it('页面把五张表递给出处块，展示序就是清单序', () => {

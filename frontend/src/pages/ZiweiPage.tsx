@@ -106,6 +106,10 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
     <>
       <ChartSummary chart={chart} />
 
+      <ResultCard title="全盘白话" eyebrow="OVERALL READING · WHOLE CHART" icon="sparkle" elevated>
+        <PlainSectionList sections={chart.plain} />
+      </ResultCard>
+
       <ResultCard title="十二宫命盘" eyebrow="ZI WEI CHART · 4×4" icon="vault" elevated>
         <ZiweiChartGrid chart={chart} />
       </ResultCard>

@@ -73,6 +73,10 @@ function QimenResults({ chart }: { chart: QimenChart }) {
     <>
       <JuSummary chart={chart} />
 
+      <ResultCard title="全局白话" eyebrow="OVERALL READING · WHOLE BOARD" icon="sparkle" elevated>
+        <PlainSectionList sections={chart.plain} />
+      </ResultCard>
+
       <ResultCard
         title="洛书九宫盘"
         eyebrow="天地人神 · 四盘交错"

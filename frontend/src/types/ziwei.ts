@@ -3,7 +3,7 @@
  * snake_case is preserved end-to-end.
  */
 
-import type { BirthInput, Gender, ProvenanceTable } from './common';
+import type { BirthInput, Gender, PlainSection, ProvenanceTable } from './common';
 
 /** Input for a 紫微斗数 chart; `gender` is required (fixes the 大限 direction). */
 export interface ZiweiRequest extends BirthInput {
@@ -93,6 +93,8 @@ export interface ZiweiChart {
 
   palaces: Palace[];
   sihua: SiHuaInfo;
+  /** 全盘白话：全盘气象、命宫与三方四正、运限与四化三节。 */
+  plain: PlainSection[];
 
   dayun_direction: string;
   dayun_start_age: number;

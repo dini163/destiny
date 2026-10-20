@@ -6,6 +6,7 @@ import { ClassicalText } from '../components/zhouyi/ClassicalText';
 import { HexagramCard } from '../components/zhouyi/HexagramCard';
 import { HexagramStack } from '../components/zhouyi/HexagramStack';
 import { Icon } from '../components/ui/Icon';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useZhouyiCast } from '../hooks/useZhouyiCast';
@@ -23,8 +24,8 @@ import type { CastMethod, ZhouyiCast, ZhouyiCastRequest } from '../types/zhouyi'
  * omitted because the engine does not compute them (PRD no-mock rule).
  *
  * The 卦爻辞 panel carries each line's curated vernacular retelling above the received
- * text (丁组 spec §5), so there is no separate 白话 block on this page: the retelling
- * belongs to the line it translates.
+ * text (丁组 spec §5); the whole-hexagram reading sits in its own card before the board,
+ * so per-line retelling stays in place and the overview is not buried inside one line.
  */
 export function ZhouyiPage() {
   const [method, setMethod] = useState<CastMethod>('three_coin');
@@ -91,6 +92,10 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
   return (
     <>
       <CastSummary cast={cast} />
+
+      <ResultCard title="整卦白话" eyebrow="OVERALL READING · WHOLE HEXAGRAM" icon="sparkle" elevated>
+        <PlainSectionList sections={cast.plain} />
+      </ResultCard>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="lg:col-span-8">

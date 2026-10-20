@@ -26,6 +26,15 @@ it('the plain block carries all nine palaces in luoshu order, byte for byte', ()
   expect(paragraphs).toEqual(chart.palaces.map((p) => p.plain));
 });
 
+it('the whole-board block carries its four overview sections, byte for byte', () => {
+  expect(chart.plain.map((s) => s.title)).toEqual(['值符主线', '值使门线', '时干落宫', '旬空与驿马']);
+  const { container } = render(<PlainSectionList sections={chart.plain} />);
+  const headings = [...container.querySelectorAll('h3')].map((h) => h.textContent);
+  expect(headings).toEqual(['值符主线', '值使门线', '时干落宫', '旬空与驿马']);
+  const paragraphs = [...container.querySelectorAll('p')].map((p) => p.textContent);
+  expect(paragraphs).toEqual(chart.plain.map((s) => s.text));
+});
+
 it('the center palace keeps its single line and no seats', () => {
   /** 中五宫那一段只有一句开篇句（T6 的 `items=[]` 支路）。前端不许给它补一句
    *  「此宫无星」——补出来的字不在受控语料里（spec §5）。 */
@@ -62,11 +71,20 @@ it('the page wires the nine palaces into the block and the tables into the panel
   expect(src).toContain('title: `${palace.gua}${palace.number}宫 · ${palace.direction}`');
   expect(src).toContain('text: palace.plain');
   expect(src).toContain('title="九宫白话"');
+  expect(src).toContain('title="全局白话"');
+  expect(src).toContain('sections={chart.plain}');
   expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
   /** 同紫微那条：「盘面卡之后」与「`<Provenance>` 之前」两句都钉。
    *  存在性钉不在此处手写——`pinLiteralOrder`（`tests/lib/sourcePin.ts`）先钉存在性再比次序，
    *  裸 `indexOf` 比较那种「锚点被删后因 -1 照样绿」的空钉形状是终审 I-1 收掉的东西。 */
-  pinLiteralOrder(src, ['<QimenBoard chart={chart} />', '<PlainSectionList', '<Provenance chart={chart} />']);
+  pinLiteralOrder(src, [
+    '<JuSummary chart={chart} />',
+    'title="全局白话"',
+    'sections={chart.plain}',
+    '<QimenBoard chart={chart} />',
+    'sections={chart.palaces.map(',
+    '<Provenance chart={chart} />',
+  ]);
 });
 
 it('the provenance block lists both tables the endpoint read', () => {
