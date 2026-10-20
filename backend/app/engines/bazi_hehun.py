@@ -847,6 +847,11 @@ def hehun_fired(rows: Sequence[HehunRow]) -> list[HehunFired]:
     ]
 
 
+# 顺序本身就是判据的一部分：`hehun_plain()` 取主导档用的是稳定排序
+# `sorted(_SYNC_ORDER, key=lambda name: -counts[name])[0]`，计数相等时**排在前面的档赢**，
+# 即平局偏向 同频。这一条今天没有机器钉住：两页夹具的那一格是 1/0/0，无平局可钉，
+# 钉它要改轴夹具（超出 J-T2）；取数那一侧的同一事实写在
+# `tests/test_bazi_hehun.py::test_the_third_section_names_the_dominant_sync_band` 的 docstring 里。
 _SYNC_ORDER: tuple[str, ...] = ("同频", "半同步", "背离")
 
 

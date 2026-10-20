@@ -1468,10 +1468,16 @@ def test_the_ledger_identity_is_pinned_on_both_sum_pages(female: HehunProfile) -
     `cd backend && grep -n "def build_ledger" app/schemas/scoring.py`），本仓已有两处钉它：
     `tests/test_scoring.py::test_ledger_clamps_to_range_and_records_the_clamp`（合成 contributions，
     跨系统）与 `tests/content/test_hehun_plain_corpus.py::test_score_samples_obey_the_ledger_identity`
-    （三组手写样例槽值）。这一条与它们**有意重复**，理由是它钉的不是同一件事：
-    框架句里的两个合计取的是 `_sign_sums(score.factors)` 的返回值顺序，那条路径在以上两处之外，
-    把它的 `return minus, plus` 写反只有本条的第二页会红（评审席 3a 号变异，`63 passed` 就是
-    缺这一口的现场）。删掉它 = 装配那半边重新变回无人看。
+    （三组手写样例槽值）。这一条与它们**有意重复**，但重复的不是同一环节：上面三处钉的都是
+    「账本自己怎么造」，本条钉「装配取数用的那份 `_sign_sums` 与 `score.value` / `HEHUN_BASE`
+    对不对得上」——本条把 `_sign_sums` 的返回值直接拿去对账，而
+    `test_the_plain_block_quotes_the_corpus_and_fills_its_slots` 用的是**测自己按符号求和**，
+    钉的是装配印进句子里的那些槽。所以 `return plus, minus` 写反（评审席 3a 号变异 K1）时
+    **两条各红 `plus-not-minus` 那一页**，`63 passed` 的年代则是两条都不红。复测
+    （改坏→跑→逐字还原）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest -q -o addopts="" tests/test_bazi_hehun.py`
+    → `2 failed, 66 passed`（FAILED 的两行正是上面那两条的 `[plus-not-minus]`）。
+    据此，删掉本条并不会让顺序那半边无人看（slots 那条兜得住）——本条独有的半边是
+    `plus − minus == value` 与 `plus >= HEHUN_BASE` 这两条构造等式在装配边的那一次对账。
 
     两页各钉一边（现跑复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_hehun import _sign_sums, compute_hehun; from tests.test_bazi_hehun import COMPLEMENT_PROFILE, MALE_PROFILE, SAME_PROFILE; print([_sign_sums(compute_hehun(male=MALE_PROFILE, female=q, reference_date=date(2026, 9, 22), axis_years=1).score.factors) for q in (SAME_PROFILE, COMPLEMENT_PROFILE)])"`
     → `[(89.0, 89.0), (97.0, 59.0)]`）：第一页两边相等，任何「加减对调」在它身上都印出同一句话；
