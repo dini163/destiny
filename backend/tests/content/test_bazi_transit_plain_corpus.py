@@ -344,10 +344,13 @@ def test_the_three_sentences_never_name_a_calendar_unit() -> None:
 
     三页同一条句子（岁运那一节的档位是**五年账本的均值**再过尺），所以句子一旦写「这一年」，
     流日页与流时页上它就是假话。这一条拦的就是那种「只在某页读起来对」的写法。
+    判据是**单字级整串零命中**（「年 / 月 / 日 / 时 / 岁」五字，口径同门面 ① 对档位名的单字扫描，
+    宁改句子不放松尺）——「本月」「流年」这类没打成短语的写法因此在射程内；三句今天五字零命中，
+    本条跑绿本身就是这一主张的复测。
     只扫档位句：九句框架本来就各归一页，`{ganzhi} 这一段` 与「同一年内月和月之间」那样的
     月表句是它们的本职。
     """
-    banned_subjects = ("这一年", "这个月", "这一天", "这两年", "这五年")
+    banned_subjects = ("年", "月", "日", "时", "岁")
     for key, text in BAZI_TRANSIT_READINGS.items():
         assert "这一段" in text, key
         assert [unit for unit in banned_subjects if unit in text] == [], key

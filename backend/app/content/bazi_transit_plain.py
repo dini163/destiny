@@ -21,8 +21,9 @@
    `engines/bazi_transit.transit_narrative` 把判语连缀成 `narrative` 的那一步。复测（整串统计，
    避开中文字面量进 shell）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.bazi_transit_rules import TRANSIT_RULES as T; v=[r.reading for r in T.values()]; print(sum(chr(65371) in x for x in v), sum(chr(65288)+chr(12298) in x for x in v), len(v))"` → `0 37 46`；
    `chr(65371)` 是全角分号、`chr(65288)+chr(12298)` 是全角左括号加书名号）、
-   `score.tier`（就是 ① 那三个单字）、`qi_strength`（十二长生名，实测本夹具那一日的十二格里
-   确有 `死` / `墓` / `绝` 三名，读起来像判词）、`YiJiKind` 的六个组名（全含 `宜` 或 `忌`，
+   `score.tier`（就是 ① 那三个单字）、`qi_strength`（十二长生名，实测本夹具 2026-06-15 庚申
+   那一日的十二格里确有 `死` / `墓` / `绝` 三名，读起来像判词。复测（三个 `chr` 码点依次是
+   死 / 墓 / 绝，避开中文字面量进 shell）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liushi as L; from datetime import date; r=L.compute_liushi_day(**L._NATAL_KWARGS, solar_date=date(2026,6,15), reference_date=date(2026,6,15)); qi={h.qi_strength for h in r.hours}; print(len(r.hours), len(qi), all(chr(c) in qi for c in (0x6B7B,0x5893,0x7EDD)))"` → `12 12 True`）、`YiJiKind` 的六个组名（全含 `宜` 或 `忌`，
    `advice_hits` 六字表拦着）。
 ③ 岁运那一节的档位取的是**五年账本的均值再过 `_tier`**（spec §4.3 第二行），流日取月段账本的
    `tier`、流时取日段账本的 `tier`。所以三条档位句的主语一律是「这一段」，不许指定是年、月、
@@ -42,7 +43,8 @@
    于是 `滞` 那一句只许说「负行摊下来厚过起点之外的正行」，不许说「抵掉的压过加进来的」。
    这条主语口径的机械版在
    `tests/content/test_bazi_transit_plain_corpus.py::test_the_three_sentences_never_name_a_calendar_unit`：
-   三句都得含「这一段」，且不得含「这一年 / 这个月 / 这一天」那一族串——九句框架各归一页，不受这条管。
+   三句都得含「这一段」，且「年 / 月 / 日 / 时 / 岁」五个单字整串零命中（口径同 ① 对档位名的
+   单字扫描，「本月」「流年」这类写法因此在射程内）——九句框架各归一页，不受这条管。
 ④ 九句框架里的数字槽一律由 `num()` 出串，两句极值框架不许在槽外手搭第二个数：
    `{span}` 的正主是 `round(高分 − 低分, 2)`，`{strong}` / `{weak}` 的正主是逐格数 `tier`，
    第二处重算就是第二把尺（spec §4.3）。极值并列一律取排在最前那一格（`max` / `min` 在升序表上
