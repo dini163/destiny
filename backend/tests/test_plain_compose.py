@@ -3,8 +3,8 @@
 本文件不测任何系统的语料内容，只测装配器的分支与异常。两张表是**测试自造的
 最小 corpus**（不是假命盘、不是假响应，不违反 AGENTS.md §9 的无 mock 铁律）。
 卡巴拉的逐字节判据原先寄在这里，Plan B Task 3 把它迁进了生产侧；那条指路注释不在文件末
-（文件末是一条测，不是注），住在本文件 :134。
-复测：`cd backend && grep -n "^# 卡巴拉的逐字节判据住在生产侧" tests/test_plain_compose.py` → `134:` 那一行。
+（文件末是一条测，不是注），住在本文件 :135。
+复测：`cd backend && grep -n "^# 卡巴拉的逐字节判据住在生产侧" tests/test_plain_compose.py` → `135:` 那一行。
 """
 
 from collections import OrderedDict
@@ -17,6 +17,7 @@ from app.engines.plain_compose import (
     compose_template,
     dedupe,
     is_slot_key,
+    num,
     overview,
     reading,
 )
@@ -139,3 +140,12 @@ def test_is_slot_key_only_answers_for_the_declared_slot_vocabulary() -> None:
     assert is_slot_key(SLOTTED, "slot.point.Sun") is True
     assert is_slot_key(SLOTTED, "slot.aspect.conjunction") is False
     assert is_slot_key(BANDED, "demo.a") is False
+
+
+def test_num_is_the_single_shape_for_every_score_slot() -> None:
+    """五页 20 余个数字槽共用这一形：整数不带小数点，真小数保留到位。"""
+    assert num(65.0) == "65"
+    assert num(62.5) == "62.5"
+    assert num(0.0) == "0"
+    assert num(-3.75) == "-3.75"
+    assert num(80.0) == "80"

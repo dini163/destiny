@@ -90,6 +90,16 @@ def overview(frame: str, parts: Mapping[str, str]) -> str:
     return frame.format(**parts)
 
 
+def num(value: float) -> str:
+    """白话槽位里所有数字的唯一出串形状：`65.0 → "65"`、`62.5 → "62.5"`。
+
+    批次二五页共 20 余个数字槽，各处各写一份 `:g` 迟早出现 65 与 65.0 并存
+    （Plan J 偏差表第 5 行）。截断与四舍五入都不在这里：求和侧的 `round(x, 2)`
+    属于装配，属于账本口径，不属于出串。
+    """
+    return f"{value:g}"
+
+
 def dedupe(items: Sequence[tuple[str, int | float]]) -> list[tuple[str, int | float]]:
     """同键只留首次出现的那一条，符号与原序不动。
 
