@@ -57,7 +57,7 @@
 
 BAZI_TRANSIT_PLAIN_SOURCE = (
     "本系统自撰白话 · 档位分界逐字取 engines/bazi_strength 的 STRONG_CUT 与 WEAK_CUT，"
-    "句子不引古籍；三页（岁运 / 流日 / 流时）共用本表"
+    "句子不引古籍 · 三页（岁运 / 流日 / 流时）共用本表"
 )
 
 #: 岁运三档 → 键。左列逐字取 `engines/bazi_transit._tier` 的三个返回值（档位名复测见模块头注 ①）。

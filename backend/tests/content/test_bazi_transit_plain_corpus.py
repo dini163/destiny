@@ -14,8 +14,12 @@
 ⑧ 三页节标题名单（`BAZI_TRANSIT_TITLES`）是装配与前端共用的那一份，键序即页面序；
 ⑨ 出处串自守：`BAZI_TRANSIT_PLAIN_SOURCE` 点名的两道分界常量真在位、真的就是 `_tier` 在用的那两道。
 
-样例句值全部来自实算（无 mock，AGENTS §9）。复测命令逐份写在 `SAMPLES` 的注释里。
+样例句值除标注「契约一形」的那三份外全部来自实算（无 mock，AGENTS §9；那三份是 schema
+字段说明承认的形状，数值是让边界值必须过门的最小构造，不宣称那样一页今天存在——三形名见下面
+样例句表的头注）。复测命令逐份写在下面各样例句表的注释里。
 """
+
+from datetime import date
 
 from app.content.bazi_transit_plain import (
     BAZI_LIURI_DAYS_FRAME,
@@ -49,7 +53,10 @@ from tests.plain_wording import (
     wording_violations,
 )
 
-#: 禁词面正主是 `LEDGER_WORDS` 那十七串（J-T1 已把七条岁运规则短名收进去，本文件不另立「本页那份」）；
+#: 禁词面正主是 `LEDGER_WORDS` 那十七串（J-T1 已把**五**条岁运规则短名收进去：
+#: `三会忌 / 三合成忌 / 半合忌 / 运干入忌 / 运支主气入忌`，本文件不另立「本页那份」）；
+#: 那个「五」的复测（三个数依次是规则短名去重数、与 `LEDGER_WORDS` 的交集数、清单全长）：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.bazi_transit_rules import TRANSIT_RULES as R; from tests.plain_wording import LEDGER_WORDS; lab={r.label for r in R.values()}; print(len(lab), len(lab & set(LEDGER_WORDS)), len(LEDGER_WORDS))"` → `46 5 17`。
 #: 本文件再并上三个档名（整串零命中，spec §7.1 括注）与 `FORBIDDEN` 三串。
 _BANNED = [
     *PREDICTION_FORBIDDEN,
@@ -60,7 +67,11 @@ _BANNED = [
     *FORBIDDEN,
 ]
 
-#: 九句框架的样例句。每份都写清它抄自哪一页（复测见各条），只有标注「契约一形」的那两份例外：
+#: 九句框架的样例句。每份都写清它抄自哪一页（复测见各条），只有标注「契约一形」的那三份例外：
+#: 三形逐字是流日第三节的「零命中契约一形」、流时第二节的「十二格同分契约一形」、
+#: 流时第三节的「零命中契约一形」。那个「三」的复测（`chr(...)` 拼的就是「契约一形」四字，
+#: 为中文字面量不进 `-c`）：`cd backend && PYTHONIOENCODING=utf-8
+#: .venv/Scripts/python.exe -c "import tests.content.test_bazi_transit_plain_corpus as m; tag=chr(0x5951)+chr(0x7EA6)+chr(0x4E00)+chr(0x5F62); print(sum(1 for _f, s in m.FRAMES for k in s if tag in k))"` → `3`。
 #: 它们是 schema 字段说明承认的形状（`day_hits` / `hour_hits` 为空数组），实测六段未见，
 #: 收进来只为让边界值必须过门，而不是宣称那样一页今天存在。
 RANGE_SAMPLES: dict[str, dict[str, str]] = {
@@ -194,7 +205,9 @@ LIURI_DAYS_SAMPLES: dict[str, dict[str, str]] = {
 }
 
 LIURI_FOCUS_SAMPLES: dict[str, dict[str, str]] = {
-    # `focus_date=2028-01-15`：己亥 60.0，`ri.` 行 7 条（三段账本共 20 行）。
+    # `focus_date=2028-01-15`：己亥 60.0，`ri.` 行 7 条（同一页账本共 21 行：年段 8 含 `基准分`
+    # 那一行 + `yue.` 6 + `ri.` 7；「规则行 20」那种读法要显式说明它排除了 `transit.base` 那一行）。
+    # 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liuri as L; from datetime import date; r=L.compute_liuri_matrix(**L._NATAL_KWARGS, anchor_date=date(2028,1,15), focus_date=date(2028,1,15), reference_date=date(2028,1,15)); f=r.focused.score.factors; print(len(f), sum(1 for x in f if x.rule.startswith('yue.')), sum(1 for x in f if x.rule.startswith('ri.')), sum(1 for x in f if x.rule == 'transit.base'), len(r.focused.day_hits))"` → `21 6 7 1 7`。
     "七条命中": {"date": "2028-01-15", "ganzhi": "己亥", "value": num(60.0), "hits": num(7)},
     # `focus_date=2029-10-20`：癸未 67.0，`ri.` 行 5 条。
     "五条命中": {"date": "2029-10-20", "ganzhi": "癸未", "value": num(67.0), "hits": num(5)},
@@ -341,6 +354,10 @@ def test_frames_meet_the_frame_gate_when_instantiated() -> None:
     for frame, samples in FRAMES:
         declared = set(frame_slots(frame))
         assert declared, "空框架出不了门：槽位清单非空才谈得上实例化"
+        assert len(samples) >= 2, (
+            f"{sorted(declared)} 那一句的样例句不足两份——表被清空时下面三个循环零次迭代恒绿，"
+            "地板只能由这一条守（brief Step 4：每句至少两份真实形状样例句）"
+        )
         for slots in samples.values():
             assert set(slots) == declared
             text = overview(frame, slots)
@@ -373,10 +390,32 @@ def test_titles_are_the_three_pages_roster() -> None:
 def test_samples_obey_the_arithmetic_the_frames_claim() -> None:
     """样例句必须是引擎给得出的形状：句子把几个数并排印出来，读者一减就看见矛盾。
 
-    `count == end − start + 1`（年表逐岁出格）、`strong + weak ≤ count`（两道线之间的年两数都不进）、
-    `best ≥ worst` / `top ≥ low`（`max` / `min` 同表）、`span == round(高分 − 低分, 2)`（差只有一个正主）、
-    分值一律落在 `[0, 100]`（`TransitDayCell.value` 的 `ge/le` 契约）。
+    **按槽位身份判的通用一遍**（`FRAMES` 里每一份样例句的每一个槽，不看句名）：
+    `value` 与 `*_value` 一律 `0 <= x <= 100`，`strong` / `weak` / `hits` / `count` 四个计数槽
+    一律 `>= 0`。分数那一条的契约正主是 `app/schemas/scoring.py` 的 `ScoreValue.value`
+    （`value: float = Field(ge=0, le=100)`，岁运 / 流日 / 流时的段账本全是这一个类型）与
+    日、时两格的同值 `ge/le`（`app/schemas/bazi_liuri.py` 的 `TransitDayCell.value`、
+    `app/schemas/bazi_liushi.py` 的 `TransitHourCell.value`）；这条通用覆盖的六个分数槽名是
+    `value` / `best_value` / `worst_value` / `top_value` / `low_value` / `high_value`
+    （后四个此前一处都没被 bound；复测：`cd backend && PYTHONIOENCODING=utf-8
+    .venv/Scripts/python.exe -c "import tests.content.test_bazi_transit_plain_corpus as m; L=sorted({n for _f, s in m.FRAMES for v in s.values() for n in v if n == 'value' or n.endswith('_value')}); print(len(L), L)"` → `6 ['best_value', 'high_value', 'low_value', 'top_value', 'value', 'worst_value']`）。
+    跨槽关系只在**同一句框架同时带着那些槽**时才判：`RANGE` 的 `count == end − start + 1`
+    与 `strong + weak <= count`、`strong_cut > weak_cut`；`LIURI_MONTH` 的
+    `strong + weak <= 段长`（那句自己带着 `start_solar` / `end_solar`，段长即两串 ISO 日之差
+    含首尾，它不带 `count`，所以总量从日期来而不是从年数来）；`LIURI_DAYS` 的
+    `1 <= count <= 60`（那句自称「这一月」，而日柱 60 甲子才一循环——段长过 60 时
+    `{high}` / `{low}` 就可能各指两格，语料侧 `BAZI_LIURI_DAYS_FRAME` 的注是同一条尺）；
+    `THREAD` / `MONTH` / `LIURI_DAYS` / `LIUSHI_HOURS` 的高低两槽高者 >= 低者，
+    `THREAD` 的 `best_year >= 1900` 与 `{dayun}` 非空串；`LIUSHI_HOURS` 的
+    `span == round(高分 − 低分, 2)`（差只有一个正主，口径 ④）。
     """
+    for _frame, samples in FRAMES:
+        for slots in samples.values():
+            for name, value in slots.items():
+                if name == "value" or name.endswith("_value"):
+                    assert 0.0 <= float(value) <= 100.0, f"{name}={value}"
+                if name in ("strong", "weak", "hits", "count"):
+                    assert int(value) >= 0, f"{name}={value}"
     for slots in RANGE_SAMPLES.values():
         start, end, count = (int(slots[k]) for k in ("start", "end", "count"))
         strong, weak = int(slots["strong"]), int(slots["weak"])
@@ -388,17 +427,17 @@ def test_samples_obey_the_arithmetic_the_frames_claim() -> None:
     for slots in MONTH_SAMPLES.values():
         assert float(slots["top_value"]) >= float(slots["low_value"])
     for slots in LIURI_MONTH_SAMPLES.values():
-        assert int(slots["strong"]) + int(slots["weak"]) >= 0 and 0.0 <= float(slots["value"]) <= 100.0
+        start_solar = date.fromisoformat(slots["start_solar"])
+        end_solar = date.fromisoformat(slots["end_solar"])
+        span_days = (end_solar - start_solar).days + 1
+        assert span_days >= 1, slots["start_solar"]
+        assert int(slots["strong"]) + int(slots["weak"]) <= span_days, f"strong+weak > {span_days}"
     for slots in LIURI_DAYS_SAMPLES.values():
-        assert int(slots["count"]) >= 1 and float(slots["high_value"]) >= float(slots["low_value"])
+        assert 1 <= int(slots["count"]) <= 60, slots["count"]
+        assert float(slots["high_value"]) >= float(slots["low_value"])
     for slots in LIUSHI_HOURS_SAMPLES.values():
         top, low = float(slots["top_value"]), float(slots["low_value"])
         assert top >= low and float(slots["span"]) == round(top - low, 2)
-    for group in (LIURI_FOCUS_SAMPLES, LIUSHI_FOCUS_SAMPLES):
-        for slots in group.values():
-            assert int(slots["hits"]) >= 0 and 0.0 <= float(slots["value"]) <= 100.0
-    for slots in LIUSHI_DAY_SAMPLES.values():
-        assert 0.0 <= float(slots["value"]) <= 100.0
 
 
 def test_the_source_string_names_the_cuts_it_claims() -> None:
@@ -406,8 +445,14 @@ def test_the_source_string_names_the_cuts_it_claims() -> None:
 
     串里点名的两道分界必须真存在、真叫这两个名字，且 `_tier` 真的就用它们——换分界而散文照旧、
     门照绿，是这条拦的形状。
+    `FORBIDDEN` 三串的整串零命中补在这里（先例：
+    `tests/content/test_western_plain_corpus.py::test_the_source_string_is_a_provenance_string_not_a_sentence`）：
+    这条串不进工厂遍历，工厂那四条 corpus 门看不到它，而它随 `plain_source` 上 J-T4 / J-T5
+    三页的响应面——「；」正是三串之一，靠人审守不住。
     """
     for name in ("STRONG_CUT", "WEAK_CUT"):
         assert name in BAZI_TRANSIT_PLAIN_SOURCE, name
     assert "自撰" in BAZI_TRANSIT_PLAIN_SOURCE
+    for token in FORBIDDEN:
+        assert token not in BAZI_TRANSIT_PLAIN_SOURCE, token
     assert _tier(STRONG_CUT) == "顺" and _tier(WEAK_CUT - 0.1) == "滞"

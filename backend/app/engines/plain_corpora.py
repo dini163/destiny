@@ -451,8 +451,16 @@ def _hehun_universe() -> set[str]:
 
 
 #: 合婚白话的登记表：7 条档位 / 同频散文（批次二 spec §5.3）。三句报事实的框架句**不在**
-#: 这张表里——它们由 `engines/bazi_hehun.hehun_plain()` 用 `overview()` 实例化，进 entries
-#: 会被工厂的 40 字条目门打红（框架句走 `frame_violations` 的 20 字口径）。
+#: 这张表里——它们由 `engines/bazi_hehun.hehun_plain()` 用 `overview()` 实例化。框架句要是被塞进
+#: entries，打红的是 `tests/test_plain_corpora.py::test_entry_keys_mirror_the_source_tables_exactly`
+#: （`set(entries)` 不再等于 `universe()`）；**40 字条目门管不住它们**：那条门只查三件事——剥掉
+#: 占位符的正体不少于 40 字、以唯一一个「。」收尾、含「你」，而这三句框架句三件都天生满足（三句
+#: 剥掉占位符后 90–92 字；唯一一个「。」与含「你」两项都是 `all(...)`，见下面那条复测的最后两个
+#: `True`），所以 `wording_violations` 对它们只会返回空表（复测：`cd backend &&
+#: PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re, app.content.hehun_plain as h; ph=re.compile(chr(123)+'[a-z][a-z0-9_]*'+chr(125)); F=[h.HEHUN_SCORE_FRAME, h.HEHUN_COMPLEMENT_FRAME, h.HEHUN_AXIS_FRAME]; L=sorted(len(ph.sub('', x)) for x in F); print(L[0], L[-1], len(F), all(x.count(chr(0x3002)) == 1 for x in F), all(chr(0x4F60) in x for x in F))"` → `90 92 3 True True`）。
+#: 框架句自己的口径是 `frame_violations` 的 20 字上限，它由
+#: `tests/content/test_hehun_plain_corpus.py::test_frames_meet_the_frame_gate_when_instantiated`
+#: 在实例化后的文本上逐句核（连同 `advice_hits` 与那份 `_BANNED` 四串清单）。
 HEHUN = PlainCorpus(
     system="hehun",
     entries=hehun_plain.HEHUN_READINGS,
@@ -475,8 +483,17 @@ def _bazi_transit_universe() -> set[str]:
 
 
 #: 岁运 / 流日 / 流时三页共用的登记表：3 条档位散文（批次二 spec §7.1）。九句报事实的框架句
-#: **不在**这张表里——它们由 J-T4 / J-T5 的引擎用 `overview()` 实例化，进 entries 会被工厂的
-#: 40 字条目门打红（框架句走 `frame_violations` 的 20 字口径，同 `HEHUN` 那行的同一条理由）。
+#: **不在**这张表里——它们由 J-T4 / J-T5 的引擎用 `overview()` 实例化。框架句要是被塞进 entries，
+#: 打红的是 `tests/test_plain_corpora.py::test_entry_keys_mirror_the_source_tables_exactly`
+#: （`set(entries)` 不再等于 `universe()`，同源的 `test_universe_is_reproducible_and_non_empty`
+#: 那条 universe 门同红）；**40 字条目门管不住它们**：那条门只查三件事——剥掉占位符的正体不少于
+#: 40 字、以唯一一个「。」收尾、含「你」，而这九句框架句三件都天生满足（剥掉占位符后 64–98 字；
+#: 后两项是 `all(...)`，见下面那条复测的最后两个 `True`），所以 `wording_violations` 对它们只会
+#: 返回空表（复测：`cd backend &&
+#: PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import re, app.content.bazi_transit_plain as p; ph=re.compile(chr(123)+'[a-z][a-z0-9_]*'+chr(125)); F=[p.BAZI_TRANSIT_RANGE_FRAME, p.BAZI_TRANSIT_THREAD_FRAME, p.BAZI_TRANSIT_MONTH_FRAME, p.BAZI_LIURI_MONTH_FRAME, p.BAZI_LIURI_DAYS_FRAME, p.BAZI_LIURI_FOCUS_FRAME, p.BAZI_LIUSHI_DAY_FRAME, p.BAZI_LIUSHI_HOURS_FRAME, p.BAZI_LIUSHI_FOCUS_FRAME]; L=sorted(len(ph.sub('', x)) for x in F); print(L[0], L[-1], len(F), all(x.count(chr(0x3002)) == 1 for x in F), all(chr(0x4F60) in x for x in F))"` → `64 98 9 True True`）。
+#: 框架句自己的口径是 `frame_violations` 的 20 字（同 `HEHUN` 那行），它由
+#: `tests/content/test_bazi_transit_plain_corpus.py::test_frames_meet_the_frame_gate_when_instantiated`
+#: 在实例化后的文本上逐句核（连同那份 `_BANNED`，`FORBIDDEN` 三串已并进去）。
 BAZI_TRANSIT = PlainCorpus(
     system="bazi_transit",
     entries=bazi_transit_plain.BAZI_TRANSIT_READINGS,
