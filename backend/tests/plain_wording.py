@@ -99,6 +99,13 @@ LEDGER_WORDS: tuple[str, ...] = (
 #: 白话只报账本形状，不给盘面定顺逆。
 ORIENTATION_WORDS: tuple[str, ...] = ("顺势", "逆势", "有利", "不利", "好运", "厄运")
 
+#: 岁运三片的档位名（批次二 spec §7.1：`app/engines/bazi_transit._tier` 的三个返回值）。
+#: 按**整串零命中**扫，不是边沿形——「平顺」「平常」这类词形因此一并出局，宁改句子不放松尺。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from tests.plain_wording import TIER_WORDS; print(len(TIER_WORDS))"` → `3`。
+#: 只有 `tests/content/test_bazi_transit_plain_corpus.py` 引它：工厂门管不到未登记的语料，
+#: 而这三枚单字管的是「档位名不许被念进句子」这条本批自加的口径。
+TIER_WORDS: tuple[str, ...] = ("顺", "平", "滞")
+
 
 def advice_hits(
     text: str,

@@ -65,7 +65,7 @@ def test_universe_is_reproducible_and_non_empty(corpus) -> None:
 #: 「例外要写得出名字」才是接口，「放松断言」不是）。名单内要求 `openers == {}`，
 #: 两个方向都钉——今天多写一句开篇句也红，因为没人会去渲染它。
 #: 复测：`cd backend && grep -n "SECTIONLESS" tests/test_plain_corpora.py`。
-SECTIONLESS = {"hehun", "kabbalah", "zhouyi"}
+SECTIONLESS = {"bazi_transit", "hehun", "kabbalah", "zhouyi"}
 
 
 def test_sectionless_roster_is_the_named_exceptions_verbatim() -> None:
@@ -80,7 +80,7 @@ def test_sectionless_roster_is_the_named_exceptions_verbatim() -> None:
     由 `tests/content/test_zhouyi_plain_corpus.py::test_the_registered_shape_is_sectionless_unclosed_and_unsorted`
     钉。见计划偏差表第 7 行。
     """
-    assert SECTIONLESS == {"hehun", "kabbalah", "zhouyi"}
+    assert SECTIONLESS == {"bazi_transit", "hehun", "kabbalah", "zhouyi"}
 
 
 @pytest.mark.parametrize("corpus", CORPORA, ids=SYSTEMS)
@@ -88,8 +88,9 @@ def test_openers_are_non_empty_and_never_slot_keys(corpus) -> None:
     """名字即判据：这条只钉「有小节的公司有开篇句」与「开篇句的键不落在槽位词表上」，不查覆盖面。
 
     「覆盖面」在这里无从查起——小节名单由各系统的装配测试钉（spec §4 第 3 条）。
-    无小节的两家是卡巴拉与周易（卡巴拉 T2 裁定，见多系统计划 G19 表行 7；周易依丁组 spec §5，
-    它的今译挂在卦辞行与六条爻行上，页面没有段落容器）。
+    无小节的四家逐字登记在上面的 `SECTIONLESS` 里（卡巴拉 T2 裁定，见多系统计划 G19 表行 7；
+    周易依丁组 spec §5，它的今译挂在卦辞行与六条爻行上，页面没有段落容器；合婚与岁运三片依批次二
+    spec §5.3 / §7.1，白话直接挂在档位句与框架句上，同样没有段落容器）。
     """
     if corpus.system in SECTIONLESS:
         assert corpus.openers == {}, f"{corpus.system} 登记为无小节却不空"

@@ -10,6 +10,7 @@ from __future__ import annotations
 from itertools import combinations, product
 
 from app.content import (
+    bazi_transit_plain,
     hehun_plain,
     kabbalah_plain,
     lenormand_plain,
@@ -462,6 +463,30 @@ HEHUN = PlainCorpus(
 )
 
 
+def _bazi_transit_universe() -> set[str]:
+    """岁运三片键全集 = 3 档 = 3。基数从 `content/bazi_transit_plain` 的那张键表现算。
+
+    与 `engines/bazi_transit._tier` 的三个返回值的一致性**不在这里查**：这一查就要 import 引擎，
+    而引擎反过来 import 本模块，环就成了（同 `_hehun_universe` 的裁定），改由
+    `tests/content/test_bazi_transit_plain_corpus.py::test_tone_keys_are_what_the_engine_says` 对账。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import BAZI_TRANSIT; print(len(BAZI_TRANSIT.universe()))"` → 3。
+    """
+    return set(bazi_transit_plain.BAZI_TRANSIT_TONE_KEYS.values())
+
+
+#: 岁运 / 流日 / 流时三页共用的登记表：3 条档位散文（批次二 spec §7.1）。九句报事实的框架句
+#: **不在**这张表里——它们由 J-T4 / J-T5 的引擎用 `overview()` 实例化，进 entries 会被工厂的
+#: 40 字条目门打红（框架句走 `frame_violations` 的 20 字口径，同 `HEHUN` 那行的同一条理由）。
+BAZI_TRANSIT = PlainCorpus(
+    system="bazi_transit",
+    entries=bazi_transit_plain.BAZI_TRANSIT_READINGS,
+    openers={},
+    closers=None,
+    grouping="keep",
+    universe=_bazi_transit_universe,
+)
+
+
 #: 系统词表到 corpus 的唯一映射。新系统在本表登记一行即接入工厂，测试文件不改——
 #: 除登记在 `SECTIONLESS` 里的形状例外（无小节系统必须 `openers == {}`）。
 PLAIN_CORPORA: dict[str, PlainCorpus] = {
@@ -478,4 +503,5 @@ PLAIN_CORPORA: dict[str, PlainCorpus] = {
     TRANSIT.system: TRANSIT,
     VEDIC.system: VEDIC,
     HEHUN.system: HEHUN,
+    BAZI_TRANSIT.system: BAZI_TRANSIT,
 }
