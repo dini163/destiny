@@ -31,7 +31,7 @@ from app.content.zhouyi_najia import (
     liushen_for_day_gan,
     najia_for_hexagram,
 )
-from app.content.zhouyi_plain import gua_ci_key, yao_ci_key, yong_ci_key
+from app.content.zhouyi_plain import gua_ci_key, overall_key, yao_ci_key, yong_ci_key
 from app.content.zhouyi_text import (
     YAO_CI,
     YAO_CI_COUNT,
@@ -488,6 +488,23 @@ def test_bian_and_hu_carry_their_own_plain_gua_ci() -> None:
     assert result.bian.plain_gua_ci == reading(ZHOUYI, gua_ci_key(31))
     assert result.hu.plain_gua_ci == reading(ZHOUYI, gua_ci_key(28))
     assert result.bian.plain_yong_ci is None
+
+
+def test_the_cast_carries_an_overall_reading_with_a_moving_line_section() -> None:
+    """整卦白话两段：本卦总论 + 动爻带来的变卦去向（与上一条同一手 55 之 31，动爻在第 1、5 位）。"""
+    result = _manual([[3, 3, 3], [3, 3, 2], [2, 2, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2]])
+    assert result.moving_positions == [1, 5]
+    assert [section.title for section in result.plain] == ["本卦总论", "变卦去向"]
+    assert result.plain[0].text == reading(ZHOUYI, overall_key(55))
+    assert result.plain[1].text.endswith(reading(ZHOUYI, overall_key(31)))
+    assert "你摇出的这一卦有两处动爻" in result.plain[1].text
+
+
+def test_a_still_hexagram_gets_one_overall_section_only() -> None:
+    result = _manual([[3, 2, 2]] * 6)  # 乾为天，六爻皆少阳，无动爻
+    assert result.bian is None
+    assert [section.title for section in result.plain] == ["本卦总论"]
+    assert result.plain[0].text == reading(ZHOUYI, overall_key(1))
 
 
 def test_a_hexagram_without_yong_has_no_plain_yong_ci() -> None:

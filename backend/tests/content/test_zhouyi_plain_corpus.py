@@ -424,9 +424,15 @@ def test_every_middle_segment_claim_needs_three_segments() -> None:
 
 
 def test_plain_source_line_says_it_is_a_retelling_not_an_original() -> None:
-    """出处串自述身份（同 `test_tarot_zh_corpus.py` 里那条译表自述的先例）。"""
+    """出处串自述身份（同 `test_tarot_zh_corpus.py` 里那条译表自述的先例）。
+
+    两半各自诚实：450 条今译逐条对应原文；64 条整卦总论没有逐字底本，写明「自撰」。
+    """
     assert ZHOUYI_PLAIN_SOURCE
-    assert "今译" in ZHOUYI_PLAIN_SOURCE, ZHOUYI_PLAIN_SOURCE
+    assert ZHOUYI_PLAIN_SOURCE.startswith(
+        "本系统白话今译 · 逐条对应 zhouyi_guaci 与 zhouyi_yaoci_upper/lower 的原文"
+    ), ZHOUYI_PLAIN_SOURCE
+    assert "自撰" in ZHOUYI_PLAIN_SOURCE, ZHOUYI_PLAIN_SOURCE
     for banned in ("；", "（《", "』"):
         assert banned not in ZHOUYI_PLAIN_SOURCE
 

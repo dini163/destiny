@@ -16,7 +16,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable
 
 
 class CastMethod(str, Enum):
@@ -127,6 +127,11 @@ class ZhouyiCast(BaseModel):
     ben: HexagramInfo = Field(description="本卦 — the primary hexagram as cast.")
     bian: HexagramInfo | None = Field(description="变卦 — after moving lines change; null if none move.")
     hu: HexagramInfo = Field(description="互卦 — the nuclear hexagram from lines 2-3-4 / 3-4-5.")
+
+    # Whole-hexagram reading (before the per-line detail on the page)
+    plain: list[PlainSection] = Field(
+        description="整卦白话：本卦总论一段；有动爻时再给变卦去向一段（逐字取自 content/zhouyi_plain.py）。"
+    )
 
     # Lines
     moving_positions: list[int] = Field(description="Moving-line positions (1-6, bottom-to-top).")

@@ -19,8 +19,12 @@ from app.content.zhouyi_text import YAO_CI
 from app.content.zhouyi_yaoci_plain_lower import YAOCI_PLAIN_LOWER
 from app.content.zhouyi_yaoci_plain_upper import YAOCI_PLAIN_UPPER
 
-#: 全表出处：逐条对应 `zhouyi_guaci.py` 与 `zhouyi_yaoci_*.py` 的通行本原文。
-ZHOUYI_PLAIN_SOURCE = "本系统白话今译 · 逐条对应 zhouyi_guaci 与 zhouyi_yaoci_upper/lower 的原文"
+#: 全表出处：前半逐条对应 `zhouyi_guaci.py` 与 `zhouyi_yaoci_*.py` 的通行本原文；
+#: 整卦总论 64 条没有逐字底本，是平台按通行义理归纳的自撰白话（诚实标注，AGENTS §7）。
+ZHOUYI_PLAIN_SOURCE = (
+    "本系统白话今译 · 逐条对应 zhouyi_guaci 与 zhouyi_yaoci_upper/lower 的原文。"
+    "整卦总论 64 条为平台自撰的通行义理归纳"
+)
 
 
 def gua_ci_key(number: int) -> str:
