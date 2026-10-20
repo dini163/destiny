@@ -8,8 +8,8 @@
 ⑤ 禁插清单（spec §4.2）：账本词面在白话文本里零命中；
 ⑥ 样例句本身是**引擎给得出的形状**（`plus − minus == value` 的账本恒等式 + 平局取最早那一段），
    框架门只量单句形状，量不到槽与槽之间的算术（评审轮 I1 / C2）；
-⑦ 出处串自守：`HEHUN_PLAIN_SOURCE` 点名的四处常量真在位、且真的就是 `hehun_tier` / `axis_sync`
-   在用的那几道分界（spec §8.7）。
+⑦ 出处串自守：`HEHUN_PLAIN_SOURCE` 点名的五处常量真在位、且真的就是 `hehun_tier` / `axis_sync`
+   在用的那五道分界（spec §8.7）。
 """
 
 from typing import get_args
@@ -178,8 +178,11 @@ def test_score_samples_obey_the_ledger_identity() -> None:
 def test_the_source_string_names_the_cuts_it_claims() -> None:
     """出处串自守（spec §8.7：串不进 `wording_violations`，由语料测自守；AGENTS §7 的诚实性压在这一行）。
 
-    串里点名的四处常量必须**真的存在**、真的叫这几个名字，且 `hehun_tier` 的三道分界确实落在
-    `HEHUN_TOP_CUT` / `STRONG_CUT` / `WEAK_CUT` 上——改名或换分界而散文照旧、门照绿，是这条拦的形状。
+    串里点名的五处常量必须**真的存在**、真的叫这几个名字，且五道分界确实落在这五个常量上
+    （`hehun_tier` 三道：`HEHUN_TOP_CUT` / `STRONG_CUT` / `WEAK_CUT`；`axis_sync` 两道：
+    `HEHUN_SYNC_CLOSE` / `HEHUN_SYNC_WIDE`）——改名或换分界而散文照旧、门照绿，是这条拦的形状。
+    这批断言与常量**共享同一份数值**，所以它们守的是结构（哪一道界由哪个常量把、比较方向、
+    档序、返回名），不是数值本身。
     """
     for name in ("HEHUN_TOP_CUT", "STRONG_CUT", "WEAK_CUT", "HEHUN_SYNC_CLOSE", "HEHUN_SYNC_WIDE"):
         assert name in HEHUN_PLAIN_SOURCE, name
