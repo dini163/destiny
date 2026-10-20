@@ -25,15 +25,24 @@ from app.content.zhouyi_guaci import YONG_CI
 from app.content.zhouyi_hexagrams import HEXAGRAM_BY_NUMBER
 from app.content.zhouyi_plain import (
     ZHOUYI_ANCHORS,
+    ZHOUYI_OVERALL_READINGS,
     ZHOUYI_PLAIN_SOURCE,
     ZHOUYI_READINGS,
+    corpus_entries,
+    corpus_universe,
     gua_ci_key,
+    overall_key,
     yao_ci_key,
     yong_ci_key,
 )
 from app.content.zhouyi_text import ZHOUYI_SOURCE
 from app.engines.plain_corpora import PLAIN_CORPORA, ZHOUYI
-from tests.plain_wording import advice_hits, wording_violations
+from tests.plain_wording import (
+    PREDICTION_FORBIDDEN,
+    WU_DECISION_FORBIDDEN,
+    advice_hits,
+    wording_violations,
+)
 
 #: 本批已覆盖的卦号。T2-T12 每批往里加自己那 5-6 卦，一条也不许多。
 COVERED: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64,)
@@ -436,13 +445,14 @@ def test_the_registered_shape_is_sectionless_unclosed_and_unsorted() -> None:
     assert ZHOUYI.grouping == "keep"
 
 
-def test_the_universe_is_exactly_the_450_computed_from_the_source_tables() -> None:
-    """工厂钉的是两侧**相等**，钉不出「两侧一起少」；450 这一格由本条数出来。
+def test_the_universe_is_exactly_the_514_computed_from_the_source_tables() -> None:
+    """工厂钉的是两侧**相等**，钉不出「两侧一起少」；514 这一格由本条数出来
+    （450 条逐爻今译 + 64 条整卦总论）。anchor 仍只对 450 条今译。
 
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 450。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.plain_corpora import ZHOUYI; print(len(ZHOUYI.universe()))"` → 514。
     """
-    assert len(ZHOUYI.universe()) == 450
-    assert ZHOUYI.universe() == set(ZHOUYI_READINGS)
+    assert len(ZHOUYI.universe()) == 514
+    assert ZHOUYI.universe() == set(ZHOUYI_READINGS) | set(ZHOUYI_OVERALL_READINGS)
     assert set(ZHOUYI_ANCHORS) == set(ZHOUYI_READINGS)
 
 
@@ -482,3 +492,54 @@ def test_the_shared_source_strings_are_one_copy_with_meihua() -> None:
 def test_the_plain_source_line_is_the_registered_fifth_row() -> None:
     """今译表进清单（AGENTS.md §7「读了就列」）：`ZHOUYI_PLAIN_SOURCE` 的自述与登记同一笔。"""
     assert ZHOUYI_CONTENT_SOURCES[-1] == ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE)
+
+
+# --- 整卦总论 64 条（批次一 spec §4） ------------------------------------------
+
+_ROLE_WORDS = ("本卦", "变卦", "互卦", "之卦")
+
+
+def test_overall_table_covers_all_sixty_four_hexagrams() -> None:
+    assert set(ZHOUYI_OVERALL_READINGS) == {overall_key(n) for n in range(1, 65)}
+    assert len(ZHOUYI_OVERALL_READINGS) == 64
+
+
+def test_each_overall_entry_starts_with_its_full_name() -> None:
+    for number in range(1, 65):
+        text = ZHOUYI_OVERALL_READINGS[overall_key(number)]
+        assert text.startswith(HEXAGRAM_BY_NUMBER[number].full_name_zh), number
+
+
+def test_no_overall_entry_uses_a_hexagram_role_word() -> None:
+    for key, text in ZHOUYI_OVERALL_READINGS.items():
+        for token in _ROLE_WORDS:
+            assert token not in text, (key, token)
+
+
+def test_overall_entries_carry_no_advice_or_forecast() -> None:
+    """建议词扫**剥掉句首卦名之后**的正体：第五卦「水天需」的卦名自带一个「需」字，
+    而卦名是逐字身份、不能改写；正文里再出现一次才是真建议。预告/决策串仍扫全句
+    （那些串不会长在卦名里）。"""
+    for key, text in ZHOUYI_OVERALL_READINGS.items():
+        number = int(key.rsplit(".", 1)[1])
+        prefix = HEXAGRAM_BY_NUMBER[number].full_name_zh
+        assert text.startswith(prefix), key
+        assert advice_hits(text[len(prefix):]) == [], key
+        for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN:
+            assert token not in text, (key, token)
+
+
+def test_overall_entries_are_mutually_distinct() -> None:
+    assert len(set(ZHOUYI_OVERALL_READINGS.values())) == 64
+
+
+def test_overall_entries_meet_the_shared_wording_contract() -> None:
+    for key in ZHOUYI_OVERALL_READINGS:
+        assert wording_violations(ZHOUYI, key) == [], key
+
+
+def test_the_registered_universe_is_the_translations_plus_the_overall_layer() -> None:
+    assert corpus_universe() == set(ZHOUYI_READINGS) | set(ZHOUYI_OVERALL_READINGS)
+    assert len(corpus_universe()) == 514
+    assert set(corpus_entries()) == corpus_universe()
+    assert ZHOUYI.universe() == corpus_universe()
