@@ -5,6 +5,7 @@
 后面每个任务都只往这个文件追加测。
 """
 
+from collections import Counter
 from datetime import date, time
 
 import pytest
@@ -25,6 +26,11 @@ from app.content.bazi_hehun_rules import (
     hehun_rule,
 )
 from app.content.bazi_nayin import nayin_meaning
+from app.content.hehun_plain import (
+    HEHUN_SECTION_TITLES,
+    HEHUN_SYNC_KEYS,
+    HEHUN_TONE_KEYS,
+)
 from app.core.errors import InvalidBirthDataError, TransitRangeError
 from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
@@ -43,6 +49,7 @@ from app.engines.bazi_hehun import (
     HehunAxisRange,
     HehunAxisWindow,
     HehunChartPair,
+    _best_aligned_segment,
     axis_segments,
     axis_sync,
     axis_window,
@@ -80,10 +87,24 @@ from app.engines.bazi_hehun import (
 )
 from app.engines.bazi_rules import derive_relations
 from app.engines.bazi_transit import compute_transit
+from app.engines.plain_compose import num, reading
+from app.engines.plain_corpora import HEHUN
 from app.schemas.bazi import BaziChart
-from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult, HehunAxis, HehunProfile
+from app.schemas.bazi_hehun import (
+    BaziHehunRequest,
+    BaziHehunResult,
+    HehunAxis,
+    HehunAxisSegment,
+    HehunProfile,
+)
 from app.schemas.common import Gender
 from app.solar.geo import resolve_longitude
+from tests.plain_wording import (
+    LEDGER_WORDS,
+    PREDICTION_FORBIDDEN,
+    WU_DECISION_FORBIDDEN,
+    advice_hits,
+)
 
 
 def _chart(y: int, m: int, d: int, hh: int, mm: int, city: str, gender: Gender) -> BaziChart:
@@ -1290,8 +1311,8 @@ def test_a_partner_profile_is_a_summary_not_a_second_natal_chart() -> None:
     assert (partner.tst_applied, partner.true_solar_time) == (True, "1988-02-15 22:12")
 
 
-def test_the_result_is_the_ten_sections_the_contract_promised() -> None:
-    """§5.2 的十个段一段不缺，且互相自洽：矩阵 16 格、fired 与账本同长、轴长等于请求年数。"""
+def test_the_result_is_the_eleven_sections_the_contract_promised() -> None:
+    """§5.2 的十个段一段不缺（批次二 J-T2 起再加 plain，共十一），且互相自洽：矩阵 16 格、fired 与账本同长、轴长等于请求年数。"""
     result = compute_hehun(
         male=MALE_PROFILE, female=SAME_PROFILE, reference_date=date(2026, 9, 22), axis_years=5
     )
@@ -1305,6 +1326,7 @@ def test_the_result_is_the_ten_sections_the_contract_promised() -> None:
         "nayin",
         "axis",
         "yi_ji",
+        "plain",
         "provenance",
     }
     assert (result.male.side, result.female.side) == ("male", "female")
@@ -1317,9 +1339,11 @@ def test_the_result_is_the_ten_sections_the_contract_promised() -> None:
 
 
 def test_the_provenance_lists_only_the_tables_this_page_reads() -> None:
-    """溯源纪律：一张表也没引的不能列，引了十张的不能只列三张。
+    """溯源纪律：一张表也没引的不能列，引了十一张的不能只列三张。
 
-    与 `NAME_CONTENT_SOURCES` 同一条理由（`content/__init__.py:37`）：把 `bazi_dimensions`
+    与 `NAME_CONTENT_SOURCES` 同一条理由（`content/__init__.py` 该清单的头注，
+    复测：`cd backend && grep -n "把姓名学语料混进去" app/content/__init__.py`）：
+    把 `bazi_dimensions`
     （六维详批）列进来就是让合婚声称引了它没引的书 —— 本页既没呈现也没用它计分。
     反过来 `bazi_wangshuai` / `bazi_geju` / `bazi_tiaohou` 看着像"本命盘的事"，
     其实两造的喜忌集正是由它们合并出来的（互补图与宜忌的唯一输入），一张都删不得。
@@ -1339,6 +1363,7 @@ def test_the_provenance_lists_only_the_tables_this_page_reads() -> None:
         "bazi_changsheng",
         "bazi_transit_rules",
         "bazi_hehun_rules",
+        "hehun_plain",
     ]
     assert {table.version for table in provenance.tables} == {CONTENT_VERSION}
     assert (provenance.reference_date, provenance.engine) == ("2026-09-22", "lunar-python")
@@ -1358,3 +1383,94 @@ def test_the_axis_length_default_has_exactly_one_home() -> None:
     with pytest.raises(TypeError, match="missing 1 required keyword-only argument: 'axis_years'"):
         compute_hehun(male=MALE_PROFILE, female=SAME_PROFILE)  # type: ignore[call-arg]
     assert BaziHehunRequest(male=MALE_PROFILE, female=SAME_PROFILE).axis_years == 21
+
+
+def test_the_plain_block_is_three_sections_in_the_declared_order() -> None:
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    assert [section.title for section in result.plain] == list(HEHUN_SECTION_TITLES)
+    assert len(result.plain) == 3
+
+
+def test_the_plain_block_quotes_the_corpus_and_the_ledger() -> None:
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    first, second, third = (section.text for section in result.plain)
+    frame_line, tone_line = first.split("\n")
+    assert tone_line == reading(HEHUN, HEHUN_TONE_KEYS[result.score.tier])
+    assert num(result.score.value) in frame_line
+    plus = round(sum(f.delta for f in result.score.factors if f.delta > 0), 2)
+    minus = round(sum(-f.delta for f in result.score.factors if f.delta < 0), 2)
+    assert num(plus) in frame_line and num(minus) in frame_line
+    assert plus - minus == result.score.value          # spec §4.3 的截断行不变式
+    assert plus >= HEHUN_BASE                          # 起点那一笔只进加的这一边（round 2 A 改的注释理由）
+    assert "\n" not in second                       # 本节一行，不硬凑第二行（spec §5.2）
+    assert result.nayin.phrase in second            # 三字生克句逐字入槽，不在别处重述
+    assert second.count("。") == 1
+    for view in result.complement.views:            # 两视角的 补 / 阙 格五行逐个真出现在句子里
+        for cell in view.cells:
+            if cell.name in ("补", "阙"):
+                assert all(element.element in second for element in cell.elements)
+
+
+def test_the_complement_frame_says_who_gives_to_whom() -> None:
+    """J-T1 评审轮 C1 的机器半边：句子里「坤递过来」那一组确实是 `viewer == "male"` 的 补 格。
+
+    象限纵轴是**观看方**的喜忌、横轴量**对方**盘的旺弱（`engines/bazi_hehun.py:_one_view_facts`），
+    所以「乾这一侧看过去，坤递过来的那组」只能落在 `views["male"]` 的 补 格上。框架门只数槽名，
+    看不见主语与宾语的先后——这两行是把 J-T1 写在常量旁那条尺搬到机器侧。
+    """
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    male_view = next(view for view in result.complement.views if view.viewer == "male")
+    give = "、".join(
+        element.element for cell in male_view.cells if cell.name == "补" for element in cell.elements
+    ) or "没有"
+    assert f"坤递过来的那组五行是 {give}，乾想要而坤给不出的是" in result.plain[1].text
+
+
+def test_the_third_section_names_the_dominant_sync_band() -> None:
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    frame_line, tone_line = result.plain[2].text.split("\n")
+    counts = Counter(row.sync for row in result.axis.rows)
+    dominant = sorted(("同频", "半同步", "背离"), key=lambda name: -counts[name])[0]
+    assert tone_line == reading(HEHUN, HEHUN_SYNC_KEYS[dominant])
+    for year in (result.axis.start_year, result.axis.end_year):
+        assert num(year) in frame_line
+
+
+def test_the_axis_ruler_gives_the_earliest_segment_on_a_tie() -> None:
+    """§4.3 那把尺的平局判据（评审轮 C2）：`同频` 行计数取 max、段按 `start_year` 升序、**相同取最早**。
+
+    测的是**生产的** `_best_aligned_segment`，不是测里重抄一遍 `max(sorted(...))`——重抄的那份
+    证的是 Python 的语义，装配处改了什么它看不见。`axis_years=1` 那份夹具走不出平局形状，
+    所以这里手搭两段各 0 行同频：全平局 ⇒ 必须报第一段。把实现里的 `sorted(...)` 去掉这条即红
+    （`max` 返回**首个**最大值，未排序时给的是列表序的第一个，与 `start_year` 序可以不同）。
+    """
+    segments = [
+        HehunAxisSegment(start_year=2028, end_year=2029, label="乾第二段／坤第二段"),
+        HehunAxisSegment(start_year=2026, end_year=2027, label="乾第一段／坤第一段"),
+    ]
+    best = _best_aligned_segment(segments, rows=())
+    assert (best.start_year, best.end_year) == (2026, 2027)
+
+
+def test_the_plain_block_carries_no_ledger_word_and_no_advice() -> None:
+    """§8 第 6 条：合成句的门。框架句与条目各自绿不等于拼起来绿（槽值是闸看不见的半边）。"""
+    result = compute_hehun(
+        male=MALE_PROFILE, female=SAME_PROFILE,
+        reference_date=date(2026, 9, 22), axis_years=1,
+    )
+    for section in result.plain:
+        assert advice_hits(section.text) == []
+        for token in (*PREDICTION_FORBIDDEN, *WU_DECISION_FORBIDDEN, *LEDGER_WORDS):
+            assert token not in section.text

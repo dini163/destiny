@@ -16,6 +16,7 @@ from app.content.bazi_hehun_rules import HEHUN_RULE_SOURCE
 from app.content.bazi_plain import PLAIN_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
+from app.content.hehun_plain import HEHUN_PLAIN_SOURCE
 from app.content.kabbalah import KABBALAH_SOURCE
 from app.content.kabbalah_plain import KABBALAH_PLAIN_SOURCE
 from app.content.kangxi_strokes import STROKE_SOURCE as KANGXI_STROKE_SOURCE
@@ -122,11 +123,16 @@ ALMANAC_CONTENT_VERSION = version("lunar-python")
 #: 免得把书名逐字抄第二遍 —— 抄一份错一处，书名也就分了家。
 NATAL_SOURCE_BY_MODULE: dict[str, str] = dict(CONTENT_SOURCES)
 
-#: 合婚一页真正读到的十张表。单列的理由同 `NAME_CONTENT_SOURCES`：`bazi_dimensions`
+#: 合婚一页真正读到的十一张表。单列的理由同 `NAME_CONTENT_SOURCES`：`bazi_dimensions`
 #: （六维详批）在本页既没参与计算也没有呈现，列进来等于让合婚声称引了它没引的书；
 #: 而 `bazi_wangshuai` / `bazi_geju` / `bazi_tiaohou` 三张看着像"本命盘的事"，
 #: 其实两造的喜忌集正是由它们合并出来的（互补图与宜忌的唯一输入），一张都删不得。
 #: 岁运那两张由轻量轴读：轴行一分一档与 `/bazi/liuyue` 的年表同一把尺（合婚 spec §10.5）。
+#: 第十一行 `hehun_plain` 是**白话转述表**，不是判语来源：前十张给的是计分与盘理的依据
+#: （古籍书名或模型参数口径），它给的是本页 `plain` 三节逐字印进响应的档位句、同频句与
+#: 三句框架——端点不列它，`provenance.tables` 就漏掉了真正被读进页面文案的那张表
+#: （AGENTS §7「读了就列」；它自撰、不引古籍，凭据由 `HEHUN_PLAIN_SOURCE` 自己说清）。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import HEHUN_CONTENT_SOURCES; print(len(HEHUN_CONTENT_SOURCES))"` → 11。
 HEHUN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_shishen", NATAL_SOURCE_BY_MODULE["bazi_shishen"]),
     ("bazi_nayin", NATAL_SOURCE_BY_MODULE["bazi_nayin"]),
@@ -137,6 +143,7 @@ HEHUN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_relations", NATAL_SOURCE_BY_MODULE["bazi_relations"]),
     *TRANSIT_CONTENT_SOURCES,
     ("bazi_hehun_rules", HEHUN_RULE_SOURCE),
+    ("hehun_plain", HEHUN_PLAIN_SOURCE),
 )
 
 #: 数字命理一页真正读到的四张表。单列的理由同 `NAME_CONTENT_SOURCES`：混进

@@ -16,6 +16,7 @@
 "打到了对方第几根柱"，与实际关系无关（§2.2）。契约带的是真语义的柱位对。
 """
 
+from collections import Counter
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
@@ -42,6 +43,14 @@ from app.content.bazi_hehun_rules import (
 )
 from app.content.bazi_nayin import nayin_meaning
 from app.content.bazi_relations import RELATION_TABLES
+from app.content.hehun_plain import (
+    HEHUN_AXIS_FRAME,
+    HEHUN_COMPLEMENT_FRAME,
+    HEHUN_SCORE_FRAME,
+    HEHUN_SECTION_TITLES,
+    HEHUN_SYNC_KEYS,
+    HEHUN_TONE_KEYS,
+)
 from app.content.wuxing import CONTROLS, GENERATES
 from app.core.errors import DestinyError, TransitRangeError
 from app.engines.bazi import compute_bazi_chart
@@ -57,6 +66,8 @@ from app.engines.bazi_transit import (
     transit_ledger,
     year_scan,
 )
+from app.engines.plain_compose import num, overview, reading
+from app.engines.plain_corpora import HEHUN
 from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_hehun import (
     AxisSync,
@@ -88,7 +99,7 @@ from app.schemas.bazi_hehun import (
     Vigor,
     YiJiKind,
 )
-from app.schemas.common import Gender, ProvenanceTable
+from app.schemas.common import Gender, PlainSection, ProvenanceTable
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
@@ -836,6 +847,105 @@ def hehun_fired(rows: Sequence[HehunRow]) -> list[HehunFired]:
     ]
 
 
+_SYNC_ORDER: tuple[str, ...] = ("同频", "半同步", "背离")
+
+
+def _sign_sums(factors: Sequence[ScoreFactor]) -> tuple[float, float]:
+    """账本按符号各自求和：正值直取、负值取绝对值，各 `round(x, 2)`（spec §4.3 末行）。"""
+    plus = round(sum(factor.delta for factor in factors if factor.delta > 0), 2)
+    minus = round(sum(-factor.delta for factor in factors if factor.delta < 0), 2)
+    return plus, minus
+
+
+def _best_aligned_segment(
+    segments: Sequence[HehunAxisSegment], rows: Sequence[HehunAxisRow]
+) -> HehunAxisSegment:
+    """§4.3 那一行尺的形状：段按 `start_year` 升序，取段内 `同频` 行最多的那一段，**平局取最早**。
+
+    平局落在「最早」靠的是两件事叠在一起：先 `sorted`、`max` 返回**首个**最大值。
+    段表恒非空（`axis_years` 契约 `ge=1`），所以这里不写空序列分支。
+    """
+    return max(
+        sorted(segments, key=lambda segment: segment.start_year),
+        key=lambda segment: sum(
+            1
+            for row in rows
+            if row.sync == "同频" and segment.start_year <= row.year <= segment.end_year
+        ),
+    )
+
+
+def _quadrant_words(view: HehunComplementView) -> tuple[str, str]:
+    """一视角「补」「阙」两格的五行串（、 连接，空格喂「没有」——§4.2 的干净名词）。"""
+
+    def one(name: str) -> str:
+        cell = next(item for item in view.cells if item.name == name)
+        return "、".join(entry.element for entry in cell.elements) or "没有"
+
+    return one("补"), one("阙")
+
+
+def hehun_plain(
+    score: ScoreValue,
+    complement: HehunComplement,
+    nayin: HehunNayin,
+    axis: HehunAxis,
+) -> list[PlainSection]:
+    """合盘白话三节（spec §5.3）：事实全部取自同一次装配的对象，不重排盘也不重算账本。
+
+    第一节与第三节是两行：框架句报数、档位句报形状（spec §4.1）。第二节一行——互补图与
+    纳音都是**已经在盘上的事实**，没有第二把尺可报。档位不写进句子，而是用档位挑句子。
+    """
+    plus, minus = _sign_sums(score.factors)
+    views = {view.viewer: view for view in complement.views}
+    male_give, male_thin = _quadrant_words(views["male"])
+    female_give, female_thin = _quadrant_words(views["female"])
+    counts = Counter(row.sync for row in axis.rows)
+    dominant = sorted(_SYNC_ORDER, key=lambda name: -counts[name])[0]
+    best = _best_aligned_segment(axis.segments, axis.rows)
+    return [
+        PlainSection(
+            title=HEHUN_SECTION_TITLES[0],
+            text=overview(
+                HEHUN_SCORE_FRAME,
+                {"value": num(score.value), "plus": num(plus), "minus": num(minus)},
+            )
+            + "\n"
+            + reading(HEHUN, HEHUN_TONE_KEYS[score.tier]),
+        ),
+        PlainSection(
+            title=HEHUN_SECTION_TITLES[1],
+            text=overview(
+                HEHUN_COMPLEMENT_FRAME,
+                {
+                    "m_give": male_give,
+                    "m_thin": male_thin,
+                    "f_give": female_give,
+                    "f_thin": female_thin,
+                    "nayin": nayin.phrase,
+                },
+            ),
+        ),
+        PlainSection(
+            title=HEHUN_SECTION_TITLES[2],
+            text=overview(
+                HEHUN_AXIS_FRAME,
+                {
+                    "start": num(axis.start_year),
+                    "end": num(axis.end_year),
+                    "aligned": num(counts["同频"]),
+                    "half": num(counts["半同步"]),
+                    "apart": num(counts["背离"]),
+                    "best_start": num(best.start_year),
+                    "best_end": num(best.end_year),
+                },
+            )
+            + "\n"
+            + reading(HEHUN, HEHUN_SYNC_KEYS[dominant]),
+        ),
+    ]
+
+
 # ---------------------------------------------------------------- 轻量轴（spec §7.3）
 #: 一造的大运全表：`公历年 -> 流年`。键的最小值即该造可推的第一年（实测等于出生年）。
 LuckTable = dict[int, AnnualLuck]
@@ -1134,7 +1244,7 @@ def partner_profile(chart: BaziChart, side: PartnerSide) -> HehunPartner:
 
 
 def hehun_provenance(reference: date, pair: HehunChartPair) -> HehunProvenance:
-    """溯源：版本、参考日、规则条数、十张表与方法声明。
+    """溯源：版本、参考日、规则条数、十一张表与方法声明。
 
     `rule_count` 回显的是**表里有多少条**，不是**这一对命中了多少条** —— 后者页面上
     直接数得出来（`fired`），前者才是"这套说法一共 29 条、每条都可核对"那句话的凭据。
@@ -1183,21 +1293,26 @@ def compute_hehun(
         window=axis_window(male_luck, female_luck),
     )
     rows = hehun_rows(pair)
+    score = hehun_ledger(rows)
+    complement_chart = complement(pair)
+    nayin_pair = nayin_view(pair)
+    axis = hehun_axis(
+        pair,
+        male_luck,
+        female_luck,
+        start_year=span.start_year,
+        years=span.end_year - span.start_year + 1,
+    )
     return BaziHehunResult(
         male=partner_profile(pair.male, "male"),
         female=partner_profile(pair.female, "female"),
-        score=hehun_ledger(rows),
+        score=score,
         matrix=pair_matrix(pair),
         fired=hehun_fired(rows),
-        complement=complement(pair),
-        nayin=nayin_view(pair),
-        axis=hehun_axis(
-            pair,
-            male_luck,
-            female_luck,
-            start_year=span.start_year,
-            years=span.end_year - span.start_year + 1,
-        ),
+        complement=complement_chart,
+        nayin=nayin_pair,
+        axis=axis,
         yi_ji=yi_ji(pair),
+        plain=hehun_plain(score, complement_chart, nayin_pair, axis),
         provenance=hehun_provenance(reference, pair),
     )

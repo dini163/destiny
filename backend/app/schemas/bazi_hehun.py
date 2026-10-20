@@ -18,7 +18,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.schemas.bazi import DayunStep, WuxingScore
-from app.schemas.common import CalendarType, ProvenanceTable
+from app.schemas.common import CalendarType, PlainSection, ProvenanceTable
 from app.schemas.scoring import ScoreValue
 
 #: 乾/坤。键位即性别（spec §5.1），所以 `HehunProfile` 里没有 `gender` 字段。
@@ -310,4 +310,7 @@ class BaziHehunResult(BaseModel):
     nayin: HehunNayin
     axis: HehunAxis
     yi_ji: HehunYiJi
+    plain: list[PlainSection] = Field(
+        description="合盘白话三节：契合分的来历、五行互给、同频的段落（批次二 spec §5）。"
+    )
     provenance: HehunProvenance
