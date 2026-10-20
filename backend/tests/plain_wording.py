@@ -82,7 +82,8 @@ PREDICTION_GATED_SYSTEMS: frozenset[str] = frozenset({"western", "transit", "ved
 #: 批次二 spec §4.2 的账本词面清单（合婚四档 + 六宜忌组 + 七条规则短名，跨两份语料测与三份
 #: golden 共用）。后五串出自 `content/bazi_transit_rules.TRANSIT_RULES` 的 `label`，与岁运三片同源，
 #: 所以这张表住在这里而不是某个系统的语料测里——清单定义在测模块里再被另一个测模块 import，
-#: 那个文件会在两个模块名下各导一次（`tests/test_plain_corpora.py:71-82` 记的坑）。
+#: 那个文件会在两个模块名下各导一次（坑记在 `tests/test_plain_corpora.py::
+#: test_sectionless_roster_is_the_named_exceptions_verbatim` 的 docstring 里）。
 #: **只准增不准删**，删要走裁定——每加一枚就是替某张表挡住一次「把账本短名念进散文」。
 LEDGER_WORDS: tuple[str, ...] = (
     "天作之合", "相得益彰", "中和可处", "欠和宜慎",
@@ -90,9 +91,12 @@ LEDGER_WORDS: tuple[str, ...] = (
     "我忌彼旺", "我忌彼弱", "半合忌", "三合成忌", "三会忌", "运干入忌", "运支主气入忌",
 )
 
-#: 取向词门（批次二 spec §8 第 5 条，本批**自加**、不是工厂门；口径同
-#: `tests/content/test_kabbalah_plain_corpus.py` 的 `PLAIN_VERDICT_WORDS` 那六串）。
-#: 它们不在 `ADVICE_TOKENS` 里，所以六字表放过、这条拦住：白话只报账本形状，不给盘面定顺逆。
+#: 取向词门（批次二 spec §8 第 5 条，本批**自加**、不是工厂门）。口径的正主是
+#: `app/content/kabbalah_plain.py` 头注那十串（顺势/逆势/有利/不利/吉/凶/宜/忌/好运/厄运），
+#: 本表只取 `ADVICE_TOKENS` 管不到的那六串——余下四字（宜/忌/吉/凶）已由六字表拦着，
+#: 那张表在测试侧叫 `VERDICT_TOKENS`（卡巴拉语料测以 `PLAIN_VERDICT_WORDS` 之名 import 它，
+#: 四字口径，不是六串）。它们不在 `ADVICE_TOKENS` 里，所以六字表放过、这条拦住：
+#: 白话只报账本形状，不给盘面定顺逆。
 ORIENTATION_WORDS: tuple[str, ...] = ("顺势", "逆势", "有利", "不利", "好运", "厄运")
 
 

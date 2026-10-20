@@ -1,25 +1,37 @@
-"""合婚白话表：工厂看不到的那五件事（批次二 spec §9.1）。
+"""合婚白话表：工厂看不到的那七件事（批次二 spec §9.1 + J-T1 评审轮）。
 
 工厂管措辞四条与 `set(entries) == universe()`；这里钉它结构上够不着的：
 ① 登记身份（R24：`PLAIN_CORPORA` 是同键字面量字典，两行 `hehun` 会静默留后一条）；
 ② 两张键表与引擎 / 契约的**词面一致**（`hehun_tier` 改一个档名、`AxisSync` 加一档，
    工厂看不见，本文件的 `get_args` 对账看得见）；
 ③ 七条互异；④ 三句框架的样例句过 `frame_violations`，且每个槽位被引用一次；
-⑤ 禁插清单（spec §4.2）：账本词面在白话文本里零命中。
+⑤ 禁插清单（spec §4.2）：账本词面在白话文本里零命中；
+⑥ 样例句本身是**引擎给得出的形状**（`plus − minus == value` 的账本恒等式 + 平局取最早那一段），
+   框架门只量单句形状，量不到槽与槽之间的算术（评审轮 I1 / C2）；
+⑦ 出处串自守：`HEHUN_PLAIN_SOURCE` 点名的四处常量真在位、且真的就是 `hehun_tier` / `axis_sync`
+   在用的那几道分界（spec §8.7）。
 """
 
 from typing import get_args
 
+from app.content.bazi_hehun_rules import (
+    HEHUN_BASE,
+    HEHUN_SYNC_CLOSE,
+    HEHUN_SYNC_WIDE,
+    HEHUN_TOP_CUT,
+)
 from app.content.hehun_plain import (
     HEHUN_AXIS_FRAME,
     HEHUN_COMPLEMENT_FRAME,
+    HEHUN_PLAIN_SOURCE,
     HEHUN_READINGS,
     HEHUN_SCORE_FRAME,
     HEHUN_SECTION_TITLES,
     HEHUN_SYNC_KEYS,
     HEHUN_TONE_KEYS,
 )
-from app.engines.bazi_hehun import hehun_tier
+from app.engines.bazi_hehun import axis_sync, hehun_tier
+from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.plain_compose import num, overview
 from app.engines.plain_corpora import HEHUN, PLAIN_CORPORA
 from app.schemas.bazi_hehun import AxisSync
@@ -35,12 +47,14 @@ from tests.plain_wording import (
 )
 
 #: 三句框架的样例句：喂**真实形状**的槽值——小数由 `num()` 出串、五行串是「木、火」这种
-#: 顿号连接的单字、干支是两字串、`{best_start}` / `{best_end}` 恒为年份串（`axis_years` 契约
-#: `ge=1`，段表不空，所以「没有」这一支在生产里不存在，见 `hehun_plain` 的框架句注）。
+#: 顿号连接的单字、`{best_start}` / `{best_end}` 恒为年份串（`axis_years` 契约 `ge=1`，段表不空，
+#: 所以「没有」这一支在生产里不存在，见 `hehun_plain` 的框架句注）。三份 SCORE 三元组还各自
+#: 满足账本恒等式（`test_score_samples_obey_the_ledger_identity`），第三份 AXIS 喂的是尺在平局时
+#: 给得出的那一形（`同频` 计数为 0 ⇒ 全平局 ⇒ 最早那一段），不是随手编的年份。
 SCORE_SAMPLES: dict[str, dict[str, str]] = {
     "小数分": {"value": num(62.5), "plus": num(78.5), "minus": num(16.0)},
-    "零分且负账": {"value": num(0.0), "plus": num(9.0), "minus": num(24.5)},
-    "整数高分": {"value": num(85.0), "plus": num(63.0), "minus": num(4.0)},
+    "零分且负账": {"value": num(0.0), "plus": num(50.0), "minus": num(50.0)},
+    "整数高分": {"value": num(85.0), "plus": num(90.0), "minus": num(5.0)},
 }
 
 COMPLEMENT_SAMPLES: dict[str, dict[str, str]] = {
@@ -85,8 +99,8 @@ AXIS_SAMPLES: dict[str, dict[str, str]] = {
         "aligned": num(0),
         "half": num(2),
         "apart": num(3),
-        "best_start": num(2027),
-        "best_end": num(2028),
+        "best_start": num(2026),
+        "best_end": num(2027),
     },
 }
 
@@ -147,3 +161,36 @@ def test_frames_meet_the_frame_gate_when_instantiated() -> None:
 
 def test_section_titles_are_three_and_pinned() -> None:
     assert HEHUN_SECTION_TITLES == ("契合分的来历", "五行互给", "同频的段落")
+
+
+def test_score_samples_obey_the_ledger_identity() -> None:
+    """样例句得是**引擎给得出的三元组**：`plus − minus == value` 且 `plus ≥ 起点那一笔`。
+
+    框架门只看单句形状，管不到槽与槽之间的算术；而这一节把三个数并排印给读者，读者一减就看见矛盾。
+    `build_ledger` 把起点分作为恒在的正数行放进 `factors`，所以按符号求和必满足等式且 `plus` 不小于起点。
+    """
+    for name, slots in SCORE_SAMPLES.items():
+        value, plus, minus = (float(slots[key]) for key in ("value", "plus", "minus"))
+        assert plus - minus == value, name
+        assert plus >= HEHUN_BASE, name
+
+
+def test_the_source_string_names_the_cuts_it_claims() -> None:
+    """出处串自守（spec §8.7：串不进 `wording_violations`，由语料测自守；AGENTS §7 的诚实性压在这一行）。
+
+    串里点名的四处常量必须**真的存在**、真的叫这几个名字，且 `hehun_tier` 的三道分界确实落在
+    `HEHUN_TOP_CUT` / `STRONG_CUT` / `WEAK_CUT` 上——改名或换分界而散文照旧、门照绿，是这条拦的形状。
+    """
+    for name in ("HEHUN_TOP_CUT", "STRONG_CUT", "WEAK_CUT", "HEHUN_SYNC_CLOSE", "HEHUN_SYNC_WIDE"):
+        assert name in HEHUN_PLAIN_SOURCE, name
+    assert "自撰" in HEHUN_PLAIN_SOURCE
+    assert hehun_tier(HEHUN_TOP_CUT) == "天作之合"
+    assert hehun_tier(HEHUN_TOP_CUT - 0.1) == "相得益彰"
+    assert hehun_tier(STRONG_CUT) == "相得益彰"
+    assert hehun_tier(STRONG_CUT - 0.1) == "中和可处"
+    assert hehun_tier(WEAK_CUT) == "中和可处"
+    assert hehun_tier(WEAK_CUT - 0.1) == "欠和宜慎"
+    assert axis_sync(HEHUN_SYNC_CLOSE) == "同频"
+    assert axis_sync(HEHUN_SYNC_CLOSE + 0.1) == "半同步"
+    assert axis_sync(HEHUN_SYNC_WIDE) == "半同步"
+    assert axis_sync(HEHUN_SYNC_WIDE + 0.1) == "背离"

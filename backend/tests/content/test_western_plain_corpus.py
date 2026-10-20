@@ -365,7 +365,8 @@ def test_the_source_string_is_a_provenance_string_not_a_sentence() -> None:
 def test_the_corpus_is_registered_under_its_own_system_name() -> None:
     """登记行在，且登记的对象就是本地门逐条跑过的那一个。
 
-    `key == corpus.system` 这一条工厂自己也查（`test_plain_corpora.py:40-50`），但工厂查的是
+    `key == corpus.system` 这一条工厂自己也查（`tests/test_plain_corpora.py::
+    test_at_least_one_corpus_is_registered`），但工厂查的是
     「键与它指向的对象同值」，查不出「这张表整个不在字典里」——少一行时工厂只是用例变少，
     全绿。所以同值这条必须在**这里**也钉一遍，两边的失败形状才互补。
     """
