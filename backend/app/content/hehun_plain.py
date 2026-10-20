@@ -17,9 +17,13 @@
    跨档的「谁抵得更多」这类比较不进句子，`中和可处` 那一档容得下「一条命中都没有、只剩起点那一笔」
    这一页，所以这一支由那句自己说出来，不留给读者想象。
 ④ 抵回去的那一边**可以一个也没有**（`plus` 含起点那一笔且 `minus` 可为零，90/0 就是天作之合），
-   所以 top/strong 不许写成「抵掉的那几笔没能…」这种预设它存在的句式（评审轮 round 2 D）；
-   只有 low 敢断言这一边占了上风——`value < 45` 而 `plus ≥ 50` ⇒ `minus > 5` 是定理。
-   复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import hehun_tier; print(hehun_tier(90.0))"` → `天作之合`。
+   所以 top/strong/middle 不许写成「抵掉的那几笔没能…」这种预设它存在的句式（评审轮 round 2 D）；
+   `low` 只许说「那几笔确实存在、净额被带到了起点那一笔之下」——那是定理（`value < 45` 而
+   `plus ≥ 50` ⇒ `minus > 5`），但**不许**说这一边「占了上风」：`value = plus − minus` 非负
+   ⇒ `plus ≥ minus` 在**每一页**都成立，而同一节上面那行就把这两个合计并排印给读者
+   （round 3 F-2 改的就是这半句）。
+   复测（90/0 落最高档）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import hehun_tier; print(hehun_tier(90.0))"` → `天作之合`；
+   复测（最低档里加的那一边仍然更大）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import HehunRow, hehun_ledger; s = hehun_ledger([HehunRow('r1', 'L1', 'f', 'both', 10.0), HehunRow('r2', 'L2', 'f', 'both', -10.0), HehunRow('r3', 'L3', 'f', 'both', -10.0)]); print(s.value, sum(f.delta for f in s.factors if f.delta > 0), sum(-f.delta for f in s.factors if f.delta < 0), s.tier)"` → `40.0 60.0 20.0 欠和宜慎`。
 """
 
 HEHUN_PLAIN_SOURCE = (
@@ -61,8 +65,8 @@ HEHUN_TONE_READINGS: dict[str, str] = {
         "方向不完全一致，这一页一条命中都没有、只剩起点那一笔时也是这一档。"
     ),
     "hehun.tone.low": (
-        "抵回去的那一边这回占了上风，把净额带到起点那一笔之下，你读到的是同一条线索在你们两边来回"
-        "拉扯，两边的账眼下对不齐，这一档落在整把尺的最低那一段。"
+        "这一页上，相互抵掉的那几笔确实存在，还把净额带到了起点那一笔之下，你读到的是同一条线索"
+        "在你们两边来回拉扯，两边的账眼下对不齐，它落在整把尺的最低那一段。"
     ),
 }
 
@@ -76,8 +80,8 @@ HEHUN_SYNC_READINGS: dict[str, str] = {
         "岁运落到两个人身上并不等重，轻重隔开了一层。"
     ),
     "hehun.sync.apart": (
-        "把两人同一年的岁运分相减，得数已经越过最宽那一条线，两条年头差得开，你读到的是轻重很"
-        "不一样，这一把尺量的是差的大小，说不出哪一头更重。"
+        "两人同一年的岁运分相减，得数已经越过最宽那一条线，两条年头差得开，你读到的是轻重很不"
+        "一样，这一把尺量的是差的大小，说不出哪一头更重。"
     ),
 }
 
