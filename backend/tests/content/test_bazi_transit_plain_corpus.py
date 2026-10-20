@@ -9,8 +9,9 @@
    框架门只量单句形状，量不到槽与槽之间的算术（J-T1 评审轮 I1 的同一条路子）；
 ⑦ 边界页：单流年页（`count` 为 1、`best` 即 `worst`）、未起运页（`{dayun}` 落 `尚未起运`）、
    月极值并列页、零命中页与十二格同分页——后两形由契约承认（`TransitDayCell.day_hits` /
-   `TransitHourCell.hour_hits` 的字段说明自己写着「一条未中为 []」），实测六段 184 日与六日 72 格
-   里都没有出现，所以它们只进样例句、不写进句子；
+   `TransitHourCell.hour_hits` 的字段说明自己写着「一条未中为 []」），本表不报「扫过几段共几格」
+   那类数（时辰表每天恒出十二格，格数只是十二的整倍数，没有一条命令能把它跑出来），
+   所以它们只进样例句、不写进句子；
 ⑧ 三页节标题名单（`BAZI_TRANSIT_TITLES`）是装配与前端共用的那一份，键序即页面序；
 ⑨ 出处串自守：`BAZI_TRANSIT_PLAIN_SOURCE` 点名的两道分界常量真在位、真的就是 `_tier` 在用的那两道。
 
@@ -72,7 +73,8 @@ _BANNED = [
 #: 流时第三节的「零命中契约一形」。那个「三」的复测（`chr(...)` 拼的就是「契约一形」四字，
 #: 为中文字面量不进 `-c`）：`cd backend && PYTHONIOENCODING=utf-8
 #: .venv/Scripts/python.exe -c "import tests.content.test_bazi_transit_plain_corpus as m; tag=chr(0x5951)+chr(0x7EA6)+chr(0x4E00)+chr(0x5F62); print(sum(1 for _f, s in m.FRAMES for k in s if tag in k))"` → `3`。
-#: 它们是 schema 字段说明承认的形状（`day_hits` / `hour_hits` 为空数组），实测六段未见，
+#: 它们是 schema 字段说明承认的形状（`day_hits` / `hour_hits` 为空数组）；本表不报「扫过几段共几格」
+#: 那类经验数（时辰表每天恒出十二格，任何扫描的格数都只是十二的整倍数，格数本身不是凭据），
 #: 收进来只为让边界值必须过门，而不是宣称那样一页今天存在。
 RANGE_SAMPLES: dict[str, dict[str, str]] = {
     # 复测：`-c "import tests.test_bazi_transit as T; r=T._default(); print([(y.year, y.score.value) for y in r.years])"`
@@ -186,7 +188,8 @@ LIURI_MONTH_SAMPLES: dict[str, dict[str, str]] = {
 }
 
 LIURI_DAYS_SAMPLES: dict[str, dict[str, str]] = {
-    # 同上月段：29 格，最高 己酉 77.0、最低 甲午 16.0（日柱在一个月内不重复：60 甲子对 ≤ 33 格）。
+    # 同上月段：29 格，最高 己酉 77.0、最低 甲午 16.0（段内日柱不可能重格：月段按相邻两「节」切，
+    # 节气间隔恒短于日柱 60 甲子那一循环，这是结构事实，不靠扫过几格）。
     "月内日柱不重": {
         "count": num(29),
         "high": "己酉",
@@ -211,7 +214,7 @@ LIURI_FOCUS_SAMPLES: dict[str, dict[str, str]] = {
     "七条命中": {"date": "2028-01-15", "ganzhi": "己亥", "value": num(60.0), "hits": num(7)},
     # `focus_date=2029-10-20`：癸未 67.0，`ri.` 行 5 条。
     "五条命中": {"date": "2029-10-20", "ganzhi": "癸未", "value": num(67.0), "hits": num(5)},
-    # 契约一形（`TransitDayCell.day_hits` 字段说明：「一条未中为 []」）；实测六段 184 日未见。
+    # 契约一形（`TransitDayCell.day_hits` 字段说明：「一条未中为 []」），本表不报扫过几格的数。
     "零命中契约一形": {"date": "2031-05-05", "ganzhi": "壬辰", "value": num(63.0), "hits": num(0)},
 }
 
@@ -254,7 +257,8 @@ LIUSHI_HOURS_SAMPLES: dict[str, dict[str, str]] = {
         "span": num(round(4.0 - 0.0, 2)),
     },
     # 契约一形（`TransitHourCell.hour_hits` 字段说明：「时段一条未中为 []，此时本格分值等于日头分」
-    # ⇒ 十二格同分，`max` 与 `min` 都取时辰序首格，`{span}` 落 0）；实测六日 72 格未见。
+    # ⇒ 十二格同分，`max` 与 `min` 都取时辰序首格，`{span}` 落 0）；时辰表每天恒出十二格，
+    # 扫多少日都只是十二的整倍数，所以这里只挂契约标签，不挂「扫过 N 格未见」那种经验数。
     "十二格同分契约一形": {
         "top_zhi": "子",
         "top_clock": "23:00",

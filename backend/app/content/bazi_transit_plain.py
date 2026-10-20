@@ -28,12 +28,17 @@
    `tier`、流时取日段账本的 `tier`。所以三条档位句的主语一律是「这一段」，不许指定是年、月、
    日还是时；涉及「叠」与「抵」的比较一律按**摊下来**说，因为岁运那一页说的本来就是平均数。
    摊下来的算术根据（一页一本账时也逐字成立）：`value = 起点那一笔 + Σ(正行) − Σ(负行)`，
-   起点那一笔恒为 `TRANSIT_BASE = 50.0`，`value >= 65` 蕴含正行摊下来厚过负行，
-   `value < 45` 蕴含负行厚过正行加上五分之差。
+   起点那一笔恒为 `TRANSIT_BASE = 50.0`（`content/bazi_transit_rules.py`），它就是 `build_ledger`
+   放进账本的**第一行**（`schemas/scoring.py` 的 `ScoreFactor` 注着 "factors[0] carries the base
+   term"）。**本门面里「正行」只指起点之外那些 delta 为正的行**；含起点那一笔的那个合计一律另写作
+   「加的一边」，两个数不共用一个名字。于是 `value >= 65` 蕴含正行摊下来厚过负行，
+   `value < 45` 蕴含负行厚过正行加上五分之差——两条都是 `50 + 正行 − 负行 = value` 的变形。
    反例摆在这里，防止有人把 ③ 写成方向错觉：`value < 45` **不**蕴含「抵掉的比加进来的多」——
-   按符号求和时起点那一笔算在正的一边，所以加的一边永远不小于抵的一边（实测：本夹具 2026 年那一页
-   `value 29.0`，正行合计 `58.0`、负行合计 `29.0`，复测：
-   `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_transit as T; y=min(T._transit().years, key=lambda v: v.score.value); print(y.year, y.score.value, sum(f.delta for f in y.score.factors if f.delta > 0), sum(-f.delta for f in y.score.factors if f.delta < 0))"` → `2026 29.0 58.0 29.0`）。
+   按符号求和时起点那一笔算在加的一边，所以加的一边永远不小于抵的一边（实测：本夹具 2026 年那一页
+   `value 29.0`，加的一边含起点那一笔共 `58.0`，其中起点之外的正行只有 `8.0`，抵的一边 `29.0`
+   ⇒ `29 > 8 + 5` 立，而 `29 > 58 + 5` 破不了。五个数依次是年、分、加的一边、起点之外的正行、
+   抵的一边；剥掉 `factors[0]` 就是剥掉起点那一笔，复测：
+   `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_transit as T; y=min(T._transit().years, key=lambda v: v.score.value); g=y.score.factors; print(y.year, y.score.value, sum(f.delta for f in g if f.delta > 0), sum(f.delta for f in g[1:] if f.delta > 0), sum(-f.delta for f in g if f.delta < 0))"` → `2026 29.0 58.0 8.0 29.0`）。
    于是 `滞` 那一句只许说「负行摊下来厚过起点之外的正行」，不许说「抵掉的压过加进来的」。
    这条主语口径的机械版在
    `tests/content/test_bazi_transit_plain_corpus.py::test_the_three_sentences_never_name_a_calendar_unit`：
@@ -44,15 +49,20 @@
    取第一个），所以句子里那句「并列取最前」是尺本身的话，不是修辞。
 
 边界页清单（每句框架的真值都要在这些页上成立，门测 `tests/content/test_bazi_transit_plain_corpus.py`
-按这些形状喂样例句；标「实测」的都在本文件某条注释里给了复测命令，标「契约一形」的由 schema
-字段说明承认、本次扫描未见，所以它们只进门测、不进句子）：单流年页（`start_year == end_year`，
-实测 `{count}` 为 1、`{best_*}` 与 `{worst_*}` 同一年同一分）、未起运页（实测
+按这些形状喂样例句；标「实测」的都在本文件某条注释里给了跑出它的复测命令，标「契约一形」的只由
+schema 的字段类型与字段说明承认、不宣称今天存在这样一页，所以它们只进门测的样例句——两句 FOCUS 框架句**只许以条件形**
+提到「一条也没有」那一形（「一条也没有也照样是这一格的形状」不宣称存在这样一页），别的写法一律不许）：
+单流年页（`start_year == end_year`，实测年表只出一格 ⇒ `{count}` 为 1、`{best_*}` 与 `{worst_*}`
+同一年同一分，复测见下面「单流年页的复测」那条）、未起运页（实测
 `_transit(start_year=1990, end_year=1992).dayun_covered` 的 `ganzhi` 是 `['']`，`{dayun}` 落
 `尚未起运`）、月极值并列页（实测 `focus_year=2026` 的 癸巳 / 甲午 同为 0.0）、整段无一格够得着
-高分界的月段页（实测 2026-06 段 `32 格 / 顺 0 / 滞 32`、`{value}` 为 0.0）、零命中页（`day_hits` /
-`hour_hits` 为空数组 ⇒ `{hits}` 为 0：契约一形，六段 184 个流日格与六日 72 个时辰格里未见）、
-十二格同分页（⇒ `{top_zhi}` 即 `{low_zhi}`、`{span}` 为 0：契约一形，同上未见）。
+高分界的月段页（实测 2026-06 段 `32 格 / 顺 0 / 滞 32`、`{value}` 为 0.0，四个数都出自流日第一节
+那条命令）、零命中页（`day_hits` / `hour_hits` 为空数组 ⇒ `{hits}` 为 0：契约一形，本清单不宣称
+今天存在这样一页，扫过多少格也不在这里报——那类格数没有能跑出它的命令）、十二格同分页（⇒ `{top_zhi}` 即 `{low_zhi}`、
+`{span}` 为 0：契约一形、同上不作存在宣称；时辰表每天恒出 12 格，扫几天都只得到 12 的整倍数，格数本身
+不是判据）。
 未起运页的复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_transit as T; print([s.ganzhi for s in T._transit(start_year=1990, end_year=1992).dayun_covered])"` → `['']`。
+单流年页的复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_transit as T; y=T._transit(start_year=2029, end_year=2029).years; print(len(y), y[0].year, y[0].score.value)"` → `1 2029 74.0`（年表就一格，`max` 与 `min` 打在单格年表上必然是同一年同一个分）。
 """
 
 BAZI_TRANSIT_PLAIN_SOURCE = (
@@ -88,7 +98,7 @@ BAZI_TRANSIT_READINGS: dict[str, str] = {
         "起点那一笔自己就落在这两道线中间，你读到的是这一段眼下摊下来的净额没被哪一边推出线外。"
     ),
     "bazi_transit.tone.zhi": (
-        "这一段摊到尺上落在低分界那一条线之下，账上抵掉的那几笔确实在，而且摊下来厚过起点之外"
+        "这一段自己落在低分界那一条线之下，账上抵掉的那几笔确实在，而且摊下来厚过起点之外"
         "叠上来的那几笔，你读到的是这段账的净额被压到了起点那一笔以下，往后的事不由这张表替你定。"
     ),
 }
@@ -125,17 +135,21 @@ BAZI_TRANSIT_MONTH_FRAME = (
 
 #: 流日第一节：`{value}` 是月段账本自己的分（页面月卡同一个数，不重算均值），
 #: `{strong}` / `{weak}` 数的是这一月各日的 `tier`。整段无高分格的那一页真实存在：
-#: 复测 `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liuri as L; from datetime import date; r=L.compute_liuri_matrix(**L._NATAL_KWARGS, anchor_date=date(2026,6,15), reference_date=date(2026,6,15)); print(len(r.days), sum(1 for d in r.days if d.tier=='顺'), sum(1 for d in r.days if d.tier=='滞'))"`
-#: → `32 0 32`。起止两串只从槽里来，句子不做第二个日期推算。
+#: 复测 `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liuri as L; from datetime import date; from tests.plain_wording import TIER_WORDS as W; r=L.compute_liuri_matrix(**L._NATAL_KWARGS, anchor_date=date(2026,6,15), reference_date=date(2026,6,15)); print(len(r.days), sum(1 for d in r.days if d.tier == W[0]), sum(1 for d in r.days if d.tier == W[2]), r.month_score.value)"`
+#: → `32 0 32 0.0`（四个数依次是段长、够得着高分界的格数、落不到低分界的格数、`{value}` 的正主；
+#: 档位名走 `TIER_WORDS` 的下标而不是字面量，为的是这条命令能原样贴进 shell）。
+#: 起止两串只从槽里来，句子不做第二个日期推算。
 BAZI_LIURI_MONTH_FRAME = (
     "{ganzhi} 这一段从 {start_solar} 管到 {end_solar}，月段自己的分记作 {value}，"
     "摊进这段日子时够得着高分界那一条线的有 {strong} 格、落不到低分界那一条线的有 {weak} 格，"
     "其余的日子这两个数都不算，你看到的是这一月的账压在日上怎么散开。"
 )
 
-#: 流日第二节：`{high}` / `{low}` 是日柱干支串。干支在一个月段里不重格：日柱 60 甲子才一循环，
-#: 只要段长不超过 60 格就不可能重格，而月段按相邻两节气切，本次扫过的七段里最长 32 格
-#: （复测见流日第一节那条命令的 `len(r.days)`），所以「哪一格」指得准。
+#: 流日第二节：`{high}` / `{low}` 是日柱干支串。「干支在一个月段里不重格」是一条结构事实，
+#: 不需要扫描背书：一年只排十二个月柱，段界就是相邻两个「节」的交界（`engines/bazi_liuri.py`
+#: 的节气月段），一段三十天上下，恒在日柱 60 甲子那个循环的长度之下 ⇒ 同一段里日柱不可能重格，
+#: 「哪一格」因此指得准。留下一个可复现的锚点：本夹具 `anchor_date=2026-06-15` 那一段的段长是 32
+#: （复测即流日第一节那条命令的第一个数 `len(r.days)` → `32`）。
 #: 整段同分那一形里 `max` 与 `min` 都落回排在最前的那一格，句子已经先说了并列取最前。
 BAZI_LIURI_DAYS_FRAME = (
     "这一月摊开成 {count} 个日子，日分最高的是 {high} 那一格，{high_value} 分，"
@@ -145,14 +159,17 @@ BAZI_LIURI_DAYS_FRAME = (
 
 #: 流日第三节：`{hits}` 是 `ri.` 段命中行数，不是判语；命中行的 `label` 与 `reading` 都不进槽
 #: （禁插清单，口径 ②）。`day_hits` 为空数组那一形由 `TransitDayCell.day_hits` 的字段说明承认
-#: （「一条未中为 []」）；实测六段共 184 格未见，所以它只进门测样例句，不写进句子。
+#: （「一条未中为 []」）——它的凭据是字段类型与字段说明，不是某次扫描的格数，所以它只进门测样例句；
+#: 句子那一侧只许以条件形提到它，口径见门面边界清单的前言。
 BAZI_LIURI_FOCUS_FRAME = (
     "聚焦的 {date} 是 {ganzhi} 这一格，日分记到 {value}，落在它身上的流日规则命中 {hits} 条，"
     "条数是账本行数不是判语，一条也没有也照样是这一格的形状，你读到的是这一天在表里占的位置。"
 )
 
 #: 流时第一节：只报日段那一段的账，十二格各自的分归第二节那句。
-#: `{value}` 可以为 0.0（实测 2026-06-15 庚申那天的日段就是 0.0，同上面流日那条命令同源）。
+#: `{value}` 可以为 0.0（实测 2026-06-15 那一天的日段就是 0.0，日柱 庚申；它有自己的复测，
+#: 与流日那条各数各的账，别混为一谈：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liushi as L; from datetime import date; r=L.compute_liushi_day(**L._NATAL_KWARGS, solar_date=date(2026,6,15), reference_date=date(2026,6,15)); print(r.day_ganzhi, r.day_score.value)"` → `庚申 0.0`）。
 BAZI_LIUSHI_DAY_FRAME = (
     "{date} 这一天的日柱是 {ganzhi}，日段自己的分记到 {value}，"
     "这一句只报当日那一段的账，不报它下面每一格各自的分，"
@@ -162,7 +179,9 @@ BAZI_LIUSHI_DAY_FRAME = (
 #: 流时第二节：`{span}` 的正主是 `round(高分 − 低分, 2)`，句子不许在槽外再算一次差
 #: （口径 ④）。十二格同分那一形由 `TransitHourCell.hour_hits` 的字段说明承认
 #: （「时段一条未中为 []，此时本格分值等于日头分」⇒ 十二格同分、`{span}` 落 0、
-#: `max` 与 `min` 都取时辰序首格）；实测六日 72 格未见，同样只进样例句。
+#: `max` 与 `min` 都取时辰序首格）；这一形同样只进样例句——时辰表每天恒出十二格
+#: （`engines/bazi_liushi.py` 的 `HOUR_ZHI` 十二支），扫几天都只得到 12 的整倍数，
+#: 所以这里不报「扫过几日共几格」那种没有命令能跑出的数。
 #: 钟面只报 `{*_clock}` 起点：23:00 那一格的起点钟面属于前一日，句子不提日界。
 BAZI_LIUSHI_HOURS_FRAME = (
     "时辰那张表里分最高的一格是 {top_zhi} 时，钟面 {top_clock} 起，{top_value} 分，"
