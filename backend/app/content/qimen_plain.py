@@ -21,7 +21,8 @@ import engines/schemas）。
 
 QIMEN_PLAIN_SOURCE = (
     "本系统白话转述 · 逐条对应 content/qimen.py 的九星·八门·八神类象（nature），"
-    "并转述其五行与本位洛书数，取向字（`luck` 字段那一类判词）不在白话内，仍归源表与盘面"
+    "并转述其五行与本位洛书数，取向字（`luck` 字段那一类判词）不在白话内，仍归源表与盘面。"
+    "全局四句为盘面事实的自撰框架，不含上游判词"
 )
 
 
@@ -38,6 +39,11 @@ def door_key(name: str) -> str:
 def god_key(name: str) -> str:
     """八神键；`name` 逐字取 `EIGHT_GODS` 的名字元组。"""
     return f"qimen.god.{name}"
+
+
+def overview_key(name: str) -> str:
+    """全局框架句的键；`name` 是四块盘面事实的英文短名（`zhifu` 等），不是名相。"""
+    return f"qimen.overview.{name}"
 
 
 #: 九宫开篇句。键 = `LUOSHU[n].gua`（`content/qimen.py:40-50`）逐字，含中宫的 `中`。
@@ -95,11 +101,21 @@ QIMEN_GOD_MEANINGS: dict[str, str] = {
     "九天": "九天写作扬动高远、出行扩张，你在这一格读到的是往上走、往外扩、动静摊得开的那股气势。",
 }
 
-#: 聚合表：25 条、三个前缀段互不撞名（`qimen.star.` / `qimen.door.` / `qimen.god.`）。
+#: 四条全局框架句（批次一 spec §6）：只报盘面事实（谁落哪一格、空在哪、马在哪），
+#: 四块各自独立成节，槽位由引擎在装配时填。四条都没有上游字段，属平台自撰。
+QIMEN_OVERVIEW_MEANINGS: dict[str, str] = {
+    "zhifu": "值符{star}落在{number}宫，这条主线讲的是你这一局里最要紧的那股力量从哪一格推动全局，先认准它再往下看。",
+    "zhishi": "值使{door}落在{number}宫，这条门线讲的是你这一局里事情实际怎么走、从哪一格开合，落点就在这一门。",
+    "shigan": "时干{gan}落在{number}宫，这一格是你当下所问之事在盘上的落点，读盘时先从这里入手，再对照其他宫位。",
+    "kongma": "旬空落在{kong}，驿马在{ma}，这两样讲的是你这一局里哪一处暂时使不上力、哪一处已经动起来，读盘时先把这两笔放在一边。",
+}
+
+#: 聚合表：29 条、四个前缀段互不撞名（`qimen.star.` / `qimen.door.` / `qimen.god.` / `qimen.overview.`）。
 #: 键由构造函数施加，条目全是字面句子，所以「少写一格」仍被工厂的
 #: `set(entries) == universe()` 抓到（同 `content/ziwei_plain.py` 的聚合表）。
 QIMEN_READINGS: dict[str, str] = {
     **{star_key(name): text for name, text in QIMEN_STAR_MEANINGS.items()},
     **{door_key(name): text for name, text in QIMEN_DOOR_MEANINGS.items()},
     **{god_key(name): text for name, text in QIMEN_GOD_MEANINGS.items()},
+    **{overview_key(name): text for name, text in QIMEN_OVERVIEW_MEANINGS.items()},
 }

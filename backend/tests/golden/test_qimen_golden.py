@@ -448,3 +448,12 @@ def test_palace_lines_follow_the_gua_opener_then_star_door_god(anchor: Anchor) -
         assert lines[1:-2] == [QIMEN.entries[star_key(star.name)] for star in palace.stars]
         assert lines[-2] == QIMEN.entries[door_key(palace.door.name)]
         assert lines[-1] == QIMEN.entries[god_key(palace.god.name)]
+
+
+def test_the_chart_carries_four_overview_sections() -> None:
+    chart = _chart()
+    assert [s.title for s in chart.plain] == ["值符主线", "值使门线", "时干落宫", "旬空与驿马"]
+    assert chart.zhifu_star in chart.plain[0].text and str(chart.zhifu_palace) in chart.plain[0].text
+    assert chart.zhishi_door in chart.plain[1].text and str(chart.zhishi_palace) in chart.plain[1].text
+    assert chart.time_ganzhi[0] in chart.plain[2].text
+    assert chart.kongwang in chart.plain[3].text and chart.yima in chart.plain[3].text

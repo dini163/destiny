@@ -51,7 +51,7 @@ TOP_LEVEL_KEYS = {
     "jieqi", "yuan", "dun", "ju_number", "ju_name",
     "xunshou", "xunshou_yi", "zhifu_star", "zhishi_door",
     "zhifu_palace", "zhishi_palace", "kongwang", "yima",
-    "palaces", "engine", "provenance",
+    "palaces", "plain", "engine", "provenance",
 }
 
 PALACE_KEYS = {
@@ -75,7 +75,7 @@ FRONTEND_CHART_KEYS = {
     "jieqi", "yuan", "dun", "ju_number", "ju_name",
     "xunshou", "xunshou_yi", "zhifu_star", "zhishi_door",
     "zhifu_palace", "zhishi_palace", "kongwang", "yima",
-    "palaces", "engine", "provenance",
+    "palaces", "plain", "engine", "provenance",
 }
 
 FRONTEND_PALACE_KEYS = {
@@ -118,7 +118,7 @@ def test_the_board_comes_back_with_exactly_the_hand_written_contract(client: Tes
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 22  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
+    assert len(TOP_LEVEL_KEYS) == 23  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
     assert body["engine"] == "qimen-luoshu-rotating"
     assert body["provenance"]["engine"] == body["engine"]  # 两处引擎名不能各说各话
     assert body["cast_time"] == "2024-05-15 10:30"

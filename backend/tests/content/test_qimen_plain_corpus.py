@@ -1,6 +1,6 @@
 """奇门白话转述表：工厂看不到的那六件事（多系统白话 spec §8 丙组、§11）。
 
-① 登记身份（R24）；② `universe()` 的构成 9+8+8=25，且星/门/神三批名字互不相同
+① 登记身份（R24）；② `universe()` 的构成 9+8+8+4=29，且星/门/神三批名字互不相同
    （奇门三家用不同前缀入键，跨批撞名撞不掉一格——真会撞的是同批之内重名，那由条数 25
    与工厂的 `set(entries) == universe()` 兜住；紫微才是跨批同键的病根，那里主星与乙级
    共用 `star_key`）；③ 小节覆盖面
@@ -20,12 +20,13 @@ from app.content.qimen_plain import (
     QIMEN_READINGS,
     door_key,
     god_key,
+    overview_key,
     star_key,
 )
 from app.engines.plain_corpora import PLAIN_CORPORA, QIMEN
 from app.engines.qimen import SCHOOL_NOTE
 from app.engines.plain_compose import reading
-from tests.plain_wording import advice_hits
+from tests.plain_wording import advice_hits, frame_violations
 
 #: 源表用汉字序数写本位（`本位居一` / `本位在一宫`），汉字表就是 `engines/qimen.py:266`
 #: 的 `_CN`（1-9），此处独立写死是因为测试不许反向 import 引擎的私物。
@@ -51,14 +52,15 @@ def test_qimen_corpus_is_the_row_the_factory_iterates() -> None:
     assert QIMEN.slot_prefixes == frozenset()
 
 
-def test_universe_is_nine_stars_plus_eight_doors_plus_eight_gods() -> None:
+def test_universe_is_nine_stars_plus_eight_doors_plus_eight_gods_plus_four_overview() -> None:
     assert (len(NINE_STARS), len(EIGHT_DOORS), len(EIGHT_GODS)) == (9, 8, 8)
     assert QIMEN.universe() == (
         {star_key(star.name) for star in NINE_STARS}
         | {door_key(door.name) for door in EIGHT_DOORS}
         | {god_key(god) for god in EIGHT_GODS}
+        | {overview_key(name) for name in _OVERVIEW}
     )
-    assert len(QIMEN.universe()) == 25
+    assert len(QIMEN.universe()) == 29
     # 三批名字互不相同。奇门用三个前缀入键，跨批撞名撞不掉格；真正会撞的是同批之内重名，
     # 那由上面的条数 25 与工厂的 `set(entries) == universe()` 兜住。这条仍保留：读者要能
     # 分清「值符」的两义（八神之名 vs 盘上的值符星角色旗标），前提就是这三批各有各的名。
@@ -164,7 +166,38 @@ def test_source_line_names_all_three_tables_it_retells() -> None:
     assert QIMEN_PLAIN_SOURCE.startswith("本系统白话转述")
     for token in FORBIDDEN:
         assert token not in QIMEN_PLAIN_SOURCE, token
-    # 奇门 25 条**全部有上游字段**（星 `nature`、门 `nature`、神 `GOD_NATURE`），
-    # 所以串里不许出现「自持」——写了就是虚报取材范围（对照紫微那条相反的要求）。
+    # 25 条名相条目全部有上游字段（星 `nature`、门 `nature`、神 `GOD_NATURE`），而新增的
+    # 四条全局框架句没有上游字段，串里必须自己说清（AGENTS §7，对照紫微那条「自持」的要求）。
     assert "自持" not in QIMEN_PLAIN_SOURCE
+    assert "自撰" in QIMEN_PLAIN_SOURCE
     assert "九星" in QIMEN_PLAIN_SOURCE and "八门" in QIMEN_PLAIN_SOURCE and "八神" in QIMEN_PLAIN_SOURCE
+
+
+#: 四条全局框架句的键名（批次一 spec §6）。名字是英文短名而不是中文，因为它们是
+#: 「这一句在讲盘的哪一块」的代号，不是盘面上的名相。
+_OVERVIEW = ("zhifu", "zhishi", "shigan", "kongma")
+
+
+def test_overview_entries_are_registered_and_framed() -> None:
+    for name in _OVERVIEW:
+        key = overview_key(name)
+        assert key in QIMEN_READINGS
+        assert QIMEN.universe() >= {key}
+        assert advice_hits(QIMEN_READINGS[key]) == [], key
+
+
+def test_overview_frames_meet_the_frame_contract_after_formatting() -> None:
+    samples = {
+        "zhifu": {"star": "天禽", "number": "5"},
+        "zhishi": {"door": "死门", "number": "2"},
+        "shigan": {"gan": "甲", "number": "5"},
+        "kongma": {"kong": "寅卯", "ma": "巳"},
+    }
+    for name, slots in samples.items():
+        text = QIMEN_READINGS[overview_key(name)].format(**slots)
+        assert frame_violations("qimen", text) == [], name
+
+
+def test_universe_is_twenty_nine_and_openers_stay_nine() -> None:
+    assert len(QIMEN.universe()) == 29
+    assert len(QIMEN.openers) == 9

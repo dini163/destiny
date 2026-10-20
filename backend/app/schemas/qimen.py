@@ -11,7 +11,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable
 
 
 class QimenRequest(BaseModel):
@@ -118,6 +118,9 @@ class QimenChart(BaseModel):
     yima: str = Field(description="驿马地支, e.g. 巳。")
 
     palaces: list[QimenPalace] = Field(description="洛书九宫，按 1-9 排列。")
+    plain: list[PlainSection] = Field(
+        description="全局白话：值符主线、值使门线、时干落宫、旬空与驿马四节（逐字取自 content/qimen_plain.py 的框架句）。"
+    )
 
     engine: str = Field(default="qimen-luoshu-rotating")
     provenance: QimenProvenance

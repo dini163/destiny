@@ -46,10 +46,10 @@ from app.content.qimen import (
     ZHI,
     DIPAN_SEQUENCE,
 )
-from app.content.qimen_plain import door_key, god_key, star_key
-from app.engines.plain_compose import compose
+from app.content.qimen_plain import door_key, god_key, overview_key, star_key
+from app.engines.plain_compose import compose, compose_template, reading
 from app.engines.plain_corpora import QIMEN
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.qimen import (
     DoorInfo,
     GodInfo,
@@ -198,6 +198,20 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
         )
 
     ju_name = f"{dun}{_cn_number(ju_number)}局"
+    plain = [
+        PlainSection(title="值符主线", text=compose_template(
+            reading(QIMEN, overview_key("zhifu")),
+            {"star": zhifu_star.name, "number": str(zhifu_dest_palace)})),
+        PlainSection(title="值使门线", text=compose_template(
+            reading(QIMEN, overview_key("zhishi")),
+            {"door": zhishi_door.name, "number": str(zhishi_dest_palace)})),
+        PlainSection(title="时干落宫", text=compose_template(
+            reading(QIMEN, overview_key("shigan")),
+            {"gan": shi_gan, "number": str(shi_gan_palace)})),
+        PlainSection(title="旬空与驿马", text=compose_template(
+            reading(QIMEN, overview_key("kongma")),
+            {"kong": kongwang, "ma": yima})),
+    ]
     return QimenChart(
         question=question,
         cast_time=cast_time.strftime("%Y-%m-%d %H:%M"),
@@ -219,6 +233,7 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
         kongwang=kongwang,
         yima=yima,
         palaces=palaces,
+        plain=plain,
         provenance=QimenProvenance(
             engine="qimen-luoshu-rotating",
             content_version=CONTENT_VERSION,
