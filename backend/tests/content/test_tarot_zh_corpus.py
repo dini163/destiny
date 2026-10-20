@@ -29,7 +29,7 @@ from tests.plain_wording import FORBIDDEN, advice_hits
 
 #: 禁串与六字表**都从 `tests.plain_wording` 导入**，这里一个都不抄（G8，R26 口径：抄一份
 #: 就等于给「两处口径漂移」留出位置）。`SLOT_FORBIDDEN` 在本文件**不适用**：那是「槽位被
-#: 嵌进句子中间」的口径（`plain_wording.py:22`），塔罗的 `_zh` 是独立成句/独立成词，
+#: 嵌进句子中间」的口径（`plain_wording.py::SLOT_FORBIDDEN`），塔罗的 `_zh` 是独立成句/独立成词，
 #: 所以「你」「。」这类字在这里合法（156 句牌义全部以「。」收尾）。
 
 CJK = re.compile(r"[一-鿿]")
