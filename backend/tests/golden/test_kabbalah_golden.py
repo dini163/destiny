@@ -470,7 +470,6 @@ def test_the_tree_plain_block_is_three_static_sections_in_a_fixed_order() -> Non
     """
     tree = build_tree()
     assert [section.title for section in tree.plain] == list(KABBALAH_OVERVIEW_TITLES)
-    for title, key, section in zip(KABBALAH_OVERVIEW_TITLES, KABBALAH_OVERVIEW_KEYS, tree.plain):
-        assert section.title == title
+    for key, section in zip(KABBALAH_OVERVIEW_KEYS, tree.plain):
         assert section.text == reading(KABBALAH, key)
     assert [t.name for t in tree.provenance.tables] == ["kabbalah", "kabbalah_plain"]

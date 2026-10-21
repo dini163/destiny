@@ -46,6 +46,8 @@ from tests.plain_wording import (
 #: run=lambda a,b: difflib.SequenceMatcher(None,a,b,autojunk=False).find_longest_match(0,len(a),0,len(b)).size
 #: node=[n.meaning for n in (*SEPHIROTH, DAATH, *PATHS)]+[v for k,v in R.items() if k not in K]
 #: print(max(run(R[k],t) for k in K for t in node))"` → `5`。
+#: 尺寸哨兵在本文件 `test_the_three_overviews_echo_neither_a_node_meaning_nor_a_node_retelling`
+#: 末条：抬这个数（评审刀 R5 6→20 曾全绿）会红，阈值不许离开它的来历。
 _ECHO_RUN = 6
 
 #: 白话正文的结论词口径：四字（宜/忌/吉/凶），即 `tests/plain_wording.py::VERDICT_TOKENS`
@@ -140,7 +142,12 @@ def test_universe_grew_by_three_and_still_equals_the_entries() -> None:
 
 
 def test_the_existing_node_reconciliation_ignores_the_three_overviews() -> None:
-    """既有那条「逐条对账源表 .meaning」的测作用域明写节点条目，不被三条总论污染。"""
+    """节点 id 与总论键不相交，所以源表那一路（逐条扫 `.meaning`）不会被三键侵入。
+
+    不相交是靠 id 构造式（`sephirah-N` / `daath` / `path-N`）与 `overview-*` 两套命名互不搭界得来的；
+    有人把节点改名叫 `overview-*`，这条先红，才轮得到下面那些对账。白话那一路不分节点与总论，
+    36 句一起扫（本文件 `test_plain_entries_add_no_orientation_the_source_table_lacks` 的第二个 for）。
+    """
     node_keys = {str(node.id) for node in [*SEPHIROTH, DAATH, *PATHS]}
     assert node_keys & set(KABBALAH_OVERVIEW_KEYS) == set()
 
@@ -154,8 +161,10 @@ def _longest_shared_run(left: str, right: str) -> int:
 def test_the_overview_names_are_pinned_by_literal_not_by_the_constant() -> None:
     """三键三名的**字面**钉。装配与 golden 都是拿这两个常量自己对 zip 自己：
     把 `KABBALAH_OVERVIEW_TITLES` 前两项互换，`build_tree()` 跟着一起换，golden 那条
-    「节序 == 常量」照样绿——常量认不出自己的字面，所以右边逐字列出，
-    理由同 `_kabbalah_universe()` 里「不照抄构造式」那条例外（本文件 :64 起）。"""
+    「节序 == 常量」照样绿——常量认不出自己的字面，所以右边逐字列出。
+    同一条口径在本文件有两处先例：`test_universe_is_ten_sephiroth_plus_daath_plus_twenty_two_paths`
+    的「照抄它的构造式就抓不到 id 格式被改」，和 `plain_corpora._kabbalah_universe()` 的
+    「节点那 33 键不写第二份名单」。"""
     assert KABBALAH_OVERVIEW_KEYS == ("overview-reading", "overview-pillars", "overview-descent")
     assert KABBALAH_OVERVIEW_TITLES == ("全树读法", "三柱与四界", "光流与深渊")
 
@@ -171,13 +180,14 @@ def test_the_three_overviews_echo_neither_a_node_meaning_nor_a_node_retelling() 
     工厂的 `set(entries) == universe()` 与措辞四条都看不见撞句：搬过来的句子照样够 40 字、
     照样含「你」、照样只有一个句号。尺子是「与任一节点文案（原表 `.meaning` 或 33 句白话）
     的最长连续相同段 < `_ECHO_RUN`」，阈值来历见文件头的复测串。
+    尺量的是**连续逐字**段，所以它拦得住搬运、拦不住换词的复述（后者仍归人审）；
+    末条是尺寸哨兵，把阈值钉回「实测最大值 + 1」这个来历，抬它不再是静默放宽。
     """
     node_texts = [node.meaning for node in [*SEPHIROTH, DAATH, *PATHS]] + [
         text for key, text in KABBALAH_READINGS.items() if key not in set(KABBALAH_OVERVIEW_KEYS)
     ]
-    for key in KABBALAH_OVERVIEW_KEYS:
-        for node_text in node_texts:
-            assert _longest_shared_run(KABBALAH_READINGS[key], node_text) < _ECHO_RUN, (
-                key,
-                node_text[:16],
-            )
+    pairs = [(key, node_text) for key in KABBALAH_OVERVIEW_KEYS for node_text in node_texts]
+    runs = [_longest_shared_run(KABBALAH_READINGS[key], node_text) for key, node_text in pairs]
+    for (key, node_text), run in zip(pairs, runs):
+        assert run < _ECHO_RUN, (key, node_text[:16], run)
+    assert max(runs) == _ECHO_RUN - 1
