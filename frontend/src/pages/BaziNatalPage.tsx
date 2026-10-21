@@ -7,7 +7,6 @@ import { DimensionGrid } from '../components/bazi/DimensionGrid';
 import { GeJuCard } from '../components/bazi/GeJuCard';
 import { HiddenStemTable } from '../components/bazi/HiddenStemTable';
 import { PillarCard } from '../components/bazi/PillarCard';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { RelationChips } from '../components/bazi/RelationChips';
 import { ShenShaList } from '../components/bazi/ShenShaList';
 import { StrengthDial } from '../components/bazi/StrengthDial';
@@ -40,11 +39,12 @@ const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
  * BaZi natal chart page (四柱推命).
  *
  * The input console collects birth data; on submit the chart is computed by the
- * backend (`useBaziNatal`) and rendered in the ten sections of spec §8.2 — four
+ * backend (`useBaziNatal`) and rendered in the sections of spec §8.2 — four
  * pillars, hidden-stem weights, five-element distribution, strength ledger and
- * 格局, 用神三法, 神煞, 刑冲合害, 大运, 六维详批 and the provenance footer. Every
- * figure opens into its score ledger and every reading carries its own citation;
- * nothing is composed on the client (PRD no-mock rule).
+ * 格局, 用神三法, 神煞, 刑冲合害, 大运 and 六维详批. Every figure opens into its score
+ * ledger and every reading carries its own citation; nothing is composed on the
+ * client (PRD no-mock rule). The data-provenance section is hidden per the
+ * 2026-10-21 UI requirement (the backend `provenance` payload stays untouched).
  */
 export function BaziNatalPage() {
   const [gender, setGender] = useState<Gender>('male');
@@ -78,7 +78,7 @@ export function BaziNatalPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="四柱八字精算排盘"
-        badge="lunar-python 权威历算"
+        badge="权威历算"
         subtitle="真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         submitLabel={bazi.isPending ? '排盘中…' : '开始排盘'}
@@ -285,32 +285,6 @@ function sectionsFor(
           eyebrow: 'SIX DIMENSIONS',
           icon: 'sparkle',
           body: <DimensionGrid reading={chart.interpretation} />,
-        }
-      : null,
-    chart.provenance
-      ? {
-          id: 'provenance',
-          label: '数据溯源',
-          title: '数据溯源',
-          eyebrow: 'PROVENANCE',
-          icon: 'seal',
-          body: (
-            <ProvenancePanel
-              tables={chart.provenance.tables}
-              meta={[
-                { label: '排盘引擎', value: chart.provenance.engine },
-                {
-                  label: '大运参照日',
-                  value: chart.provenance.reference_date,
-                  title: '请求未指定时取服务器当日',
-                },
-              ]}
-              notes={[
-                '格局未纳入从格与合化（spec §6.4 的口径边界）。',
-                'design 稿的干支示例与实算不符时，一律以引擎输出为准（spec §2.1）。',
-              ]}
-            />
-          ),
         }
       : null,
   ];
