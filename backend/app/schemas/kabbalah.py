@@ -10,7 +10,7 @@ curated content, never invented at runtime.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable
 
 
 class PillarInfo(BaseModel):
@@ -94,6 +94,9 @@ class KabbalahTree(BaseModel):
     paths: list[PathNode] = Field(description="The twenty-two paths, 11-32.")
     sephirah_count: int = Field(default=10)
     path_count: int = Field(default=22)
+    plain: list[PlainSection] = Field(
+        description="整树总论三节（静态）：全树读法、三柱与四界、光流与深渊（批次二 spec §6）。"
+    )
     provenance: KabbalahProvenance
 
 

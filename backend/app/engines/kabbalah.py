@@ -27,11 +27,12 @@ from app.content.kabbalah import (
     get_path,
     get_sephirah,
 )
+from app.content.kabbalah_plain import KABBALAH_OVERVIEW_KEYS, KABBALAH_OVERVIEW_TITLES
 from app.core.errors import GematriaInputError
 # 同层 engines 互引合规，见 `app/engines/synastry.py`、`app/engines/meihua.py` 的既有做法。
 from app.engines.plain_compose import overview, reading
 from app.engines.plain_corpora import KABBALAH
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable
 from app.schemas.kabbalah import (
     GematriaReading,
     KabbalahProvenance,
@@ -130,6 +131,14 @@ def build_tree() -> KabbalahTree:
         paths=[_path_node(p) for p in PATHS],
         sephirah_count=len(SEPHIROTH),
         path_count=len(PATHS),
+        # 整树总论三节：静态、无生辰输入，逐键取语料原文（`reading` 未知键即崩，不兜底）。
+        # 次序 = `KABBALAH_OVERVIEW_TITLES` / `KABBALAH_OVERVIEW_KEYS` 的声明序，
+        # 由 `tests/golden/test_kabbalah_golden.py` 与页面（J-T7）共同钉住；`_tables()` 不变，
+        # 这两个键读的就是 `kabbalah_plain` 那张已经列进清单的表。
+        plain=[
+            PlainSection(title=title, text=reading(KABBALAH, key))
+            for title, key in zip(KABBALAH_OVERVIEW_TITLES, KABBALAH_OVERVIEW_KEYS)
+        ],
         provenance=KabbalahProvenance(
             engine="kabbalah-tree",
             content_version=CONTENT_VERSION,

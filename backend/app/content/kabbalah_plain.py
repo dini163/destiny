@@ -1,34 +1,54 @@
-"""卡巴拉生命之树白话转述表（多系统白话 spec §7）：33 条转述，纯表零逻辑。
+"""卡巴拉生命之树白话转述表（多系统白话 spec §7）：33 条逐节点转述 + 3 条整树总论，纯表零逻辑。
 
 分工与第一期一致：节点本体与全部对应住在 `content/kabbalah.py`（十原质 + 隐藏的 Daath +
-22 路径），这里只给每个 `id` 配一句能读给人听的话。四条措辞铁律由
+22 路径），这里先给每个 `id` 配一句能读给人听的话；批次二 J-T6 再加三条**整树总论**
+（键 `overview-*`，节点表里没有这三个 id，所以它们不进 `SephirahNode.plain_meaning`，
+走 `KabbalahTree.plain` 的三节）。四条措辞铁律由
 `tests/test_plain_corpora.py` 的工厂逐条机检；「不给建议」那一半如今也有机检半边——混在正文里的
 结论词（宜/忌/吉/凶）由 `tests/content/test_kabbalah_plain_corpus.py::
 test_plain_entries_add_no_orientation_the_source_table_lacks` 整表扫，句式上「不替你决定」仍归人审。
 
 原表是文学体长散文，含三处半文言（「万物未分之纯有」「有其位而无其质」「破而后立」），
 本表把这三处换成日常句式而**不换内容**：spec §5 规则 8 要的是读者能懂，不是辞藻。
-卡巴拉语料本身不判吉凶；33 条里唯一带取向色彩的词是 `path-21` 的「顺势」，它照搬源表
+卡巴拉语料本身不判吉凶；36 条里唯一带取向色彩的词仍是 `path-21` 的「顺势」，它照搬源表
 自己的意象（`content/kabbalah.py:260`「把握时机者顺势而上」），不是本表新加的判断——
 「不新增判断」在这一家的具体形状就是「原表没有的严重程度不许被形容词补出来」。
 「唯一」二字按取向词表扫（词表 = 顺势/逆势/有利/不利/吉/凶/宜/忌/好运/厄运；「守住那条
 界线**所需**的那份勇气」里的「需」不进口径，那是名词性用法，口径理由见
-`tests/content/test_kabbalah_plain_corpus.py` 的 `PLAIN_VERDICT_WORDS`（四字口径）头注）。复测（2026-10-01 实跑）：
+`tests/content/test_kabbalah_plain_corpus.py` 的 `PLAIN_VERDICT_WORDS`（四字口径）头注；
+三条总论也是按同一张十串表扫过的）。复测（2026-10-21 三条总论落地后实跑）：
 `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "
 from app.content.kabbalah_plain import KABBALAH_READINGS as R
 w=('顺势','逆势','有利','不利','吉','凶','宜','忌','好运','厄运')
-print([(k, t) for k, v in sorted(R.items()) for t in w if t in v])"` → `[('path-21', '顺势')]`。
+print([(k, t) for k, t in sorted(R.items()) for token in w if token in t])"` → `[('path-21', '顺势')]`。
 机检半边（源表与白话表两头扫）住 `tests/content/test_kabbalah_plain_corpus.py::
 test_plain_entries_add_no_orientation_the_source_table_lacks`。
 
-33 = 10 + 1 + 22（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+36 = 10 + 1 + 22 + 3（前头三个数是节点数，最后那个是整树总论；复测节点数：
+`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
 "from app.content.kabbalah import SEPHIROTH, DAATH, PATHS; print(len(SEPHIROTH), len(PATHS))"` → `10 22`；
-`DAATH` 是 `SEPHIROTH` 之外的单独常量，`number=0`、`is_hidden=True`）。
+`DAATH` 是 `SEPHIROTH` 之外的单独常量，`number=0`、`is_hidden=True`。总条数复测：
+`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+"from app.content.kabbalah_plain import KABBALAH_READINGS; print(len(KABBALAH_READINGS))"` → `36`）。
 """
 
-KABBALAH_PLAIN_SOURCE = "本系统白话转述 · 逐条对应 content/kabbalah.py 的十原质、隐藏 Daath 与 22 路径释义"
+KABBALAH_PLAIN_SOURCE = (
+    "本系统白话转述 · 逐条对应 content/kabbalah.py 的十原质、隐藏 Daath 与 22 路径释义，"
+    "另有整树总论三条（全树读法、三柱与四界、光流与深渊）"
+)
 
-#: 33 条转述。键 == `content/kabbalah.py` 里节点自己的 `id` 字段（G4：源表怎么写的就怎么键）。
+#: 整树总论三条。静态：这一页没有生辰输入，三条说的是这张图本身的读法。
+#: 键与十原质 / 路径的 id 同层（连字符风格，不用点号），故 `_kabbalah_universe()` 要把它们算进去。
+KABBALAH_OVERVIEW_KEYS: tuple[str, ...] = (
+    "overview-reading",
+    "overview-pillars",
+    "overview-descent",
+)
+KABBALAH_OVERVIEW_TITLES: tuple[str, ...] = ("全树读法", "三柱与四界", "光流与深渊")
+
+#: 36 条 = 33 条逐节点转述 + 3 条整树总论。前 33 条的键 == `content/kabbalah.py` 里节点自己的
+#: `id` 字段（G4：源表怎么写的就怎么键）；后三条的键是本表自起的 `overview-*` 名，节点表里
+#: 没有这三个 id，所以它们不进 `plain_meaning`，只经 `KABBALAH_OVERVIEW_KEYS` 进树响应的 `plain`。
 KABBALAH_READINGS: dict[str, str] = {
     "sephirah-1": "这是生命之树最顶端的那一格，表叫它还没分化之前的纯粹存在、创造的第一点，你在图上读到的是所有名相都还没生出来之前的那个起点。",
     "sephirah-2": "第二格是源头涌出的第一道动力，表的措辞是纯粹而还没成形的智慧火花，主动、扩张、只管给予，你在这里看到的是形式出现之前的那股力气。",
@@ -63,4 +83,10 @@ KABBALAH_READINGS: dict[str, str] = {
     "path-30": "理智与根基在这条路上同沐光明，表给太阳的是清晰、喜悦与蓬勃的生机，你在这一条上读到的是不必猜的那一段，看得见也笑得出来。",
     "path-31": "这条路管思想把觉醒叫回来，表用号角的形象说旧我不再作数、人被重新叫起，你在这一条上读到的是回头清点之后仍然接上的那股劲。",
     "path-32": "根基在这条路上圆满落进物质，表用一个走完的周期说整合与成就，并且留下新的启程，你在这一条上读到的是收尾不等于结束。",
+    # 以下三条是整树总论（批次二 J-T6）：讲的不是某一格，而是这张图本身怎么读。
+    # 三条都不复述上面任何一格的释义，也不给整棵树补一句吉凶（工厂 `closers is None` 那条裁定
+    # 在散文层的同一半边；互异与「不撞句」的尺住 `tests/content/test_kabbalah_plain_corpus.py`）。
+    "overview-reading": "这张图叫生命之树，画面上是十格原质与连着它们的二十二条路径，外面再从上往下套了四层界，你先读的是这副骨架：哪一格落在第几层、由哪条路连向哪一格，判语得回到单格才谈，整张图不替你下一句总的断语。",
+    "overview-pillars": "格子另有两套刻度：横着数三柱，慈悲之柱管扩张与给予，严厉之柱管收敛与约束，中柱·平衡管把两头调到一起，竖着数四界，名字依次是原型界 Atziluth、创造界 Briah、形成界 Yetzirah、物质界 Assiah，你在任一格里读到的是它的坐标，也就是它落在哪条柱与哪一界。",
+    "overview-descent": "还有第三条线索一路往下：光从最顶那一格起，逐层落到最末一格才算走完，它途中经过的位置上有一格只标在图上、不进原质的数目，那段空档表里叫深渊，你顺着这条线看到的是降落的次序与中间缺口，不是哪一格自己的名号与故事。",
 }

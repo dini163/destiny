@@ -12,8 +12,10 @@ import string
 import pytest
 from fastapi.testclient import TestClient
 
+from app.content.kabbalah_plain import KABBALAH_OVERVIEW_KEYS, KABBALAH_OVERVIEW_TITLES
 from app.core.errors import GematriaInputError
 from app.engines.kabbalah import build_tree, compute_gematria
+from app.engines.plain_compose import reading
 from app.engines.plain_corpora import KABBALAH
 
 
@@ -445,7 +447,11 @@ def test_every_tree_node_carries_a_plain_retelling() -> None:
     for node in nodes:
         assert node.plain_meaning and node.plain_meaning != node.meaning
         assert node.plain_meaning.endswith("。")
-    assert {n.id for n in nodes} == KABBALAH.universe()
+    # 全集里除了这 33 个节点键，还有三条整树总论（J-T6）：它们**不进节点**，只进 `tree.plain`，
+    # 所以这里按「节点覆盖完整」的本意减去那三键。减法用常量而不用字面，是因为这条要钉的是
+    # 交付面与全集的差集形状，键名逐字那两颗钉住在 `tests/content/test_kabbalah_plain_corpus.py`
+    # （`test_universe_is_...` 的字面重建 + 名字逐字钉）。
+    assert {n.id for n in nodes} == KABBALAH.universe() - set(KABBALAH_OVERVIEW_KEYS)
 
 
 def test_both_endpoints_list_both_tables() -> None:
@@ -453,3 +459,18 @@ def test_both_endpoints_list_both_tables() -> None:
     expected = {"kabbalah", "kabbalah_plain"}
     assert {row.name for row in build_tree().provenance.tables} == expected
     assert {row.name for row in compute_gematria("CHAI").provenance.tables} == expected
+
+
+def test_the_tree_plain_block_is_three_static_sections_in_a_fixed_order() -> None:
+    """整树总论三节的**序**与**正文来源**（批次二 J-T6）。
+
+    表名集合不在这里重复钉（上面那条已经钉了两个端点的同一份清单）；这条管的是
+    「页面上这三格按声明的顺序出现，每格印的就是语料表里那一句」——装配若把
+    `zip(TITLES, KEYS)` 写成 `zip(KEYS, TITLES)` 或漏掉一节，这里立刻红。
+    """
+    tree = build_tree()
+    assert [section.title for section in tree.plain] == list(KABBALAH_OVERVIEW_TITLES)
+    for title, key, section in zip(KABBALAH_OVERVIEW_TITLES, KABBALAH_OVERVIEW_KEYS, tree.plain):
+        assert section.title == title
+        assert section.text == reading(KABBALAH, key)
+    assert [t.name for t in tree.provenance.tables] == ["kabbalah", "kabbalah_plain"]

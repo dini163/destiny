@@ -41,6 +41,7 @@ TOP_LEVEL_KEYS = {
     "paths",
     "sephirah_count",
     "path_count",
+    "plain",
     "provenance",
 }
 
