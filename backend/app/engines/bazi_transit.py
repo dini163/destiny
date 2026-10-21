@@ -725,13 +725,19 @@ def _covered_dayun(chart: BaziChart, span: TransitRange) -> list[DayunStep]:
     ]
 
 
-def _transit_plain(years: Sequence[TransitYear], dayun_covered: Sequence[DayunStep]) -> list[PlainSection]:
+def _transit_plain(
+    years: Sequence[TransitYear], dayun_covered: Sequence[DayunStep]
+) -> list[PlainSection]:
     """岁运页的整体白话 2–3 节（spec §7.3）。
 
     区间档位取**均值再过 `_tier`**（spec §4.3）：五格里三平一顺一滞与四顺一滞，页面上
     该说不同的话。极值取 `max` / `min` over 升序的 `years`，并列即取最早那一年。
     第三节只有 `focus_year` 给了才装配——引擎只在该年挂 `months`，所以这里不再收
     `focus_year` 入参（本计划偏差表第 3 行）。
+    年表恒 ≥1 格由 `resolve_transit_range` 保证（它拒绝 `end < start`，缺省给五年），
+    所以下面 `/ len(years)` 与 `years[0]` / `years[-1]` 不再各自防空。
+    `focused` 取 `next(..., None)` 而不是裸 `next()`：拿不到带月表的那一年时宁可少一节，
+    也不让整页 500。
     """
     titles = BAZI_TRANSIT_TITLES["transit"]
     mean = sum(year.score.value for year in years) / len(years)

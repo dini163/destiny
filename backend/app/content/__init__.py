@@ -114,8 +114,12 @@ TRANSIT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 
 #: 岁运三片的白话转述表。**刻意不并进 `TRANSIT_CONTENT_SOURCES`**：那张清单被
 #: `HEHUN_CONTENT_SOURCES` 用 `*` 展开复用，加进去等于让合婚页声称读了它没读的表
-#: （AGENTS §7、本文件 :50-51 注）。它只在 `compute_transit` 与 `liuri_provenance` 两处展开。
-#: 复测：`cd backend && grep -n "BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/content/__init__.py app/engines/bazi_transit.py app/engines/bazi_liuri.py`
+#: （AGENTS §7，理由同本文件 `NAME_CONTENT_SOURCES` 头注）；`bazi_liuri` 的溯源同样展开它，
+#: 流日/流时两页会一起替一张没读过的表背书。今天它只在 `bazi_transit.compute_transit`
+#: 一处展开，`bazi_liuri.liuri_provenance` 的同源展开由 J-T5 落地。
+#: 展开点复测（只扫 `app/engines/`，本注释自己不在扫描面里）：
+#: `cd backend && grep -rn "\\*BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/engines/` → 今天 1 处
+#: （`bazi_transit.py`），J-T5 起 2 处。
 BAZI_TRANSIT_PLAIN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),
 )
