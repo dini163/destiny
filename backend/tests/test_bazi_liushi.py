@@ -15,12 +15,13 @@ from app.content.bazi_transit_plain import (
     BAZI_LIUSHI_DAY_FRAME,
     BAZI_LIUSHI_FOCUS_FRAME,
     BAZI_LIUSHI_HOURS_FRAME,
+    BAZI_TRANSIT_PLAIN_SOURCE,
     BAZI_TRANSIT_TITLES,
     BAZI_TRANSIT_TONE_KEYS,
 )
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
-from app.engines.bazi_liuri import compute_liuri_matrix
+from app.engines.bazi_liuri import compute_liuri_matrix, liuri_provenance
 from app.engines.bazi_liushi import HOUR_ZHI, compute_liushi_day, liushi_hour_moments
 from app.engines.plain_compose import num, reading
 from app.engines.plain_corpora import BAZI_TRANSIT
@@ -249,14 +250,26 @@ def test_an_absent_day_falls_back_to_the_reference_segment() -> None:
 
 
 def test_the_provenance_is_the_same_thirteen_tables_as_the_liuri_page() -> None:
-    """13 张表只有一处产出（决策 7）：两张表名逐字，条数钉死，多一行少一行都算谎。
+    """13 张表只有一处产出（决策 7）：本页那份逐字等于 `liuri_provenance` 那一份。
+
+    这里**不**再抄一遍十三行名单（那是流日侧 `tests/test_bazi_liuri.py` 的活，两份逐字名单会让
+    同一件事被钉两遍）；本页钉的是身份与张数：白话那一张恰好出现一次、历注那一张恰好出现一次，
+    整份顺序与流日同源。J-T5 评审轮 F-01 的刀只数张数抓不到——把白话那份展开换成
+    `*ALMANAC_CONTENT_SOURCES,` 之后张数仍是 13，而 `bazi_transit_plain` 被声称 0 次、
+    `almanac_yiji` 被声称 2 次（`{table.name: table}` 后者覆盖前者，版本断言照绿）。
 
     条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 13。
     """
-    tables = {table.name: table for table in _focused().provenance.tables}
-    assert len(_focused().provenance.tables) == 13
-    assert tables["almanac_yiji"].version == "1.4.8"
-    assert tables["bazi_transit_rules"].version == CONTENT_VERSION
+    tables = _focused().provenance.tables
+    names = [table.name for table in tables]
+    assert len(names) == 13
+    assert names.count("bazi_transit_plain") == 1
+    assert names.count("almanac_yiji") == 1
+    assert names == [table.name for table in liuri_provenance(_REFERENCE).tables]
+    by_name = {table.name: table for table in tables}
+    assert by_name["almanac_yiji"].version == "1.4.8"
+    assert by_name["bazi_transit_rules"].version == CONTENT_VERSION
+    assert by_name["bazi_transit_plain"].source == BAZI_TRANSIT_PLAIN_SOURCE
     assert _focused().provenance.engine == "lunar-python"
 
 
@@ -349,7 +362,8 @@ def test_the_plain_block_gains_the_focus_hour_section_when_a_focus_is_given() ->
 
 
 def test_the_plain_block_carries_no_tier_name_and_no_advice() -> None:
-    """两页各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零（同 J-T4 Step 1 第五条口径）。
+    """本页两个 fixture 各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零
+    （同 J-T4 Step 1 第五条口径；流日那半边在 `tests/test_bazi_liuri.py` 的同名测里各扫各的）。
 
     扫的是**装配产物**（框架句 + 档位句 + 槽值），不是语料表自己；档位句与槽值都在射程里，
     所以这里能拦住「把 `tier` 或 `fired[].label` 顺手灌进句子」那一类接线错。

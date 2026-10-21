@@ -14,6 +14,7 @@ from app.content.bazi_transit_plain import (
     BAZI_LIURI_DAYS_FRAME,
     BAZI_LIURI_FOCUS_FRAME,
     BAZI_LIURI_MONTH_FRAME,
+    BAZI_TRANSIT_PLAIN_SOURCE,
     BAZI_TRANSIT_TITLES,
     BAZI_TRANSIT_TONE_KEYS,
 )
@@ -31,7 +32,15 @@ from app.engines.plain_compose import num, reading
 from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi_liuri import BaziLiuriResult
 from app.schemas.common import CalendarType, Gender
-from tests.plain_wording import advice_hits, slot_value
+from tests.plain_wording import (
+    FORBIDDEN,
+    LEDGER_WORDS,
+    PREDICTION_FORBIDDEN,
+    TIER_WORDS,
+    WU_DECISION_FORBIDDEN,
+    advice_hits,
+    slot_value,
+)
 
 _BIRTH = (date(1988, 2, 15), time(23, 30))
 _NATAL_KWARGS: dict[str, object] = {
@@ -357,16 +366,37 @@ def test_the_almanac_is_passed_through_without_invention() -> None:
 def test_the_provenance_carries_thirteen_tables_and_the_library_version() -> None:
     """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。
 
+    十三行表名逐字列在这里，不照引擎那样 `*` 展开四份常量（J-T5 评审轮 F-01 的账）：只数张数的钉
+    管不住**身份**——把白话那份展开换成 `*ALMANAC_CONTENT_SOURCES,` 之后张数仍是 13，`bazi_transit_plain`
+    被声称 0 次而 `almanac_yiji` 被声称 2 次，`{table.name: table}` 后者覆盖前者，连版本断言都照绿，
+    三点选测全绿（评审席实测 `3 passed, 51 deselected`）。同一类盲区在岁运页由 `tests/test_bazi_transit.py`
+    的十二行逐字名单管着，本行与流时那条是它在流日/流时两页的对应物。名字之外的正文只钉白话与历注两行。
+
     条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 13。
     """
     from importlib.metadata import version
 
     result = compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
-    tables = {table.name: table for table in result.provenance.tables}
-    assert len(result.provenance.tables) == 13
-    assert tables["almanac_yiji"].version == version("lunar-python") == "1.4.8"
-    assert "外部历法库" in tables["almanac_yiji"].source
-    assert tables["bazi_transit_rules"].version == CONTENT_VERSION
+    tables = result.provenance.tables
+    assert [table.name for table in tables] == [
+        "bazi_shishen",
+        "bazi_nayin",
+        "bazi_wangshuai",
+        "bazi_geju",
+        "bazi_tiaohou",
+        "bazi_shensha",
+        "bazi_relations",
+        "bazi_dimensions",
+        "bazi_plain",
+        "bazi_changsheng",
+        "bazi_transit_rules",
+        "bazi_transit_plain",
+        "almanac_yiji",
+    ]
+    assert tables[11].source == BAZI_TRANSIT_PLAIN_SOURCE
+    assert tables[12].version == version("lunar-python") == "1.4.8"
+    assert "外部历法库" in tables[12].source
+    assert tables[10].version == CONTENT_VERSION
     assert result.provenance.engine == "lunar-python"
 
 
@@ -501,3 +531,22 @@ def test_the_plain_block_extremes_and_counts_match_the_day_table() -> None:
         assert slot_value(days_line, frame, f"{slot}_value") == num(cell.value)
     for section in result.plain:
         assert advice_hits(section.text) == []
+
+
+def test_the_plain_block_carries_no_tier_name_and_no_advice() -> None:
+    """两个流日 fixture 各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零
+    （同 J-T4 Step 1 第五条口径，也同 `tests/test_bazi_liushi.py` 那条流时侧姊妹钉）。
+
+    J-T5 评审轮 F-03 的账：流时那条 docstring 写着「两页各扫一遍」，循环的却是 `_bare()` 与
+    `_focused()` 两个**流时** fixture，流日装配文本里灌进 `tier` 或 `fired[].label` 时
+    流日侧一条都不红。扫的是**装配产物**（框架句 + 档位句 + 槽值），不是语料表自己——
+    语料那半边由 `tests/content/test_bazi_transit_plain_corpus.py` 管。
+    """
+    forbidden = (
+        *PREDICTION_FORBIDDEN, *WU_DECISION_FORBIDDEN, *LEDGER_WORDS, *TIER_WORDS, *FORBIDDEN
+    )
+    for result in (_matrix(), _matrix_focused()):
+        for section in result.plain:
+            assert advice_hits(section.text) == []
+            for token in forbidden:
+                assert token not in section.text
