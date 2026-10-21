@@ -69,3 +69,23 @@ class PlainSection(BaseModel):
 
     title: str = Field(description="小节名，取自各系统 content 的小节名册，不是引擎现编的词。")
     text: str = Field(description="开篇句 + 逐条判语，段内以 \\n 分行；全表没有一句请求时生成。")
+
+
+class Verdict(BaseModel):
+    """结论卡片（2026-10-21 verdict-card 设计 spec §1）：档位 + 星级 + 结论句 + 分项 + 建议。
+
+    系统无关（八字六维、姓名学五格、合盘二十二键共用一个形状），所以住 `common.py`；
+    各系统 summary schema 以 `verdict: Verdict` 挂上。五档映射与判定本身住在各系统引擎
+    （`app/engines/verdict.py::grade_for`），本模型只声明卡片载什么，不产生任何值。
+    前端镜像在 `frontend/src/types/common.ts::Verdict`，snake_case 端到端。
+
+    `grade` 用系统的档位词表（八字为 大吉/吉/平/小凶/凶），`stars` 1-5 与档位一一对应；
+    `headline` 是结论先行的一句话（含档位与分档复述）；`points` 是分项要点（每维/每格一条）；
+    `advice` 是一句建议，全部来自受控语料与账本/盘面事实，本模型不现编中文。
+    """
+
+    grade: str = Field(description="档位词，如 大吉/吉/平/小凶/凶；系统可用自己的词表。")
+    stars: int = Field(ge=1, le=5, description="星级 1-5，与档位一一对应（`verdict.grade_for`）。")
+    headline: str = Field(description="结论先行的一句话：含档位词与分档复述，来自框架句装配。")
+    points: list[str] = Field(description="分项要点，每项一句/一个短语（如「事业：顺」）。")
+    advice: str = Field(description="一句建议，来自受控语料框架句，不给医疗/法律/财务建议。")
