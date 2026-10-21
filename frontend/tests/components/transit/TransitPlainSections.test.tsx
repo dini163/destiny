@@ -5,8 +5,8 @@
  * 三种凭据各管各的，读的时候别混：
  * **渲染凭据**（第 1、2 条）管 `PlainSectionList` 拿到真实五段后排成什么：五段齐、序对、
  *   逐字节，且这一件不加一个字、不把多行拆成多段。
- * **源码扫凭据**（第 3、4 条）管挂点与反串位：页面真把 `chart.plain` 递进来了吗、卡在专业网格
- *   与出处块之间吗、有没有把 `chart.natal.plain`（本命那 8 段）错接到行运页上。
+ * **源码扫凭据**（第 3、4 条）管挂点与反串位：页面真把 `chart.plain` 递进来了吗、溯源块是否已按
+ *   2026-10-21 UI 需求移除、有没有把 `chart.natal.plain`（本命那 8 段）错接到行运页上。
  * **夹具内容凭据**（第 5、6 条）管响应：层名只住在开篇句（G37 的前端镜像）、`tables` 三行的
  *   名字/版本/出处串形状（spec §9「不只钉名字」）。
  *
@@ -99,14 +99,15 @@ it('the block keeps every line break and adds no sentence of its own', () => {
   }
 });
 
-it('the page wires chart.plain under 白话详解 ahead of the provenance block', () => {
+it('the page wires chart.plain under 白话详解, and the provenance block is removed per the 2026-10-21 UI requirement', () => {
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).toContain('<PlainSectionList sections={chart.plain} />');
   expect(src).toContain('title="白话详解"');
+  // 溯源块已按 2026-10-21 UI 需求移除：页面不得再出现 `<Provenance>` 组件（含共享面板的挂载）。
+  expect(src).not.toContain('<Provenance');
   pinLiteralOrder(src, [
     '<CrossAspectList aspects={aspects} />',
     '<PlainSectionList sections={chart.plain} />',
-    '<Provenance chart={chart} />',
   ]);
 });
 
@@ -164,11 +165,9 @@ it('the provenance panel is handed the three overlay tables with their distinct 
   }
 });
 
-it('the page renders those three tables through the shared provenance panel', () => {
-  /** 走查三（T27 Step 4）的实录：页面原本只印 `note` 与 ENGINE 行，三行表永远到不了用户眼前——
-   *  数据层（上一组）、类型层（T26）都齐了，独缺渲染。用与本命页同一条「数据进来、面板出去」的
-   *  形态钉住：`TransitPage.tsx` 必须把 `chart.provenance.tables` 递进共享的 `ProvenancePanel`。
-   *  复测：把下面这行换成 `tables={chart.provenance.tables.slice(0, 2)}` 或删掉它，本测即红。 */
+it('the provenance block is removed per the 2026-10-21 UI requirement', () => {
+  /** 2026-10-21 UI 需求：数据溯源块（含共享 `ProvenancePanel` 的挂载）整块从页面移除。
+   *  三行表的名字/版本/出处串形状仍由上一条夹具内容凭据钉住，页面这一侧不再渲染。 */
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
-  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+  expect(src).not.toContain('<Provenance');
 });

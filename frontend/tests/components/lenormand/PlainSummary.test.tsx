@@ -67,20 +67,17 @@ describe('雷诺曼整阵白话', () => {
     expect(texts).not.toContain(reading.synthesis);
   });
 
-  it('页面把白话挂在透镜件里、把表清单挂在出处块，两处次序都在', () => {
+  it('页面把白话挂在透镜件里；溯源块已按 2026-10-21 UI 需求移除', () => {
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
-    // 整串字面钉：出处面板那一串比 `pinLiteralOrder` 的前缀锚点更严（改属性写法就该红），
-    // 存在性另由 `pinLiteralOrder` 对每个锚点各自再钉一遍（`indexOf` 的 -1 空钉坑见其头注）。
     expect(page).toContain('<CombinationLens reading={reading} />');
     expect(page).toContain('{reading.synthesis}');
-    expect(page).toContain('<ProvenancePanel tables={reading.provenance.tables} />');
-    // 页面不自己组白话：它只把整份 reading 交给透镜件。
+    // 溯源块（ProvenancePanel、「抽牌溯源与口径」标题、`ENGINE ·` chip）已按 2026-10-21 UI
+    // 需求整块移除：这里反向钉住页面不再残留；页面不自己组白话，只把整份 reading 交给透镜件。
+    expect(page).not.toContain('<ProvenancePanel');
+    expect(page).not.toContain('抽牌溯源');
+    expect(page).not.toContain('ENGINE · ');
     expect(page).not.toContain('plain_summary');
     pinLiteralOrder(page, ['<CombinationLens reading={reading} />', '{reading.synthesis}']);
-    // Step 5 的挂点规则是「在出处块里、在那排 chips 之前」。锚点用**看得见的字**（块的标题与
-    // `ENGINE ·` 那条 chip），不用 className：Tailwind 类名是纯样式，改一次配色就该绿的钉会假红，
-    // 而「表清单被挪出出处块」这条真漂移反倒没人看（复审 trial i 量的正是这个假红）。
-    pinLiteralOrder(page, ['抽牌溯源与口径', '<ProvenancePanel tables=', 'ENGINE · ']);
   });
 
   it('透镜件源码里白话块的字面形状与标题', () => {

@@ -1,14 +1,15 @@
 /**
- * 本命页「白话详解」块与出处面板（戊组 spec §9；用户 2026-10-04 裁定第 3 条：页尾汇总块，
- * 图/网格/表格一律不动）。母本是 `tests/components/ziwei/ZiweiPlainSections.test.tsx`。
+ * 本命页「白话详解」块（戊组 spec §9；用户 2026-10-04 裁定第 3 条：页尾汇总块，
+ * 图/网格/表格一律不动；2026-10-21 UI 需求：数据溯源块已从页面移除）。母本是
+ * `tests/components/ziwei/ZiweiPlainSections.test.tsx`。
  *
  * 三种凭据各管各的，读的时候别混：
  * **渲染凭据**（第 1、2 条）管 `PlainSectionList` 拿到真实八段后排成什么：八段齐、序对、
  *   逐字节，且这一件不加一个字、不把多行拆成多段。
  * **夹具内容凭据**（第 4 条）管响应：`tables` 的行序就是本页的展示契约，与后端 golden
  *   `test_the_provenance_tables_are_the_three_plain_modules_in_order` 是同一条链的两头。
- * **源码扫凭据**（第 3 条）管挂点：页面真把 `chart.plain` 递进来了吗、卡在出处块之前吗、
- *   那句已被本轮推翻的「未作主观吉凶演绎」退役了吗。
+ * **源码扫凭据**（第 3 条）管挂点：页面真把 `chart.plain` 递进来了吗、溯源块是否已按
+ *   2026-10-21 UI 需求移除、那句已被本轮推翻的「未作主观吉凶演绎」退役了吗。
  *
  * **限度**（写在测里而不是留给读者猜）：夹具是 `scripts/record_frontend_fixtures.py` 打的
  * J2000 格林尼治那一手（`utc_offset_hours=0.0`，与后端 `_greenwich_chart()` 同盘），八段全非空、
@@ -82,19 +83,18 @@ it('the block keeps every line break and adds no sentence of its own', () => {
   }
 });
 
-it('the page wires chart.plain under 白话详解 ahead of the provenance block, and the false disclaimer is gone', () => {
+it('the page wires chart.plain under 白话详解, the provenance block is removed per the 2026-10-21 UI requirement, and the false disclaimer is gone', () => {
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).toContain('<PlainSectionList sections={chart.plain} />');
   expect(src).toContain('title="白话详解"');
   expect(src).toContain('eyebrow="PLAIN READING"');
-  expect(src).toContain('{chart.provenance.note}');
-  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+  // 溯源块已按 2026-10-21 UI 需求移除：页面不得再出现 `<Provenance>` 组件（含共享面板的挂载）。
+  expect(src).not.toContain('<Provenance');
   // 本轮上线的东西**就是**主观吉凶演绎（542 条自撰判语），这句留着就是页面上的假话（spec §1.1）。
   expect(src).not.toContain('未作主观吉凶演绎');
   pinLiteralOrder(src, [
     '<AspectMatrix planets={chart.planets} aspects={chart.aspects} />',
     '<PlainSectionList sections={chart.plain} />',
-    '<Provenance chart={chart} />',
   ]);
 });
 

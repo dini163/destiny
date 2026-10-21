@@ -4,7 +4,7 @@
  *
  * 三种凭据各管各的：**渲染凭据**（第 1-3 条）管四段排成什么；**内容凭据**（第 4-6 条）
  * 管开篇句与两处角色词禁令在用户读到的字上也成立；**源码扫凭据**（第 7-8 条）管挂点、
- * 卡在时间轴与出处块之间、三行表真被递进 `ProvenancePanel`。
+ * 溯源块已按 2026-10-21 UI 需求从页面移除（三行表的夹具形状仍钉）。
  *
  * **限度**：252 条判语是否说歪了归评审人逐条读；`dasha_none` 那一支的真盘在 D 手
  * （1900-01-01 伦敦），夹具是 A 手，本测吃不到它——那一支由后端 golden 钉（T9）。
@@ -92,18 +92,19 @@ it('the dasha body carries no role word', () => {
   }
 });
 
-it('the page wires chart.plain between the timeline and the provenance block', () => {
+it('the page wires chart.plain after the timeline, and the provenance block is removed per the 2026-10-21 UI requirement', () => {
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).toContain('<PlainSectionList sections={chart.plain} />');
   expect(src).toContain('title="白话详解"');
+  // 溯源块已按 2026-10-21 UI 需求移除：页面不得再出现 `<Provenance>` 组件（含共享面板的挂载）。
+  expect(src).not.toContain('<Provenance');
   pinLiteralOrder(src, [
     '<DashaTimeline vimshottari={chart.vimshottari} />',
     '<PlainSectionList sections={chart.plain} />',
-    '<Provenance chart={chart} />',
   ]);
 });
 
-it('the provenance panel is handed the three vedic tables', () => {
+it('the fixture carries the three vedic tables, and the page no longer renders the provenance block', () => {
   const tables = chart.provenance.tables;
   expect(tables.map((table) => table.name)).toEqual([
     'vedic',
@@ -120,6 +121,7 @@ it('the provenance panel is handed the three vedic tables', () => {
     expect(table.source).not.toContain('《');
     expect(table.source).not.toContain('依');
   }
+  // 溯源块已按 2026-10-21 UI 需求移除：页面不再把三行表递进共享 `ProvenancePanel`。
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
-  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
+  expect(src).not.toContain('<Provenance');
 });
