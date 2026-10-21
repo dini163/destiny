@@ -20,7 +20,7 @@ export function ShenShaList({ entries }: { entries: ShenShaEntry[] }) {
     // 空白会被读成 bug，所以如实说明查表口径存在、只是本命未命中。
     return (
       <p className="text-sm text-ink-muted">
-        本命四柱未检索到传统神煞命中；神煞为查表口径，见数据溯源面板。
+        本命四柱未检索到传统神煞命中；神煞为查表口径。
       </p>
     );
   }

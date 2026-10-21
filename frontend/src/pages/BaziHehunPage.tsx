@@ -12,7 +12,6 @@ import { HehunScoreRing } from '../components/bazi/hehun/HehunScoreRing';
 import { HehunYiJiPanel } from '../components/bazi/hehun/HehunYiJiPanel';
 import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transitLink';
 import type { HehunSideLink } from '../lib/transitLink';
@@ -110,8 +109,9 @@ function makeRequest(sides: CompleteSides, axis: AxisState): BaziHehunRequest {
  * 双人合盘页（PRD §6.1.5、spec §8）。
  *
  * 一页 = 双造输入台 + 契合度总分环 + 乾坤档案对位（年命纳音随档案同区）+ 16 格对冲矩阵
- * + 命中清单 +（Task 12）互补图 + 同频轴 + 宜忌 + 溯源。页面上只有三件事是本页的意志：
- * 两半生辰、轴起哪一年、轴长几年；其余全部交回服务端口径。
+ * + 命中清单 +（Task 12）互补图 + 同频轴 + 宜忌。页面上只有三件事是本页的意志：
+ * 两半生辰、轴起哪一年、轴长几年；其余全部交回服务端口径。数据溯源段按 2026-10-21
+ * UI 需求隐藏（后端 `provenance` 载荷原样不动）。
  *
  * 与流日/流时同一条入口纪律：链接带全**两半**才自动提交，只带一半（`以此造合婚` 的落点）
  * 即预填而不提交，也不报"链接不完整"。本页自己写查询串，所以那份自动提交由 `send` 里
@@ -305,43 +305,6 @@ export function BaziHehunPage() {
             actions={<span className="label-caps text-ink-muted">唯一输入是两造喜用</span>}
           >
             <HehunYiJiPanel yiJi={result.yi_ji} />
-          </ResultCard>
-
-          <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
-            <ProvenancePanel
-              tables={result.provenance.tables}
-              meta={[
-                { label: '推演引擎', value: result.provenance.engine },
-                {
-                  label: '参考日',
-                  value: result.provenance.reference_date,
-                  title: '请求未指定时取服务器当日（定当前大运与缺省轴起点）',
-                },
-                { label: '合婚规则条数', value: String(result.provenance.rule_count) },
-                {
-                  label: '轴起讫',
-                  value: `${result.axis.start_year}—${result.axis.end_year}`,
-                  title: '缺省轴起 = max(较晚出生年, 参考日所在年)',
-                },
-                {
-                  label: '乾造起柱',
-                  value: result.male.true_solar_time ?? '未校正（标准时直排）',
-                },
-                {
-                  label: '坤造起柱',
-                  value: result.female.true_solar_time ?? '未校正（标准时直排）',
-                },
-              ]}
-              notes={[
-                result.provenance.method,
-                '契合度是岁运同一张账本的加减（50 分起算），不是吉凶断言；每一条命中都在展开的账本里可核对（spec §6.1、§10.5）。',
-                '跨造只算关系、合局、互济、年命与婚姻宫五族：十神是本造内部的坐标，伸到别人盘上就是本系统没资格立的第五学说（决策 2）。',
-                '两造的喜忌与五行分布直接取各自本命盘，合婚不重判（决策 3）。',
-                '旺弱尺是「该行加权量 / 该造自身五行均值」，比值先取四位再贴 ≥1.25 旺 / ≤0.75 弱 的标签（§2.6）。',
-                '宜忌取的是两造喜用的通说配属（方位 / 五色 / 四时），不是玄空飞星那一套日课（§7.4 的声明句为准）。',
-                '轴行的分数与岁运年表同一条装配路径，故跨页同尺；轴不展开明细，点每行那两个下钻链接即是（§7.3、§10.5）。',
-              ]}
-            />
           </ResultCard>
         </>
       ) : null}

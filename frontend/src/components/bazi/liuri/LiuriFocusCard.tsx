@@ -90,7 +90,7 @@ export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; hre
           <AlmanacLine prefix="宜" items={detail.almanac.yi} />
           <AlmanacLine prefix="忌" items={detail.almanac.ji} />
         </div>
-        <SourceNote source="外部历法库 lunar-python（通书宜忌，非本仓古籍语料，不参与本页任何计分）" />
+        <SourceNote source="通书宜忌（外部历法数据，非本仓古籍语料，不参与本页任何计分）" />
       </div>
     </ResultCard>
   );

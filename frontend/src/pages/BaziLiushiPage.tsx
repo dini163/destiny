@@ -13,7 +13,6 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
@@ -72,10 +71,11 @@ function makeRequest(
 /**
  * 一日十二时辰页（PRD §6.1.3、spec 切片 4）。
  *
- * 一页 = 命局条 + 日头 + 真气波形 + 十二格梯次谱 + 峰值备忘 + 聚焦时辰详批 + 溯源。
+ * 一页 = 命局条 + 日头 + 真气波形 + 十二格梯次谱 + 峰值备忘 + 聚焦时辰详批。
  * 页面上只有两件事是本页的意志：看哪一天、聚焦哪一支；两者留空即由服务端按参考日开窗，
  * 本页不做第二次月界与时辰边界推算（决策 2/9）。十二格共用一根日柱，所以日头那三段只
- * 出现一次（`day_score` / `day_fired`），每格多的只有 `shi.` 那一段。
+ * 出现一次（`day_score` / `day_fired`），每格多的只有 `shi.` 那一段。数据溯源段按
+ * 2026-10-21 UI 需求隐藏（后端 `provenance` 载荷原样不动）。
  *
  * 入口在流日页的聚焦卡（`?…&date=同日&hour=辰`），因此本路由不在导航栏里 —— 它是流日
  * 的下钻，无生辰即无意义（spec 决策 8 的延伸）。
@@ -191,7 +191,7 @@ export function BaziLiushiPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="流时十二辰 · 一日逐时"
-        badge="lunar-python 权威历算"
+        badge="权威历算"
         subtitle="在一个八字日内逐时辰结算加减：五鼠遁时柱、四段账本、日主临时支，点一格展开该时辰详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
@@ -292,33 +292,6 @@ export function BaziLiushiPage() {
               未聚焦任何时辰 —— 点十二格里任意一格即出该时辰详批。
             </p>
           )}
-
-          <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
-            <ProvenancePanel
-              tables={result.provenance.tables}
-              meta={[
-                { label: '推演引擎', value: result.provenance.engine },
-                {
-                  label: '参考日',
-                  value: result.provenance.reference_date,
-                  title: '请求未指定聚焦日时取服务器当日',
-                },
-                { label: '八字日', value: result.solar_date },
-                {
-                  label: '本段起讫',
-                  value: `${result.month_start_solar} ~ ${result.month_end_solar}`,
-                },
-                { label: '真太阳时', value: result.true_solar_time ?? '未校正（标准时直排）' },
-                { label: '经度', value: `${result.longitude.toFixed(2)}°` },
-              ]}
-              notes={[
-                '逐时分数是岁运规则表在时段的加减账，不是吉凶断言；每一分都在账本里可核对（spec §6.2）。',
-                '十二格共用一根日柱，年/月/日三段只结算一次，每格多的只有 `shi.` 那一段（决策 1）。',
-                '时柱取五鼠遁、日界取 23:00 属次日；时辰划分按北京钟面整点，不做真太阳时校正（决策 2/6）。',
-                '通书宜忌是「日」粒度内容，只在页头一句带过，不下挂到时辰（决策 13）。',
-              ]}
-            />
-          </ResultCard>
         </>
       ) : null}
     </div>

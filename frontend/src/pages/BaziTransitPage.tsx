@@ -10,7 +10,6 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziTransit } from '../hooks/useBaziTransit';
@@ -91,9 +90,10 @@ function parseYear(raw: string): number | null {
 /**
  * 岁运推演页（PRD §6.1.4）。
  *
- * 一页 = 命局条 + 流年区间 + 单年详批（聚焦年再下钻十二节气月）+ 溯源。区间三个端点
+ * 一页 = 命局条 + 流年区间 + 单年详批（聚焦年再下钻十二节气月）。区间三个端点
  * 全部可空，缺省补齐只在服务端做一次，本页把结果原样回显，不再二次推算（spec §7.2）。
- * 页面上没有任何手算的平均或"综合评定"：分数一律走 `ScoreLedger` 展开的账本。
+ * 页面上没有任何手算的平均或"综合评定"：分数一律走 `ScoreLedger` 展开的账本。数据溯源段
+ * 按 2026-10-21 UI 需求隐藏（后端 `provenance` 载荷原样不动）。
  *
  * 入口在主盘页的大运区块（`?birth_date=…` 查询串），因此本路由不在导航栏里 ——
  * 它是主盘的子页，不是一新一大体系（spec 决策 8）。
@@ -197,7 +197,7 @@ export function BaziTransitPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="岁运推演 · 流年与流月"
-        badge="lunar-python 权威历算"
+        badge="权威历算"
         subtitle="沿用本命盘的喜忌，逐年逐月对岁运规则表结算加减：一年一行账，命中即可展开判语与凭据。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
@@ -292,35 +292,6 @@ export function BaziTransitPage() {
           </ResultCard>
 
           {focused ? <TransitYearCard year={focused} hrefFor={liuriHrefFor} /> : null}
-
-          {transit.data.provenance ? (
-            <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
-              <ProvenancePanel
-                tables={transit.data.provenance.tables}
-                meta={[
-                  { label: '推演引擎', value: transit.data.provenance.engine },
-                  {
-                    label: '大运参照日',
-                    value: transit.data.provenance.reference_date,
-                    title: '请求未指定时取服务器当日',
-                  },
-                  {
-                    label: '区间',
-                    value: `${transit.data.start_year}—${transit.data.end_year} 年`,
-                  },
-                  {
-                    label: '真太阳时',
-                    value: transit.data.true_solar_time ?? '未校正（标准时直排）',
-                  },
-                  { label: '经度', value: `${transit.data.longitude.toFixed(2)}°` },
-                ]}
-                notes={[
-                  '岁运分数是规则表的加减账，不是吉凶断言；每一分都在账本里可核对（spec §6.1）。',
-                  '喜忌沿用本命盘用神三法的合并结果，岁运不另立用神（spec 决策 3）。',
-                ]}
-              />
-            </ResultCard>
-          ) : null}
         </>
       ) : null}
     </div>

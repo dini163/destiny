@@ -11,7 +11,6 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
@@ -61,9 +60,10 @@ function makeRequest(
 /**
  * 全月流日矩阵页（PRD §6.1.2）。
  *
- * 一页 = 命局条 + 段头 + 逐日矩阵 + 聚焦日详批 + 溯源。页面上只有两个日期是本页的意志：
+ * 一页 = 命局条 + 段头 + 逐日矩阵 + 聚焦日详批。页面上只有两个日期是本页的意志：
  * `anchor_date` 定段、`focus_date` 定详批，两者留空即由服务端按参考日开窗并原样回显，
- * 本页不做第二次月界推算（决策 9）。段长、月名、段基准一切以响应为准。
+ * 本页不做第二次月界推算（决策 9）。段长、月名、段基准一切以响应为准。数据溯源段按
+ * 2026-10-21 UI 需求隐藏（后端 `provenance` 载荷原样不动）。
  *
  * 入口在岁运页的月卡（`?…&anchor=交节日`），因此本路由不在导航栏里 —— 它是岁运的下钻，
  * 无生辰即无意义，不是一新一大体系（spec 决策 8）。
@@ -160,7 +160,7 @@ export function BaziLiuriPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="流日矩阵 · 全月逐日"
-        badge="lunar-python 权威历算"
+        badge="权威历算"
         subtitle="在一个节气月段内逐日结算加减：一格一天的气数、档位、命中与通书宜忌，点一格展开当日详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
@@ -262,36 +262,6 @@ export function BaziLiuriPage() {
               未聚焦任何一天 —— 点矩阵里任意一格即出当日详批。
             </p>
           )}
-
-          {result.provenance ? (
-            <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="seal">
-              <ProvenancePanel
-                tables={result.provenance.tables}
-                meta={[
-                  { label: '推演引擎', value: result.provenance.engine },
-                  {
-                    label: '参考日',
-                    value: result.provenance.reference_date,
-                    title: '请求未指定锚日时取服务器当日',
-                  },
-                  {
-                    label: '本段起讫',
-                    value: `${result.month_start_solar} ~ ${result.month_end_solar}`,
-                  },
-                  {
-                    label: '真太阳时',
-                    value: result.true_solar_time ?? '未校正（标准时直排）',
-                  },
-                  { label: '经度', value: `${result.longitude.toFixed(2)}°` },
-                ]}
-                notes={[
-                  '逐日分数是岁运规则表在日段的加减账，不是吉凶断言；每一分都在账本里可核对（spec §6.1）。',
-                  '段界取节气月（立春起寅月），与岁运页同段月卡逐字同源（决策 9）。',
-                  '通书宜忌取自外部历法库，只作历注呈现，不参与本页任何计分（决策 6）。',
-                ]}
-              />
-            </ResultCard>
-          ) : null}
         </>
       ) : null}
     </div>

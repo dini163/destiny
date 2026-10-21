@@ -199,7 +199,7 @@ export function DualBirthConsole({ initial, pending, onSubmit }: DualBirthConsol
                 八字合婚 · 双人合盘
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                lunar-python 权威历算
+                权威历算
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
