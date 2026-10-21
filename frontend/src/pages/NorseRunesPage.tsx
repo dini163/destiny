@@ -1,6 +1,5 @@
 import { FutharkCodex } from '../components/runes/FutharkCodex';
 import { RuneConsole } from '../components/runes/RuneConsole';
-import { RuneProvenance } from '../components/runes/RuneProvenance';
 import { RuneShadowCounsel } from '../components/runes/RuneShadowCounsel';
 import { RuneStoneGrid } from '../components/runes/RuneStoneGrid';
 import { RuneSynthesis } from '../components/runes/RuneSynthesis';
@@ -41,7 +40,7 @@ export function NorseRunesPage() {
       ) : null}
 
       {runes.isPending && !runes.data ? (
-        <p className="label-caps text-ink-muted">正在以 Python secrets 铸石…</p>
+        <p className="label-caps text-ink-muted">正在铸石…</p>
       ) : null}
 
       {runes.data ? <RuneResults cast={runes.data} /> : null}
@@ -49,7 +48,7 @@ export function NorseRunesPage() {
   );
 }
 
-/** 一次铸石的全部结果，按「碑阵 → 直读 → 阴影参照 → 全典 → 出处」的阅读次序排。 */
+/** 一次铸石的全部结果，按「碑阵 → 直读 → 阴影参照 → 全典」的阅读次序排。出处块已按 2026-10-21 UI 需求移除。 */
 function RuneResults({ cast }: { cast: RuneCastResponse }) {
   return (
     <>
@@ -75,8 +74,6 @@ function RuneResults({ cast }: { cast: RuneCastResponse }) {
       <RuneShadowCounsel notes={cast.shadow_counsel} />
 
       <FutharkCodex codex={cast.codex} />
-
-      <RuneProvenance provenance={cast.provenance} />
     </>
   );
 }

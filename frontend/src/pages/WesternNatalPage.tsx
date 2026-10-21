@@ -11,7 +11,6 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SelectMenu } from '../components/ui/SelectMenu';
 import { ResultCard } from '../components/ui/ResultCard';
 import { aspectStyle } from '../lib/astro';
@@ -70,7 +69,7 @@ export function WesternNatalPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="本命星盘与时空推运"
-        badge="pyswisseph 瑞士星历"
+        badge="瑞士星历"
         subtitle="精确计算本命四轴（ASC/MC/DES/IC）与十大主星落座落宫、主要相位容许度及元素形态分布。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。"
         requireLatitude
         submitLabel={western.isPending ? '重构星历中…' : '即刻重构星历'}
@@ -183,8 +182,6 @@ function WesternResults({ chart }: { chart: WesternChart }) {
       <ResultCard title="白话详解" eyebrow="PLAIN READING" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
-
-      <Provenance chart={chart} />
     </>
   );
 }
@@ -246,32 +243,6 @@ function AspectLegend() {
           </span>
         );
       })}
-    </div>
-  );
-}
-
-/** Methodology + provenance: the astronomy facts, then the self-authored declaration. */
-function Provenance({ chart }: { chart: WesternChart }) {
-  const offsetSource = chart.utc_offset_source === 'explicit' ? '显式时区' : '按经度推算的理论时区';
-  return (
-    <div className="panel flex flex-col gap-4 p-5 sm:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-          <div className="flex flex-col gap-1">
-            <span className="font-display text-base text-ink">天文算法与星历溯源</span>
-            <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-              行星黄经、四轴与宫头均由 <span className="text-gold-soft">{chart.engine}</span>{' '}
-              瑞士星历实时计算（{chart.zodiac === 'tropical' ? '热带黄道' : chart.zodiac}），分宫制为{' '}
-              <span className="text-gold-soft">{chart.house_system}</span>，世界时以{offsetSource}换算。
-            </p>
-            <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">{chart.provenance.note}</p>
-          </div>
-        </div>
-        <span className="label-caps shrink-0 text-ink-muted">ENGINE · {chart.engine}</span>
-      </div>
-
-      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }

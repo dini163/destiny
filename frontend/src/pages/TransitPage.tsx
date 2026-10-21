@@ -11,7 +11,6 @@ import { SelectMenu } from '../components/ui/SelectMenu';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useTransit } from '../hooks/useTransit';
 import { aspectStyle } from '../lib/astro';
@@ -76,7 +75,7 @@ export function TransitPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="行运次限推运"
-        badge="pyswisseph 瑞士星历"
+        badge="瑞士星历"
         subtitle="在本命盘之上叠加三层动态时间轴：外行星过境（行运）、一日当一年（次限推运）与太阳弧推进。指定目标日期，即看移动层诸星落入本命何宫、对本命所成之相位。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0 · 目标日任选。"
         requireLatitude
         submitLabel={transit.isPending ? '推演行运中…' : '即刻推演行运'}
@@ -219,8 +218,6 @@ function TransitResults({ chart }: { chart: TransitChart }) {
       >
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
-
-      <Provenance chart={chart} />
     </>
   );
 }
@@ -337,28 +334,6 @@ function WheelLegend() {
           );
         })}
       </div>
-    </div>
-  );
-}
-
-/** Methodology + provenance note anchored to the real ephemeris engine. */
-function Provenance({ chart }: { chart: TransitChart }) {
-  return (
-    <div className="panel flex flex-col gap-3 p-5 sm:p-6">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">推运算法与星历溯源</span>
-          <p className="max-w-4xl text-sm leading-relaxed text-ink-muted">{chart.provenance.note}</p>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-rim-soft pt-3">
-        <span className="label-caps text-ink-muted">
-          ENGINE · {chart.provenance.engine} · {chart.natal.house_system} · {chart.natal.zodiac}
-        </span>
-        <span className="text-xs text-ink-muted">星盘与推运仅供文化参考，不构成任何决策建议。</span>
-      </div>
-      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }

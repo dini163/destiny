@@ -11,7 +11,6 @@ import { ChineseDateField } from '../components/ui/DateTimeField';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useVedic } from '../hooks/useVedic';
 import { CHART_STYLES } from '../lib/vedic';
@@ -55,7 +54,7 @@ export function VedicPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="吠陀占星 · 乔蒂什"
-        badge="pyswisseph 恒星黄道"
+        badge="恒星黄道"
         subtitle="以拉希里（Lahiri / Chitrapaksha）岁差校正的恒星黄道排盘：九曜（Navagraha，含罗睺计都）、自上升起算的整宫制、二十七星宿（Nakshatra），并依月宿推排一百二十年的 Vimshottari 大运时间轴。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。"
         requireLatitude
         submitLabel={vedic.isPending ? '恒星排盘中…' : '即刻排定星盘'}
@@ -191,8 +190,6 @@ function VedicResults({ chart }: { chart: VedicChart }) {
       >
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
-
-      <Provenance chart={chart} />
     </>
   );
 }
@@ -239,28 +236,6 @@ function SummaryStrip({ chart }: { chart: VedicChart }) {
           </span>
         ) : null}
       </div>
-    </div>
-  );
-}
-
-/** Methodology + provenance note anchored to the real sidereal ephemeris engine. */
-function Provenance({ chart }: { chart: VedicChart }) {
-  return (
-    <div className="panel flex flex-col gap-3 p-5 sm:p-6">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">推运算法与星历溯源</span>
-          <p className="max-w-4xl text-sm leading-relaxed text-ink-muted">{chart.provenance.note}</p>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-rim-soft pt-3">
-        <span className="label-caps text-ink-muted">
-          ENGINE · {chart.provenance.engine} · {chart.zodiac} · {chart.provenance.ayanamsa_name}
-        </span>
-        <span className="text-xs text-ink-muted">星盘与大运仅供文化参考，不构成任何决策建议。</span>
-      </div>
-      <ProvenancePanel tables={chart.provenance.tables} />
     </div>
   );
 }

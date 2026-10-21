@@ -92,18 +92,11 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="label-caps rounded-element border border-rim bg-surface px-1.5 py-0.5 text-ink-muted">
-                CSPRNG
-              </span>
-              <span className="label-caps rounded-element border border-rim bg-surface px-1.5 py-0.5 text-ink-muted">
-                CRYPTO-SEEDED
-              </span>
-              <span className="label-caps rounded-element border border-rim bg-surface px-1.5 py-0.5 text-ink-muted">
                 #RUNES-FUTHARK
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              抽石走 Python <code className="numeric text-gold-soft">secrets</code>（OS 熵源
-              CSPRNG），释义全部取自策展语料库。本页不吃出生时间与地点：没有历法、没有星历，
+              抽石结果由权威算法真实生成、不可复现；释义全部取自策展语料库。本页不吃出生时间与地点：没有历法、没有星历，
               因此也不出综合评分、不出任何百分比 —— 没有可以推出那类数字的输入。
             </p>
           </div>
