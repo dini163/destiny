@@ -25,9 +25,13 @@
 的不变式是"年段行是月段行的前缀"：一份月账本读起来就是"今年的账 + 这个月加减的账"。
 
 总装一条线（spec §7.4）：`compute_transit` 把前面四段接成一次真排盘，所以这里的断言
-全是**契约形状**的 —— 区间回显、哪些字段该空、哪些字段必须等于语料里的那一份，而不是
-某个具体分数（分数在 golden 里对拍）。唯一一处数值断言是命局摘要那几行，因为它逐字取自
-主命盘，主命盘一变这里就该红。
+全是**契约形状**的 —— 区间回显、哪些字段该空、哪些字段必须等于语料里的那一份。白话段
+是唯一的例外：档位句与槽值要按具体分数对拍，否则「分最高那一年印成分最低那一年」这一类
+假句拦不住（J-T4 评审轮 F-1）。五年分值复测：`cd backend && PYTHONIOENCODING=utf-8
+.venv/Scripts/python.exe -c "import tests.test_bazi_transit as T; print([y.score.value for y in T._default().years])"`
+→ `[29.0, 61.0, 56.0, 74.0, 59.0]`；单年页（2029 → `[74.0]`、2024 → `[33.0]`）与
+1990–1992 页（`[41.0, 73.0, 36.0]`）同法换 `start_year` / `end_year` 即得。
+命局摘要那几行仍是逐字取自主命盘，主命盘一变这里就该红。
 """
 
 from dataclasses import replace
@@ -36,16 +40,18 @@ from functools import cache
 
 import pytest
 
-from app.content import (
-    BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
-    CONTENT_SOURCES,
-    CONTENT_VERSION,
-    TRANSIT_CONTENT_SOURCES,
-)
+from app.content import CONTENT_VERSION
 from app.content.bazi_changsheng import CHANG_SHENG_ORDER
 from app.content.bazi_relations import RELATION_TABLES, transforming_element
 from app.content.bazi_shishen import ten_god_meaning
-from app.content.bazi_transit_plain import BAZI_TRANSIT_TITLES, BAZI_TRANSIT_TONE_KEYS
+from app.content.bazi_transit_plain import (
+    BAZI_TRANSIT_MONTH_FRAME,
+    BAZI_TRANSIT_PLAIN_SOURCE,
+    BAZI_TRANSIT_RANGE_FRAME,
+    BAZI_TRANSIT_THREAD_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.content.bazi_transit_rules import TRANSIT_BASE, TRANSIT_RULES, transit_rule
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
@@ -88,6 +94,7 @@ from tests.plain_wording import (
     TIER_WORDS,
     WU_DECISION_FORBIDDEN,
     advice_hits,
+    slot_value,
 )
 
 _WINDOW = {"supported_from": 1988, "supported_to": 2083}
@@ -928,15 +935,29 @@ def test_the_ten_god_block_quotes_the_corpus_verbatim() -> None:
 def test_the_provenance_lists_the_natal_tables_plus_the_two_transit_and_the_plain_ones() -> None:
     """溯源=真用过的表：主命盘九张在前、岁运两张在后、白话转述一张收尾，一张不多一张不少（spec §7.3）。
 
+    表名逐字列在这里，不照引擎那样 `*` 展开三份常量：展开式断言只比对自己比对自己，把登记表里
+    那一行改名成任何别的表名它都照样绿（J-T4 评审轮 F-02；同一条理由让
+    `tests/test_bazi_hehun.py` 的十一行名单也是逐字列的）。名字之外的正文只钉白话那一行，
+    它是最容易被顺手接错的一行。
     十二行复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
     "import tests.test_bazi_transit as T; print(len(T._default().provenance.tables))"` → `12`。
     """
     tables = _default().provenance.tables
-    assert [(table.name, table.source) for table in tables] == [
-        *CONTENT_SOURCES,
-        *TRANSIT_CONTENT_SOURCES,
-        *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
+    assert [table.name for table in tables] == [
+        "bazi_shishen",
+        "bazi_nayin",
+        "bazi_wangshuai",
+        "bazi_geju",
+        "bazi_tiaohou",
+        "bazi_shensha",
+        "bazi_relations",
+        "bazi_dimensions",
+        "bazi_plain",
+        "bazi_changsheng",
+        "bazi_transit_rules",
+        "bazi_transit_plain",
     ]
+    assert tables[-1].source == BAZI_TRANSIT_PLAIN_SOURCE
     assert {table.version for table in tables} == {CONTENT_VERSION}
     assert _default().provenance.reference_date == _REFERENCE.isoformat()
 
@@ -962,51 +983,115 @@ def test_the_plain_block_is_two_sections_without_a_focus_year() -> None:
 
 
 def test_the_plain_block_gains_the_month_section_when_a_focus_year_is_given() -> None:
-    """给了 focus_year 才出第三节，月极值逐字对得上引擎挂出的那一格。"""
+    """给了 focus_year 才出第三节，月极值按槽位逐字对得上引擎挂出的那一格。
+
+    两头都要按槽读：整句子串检查下 `top` / `low` 互换（乃至两头的分数互换）页面照样绿，
+    而那句话正好把读者最关心的「这一月哪一格高」说反（J-T4 评审轮 F-1）。
+    """
     result = _transit(start_year=2026, end_year=2030, focus_year=2027)
     assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["transit"])
     months = next(year.months for year in result.years if year.months)
-    assert months is not None and len(months) == 12
+    assert len(months) == 12
     third = result.plain[2].text
-    assert third.count("\n") == 0 and num(2027) in third
-    for cell in (max(months, key=lambda month: month.score.value),
-                 min(months, key=lambda month: month.score.value)):
-        assert cell.ganzhi in third and num(cell.score.value) in third
+    assert third.count("\n") == 0
+    top = max(months, key=lambda month: month.score.value)
+    low = min(months, key=lambda month: month.score.value)
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "year") == num(2027)
+    for slot, cell in (("top", top), ("low", low)):
+        assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, f"{slot}_ganzhi") == cell.ganzhi
+        assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, f"{slot}_value") == num(cell.score.value)
 
 
-def test_the_plain_block_tiers_come_from_the_mean_of_the_year_ledgers() -> None:
-    """档位句取均值过尺：五年 29/61/56/74/59 的均值 55.8 是「平」，而首年 29.0 是「滞」、
-    最高 74.0 是「顺」——三档各不同，所以这一条能同时否掉「取首年」「取极值」两种取法。"""
-    result = _default()
-    values = [year.score.value for year in result.years]
-    assert values == [29.0, 61.0, 56.0, 74.0, 59.0]
-    line = result.plain[0].text.split("\n")[1]
-    assert _tier(sum(values) / len(values)) == "平"
-    assert line == reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[_tier(sum(values) / len(values))])
-    for other in ("顺", "滞"):
-        assert line != reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[other])
+def test_the_month_frame_names_the_earlier_cell_when_two_months_tie_at_the_bottom() -> None:
+    """月句那句「并列时取月表里排在最前那一格」在 2027 页没有格子并列，换一种取法测不出来；
+    2026 页才有并列（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "import tests.test_bazi_transit as T; r=T._transit(start_year=2026, end_year=2030, focus_year=2026); m=next(y.months for y in r.years if y.months); print([(x.index, x.ganzhi, x.score.value) for x in m])"`
+    → 癸巳（index 3）与 甲午（index 4）同为 0.0，最高格辛丑 46.0 唯一）。
+    两头都在这一页读：`min` 换成倒序取、或换成 `sorted(...)[-1]` 之外的稳定序，都会把「排在最前」
+    这一句变成假话（J-T4 评审轮 F-1 的同一类：整句里两个槽的值互相换得掉）。"""
+    result = _transit(start_year=2026, end_year=2030, focus_year=2026)
+    months = next(year.months for year in result.years if year.months)
+    tied = [month for month in months if month.score.value == 0.0]
+    assert [(month.index, month.ganzhi) for month in tied] == [(3, "癸巳"), (4, "甲午")]
+    third = result.plain[2].text
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "year") == num(2026)
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "top_ganzhi") == "辛丑"
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "top_value") == num(46.0)
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "low_ganzhi") == "癸巳"
+    assert slot_value(third, BAZI_TRANSIT_MONTH_FRAME, "low_value") == num(0.0)
+
+
+def test_the_tone_line_follows_the_pages_own_mean_in_all_three_bands() -> None:
+    """档位句取均值再过 `_tier`，三档各有真页：2029 单年 74.0 走「顺」，2026–2030 均值 55.8
+    走「平」（首年 29.0 是「滞」、最高 74.0 是「顺」，所以这一页同时否掉「取首年」与「取极值」
+    两种取法），2024 单年 33.0 走「滞」。
+
+    三档都要有页是 J-T4 评审轮 F-5 的账：今天之前测里只落「平」，`BAZI_TRANSIT_TONE_KEYS`
+    少一枚、或 `_tier` 的两条边界写反，全绿上线而页面替读者定错了档。
+    """
+    pages = {"顺": (2029, 2029), "平": (2026, 2030), "滞": (2024, 2024)}
+    expected = {"顺": [74.0], "平": [29.0, 61.0, 56.0, 74.0, 59.0], "滞": [33.0]}
+    lines: dict[str, str] = {}
+    for tier, (start, end) in pages.items():
+        result = _transit(start_year=start, end_year=end)
+        values = [year.score.value for year in result.years]
+        assert values == expected[tier]
+        assert _tier(sum(values) / len(values)) == tier
+        line = result.plain[0].text.split("\n")[1]
+        assert line == reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[tier])
+        lines[tier] = line
+    assert len(set(lines.values())) == 3
 
 
 def test_the_plain_block_extremes_match_the_year_table() -> None:
-    """首行报起止、流年数与两道分界；第二节报极值那一年的三件套与所覆盖大运——每个串都真在那一格上。"""
+    """首行七个槽各取到自己的值，第二节把最高/最低那一年的三件套配上对，大运槽取 join 出来的那一串。"""
     result = _default()
-    overview = result.plain[0].text
-    assert num(result.years[0].year) in overview and num(result.years[-1].year) in overview
-    assert num(len(result.years)) in overview
-    assert num(STRONG_CUT) in overview and num(WEAK_CUT) in overview
-    assert (sum(1 for year in result.years if year.score.value >= STRONG_CUT),
-            sum(1 for year in result.years if year.score.value < WEAK_CUT)) == (1, 1)
+    overview = result.plain[0].text.split("\n")[0]
+    counts = {
+        "start": num(result.years[0].year),
+        "end": num(result.years[-1].year),
+        "count": num(len(result.years)),
+        "strong": num(sum(1 for year in result.years if year.score.value >= STRONG_CUT)),
+        "weak": num(sum(1 for year in result.years if year.score.value < WEAK_CUT)),
+        "strong_cut": num(STRONG_CUT),
+        "weak_cut": num(WEAK_CUT),
+    }
+    for name, value in counts.items():
+        assert slot_value(overview, BAZI_TRANSIT_RANGE_FRAME, name) == value
     best = max(result.years, key=lambda year: year.score.value)
     worst = min(result.years, key=lambda year: year.score.value)
     assert (best.year, best.pillar.ganzhi, best.score.value) == (2029, "己酉", 74.0)
     assert (worst.year, worst.pillar.ganzhi, worst.score.value) == (2026, "丙午", 29.0)
     thread = result.plain[1].text
-    for year in (best, worst):
-        assert num(year.year) in thread
-        assert year.pillar.ganzhi in thread
-        assert num(year.score.value) in thread
+    for slot, year in (("best", best), ("worst", worst)):
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_year") == num(year.year)
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_ganzhi") == year.pillar.ganzhi
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_value") == num(year.score.value)
     assert "、".join(step.ganzhi for step in result.dayun_covered if step.ganzhi) == "戊午"
-    assert "戊午" in thread
+    assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "dayun") == "戊午"
+
+
+def test_the_range_frame_counts_are_read_on_a_page_where_the_two_differ() -> None:
+    """默认页「够得着高分界的格数」与「落不到低分界的格数」同为 1，互换读不出来；
+    1990–1992 这页是 1 / 2（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "import tests.test_bazi_transit as T; print([y.score.value for y in T._transit(start_year=1990, end_year=1992).years])"`
+    → `[41.0, 73.0, 36.0]`），所以这一条才是那两个数的钉子。"""
+    result = _transit(start_year=1990, end_year=1992)
+    overview = result.plain[0].text.split("\n")[0]
+    assert slot_value(overview, BAZI_TRANSIT_RANGE_FRAME, "strong") == num(1)
+    assert slot_value(overview, BAZI_TRANSIT_RANGE_FRAME, "weak") == num(2)
+
+
+def test_the_thread_frame_prints_the_same_year_twice_on_a_single_year_page() -> None:
+    """单年页上 best 就是 worst：框架句那句「两头并列时都按排在最前的那一年报」在此成为真话，
+    两头的三件套必须都印那一年（切片写错、`min` 落空都会让这一句半真半假）。"""
+    result = _transit(start_year=2029, end_year=2029)
+    assert len(result.years) == 1
+    thread = result.plain[1].text
+    for slot in ("best", "worst"):
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_year") == num(2029)
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_ganzhi") == "己酉"
+        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_value") == num(74.0)
 
 
 def test_the_plain_block_says_not_yet_running_before_the_first_dayun() -> None:
@@ -1019,7 +1104,17 @@ def test_the_plain_block_says_not_yet_running_before_the_first_dayun() -> None:
 
 def test_the_plain_block_carries_no_ledger_word_and_no_advice() -> None:
     """装配后的整段（框架句 + 档位句 + 槽值）自己过门：单字档名、规则短名、
-    `FORBIDDEN` 三条（`TransitFired.reading` 一旦混进来必踩其中两条）、建议词与取向禁串全零。"""
+    `FORBIDDEN`、建议词与取向禁串全零。
+
+    这条测的是**装配产物**，不是判语表自身，两者不等价（J-T4 评审轮 F-2）。若某处把
+    `TransitFired.reading` 灌进白话段，它会踩中 `FORBIDDEN` **之一**而不是两条——46 条判语里
+    37 条含 `（《`、`；` 与 `』` 各零命中、单条最多命中 1；而五条名单加 `advice_hits` 也拦不住
+    全部判语：`yongshen.zhi_favourable`、`heyue.anhe_favourable`、`dayun.yun_sheng_sui`、
+    `dayun.sui_sheng_yun` 四条只署「（本系统…」，42/46 命中。判语表自己那一道归
+    `tests/content/test_bazi_transit_plain_corpus.py`，它扫的是表而不是句子。
+    复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.bazi_transit_rules import TRANSIT_RULES as R; from tests.plain_wording import FORBIDDEN as F, LEDGER_WORDS as L, PREDICTION_FORBIDDEN as P, WU_DECISION_FORBIDDEN as W, TIER_WORDS as T, advice_hits as A; rs=[(k,x.reading) for k,x in R.items()]; tok=P+W+L+T+F; print(len(rs), sum(1 for k,t in rs if A(t) or any(w in t for w in tok)), sum(1 for k,t in rs if F[1] in t), max(sum(f in t for f in F) for k,t in rs))"`
+    → `46 42 37 1`。
+    """
     for result in (_default(), _transit(start_year=2026, end_year=2030, focus_year=2027)):
         for section in result.plain:
             assert advice_hits(section.text) == []

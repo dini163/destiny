@@ -112,6 +112,7 @@ from tests.plain_wording import (
     PREDICTION_FORBIDDEN,
     WU_DECISION_FORBIDDEN,
     advice_hits,
+    slot_value,
 )
 
 
@@ -1393,22 +1394,6 @@ def test_the_axis_length_default_has_exactly_one_home() -> None:
     assert BaziHehunRequest(male=MALE_PROFILE, female=SAME_PROFILE).axis_years == 21
 
 
-def _slot_value(line: str, frame: str, name: str) -> str:
-    """按框架常量里 `{name}` 的位置，从渲染好的句子里取出该槽**实际印进去**的那一串。
-
-    拿框架本身当尺（而不是把句子里的连接词重抄一遍进测）是评审轮 M-5「字面量重抄」的解法：
-    槽前槽后那两段字面量只长在 `content/hehun_plain.py` 里，抄一份到测里就有第二套口径，
-    语料改一个字这条测会以「找不到锚点」的形态红，而不是悄悄空转。
-    取到的必须是**这一段**而不是「整句里有没有」——后者在 `plus == minus` 的那一页
-    根本分不开加减两边（评审轮 I-1）。
-    """
-    head, tail = frame.split("{" + name + "}", 1)
-    prefix = head.split("}")[-1]
-    suffix = tail.split("{")[0]
-    start = line.index(prefix) + len(prefix)
-    return line[start : line.index(suffix, start)]
-
-
 def test_the_plain_block_is_three_sections_in_the_declared_order() -> None:
     result = compute_hehun(
         male=MALE_PROFILE, female=SAME_PROFILE,
@@ -1441,9 +1426,9 @@ def test_the_plain_block_quotes_the_corpus_and_fills_its_slots(female: HehunProf
     assert tone_line == reading(HEHUN, HEHUN_TONE_KEYS[result.score.tier])   # 档位句逐字取语料
     plus = round(sum(factor.delta for factor in result.score.factors if factor.delta > 0), 2)
     minus = round(sum(-factor.delta for factor in result.score.factors if factor.delta < 0), 2)
-    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "value") == num(result.score.value)
-    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "plus") == num(plus)
-    assert _slot_value(frame_line, HEHUN_SCORE_FRAME, "minus") == num(minus)
+    assert slot_value(frame_line, HEHUN_SCORE_FRAME, "value") == num(result.score.value)
+    assert slot_value(frame_line, HEHUN_SCORE_FRAME, "plus") == num(plus)
+    assert slot_value(frame_line, HEHUN_SCORE_FRAME, "minus") == num(minus)
     assert "\n" not in second                       # 本节一行，不硬凑第二行（spec §5.2）
     assert result.nayin.phrase in second            # 三字生克句逐字入槽，不在别处重述
     assert second.count("。") == 1
@@ -1453,7 +1438,7 @@ def test_the_plain_block_quotes_the_corpus_and_fills_its_slots(female: HehunProf
     # 守卫 `len` 是为了将来加第四档时这条先红，而不是 `zip` 静默少钉一槽。
     assert len(_SYNC_ORDER) == 3
     for slot, band in zip(("aligned", "half", "apart"), _SYNC_ORDER):
-        assert _slot_value(third_line, HEHUN_AXIS_FRAME, slot) == num(band_counts[band])
+        assert slot_value(third_line, HEHUN_AXIS_FRAME, slot) == num(band_counts[band])
 
 
 @pytest.mark.parametrize(
@@ -1528,14 +1513,14 @@ def test_the_complement_frame_says_who_gives_to_whom() -> None:
     #   tests/test_bazi_hehun.py -k says_who_gives_to_whom
     give = [element.element for element in give_cell.elements]
     thin = [element.element for element in thin_cell.elements]
-    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_give").split("、") == give
-    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_thin").split("、") == thin
+    assert slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_give").split("、") == give
+    assert slot_value(second, HEHUN_COMPLEMENT_FRAME, "m_thin").split("、") == thin
     give_str, thin_str = "、".join(give), "、".join(thin)
     assert f"坤递过来的那组五行是 {give_str}，乾想要而坤给不出的是 {thin_str}，" in second
     # 反方向那一半同样按视角钉：坤视角的 补 格为空，句子必须印「没有」而不是留下空格。
     assert not cells["female"]["补"].elements
-    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_give") == "没有"
-    assert _slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_thin") == "、".join(
+    assert slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_give") == "没有"
+    assert slot_value(second, HEHUN_COMPLEMENT_FRAME, "f_thin") == "、".join(
         element.element for element in cells["female"]["阙"].elements
     )
 
@@ -1633,8 +1618,8 @@ def test_the_third_section_prints_the_segment_the_ruler_picks() -> None:
         segments[0].end_year,
     )
     frame_line = result.plain[2].text.split("\n")[0]
-    assert _slot_value(frame_line, HEHUN_AXIS_FRAME, "best_start") == num(expected.start_year)
-    assert _slot_value(frame_line, HEHUN_AXIS_FRAME, "best_end") == num(expected.end_year)
+    assert slot_value(frame_line, HEHUN_AXIS_FRAME, "best_start") == num(expected.start_year)
+    assert slot_value(frame_line, HEHUN_AXIS_FRAME, "best_end") == num(expected.end_year)
 
 
 def test_the_axis_ruler_gives_the_earliest_segment_on_a_tie() -> None:

@@ -11,6 +11,8 @@
 
 import re
 
+import pytest
+
 from app.engines.plain_compose import is_slot_key
 
 #: 机检禁字集逐字取自第一期 spec §3 第 2 条：「（《」与「』」是出处引用标记，「；」是
@@ -135,6 +137,33 @@ def frame_slots(frame: str) -> list[str]:
     return [match.group(0).strip("{}") for match in _PLACEHOLDER.finditer(frame)]
 
 
+def slot_value(line: str, frame: str, name: str) -> str:
+    """按框架常量里 `{name}` 的位置，从渲染好的句子里取出该槽**实际印进去**的那一串。
+
+    拿框架本身当尺（而不是把句子里的连接词重抄一遍进测）是评审轮 M-5「字面量重抄」的解法：
+    槽前槽后那两段字面量只长在语料文件里，抄一份到测里就有第二套口径，语料改一个字这条测会以
+    「框架与渲染句对不上」的形态红，而不是悄悄空转。
+    取到的必须是**这一段**而不是「整句里有没有」——后者在两个槽的值同为「1」的那一页根本分不开
+    加减两边（评审轮 I-1），也在年份、格数、分界都长得一样的整段散文里放得过「最高与最低互换」
+    这一类假句（J-T4 评审轮 F-1：`num(29)` 在句里到处都在，`in` 判不出它印在哪个槽上）。
+
+    锚点按**框架的顺序**走（整条框架编译成一个正则，槽即分组），不是「从前缀第一次出现的地方
+    往后取」：岁运第二节里 `，` 出现四次，`{best_value}` 的前缀正是一个裸逗号——按第一次出现取会
+    拿到上一槽的尾巴（2026-10-21 写这条测时踩到的，下面的 `test_slot_value_*` 钉住它）。
+    对不上就抛 `ValueError` 而不是回空串：空串让断言以「不相等」红在一片噪声里，而这条测想说的
+    从来是「装配把句子拼错了」。重复槽只读第一处，这是口径不是缺陷。
+    """
+    literals = _PLACEHOLDER.split(frame)
+    names = frame_slots(frame)
+    pattern = "".join(
+        re.escape(literal) + "(.*?)" for literal in literals[:-1]
+    ) + re.escape(literals[-1])
+    match = re.search(pattern, line)
+    if match is None:
+        raise ValueError(f"框架与渲染句对不上：{frame!r} 套不进 {line!r}")
+    return match.group(names.index(name) + 1)
+
+
 def wording_violations(corpus, key: str) -> list[str]:
     """一条白话条目的措辞违例清单，空表即合规；判定次序：先禁字，再按槽位/整句分流。
 
@@ -224,3 +253,27 @@ def test_advice_hits_masks_named_word_forms() -> None:
 def test_frame_slots_reads_exactly_the_entry_gates_placeholder() -> None:
     """大括号里带大写的那一槽**不匹配**——这就是「两份正则迟早分家」的现场证据。"""
     assert frame_slots("甲{x}乙{y_1}丙{A}") == ["x", "y_1"]
+
+
+def test_slot_value_reads_the_first_segment_and_keeps_two_slots_apart() -> None:
+    """本模块唯一的取槽尺自证：首槽前缀为空也要取得到，同值的两槽不许混。
+
+    `slot_value` 是 J-T4 评审轮 F-1 之后所有「句子把哪个数印在哪个槽上」判据的底座，
+    它自己读错一段就是全批白话测一起空转，所以这几条留在测模块里显式点名跑：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -m pytest tests/plain_wording.py -o addopts=""`。
+    第二组两条是**这次改出来的形状**：裸逗号在句里出现四次，按「前缀第一次出现」取会读到
+    上一槽的尾巴——这正是岁运第二节 `{best_value}` 的处境。
+    重复槽只读第一处（`names.index(name)`），这是口径而不是缺陷——真要钉第二处，得换一条测。
+    """
+    frame = "{a} 与 {b} 两道线，{a} 再出现一次"
+    line = "65 与 45 两道线，65 再出现一次"
+    assert slot_value(line, frame, "a") == "65"
+    assert slot_value(line, frame, "b") == "45"
+    assert slot_value("顺 与 滞 两道线，顺 再出现一次", frame, "b") == "滞"
+
+    comma_frame = "大运栏写作 {dayun}，最高那一年是 {best_year} 年的 {best_ganzhi}，{best_value} 分"
+    comma_line = "大运栏写作 戊午，最高那一年是 2029 年的 己酉，74 分"
+    assert slot_value(comma_line, comma_frame, "best_value") == "74"
+    assert slot_value(comma_line, comma_frame, "dayun") == "戊午"
+    with pytest.raises(ValueError, match="框架与渲染句对不上"):
+        slot_value(comma_line.replace("己酉", "乙酉"), comma_frame + "，多出来的一槽 {extra}", "extra")

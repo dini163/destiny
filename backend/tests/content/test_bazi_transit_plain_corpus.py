@@ -1,4 +1,4 @@
-"""岁运三片语料与九句框架：工厂看不到的那九件事（批次二 spec §4.2 / §4.3 / §7.1 / §7.3–§7.5）。
+"""岁运三片语料与九句框架：工厂看不到的那十件事（批次二 spec §4.2 / §4.3 / §7.1 / §7.3–§7.5）。
 
 工厂管措辞四条与 `set(entries) == universe()`；这里钉它结构上够不着的：
 ① 登记身份（R24：`PLAIN_CORPORA` 是同键字面量字典，两行 `bazi_transit` 会静默留后一条）；
@@ -13,7 +13,9 @@
    那类数（时辰表每天恒出十二格，格数只是十二的整倍数，没有一条命令能把它跑出来），
    所以它们只进样例句、不写进句子；
 ⑧ 三页节标题名单（`BAZI_TRANSIT_TITLES`）是装配与前端共用的那一份，键序即页面序；
-⑨ 出处串自守：`BAZI_TRANSIT_PLAIN_SOURCE` 点名的两道分界常量真在位、真的就是 `_tier` 在用的那两道。
+⑨ 出处串自守：`BAZI_TRANSIT_PLAIN_SOURCE` 点名的两道分界常量真在位、真的就是 `_tier` 在用的那两道；
+⑩ 出处清单那一行（`BAZI_TRANSIT_PLAIN_CONTENT_SOURCES`）的表名与正文逐字钉在本表这一侧，
+   不让装配测用展开式比对自己。
 
 样例句值除标注「契约一形」的那三份外全部来自实算（无 mock，AGENTS §9；那三份是 schema
 字段说明承认的形状，数值是让边界值必须过门的最小构造，不宣称那样一页今天存在——三形名见下面
@@ -22,6 +24,7 @@
 
 from datetime import date
 
+from app.content import BAZI_TRANSIT_PLAIN_CONTENT_SOURCES
 from app.content.bazi_transit_plain import (
     BAZI_LIURI_DAYS_FRAME,
     BAZI_LIURI_FOCUS_FRAME,
@@ -299,6 +302,18 @@ def test_transit_corpus_is_the_row_the_factory_iterates() -> None:
     assert BAZI_TRANSIT.grouping == "keep"    # 本批无符号可传，band 分支无从触发
     assert BAZI_TRANSIT.slot_prefixes == frozenset()
     assert BAZI_TRANSIT.openers == {}         # SECTIONLESS：无小节形状本身
+
+
+def test_the_provenance_row_is_the_name_this_table_is_really_called() -> None:
+    """出处清单那一行的表名与正文逐字钉死，不许从别处派生。
+
+    J-T4 评审轮 F-02 的账：装配测原先写成 `[*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES,
+    *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES]`——那是让引擎的展开式比对自己，把这一行改名成任何
+    别的表名（`bazi_hehun_rules` 之类），页面就替岁运声称引了它没读过的表，而四处展开点全绿。
+    名字与正文长在本表这一侧；十二行的**顺序与张数**由 `tests/test_bazi_transit.py` 里那份逐字
+    名单管，两边不重复断言同一件事。
+    """
+    assert BAZI_TRANSIT_PLAIN_CONTENT_SOURCES == (("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),)
 
 
 def test_tone_keys_are_what_the_engine_says() -> None:
