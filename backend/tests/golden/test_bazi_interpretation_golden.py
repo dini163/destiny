@@ -7,6 +7,7 @@ calendar drift can never hide behind a rule change.
 """
 
 from datetime import date, time
+from statistics import mean
 
 import pytest
 
@@ -15,7 +16,15 @@ from app.content.bazi_dimensions import (
 )
 from app.content.bazi_geju import GEJU_COUNT, GEJU_RULES
 from app.content.bazi_nayin import NAYIN_COUNT, NAYIN_MEANING
-from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_READINGS, TIER_CLOSERS
+from app.content.bazi_plain import (
+    DIMENSION_OPENERS,
+    PLAIN_READINGS,
+    PLAIN_SUMMARY_FRAME,
+    TIER_ADVICE,
+    TIER_CLOSERS,
+    VERDICT_ADVICE_FRAME,
+    VERDICT_OUTLOOK,
+)
 from app.content.bazi_relations import RELATION_COUNT, RELATION_TABLES
 from app.content.bazi_shensha import SHENSHA_COUNT, SHENSHA_RULES
 from app.content.bazi_shishen import TEN_GOD_COUNT, TEN_GOD_MEANING
@@ -25,6 +34,7 @@ from app.engines.bazi_interpret import TEN_GOD_GROUPS, interpret_chart
 from app.engines.bazi_rules import derive_branch_groups, derive_relations, derive_shensha
 from app.engines.bazi_strength import assess_strength, detect_geju, element_weight_scores
 from app.engines.bazi_yongshen import select_yongshen
+from app.engines.verdict import grade_for
 from app.schemas.common import Gender
 
 BOOKS = ("《渊海子平", "《三命通会", "《滴天髓", "《协纪辨方书")  # 出处到章，故只比书名前缀
@@ -253,9 +263,28 @@ def test_every_citable_entry_names_an_allowed_source() -> None:
             assert any(entry.source.startswith(book) for book in BOOKS), (table, entry)
 
 
-def test_plain_summary_restates_the_tiers_without_new_verdicts() -> None:
-    """总论只许是 `summary` 的套壳：白话层不借总论偷偷加判断。"""
+def test_plain_summary_and_verdict_are_derived_from_the_six_ledgers() -> None:
+    """结论卡片（2026-10-21 verdict-card spec §3/§4）：档位来自六维账本均值，四段文案全来自语料。
+
+    旧口径是「总论只许是 summary 的套壳」；2026-10-21 起总论改为结论卡片 headline
+    （档位 + 六维计数 + 取向），本测改为钉「派生关系」：档位/星级 = `grade_for(均值)`、
+    headline/advice = 框架句实例化、points = 每维档位复述，任一环节拍脑袋即红。
+    """
     for name in sorted(CASES):
         interp = _bundle(CASES[name])["interpretation"]
-        assert interp.summary in interp.plain_summary
-        assert interp.plain_summary.count("\n") == 0
+        readings = interp.six_dimensions
+        mean_score = mean(r.score.value for r in readings)
+        expected_grade, expected_stars = grade_for(mean_score)
+        assert (interp.verdict.grade, interp.verdict.stars) == (expected_grade, expected_stars)
+        counts = {tier: sum(1 for r in readings if r.score.tier == tier) for tier in ("顺", "平", "滞")}
+        expected_headline = PLAIN_SUMMARY_FRAME.format(
+            grade=expected_grade, shun=counts["顺"], ping=counts["平"], zhi=counts["滞"],
+            outlook=VERDICT_OUTLOOK[expected_grade],
+        )
+        assert interp.plain_summary == expected_headline
+        assert interp.verdict.headline == expected_headline
+        assert interp.verdict.points == [f"{r.dimension}：{r.score.tier}" for r in readings]
+        weakest = min(readings, key=lambda r: r.score.value)
+        assert interp.verdict.advice == VERDICT_ADVICE_FRAME.format(
+            dimension=weakest.dimension, tier_advice=TIER_ADVICE[weakest.score.tier],
+        )

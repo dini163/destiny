@@ -7,9 +7,16 @@
 """
 
 from app.content.bazi_dimensions import DIMENSION_RULES, dim_rule
-from app.content.bazi_plain import DIMENSION_OPENERS, PLAIN_SUMMARY_FRAME, TIER_CLOSERS
+from app.content.bazi_plain import (
+    DIMENSION_OPENERS,
+    PLAIN_SUMMARY_FRAME,
+    TIER_ADVICE,
+    TIER_CLOSERS,
+    VERDICT_ADVICE_FRAME,
+    VERDICT_OUTLOOK,
+)
 from app.engines.plain_corpora import BAZI, PLAIN_CORPORA
-from tests.plain_wording import FORBIDDEN
+from tests.plain_wording import FORBIDDEN, frame_slots
 
 ALL_KEYS = {rule.key for rules in DIMENSION_RULES.values() for rule in rules}
 PREFIXES = {rules[0].key.split(".", maxsplit=1)[0] for rules in DIMENSION_RULES.values()}
@@ -31,13 +38,30 @@ def test_closers_cover_exactly_the_three_tiers() -> None:
     assert set(TIER_CLOSERS) == {"顺", "平", "滞"}
 
 
-def test_summary_frame_carries_the_placeholder_only() -> None:
+def test_summary_frame_carries_its_placeholders_only() -> None:
     # 段落框架句（PLAIN_SUMMARY_FRAME）不在工厂 openers/closers 的遍历里，参数化工厂看不见它，
     # 所以禁字这一半由本文件自守；口径正主在 tests/plain_wording.py。
-    # 文言句式的实际防线是人审 + 本表文案已避开「X之物」「随之」这类属格构造。
-    assert "{summary}" in PLAIN_SUMMARY_FRAME
+    # 2026-10-21 verdict-card spec §4：总论框架改为「档位 + 六维计数 + 取向」，
+    # 槽位从 {summary} 扩为 {grade}/{shun}/{ping}/{zhi}/{outlook}，共五槽、次序即出现序。
+    assert frame_slots(PLAIN_SUMMARY_FRAME) == ["grade", "shun", "ping", "zhi", "outlook"]
     for token in FORBIDDEN:
         assert token not in PLAIN_SUMMARY_FRAME, token
+
+
+def test_verdict_frames_and_slot_words_meet_the_same_contract() -> None:
+    # 结论卡片的框架句与槽位语料同样不在工厂遍历里（verdict-card spec §4），由本文件自守：
+    # 建议框架句走全句口径（≥20 字、恰一「。」、含「你」、禁字）；
+    # 两套槽位语料（VERDICT_OUTLOOK / TIER_ADVICE）不成句：非空、无「。」、禁字。
+    assert len(VERDICT_ADVICE_FRAME) >= 20
+    assert VERDICT_ADVICE_FRAME.count("。") == 1
+    assert "你" in VERDICT_ADVICE_FRAME
+    for token in FORBIDDEN:
+        assert token not in VERDICT_ADVICE_FRAME, token
+    for words in (VERDICT_OUTLOOK, TIER_ADVICE):
+        for word in words.values():
+            assert word.strip() and "。" not in word
+            for token in FORBIDDEN:
+                assert token not in word, token
 
 
 def test_bazi_corpus_is_the_row_the_factory_iterates() -> None:
