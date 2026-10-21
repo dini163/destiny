@@ -363,7 +363,7 @@ def test_the_plain_block_gains_the_focus_hour_section_when_a_focus_is_given() ->
 
 def test_the_plain_block_carries_no_tier_name_and_no_advice() -> None:
     """本页两个 fixture 各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零
-    （同 J-T4 Step 1 第五条口径；流日那半边在 `tests/test_bazi_liuri.py` 的同名测里各扫各的）。
+    （同 J-T4 Step 1 第六条口径；流日那半边在 `tests/test_bazi_liuri.py` 的同名测里各扫各的）。
 
     扫的是**装配产物**（框架句 + 档位句 + 槽值），不是语料表自己；档位句与槽值都在射程里，
     所以这里能拦住「把 `tier` 或 `fired[].label` 顺手灌进句子」那一类接线错。

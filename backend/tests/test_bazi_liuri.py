@@ -535,7 +535,7 @@ def test_the_plain_block_extremes_and_counts_match_the_day_table() -> None:
 
 def test_the_plain_block_carries_no_tier_name_and_no_advice() -> None:
     """两个流日 fixture 各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零
-    （同 J-T4 Step 1 第五条口径，也同 `tests/test_bazi_liushi.py` 那条流时侧姊妹钉）。
+    （同 J-T4 Step 1 第六条口径，也同 `tests/test_bazi_liushi.py` 那条流时侧姊妹钉）。
 
     J-T5 评审轮 F-03 的账：流时那条 docstring 写着「两页各扫一遍」，循环的却是 `_bare()` 与
     `_focused()` 两个**流时** fixture，流日装配文本里灌进 `tier` 或 `fired[].label` 时
