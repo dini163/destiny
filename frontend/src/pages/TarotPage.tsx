@@ -5,7 +5,6 @@ import { SpreadBoard } from '../components/tarot/SpreadBoard';
 import { SpreadControls } from '../components/tarot/SpreadControls';
 import { SpreadSummary } from '../components/tarot/SpreadSummary';
 import { Icon } from '../components/ui/Icon';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useTarotSpread } from '../hooks/useTarotSpread';
 import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../types/tarot';
@@ -98,7 +97,7 @@ export function TarotPage() {
       ) : null}
 
       {tarot.isPending && !tarot.data ? (
-        <p className="label-caps text-ink-muted">正在以 CSPRNG 洗牌布阵…</p>
+        <p className="label-caps text-ink-muted">正在洗牌布阵…</p>
       ) : null}
 
       {tarot.data ? (
@@ -187,36 +186,6 @@ function TarotResults({
       <ResultCard title="综合解读" eyebrow="SYNTHESIS" icon="seal" elevated>
         <p className="whitespace-pre-line text-sm leading-relaxed text-ink-variant">{spread.synthesis}</p>
       </ResultCard>
-
-      <Provenance spread={spread} />
     </>
-  );
-}
-
-/** Methodology + provenance note anchored to the real draw engine. */
-function Provenance({ spread }: { spread: TarotSpreadResponse }) {
-  const { engine, source, note, content_version } = spread.provenance;
-  return (
-    <div className="panel flex flex-col gap-3 p-5">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">洗牌溯源与免责</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本次以 <span className="text-gold-soft">{spread.spread_name_zh}</span> 起牌，由{' '}
-            <span className="text-gold-soft">{engine}</span> 依{' '}
-            <span className="text-gold-soft">{source}</span> 真实抽牌。
-          </p>
-          <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{note}</p>
-        </div>
-      </div>
-      <ProvenancePanel tables={spread.provenance.tables} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
-        <span className="label-caps">ENGINE · {engine}</span>
-        <span className="label-caps">RNG · {spread.rng}</span>
-        <span className="label-caps">CONTENT · {content_version}</span>
-        <span>塔罗为象征性自省工具，结果仅供娱乐与文化参考，不构成医疗、法律、财务或人生重大决策建议。</span>
-      </div>
-    </div>
   );
 }

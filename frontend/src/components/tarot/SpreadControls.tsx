@@ -67,7 +67,7 @@ export function SpreadControls({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">塔罗秘仪神谕</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                secrets CSPRNG 洗牌
+                真随机洗牌
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
@@ -143,7 +143,7 @@ export function SpreadControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          洗牌与正逆位由 Python <span className="text-gold-soft">secrets</span>（操作系统级 CSPRNG）决定，每次抽牌独立且不可复现。
+          洗牌与正逆位由权威算法真实决定，每次抽牌独立且不可复现。
         </span>
         <span>牌名、关键词与牌义取自主策展 78 张牌库，综合解读由引擎的固定句式串起这些字段。</span>
       </div>

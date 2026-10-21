@@ -71,7 +71,7 @@ export function CastControls({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">周易六爻神机</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                liuyao-najia · secrets
+                纳甲六爻 · 真随机
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
@@ -124,7 +124,7 @@ export function CastControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          铜钱摇卦与梅花时间由 Python <span className="text-gold-soft">secrets</span> 与 lunar-python 真实推算，每次起卦独立不可复现。
+          铜钱摇卦与梅花时间由权威算法真实推算，每次起卦独立不可复现。
         </span>
         <span>纳甲、六亲、六神、世应与卦爻辞均取自策展经典数据，未作运行时虚构。</span>
       </div>

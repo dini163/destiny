@@ -89,7 +89,7 @@ export function QimenControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          年月日时干支与节气由 <span className="text-gold-soft">lunar-python</span> 真实推算；九星八门八神、局数歌诀取自策展奇门数据，未作运行时虚构。时辰径取钟点，未校正真太阳时。
+          年月日时干支与节气由权威历法真实推算；九星八门八神、局数歌诀取自策展奇门数据，未作运行时虚构。时辰径取钟点，未校正真太阳时。
         </span>
       </div>
     </form>

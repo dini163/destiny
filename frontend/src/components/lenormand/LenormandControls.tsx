@@ -121,7 +121,7 @@ export function LenormandControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          抽牌以 <span className="text-gold-soft">Python secrets</span>（操作系统级 CSPRNG）洗牌、无重复发牌；牌义与组合直读取自策展 36 张牌库，未作运行时虚构。
+          抽牌由权威算法真实洗牌、无重复发牌；牌义与组合直读取自策展 36 张牌库，未作运行时虚构。
         </span>
       </div>
     </form>

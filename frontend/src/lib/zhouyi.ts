@@ -49,7 +49,7 @@ export interface CastMethodOption {
  * Hints describe the real algorithm, not invented flavour.
  */
 export const CAST_METHODS: readonly CastMethodOption[] = [
-  { value: 'three_coin', label: '铜钱摇卦', hint: '三枚铜钱六掷，由 secrets 加密乱数模拟，字(2)/背(3) 定点成爻。' },
+  { value: 'three_coin', label: '铜钱摇卦', hint: '三枚铜钱六掷，由权威算法真实模拟，字(2)/背(3) 定点成爻。' },
   { value: 'manual', label: '手动录入', hint: '自行录入六掷铜钱正背（字=2、背=3），每掷三枚，复现古法摇卦。' },
   { value: 'time', label: '梅花时间', hint: '梅花易数：以起卦农历年、月、日、时数取上下卦与动爻。' },
 ];

@@ -5,7 +5,6 @@ import { NodeInspector } from '../components/kabbalah/NodeInspector';
 import { TreeOfLife } from '../components/kabbalah/TreeOfLife';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useGematria } from '../hooks/useGematria';
 import { useKabbalahTree } from '../hooks/useKabbalahTree';
@@ -85,8 +84,6 @@ export function KabbalahPage() {
             ) : null}
             {gematria.data ? <GematriaResult reading={gematria.data} onSelect={setSelection} /> : null}
           </ResultCard>
-
-          <Provenance tree={tree.data} />
         </>
       ) : null}
     </div>
@@ -173,40 +170,6 @@ function PathIndex({
             </button>
           );
         })}
-      </div>
-    </div>
-  );
-}
-
-/** Methodology + provenance note anchored to the fixed reference map. */
-function Provenance({ tree }: { tree: KabbalahTree }) {
-  const { engine, source, note, content_version } = tree.provenance;
-  return (
-    <div className="panel flex flex-col gap-3 p-5">
-      <div className="flex items-start gap-3">
-        <Icon name="compass" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">对应体系与口径</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            全树由 <span className="text-gold-soft">{engine}</span> 依 <span className="text-gold-soft">{source}</span> 如实回显。
-          </p>
-          <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{note}</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        {tree.pillars.map((pillar) => (
-          <span key={pillar.id} className="inline-flex items-center gap-1.5 text-[11px] text-ink-muted">
-            <span className="h-2 w-2 rounded-full" style={{ backgroundColor: pillarAccent(pillar.id) }} />
-            {pillar.name_zh}（{pillar.name_en}）· {pillar.virtue}
-          </span>
-        ))}
-      </div>
-      <ProvenancePanel tables={tree.provenance.tables} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
-        <span className="label-caps">ENGINE · {engine}</span>
-        <span className="label-caps">CONTENT · {content_version}</span>
-        <span className="label-caps">四界 · {tree.worlds.join(' → ')}</span>
-        <span>卡巴拉为神秘学自省与文化研究工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。</span>
       </div>
     </div>
   );

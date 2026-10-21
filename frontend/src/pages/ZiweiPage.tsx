@@ -6,7 +6,6 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useZiwei } from '../hooks/useZiwei';
@@ -49,7 +48,7 @@ export function ZiweiPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="紫微斗数命盘"
-        badge="lunar-python 权威历算"
+        badge="权威历算"
         subtitle="以农历生月生时定命身二宫，纳音定五行局，安紫微天府十四主星与左辅右弼、禄马魁钺、羊陀火铃空劫诸曜，起生年四化与大限。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         submitLabel={ziwei.isPending ? '排盘中…' : '排定命盘'}
@@ -119,8 +118,6 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
           sections={chart.palaces.map((palace) => ({ title: palace.name, text: palace.plain }))}
         />
       </ResultCard>
-
-      <Provenance chart={chart} />
     </>
   );
 }
@@ -196,36 +193,5 @@ function Chip({ label, value }: { label: string; value: string }) {
       <span className="label-caps">{label}</span>
       <span className="text-ink">{value}</span>
     </span>
-  );
-}
-
-/** Methodology + provenance note anchored to the real chart engine. */
-function Provenance({ chart }: { chart: ZiweiChart }) {
-  const { provenance } = chart;
-  return (
-    <div className="panel flex flex-col gap-3 p-5">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1.5">
-          <span className="font-display text-base text-ink">排盘溯源与口径</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本盘由 <span className="text-gold-soft">{provenance.engine}</span> 依{' '}
-            <span className="text-gold-soft">{provenance.source}</span> 确定性安星：农历生月生日与时辰、纳音五行局由{' '}
-            <span className="text-gold-soft">lunar-python</span> 定数，十四主星与四化依安星表推排，绝无运行时杜撰。
-            {provenance.school_note}
-            紫微斗数为传统命理自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。
-          </p>
-        </div>
-      </div>
-      <ProvenancePanel tables={chart.provenance.tables} />
-      <div className="flex flex-wrap gap-x-6 gap-y-1 border-t border-rim-soft pt-3 text-[11px] text-ink-muted">
-        <span>
-          ENGINE · <span className="numeric text-gold-soft">{provenance.engine}</span>
-        </span>
-        <span>
-          CONTENT · <span className="numeric text-gold-soft">{provenance.content_version}</span>
-        </span>
-      </div>
-    </div>
   );
 }

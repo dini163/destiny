@@ -4,7 +4,6 @@ import { QimenBoard } from '../components/qimen/QimenBoard';
 import { QimenControls } from '../components/qimen/QimenControls';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useQimen } from '../hooks/useQimen';
 import type { QimenChart, QimenRequest } from '../types/qimen';
@@ -97,8 +96,6 @@ function QimenResults({ chart }: { chart: QimenChart }) {
           }))}
         />
       </ResultCard>
-
-      <Provenance chart={chart} />
     </>
   );
 }
@@ -158,33 +155,6 @@ function Meta({ label, value }: { label: string; value: string }) {
     <div className="flex flex-col gap-0.5">
       <dt className="label-caps">{label}</dt>
       <dd className="font-display text-sm text-ink-variant">{value}</dd>
-    </div>
-  );
-}
-
-/** Methodology + provenance note anchored to the real 起局 engine. */
-function Provenance({ chart }: { chart: QimenChart }) {
-  const { engine, source, school_note, content_version } = chart.provenance;
-  return (
-    <div className="panel flex flex-col gap-3 p-5">
-      <div className="flex items-start gap-3">
-        <Icon name="gauge" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">起局溯源与口径</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本局由 <span className="text-gold-soft">{engine}</span> 依{' '}
-            <span className="text-gold-soft">{source}</span> 真实推演：年月日时干支与节气由{' '}
-            <span className="text-gold-soft">lunar-python</span> 定数，九星八门八神与局数歌诀取自策展奇门数据，起局纯为确定性运算，未作运行时虚构。
-          </p>
-          <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{school_note}</p>
-        </div>
-      </div>
-      <ProvenancePanel tables={chart.provenance.tables} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
-        <span className="label-caps">ENGINE · {engine}</span>
-        <span className="label-caps">CONTENT · {content_version}</span>
-        <span>奇门遁甲为传统象数决策参考，结果仅供文化自省，不构成医疗、法律、财务或人生重大决策建议。</span>
-      </div>
     </div>
   );
 }
