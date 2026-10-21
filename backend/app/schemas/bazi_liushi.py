@@ -17,6 +17,7 @@ from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_liuri import AlmanacYiJi
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
+from app.schemas.common import PlainSection
 from app.schemas.scoring import ScoreValue
 
 
@@ -105,4 +106,8 @@ class BaziLiushiResult(BaseModel):
 
     hours: list[TransitHourCell] = Field(description="恒 12 格，子时首格在 0。")
     focused: TransitHourDetail | None = Field(default=None, description="仅 `focus_hour_zhi` 所指那一格给出。")
-    provenance: Provenance = Field(description="与流日页同源：12 张表，由 `liuri_provenance` 一处产出。")
+    plain: list[PlainSection] = Field(
+        description="流时页白话 2–3 节：本日总览（两行）、十二时辰，给了 `focus_hour_zhi` 时再加聚焦时辰"
+        "（批次二 spec §7.5；三节标题取自 `content/bazi_transit_plain.BAZI_TRANSIT_TITLES` 的 liushi 一组）。"
+    )
+    provenance: Provenance = Field(description="与流日页同源：13 张表，由 `liuri_provenance` 一处产出。")

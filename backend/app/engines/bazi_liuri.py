@@ -10,7 +10,7 @@
 
 四个内核心（`LiuriMonthSegment` / `LiuriMonthBase` / `LiuriDayRow` / `liuri_day_row`）
 与 `liuri_provenance` 是模块级的：切片 4 的 `bazi_liushi` 要拿"日所在的段、段的基准、
-那一日的三段账本与十二长生、以及那 12 行溯源"，而跨模块传私有名等于把切片 3 §5.4 的
+那一日的三段账本与十二长生、以及那 13 行溯源"，而跨模块传私有名等于把切片 3 §5.4 的
 纪律作废。
 """
 
@@ -22,11 +22,19 @@ from lunar_python import Solar
 from app.content import (
     ALMANAC_CONTENT_SOURCES,
     ALMANAC_CONTENT_VERSION,
+    BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
     CONTENT_SOURCES,
     CONTENT_VERSION,
     TRANSIT_CONTENT_SOURCES,
 )
 from app.content.bazi_shishen import ten_god_meaning
+from app.content.bazi_transit_plain import (
+    BAZI_LIURI_DAYS_FRAME,
+    BAZI_LIURI_FOCUS_FRAME,
+    BAZI_LIURI_MONTH_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_moment import resolve_natal_moment
@@ -45,6 +53,8 @@ from app.engines.bazi_transit import (
     transit_narrative,
     year_scan,
 )
+from app.engines.plain_compose import num, overview, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
 from app.schemas.bazi_liuri import (
     AlmanacYiJi,
@@ -54,7 +64,7 @@ from app.schemas.bazi_liuri import (
     TransitDayHit,
 )
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
-from app.schemas.common import CalendarType, Gender
+from app.schemas.common import CalendarType, Gender, PlainSection
 from app.schemas.scoring import ScoreValue
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -271,10 +281,14 @@ def _focused_row(
 
 
 def liuri_provenance(reference: date) -> Provenance:
-    """溯源那 12 行：主命盘 9 + 岁运 2 + 历注 1（切片 3 spec §7.4 定的是「三份清单相接」
-    这个口径，行数随清单长度走 —— 主命盘那张清单刚收进 `bazi_plain`，这里就跟着到 12）。
+    """溯源那 13 行：主命盘 9 + 岁运 2 + 白话 1 + 历注 1（切片 3 spec §7.4 定的是「清单相接」
+    这个口径——那时三份，J-T5 起四份——行数随清单长度走：主命盘那张清单收进 `bazi_plain` 时
+    这里跟到 12，白话那张 `bazi_transit_plain` 被本页装配读到时这里跟到 13）。
 
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import CONTENT_SOURCES as c, TRANSIT_CONTENT_SOURCES as t, ALMANAC_CONTENT_SOURCES as a; print(len(c) + len(t) + len(a))"` → 12。
+    条数复测（四段清单都要算进去，少一段这条命令就复现不出 13）：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import CONTENT_SOURCES as c, TRANSIT_CONTENT_SOURCES as t, BAZI_TRANSIT_PLAIN_CONTENT_SOURCES as p, ALMANAC_CONTENT_SOURCES as a; print(len(c) + len(t) + len(p) + len(a))"` → 13。
+
+    白话那张单独成清单、不并进 `TRANSIT_CONTENT_SOURCES`，理由见 `content/__init__.py`
+    的 `BAZI_TRANSIT_PLAIN_CONTENT_SOURCES` 头注（并进会让合婚页替一张没读过的表背书）。
 
     提到模块级是流时那一轮的事：一页 = 一日十二时，用的是同一批表、同一个版本口径，
     而再复制一份 `tables` 清单等于给"多一行是谎称引用、少一行是不认账"这条纪律开出
@@ -286,7 +300,11 @@ def liuri_provenance(reference: date) -> Provenance:
         tables=[
             *(
                 ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
-                for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
+                for module, source in (
+                    *CONTENT_SOURCES,
+                    *TRANSIT_CONTENT_SOURCES,
+                    *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
+                )
             ),
             *(
                 ProvenanceTable(name=module, version=ALMANAC_CONTENT_VERSION, source=source)
@@ -294,6 +312,73 @@ def liuri_provenance(reference: date) -> Provenance:
             ),
         ],
     )
+
+
+def _liuri_plain(
+    *,
+    month_ganzhi: str,
+    month_start_solar: str,
+    month_end_solar: str,
+    month_score: ScoreValue,
+    days: list[TransitDayCell],
+    focused: TransitDayDetail | None,
+) -> list[PlainSection]:
+    """流日页的整体白话 2–3 节（spec §7.4）。
+
+    档位取 `month_score.tier` 这把现成的尺，不重算 29 格均值：同一页的月卡已经报过这个数，
+    白话若另起一算，两处迟早分家（spec §4.3 首行）。简表格只有 `value` / `tier`，
+    **没有 `score`**——极值一律读 `cell.value`。
+    """
+    titles = BAZI_TRANSIT_TITLES["liuri"]
+    hi = max(days, key=lambda cell: cell.value)
+    lo = min(days, key=lambda cell: cell.value)
+    sections = [
+        PlainSection(
+            title=titles[0],
+            text=overview(
+                BAZI_LIURI_MONTH_FRAME,
+                {
+                    "ganzhi": month_ganzhi,
+                    "start_solar": month_start_solar,
+                    "end_solar": month_end_solar,
+                    "value": num(month_score.value),
+                    "strong": num(sum(1 for cell in days if cell.tier == "顺")),
+                    "weak": num(sum(1 for cell in days if cell.tier == "滞")),
+                },
+            )
+            + "\n"
+            + reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[month_score.tier]),
+        ),
+        PlainSection(
+            title=titles[1],
+            text=overview(
+                BAZI_LIURI_DAYS_FRAME,
+                {
+                    "count": num(len(days)),
+                    "high": hi.ganzhi,
+                    "high_value": num(hi.value),
+                    "low": lo.ganzhi,
+                    "low_value": num(lo.value),
+                },
+            ),
+        ),
+    ]
+    if focused is not None:
+        sections.append(
+            PlainSection(
+                title=titles[2],
+                text=overview(
+                    BAZI_LIURI_FOCUS_FRAME,
+                    {
+                        "date": focused.solar_date,
+                        "ganzhi": focused.ganzhi,
+                        "value": num(focused.value),
+                        "hits": num(len(focused.day_hits)),
+                    },
+                ),
+            )
+        )
+    return sections
 
 
 def compute_liuri_matrix(
@@ -344,6 +429,8 @@ def compute_liuri_matrix(
     base = month_base(natal, annual, segment)
     rows = liuri_days(natal, base, segment)
     focused = _focused_row(rows, focus_date, segment)
+    cells = [TransitDayCell(**_cell_fields(row)) for row in rows]
+    detail = None if focused is None else _day_detail(focused)
     return BaziLiuriResult(
         four_pillars=chart.four_pillars,
         pillars=list(chart.pillars),
@@ -367,7 +454,15 @@ def compute_liuri_matrix(
         month_end_solar=segment.end.isoformat(),
         month_score=base.score,
         month_fired=base.fired,
-        days=[TransitDayCell(**_cell_fields(row)) for row in rows],
-        focused=None if focused is None else _day_detail(focused),
+        days=cells,
+        focused=detail,
+        plain=_liuri_plain(
+            month_ganzhi=segment.month_ganzhi,
+            month_start_solar=segment.start.isoformat(),
+            month_end_solar=segment.end.isoformat(),
+            month_score=base.score,
+            days=cells,
+            focused=detail,
+        ),
         provenance=liuri_provenance(reference),
     )

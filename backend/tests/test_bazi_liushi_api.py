@@ -120,11 +120,12 @@ def test_three_transit_schemas_carry_their_own_field_lists() -> None:
     assert list(BaziLiuriResult.model_fields) == [
         *nine, "anchor_date", "year", "year_ganzhi", "year_age", "dayun_index", "dayun_ganzhi",
         "month_index", "month_in_chinese", "month_ganzhi", "month_start_solar",
-        "month_end_solar", "month_score", "month_fired", "days", "focused", "provenance",
+        "month_end_solar", "month_score", "month_fired", "days", "focused", "plain",
+        "provenance",
     ]
     assert list(BaziLiushiResult.model_fields) == [
         *nine, "solar_date", "weekday", "lunar_day", "day_ganzhi", "year", "year_ganzhi",
         "year_age", "dayun_index", "dayun_ganzhi", "month_index", "month_in_chinese",
         "month_ganzhi", "month_start_solar", "month_end_solar", "day_score", "day_fired",
-        "day_almanac", "hours", "focused", "provenance",
+        "day_almanac", "hours", "focused", "plain", "provenance",
     ]

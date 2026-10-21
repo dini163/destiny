@@ -15,6 +15,13 @@ from datetime import date, datetime, time, timedelta
 from lunar_python import Solar
 
 from app.content.bazi_shishen import ten_god_meaning
+from app.content.bazi_transit_plain import (
+    BAZI_LIUSHI_DAY_FRAME,
+    BAZI_LIUSHI_FOCUS_FRAME,
+    BAZI_LIUSHI_HOURS_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import (
@@ -40,6 +47,8 @@ from app.engines.bazi_transit import (
     transit_ledger,
     transit_narrative,
 )
+from app.engines.plain_compose import num, overview, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi_liuri import AlmanacYiJi
 from app.schemas.bazi_liushi import (
     BaziLiushiResult,
@@ -48,7 +57,7 @@ from app.schemas.bazi_liushi import (
     TransitHourHit,
 )
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
-from app.schemas.common import CalendarType, Gender
+from app.schemas.common import CalendarType, Gender, PlainSection
 from app.schemas.scoring import ScoreValue
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -182,6 +191,66 @@ def _resolve_segment(day: date, luck: dict[int, AnnualLuck]) -> LiuriMonthSegmen
         ) from None
 
 
+def _liushi_plain(
+    *,
+    solar_date: str,
+    day_ganzhi: str,
+    day_score: ScoreValue,
+    hours: list[TransitHourCell],
+    focused: TransitHourDetail | None,
+) -> list[PlainSection]:
+    """流时页的整体白话 2–3 节（spec §7.5）。
+
+    钟面只报该格的 `start_clock`（实测子时格是 `23:00`）：`end_clock` 跨日，
+    拿来当起点会让读者以为夜子时排在黎明前。极值按 `hours` 的自然序取，时辰序 0 = 子时首格。
+    """
+    titles = BAZI_TRANSIT_TITLES["liushi"]
+    hi = max(hours, key=lambda cell: cell.value)
+    lo = min(hours, key=lambda cell: cell.value)
+    sections = [
+        PlainSection(
+            title=titles[0],
+            text=overview(
+                BAZI_LIUSHI_DAY_FRAME,
+                {"date": solar_date, "ganzhi": day_ganzhi, "value": num(day_score.value)},
+            )
+            + "\n"
+            + reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[day_score.tier]),
+        ),
+        PlainSection(
+            title=titles[1],
+            text=overview(
+                BAZI_LIUSHI_HOURS_FRAME,
+                {
+                    "top_zhi": hi.zhi,
+                    "top_clock": hi.start_clock,
+                    "top_value": num(hi.value),
+                    "low_zhi": lo.zhi,
+                    "low_clock": lo.start_clock,
+                    "low_value": num(lo.value),
+                    "span": num(round(hi.value - lo.value, 2)),
+                },
+            ),
+        ),
+    ]
+    if focused is not None:
+        sections.append(
+            PlainSection(
+                title=titles[2],
+                text=overview(
+                    BAZI_LIUSHI_FOCUS_FRAME,
+                    {
+                        "zhi": focused.zhi,
+                        "clock": focused.start_clock,
+                        "value": num(focused.value),
+                        "hits": num(len(focused.hour_hits)),
+                    },
+                ),
+            )
+        )
+    return sections
+
+
 def compute_liushi_day(
     *,
     birth_date: date,
@@ -228,6 +297,8 @@ def compute_liushi_day(
     day_row = liuri_day_row(natal, base, day)
     rows = liushi_hours(natal, base, day_row, day)
     focused = _focused_hour(rows, focus_hour_zhi)
+    cells = [TransitHourCell(**_hour_fields(row)) for row in rows]
+    detail = None if focused is None else _hour_detail(focused)
     return BaziLiushiResult(
         four_pillars=chart.four_pillars,
         pillars=list(chart.pillars),
@@ -255,7 +326,14 @@ def compute_liushi_day(
         day_score=day_row.score,
         day_fired=day_row.fired,
         day_almanac=AlmanacYiJi(yi=day_row.yi, ji=day_row.ji),
-        hours=[TransitHourCell(**_hour_fields(row)) for row in rows],
-        focused=None if focused is None else _hour_detail(focused),
+        hours=cells,
+        focused=detail,
+        plain=_liushi_plain(
+            solar_date=day_row.solar_date,
+            day_ganzhi=day_row.ganzhi,
+            day_score=day_row.score,
+            hours=cells,
+            focused=detail,
+        ),
         provenance=liuri_provenance(reference),
     )

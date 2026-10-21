@@ -10,6 +10,13 @@ import pytest
 from lunar_python import Solar
 
 from app.content import CONTENT_VERSION
+from app.content.bazi_transit_plain import (
+    BAZI_LIURI_DAYS_FRAME,
+    BAZI_LIURI_FOCUS_FRAME,
+    BAZI_LIURI_MONTH_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import (
@@ -20,7 +27,11 @@ from app.engines.bazi_liuri import (
 )
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_transit import annual_luck_by_year, natal_projection
+from app.engines.plain_compose import num, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
+from app.schemas.bazi_liuri import BaziLiuriResult
 from app.schemas.common import CalendarType, Gender
+from tests.plain_wording import advice_hits, slot_value
 
 _BIRTH = (date(1988, 2, 15), time(23, 30))
 _NATAL_KWARGS: dict[str, object] = {
@@ -52,6 +63,22 @@ def _fixture(anchor: date):
     luck = _luck()
     segment = resolve_liuri_month(anchor, luck)
     return natal, segment, luck[segment.owner_year]
+
+
+@cache
+def _matrix() -> BaziLiuriResult:
+    """缺省请求：只给参考日，段自动落 2028 年小寒月（癸丑，2028-01-06 → 2028-02-03，29 格）。"""
+    return compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
+
+
+@cache
+def _matrix_focused() -> BaziLiuriResult:
+    return compute_liuri_matrix(
+        **_NATAL_KWARGS,
+        anchor_date=date(2028, 1, 15),
+        focus_date=date(2028, 1, 15),
+        reference_date=date(2028, 1, 15),
+    )
 
 
 def test_an_anchor_after_li_chun_resolves_inside_that_years_boundary_list() -> None:
@@ -327,16 +354,16 @@ def test_the_almanac_is_passed_through_without_invention() -> None:
         assert len(set(cell.almanac.yi)) == len(cell.almanac.yi)
 
 
-def test_the_provenance_carries_twelve_tables_and_the_library_version() -> None:
+def test_the_provenance_carries_thirteen_tables_and_the_library_version() -> None:
     """历注那行的版本取自依赖元数据，不是本仓语料的 `CONTENT_VERSION`（spec §7.5）。
 
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 13。
     """
     from importlib.metadata import version
 
     result = compute_liuri_matrix(**_NATAL_KWARGS, reference_date=date(2028, 1, 15))
     tables = {table.name: table for table in result.provenance.tables}
-    assert len(result.provenance.tables) == 12
+    assert len(result.provenance.tables) == 13
     assert tables["almanac_yiji"].version == version("lunar-python") == "1.4.8"
     assert "外部历法库" in tables["almanac_yiji"].source
     assert tables["bazi_transit_rules"].version == CONTENT_VERSION
@@ -381,3 +408,96 @@ def test_a_conflicting_favorable_set_books_both_sides_rather_than_choosing() -> 
     assert ("ri.yongshen.gan_unfavourable", -10.0) in day_rows
     gan_only = [delta for rule, delta in day_rows if rule.endswith((".gan_favourable", ".gan_unfavourable"))]
     assert sum(gan_only) == 0.0
+
+
+def test_the_plain_block_is_two_sections_without_a_focus_date() -> None:
+    """无 `focus_date` 恒两节，第一节两行、第二节一行；`focused` 为 None 时第三节连标题都不出现。"""
+    result = _matrix()
+    assert result.focused is None
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["liuri"][:2])
+    assert result.plain[0].text.count("\n") == 1 and result.plain[1].text.count("\n") == 0
+
+
+def test_the_plain_block_gains_the_focus_day_section_when_a_focus_date_is_given() -> None:
+    """聚焦日三件套（ISO 日 / 干支 / 分）与命中条数逐字取自 `focused` 那一格，不另算。
+
+    实测：focus 2028-01-15 = 己亥 60.0，`day_hits` 7 条（同一天的那一行也在本文件
+    `_GUILIU_GOLDEN` 里，它钉的是分值与 `ri.` 命中条数，这一条钉的是白话槽位）。
+    四个数一律按槽读：`num(7)` 与 `num(60)` 整句里独一份，换成整段扫描却认不出
+    「命中条数被印到分值槽上」这类互换（J-T4 评审轮 F-1 的同一条理由）。
+    """
+    result = _matrix_focused()
+    focused = result.focused
+    assert focused is not None
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["liuri"])
+    third = result.plain[2].text
+    assert third.count("\n") == 0
+    assert slot_value(third, BAZI_LIURI_FOCUS_FRAME, "date") == focused.solar_date
+    assert slot_value(third, BAZI_LIURI_FOCUS_FRAME, "ganzhi") == focused.ganzhi
+    assert slot_value(third, BAZI_LIURI_FOCUS_FRAME, "value") == num(focused.value)
+    assert slot_value(third, BAZI_LIURI_FOCUS_FRAME, "hits") == num(len(focused.day_hits))
+    assert (focused.solar_date, focused.ganzhi, focused.value, len(focused.day_hits)) == (
+        "2028-01-15",
+        "己亥",
+        60.0,
+        7,
+    )
+
+
+def test_the_plain_block_uses_the_month_ledgers_own_tier() -> None:
+    """第一节第二行取 `month_score.tier` 这把现成的尺（实测 58.0 → 平），不重算均值。
+
+    老实说一句：29 格均值实测 50.34，同落平档，所以第二行本身分辨不出两种取法；
+    能分辨的是首行里的 `{value}` 槽——它印的是 58.0（月账本那个数），不是 50.3
+    （spec §4.3 首行）。四个槽值与那两组数都出自 `_matrix()` 那一页，复测：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liuri as L; r=L._matrix(); print(r.month_score.value, round(sum(d.value for d in r.days)/len(r.days), 2))"` → `58.0 50.34`。
+    """
+    result = _matrix()
+    assert (result.month_score.value, result.month_score.tier) == (58.0, "平")
+    first = result.plain[0].text
+    line = first.split("\n")[1]
+    assert line == reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[result.month_score.tier])
+    overview = first.split("\n")[0]
+    printed = {
+        "ganzhi": result.month_ganzhi,
+        "start_solar": result.month_start_solar,
+        "end_solar": result.month_end_solar,
+        "value": num(result.month_score.value),
+    }
+    for name, value in printed.items():
+        assert slot_value(overview, BAZI_LIURI_MONTH_FRAME, name) == value
+    assert num(round(sum(cell.value for cell in result.days) / len(result.days), 2)) not in first
+    assert (result.month_ganzhi, result.month_start_solar, result.month_end_solar) == (
+        "癸丑",
+        "2028-01-06",
+        "2028-02-03",
+    )
+
+
+def test_the_plain_block_extremes_and_counts_match_the_day_table() -> None:
+    """极值与两档日数都从 `days` 来：实测 29 格里 顺 6 / 滞 10，最高 己酉 77.0（2028-01-25）、
+    最低 甲午 16.0（2028-01-10）——四个数都在本文件 `_GUILIU_GOLDEN` 那 29 行里。
+    简表格只有 `value` / `tier`，**没有 `score`**——写 `cell.score.value` 是 AttributeError。
+    两档计数复测（`chr(0x987A)`=顺、`chr(0x6EDE)`=滞，命令保持 ASCII 才贴得进 GBK 控制台）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liuri as L; from tests.plain_wording import TIER_WORDS as W; r=L._matrix(); print(len(r.days), sum(1 for d in r.days if d.tier == W[0]), sum(1 for d in r.days if d.tier == W[2]))"` → `29 6 10`。
+    """
+    result = _matrix()
+    hi = max(result.days, key=lambda cell: cell.value)
+    lo = min(result.days, key=lambda cell: cell.value)
+    assert (hi.ganzhi, hi.value, len(result.days)) == ("己酉", 77.0, 29)
+    assert (lo.ganzhi, lo.value) == ("甲午", 16.0)
+    strong = sum(1 for cell in result.days if cell.tier == "顺")
+    weak = sum(1 for cell in result.days if cell.tier == "滞")
+    assert (strong, weak) == (6, 10)
+
+    overview = result.plain[0].text.split("\n")[0]
+    assert slot_value(overview, BAZI_LIURI_MONTH_FRAME, "strong") == num(strong)
+    assert slot_value(overview, BAZI_LIURI_MONTH_FRAME, "weak") == num(weak)
+    days_line = result.plain[1].text
+    frame = BAZI_LIURI_DAYS_FRAME
+    assert slot_value(days_line, frame, "count") == num(len(result.days))
+    for slot, cell in (("high", hi), ("low", lo)):
+        assert slot_value(days_line, frame, slot) == cell.ganzhi
+        assert slot_value(days_line, frame, f"{slot}_value") == num(cell.value)
+    for section in result.plain:
+        assert advice_hits(section.text) == []

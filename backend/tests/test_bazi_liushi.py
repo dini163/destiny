@@ -11,13 +11,31 @@ from lunar_python import Solar
 
 from app.content import CONTENT_VERSION
 from app.content.bazi_changsheng import CHANG_SHENG_ORDER
+from app.content.bazi_transit_plain import (
+    BAZI_LIUSHI_DAY_FRAME,
+    BAZI_LIUSHI_FOCUS_FRAME,
+    BAZI_LIUSHI_HOURS_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_liuri import compute_liuri_matrix
 from app.engines.bazi_liushi import HOUR_ZHI, compute_liushi_day, liushi_hour_moments
+from app.engines.plain_compose import num, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi_liuri import TransitDayDetail
 from app.schemas.bazi_liushi import BaziLiushiResult
 from app.schemas.common import CalendarType, Gender
+from tests.plain_wording import (
+    FORBIDDEN,
+    LEDGER_WORDS,
+    PREDICTION_FORBIDDEN,
+    TIER_WORDS,
+    WU_DECISION_FORBIDDEN,
+    advice_hits,
+    slot_value,
+)
 
 _BIRTH = (date(1988, 2, 15), time(23, 30))
 _NATAL_KWARGS = {
@@ -230,13 +248,13 @@ def test_an_absent_day_falls_back_to_the_reference_segment() -> None:
     assert result.focused is None and len(result.hours) == 12
 
 
-def test_the_provenance_is_the_same_twelve_tables_as_the_liuri_page() -> None:
-    """12 张表只有一处产出（决策 7）：两张表名逐字，条数钉死，多一行少一行都算谎。
+def test_the_provenance_is_the_same_thirteen_tables_as_the_liuri_page() -> None:
+    """13 张表只有一处产出（决策 7）：两张表名逐字，条数钉死，多一行少一行都算谎。
 
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 12。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from datetime import date; from app.engines.bazi_liuri import liuri_provenance; print(len(liuri_provenance(date(2028, 1, 15)).tables))"` → 13。
     """
     tables = {table.name: table for table in _focused().provenance.tables}
-    assert len(_focused().provenance.tables) == 12
+    assert len(_focused().provenance.tables) == 13
     assert tables["almanac_yiji"].version == "1.4.8"
     assert tables["bazi_transit_rules"].version == CONTENT_VERSION
     assert _focused().provenance.engine == "lunar-python"
@@ -253,3 +271,94 @@ def test_no_hour_row_pollutes_the_natal_chart() -> None:
 def test_the_result_round_trips_through_its_own_schema() -> None:
     parsed = BaziLiushiResult.model_validate(_focused().model_dump())
     assert parsed == BaziLiushiResult.model_validate(parsed.model_dump())
+
+
+def test_the_plain_block_is_two_sections_without_a_focus_hour() -> None:
+    """无 `focus_hour_zhi` 恒两节。实测甲辰日：day_score 52.0 平；十二格里 顺 2 / 滞 8，
+    最高 未 75.0（13:00）、最低 子 24.0（23:00），`{span}` = num(51.0)。
+    复测（`TIER_WORDS[0]`=顺、`[2]`=滞，命令保持 ASCII 才贴得进 GBK 控制台）：
+    `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "import tests.test_bazi_liushi as L; from tests.plain_wording import TIER_WORDS as W; r=L._bare(); hi=max(r.hours,key=lambda c:c.value); lo=min(r.hours,key=lambda c:c.value); print(len(r.hours), sum(1 for c in r.hours if c.tier==W[0]), sum(1 for c in r.hours if c.tier==W[2]), hi.value, hi.start_clock, lo.value, lo.start_clock, round(hi.value-lo.value,2))"` → `12 2 8 75.0 13:00 24.0 23:00 51.0`。
+    六个槽全部按位读：`{top_*}` 与 `{low_*}` 若互换，整段扫描认不出来，而那句正好把
+    读者最关心的「哪个时辰最高」说反（J-T4 评审轮 F-1 的同一条理由）。
+    """
+    result = _bare()
+    assert result.focused is None
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["liushi"][:2])
+    assert result.plain[0].text.count("\n") == 1 and result.plain[1].text.count("\n") == 0
+    hi = max(result.hours, key=lambda cell: cell.value)
+    lo = min(result.hours, key=lambda cell: cell.value)
+    assert (hi.zhi, hi.value, hi.start_clock) == ("未", 75.0, "13:00")
+    assert (lo.zhi, lo.value, lo.start_clock) == ("子", 24.0, "23:00")
+    hours_line = result.plain[1].text
+    frame = BAZI_LIUSHI_HOURS_FRAME
+    for slot, cell in (("top", hi), ("low", lo)):
+        assert slot_value(hours_line, frame, f"{slot}_zhi") == cell.zhi
+        assert slot_value(hours_line, frame, f"{slot}_clock") == cell.start_clock
+        assert slot_value(hours_line, frame, f"{slot}_value") == num(cell.value)
+    assert slot_value(hours_line, frame, "span") == num(round(hi.value - lo.value, 2))
+
+
+def test_the_plain_block_uses_the_day_ledgers_own_tier() -> None:
+    """第一节第二行取 `day_score.tier`（实测 52.0 → 平），逐字等于那张档位句；
+    第一行的三个槽取自日头回显那三件（`solar_date` / `day_ganzhi` / `day_score.value`），
+    引擎不另算第二遍——本文件的 `test_the_day_echoes_the_resolved_segment_and_almanac`
+    钉的是同一组数，那条测的是账本，这条钉的是槽位。"""
+    result = _bare()
+    assert (result.day_score.value, result.day_score.tier) == (52.0, "平")
+    first = result.plain[0].text
+    assert first.split("\n")[1] == reading(
+        BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[result.day_score.tier]
+    )
+    day_line = first.split("\n")[0]
+    printed = {
+        "date": result.solar_date,
+        "ganzhi": result.day_ganzhi,
+        "value": num(result.day_score.value),
+    }
+    for name, value in printed.items():
+        assert slot_value(day_line, BAZI_LIUSHI_DAY_FRAME, name) == value
+
+
+def test_the_plain_block_gains_the_focus_hour_section_when_a_focus_is_given() -> None:
+    """聚焦时辰三节。实测庚戌日 + 辰时：十二格里最高就是辰 92.0（07:00）、最低 午 44.0（11:00），
+    聚焦格 `focused.value` 92.0 与 `hours` 那一格逐字相等，`hour_hits` 4 条
+    （同一格的四行键序见 `test_the_focused_chen_hour_carries_those_four_rows_in_ledger_order`）。
+    """
+    result = _focused()
+    focused = result.focused
+    assert focused is not None
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["liushi"])
+    cell = next(hour for hour in result.hours if hour.zhi == focused.zhi)
+    assert (cell.value, cell.start_clock) == (focused.value, focused.start_clock)
+    assert (focused.zhi, focused.value, focused.start_clock, len(focused.hour_hits)) == (
+        "辰",
+        92.0,
+        "07:00",
+        4,
+    )
+    third = result.plain[2].text
+    assert third.count("\n") == 0
+    printed = {
+        "zhi": focused.zhi,
+        "clock": focused.start_clock,
+        "value": num(focused.value),
+        "hits": num(len(focused.hour_hits)),
+    }
+    for name, value in printed.items():
+        assert slot_value(third, BAZI_LIUSHI_FOCUS_FRAME, name) == value
+
+
+def test_the_plain_block_carries_no_tier_name_and_no_advice() -> None:
+    """两页各扫一遍装配出的整段：单字档名、`FORBIDDEN` 三条、建议词全零（同 J-T4 Step 1 第五条口径）。
+
+    扫的是**装配产物**（框架句 + 档位句 + 槽值），不是语料表自己；档位句与槽值都在射程里，
+    所以这里能拦住「把 `tier` 或 `fired[].label` 顺手灌进句子」那一类接线错。
+    """
+    forbidden = (
+        *PREDICTION_FORBIDDEN, *WU_DECISION_FORBIDDEN, *LEDGER_WORDS, *TIER_WORDS, *FORBIDDEN
+    )
+    for result in (_bare(), _focused()):
+        for section in result.plain:
+            assert advice_hits(section.text) == []
+            for token in forbidden:
+                assert token not in section.text

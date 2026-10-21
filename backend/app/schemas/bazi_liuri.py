@@ -20,6 +20,7 @@ from app.schemas.bazi import BaziNatalRequest, BaziPillar
 from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
+from app.schemas.common import PlainSection
 from app.schemas.scoring import ScoreValue
 
 
@@ -113,8 +114,12 @@ class BaziLiuriResult(BaseModel):
 
     days: list[TransitDayCell]
     focused: TransitDayDetail | None = Field(default=None, description="仅 `focus_date` 所指之日给出。")
+    plain: list[PlainSection] = Field(
+        description="流日页白话 2–3 节：本月总览（两行）、逐日分布，给了 `focus_date` 时再加聚焦之日"
+        "（批次二 spec §7.4；三节标题取自 `content/bazi_transit_plain.BAZI_TRANSIT_TITLES` 的 liuri 一组）。"
+    )
     provenance: Provenance = Field(
-        description="`tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12"
+        description="`tables` = 主命盘九张 + 岁运两张 + 白话一张 + 历注一张 = 13"
         "（`content/__init__.py` 的 `CONTENT_SOURCES` + `TRANSIT_CONTENT_SOURCES` + "
-        "`ALMANAC_CONTENT_SOURCES` 三份清单相接，长度即真值）。"
+        "`BAZI_TRANSIT_PLAIN_CONTENT_SOURCES` + `ALMANAC_CONTENT_SOURCES` 四份清单相接，长度即真值）。"
     )
