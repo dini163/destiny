@@ -16,12 +16,12 @@ const SEALS: Seal[] = [
   {
     title: '天文与时空基准',
     caption: 'EPHEMERIS & TRUE SOLAR TIME',
-    body: '瑞士星历 pyswisseph 计算行星黄经与宫头；真太阳时按经度时差（每度 4 分钟）与均时差 E(t) 动态校准（E(t) 取 NOAA 解析近似），经纬度解析全球坐标。',
+    body: '以权威星历推算行星黄经与宫头；真太阳时按经度时差（每度 4 分钟）与均时差动态校准，经纬度解析全球坐标。',
   },
   {
     title: '古籍历法溯源',
     caption: 'CLASSICAL PROVENANCE',
-    body: 'lunar-python 严谨二十四节气换气定柱；卦爻辞锚定《周易》通行本原文，杜绝虚构易辞与生搬硬造的星盘断语。',
+    body: '依权威历法严谨推算二十四节气换气定柱；卦爻辞锚定《周易》通行本原文，杜绝虚构易辞与生搬硬造的星盘断语。',
   },
   {
     title: '隐私与天机安全',
