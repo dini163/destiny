@@ -24,6 +24,7 @@ import type {
 } from './bazi';
 import type { AlmanacYiJi } from './baziLiuri';
 import type { TransitFired, TransitTenGod } from './baziTransit';
+import type { PlainSection } from './common';
 import type { ScoreValue } from './scoring';
 
 /** 十二地支时辰，序即响应里 `hours` 的序（0 = 子，首格落在当日 23:00）。 */
@@ -128,6 +129,8 @@ export interface BaziLiushiResult {
   hours: TransitHourCell[];
   /** 仅 `focus_hour_zhi` 所指那一格给出，其余为 null。 */
   focused: TransitHourDetail | null;
+  /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
+  plain: PlainSection[];
   /** `tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12，与流日页同源。 */
   provenance: Provenance;
 }

@@ -6,7 +6,7 @@
  * returns the whole Tree; `POST /kabbalah/gematria` folds an optional word onto it.
  */
 
-import type { ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable } from './common';
 
 /** One of the three columns of the Tree (慈悲 / 严厉 / 平衡). */
 export interface PillarInfo {
@@ -88,6 +88,8 @@ export interface KabbalahTree {
   paths: PathNode[];
   sephirah_count: number;
   path_count: number;
+  /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
+  plain: PlainSection[];
   provenance: KabbalahProvenance;
 }
 

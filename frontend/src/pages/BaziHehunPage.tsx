@@ -11,6 +11,7 @@ import { HehunPartnerProfiles } from '../components/bazi/hehun/HehunPartnerProfi
 import { HehunScoreRing } from '../components/bazi/hehun/HehunScoreRing';
 import { HehunYiJiPanel } from '../components/bazi/hehun/HehunYiJiPanel';
 import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transitLink';
@@ -239,6 +240,10 @@ export function BaziHehunPage() {
             }
           >
             <HehunScoreRing score={result.score} />
+          </ResultCard>
+
+          <ResultCard title="合盘白话" eyebrow="OVERALL READING · COMPATIBILITY" icon="sparkle" elevated>
+            <PlainSectionList sections={result.plain} />
           </ResultCard>
 
           <ResultCard

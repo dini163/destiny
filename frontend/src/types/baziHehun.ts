@@ -24,7 +24,7 @@
  * 切片 3 定下的简表约定，明细走轴行那两个岁运下钻链接（§7.3）。
  */
 
-import type { CalendarType, ProvenanceTable } from './common';
+import type { CalendarType, PlainSection, ProvenanceTable } from './common';
 import type { DayunStep, WuxingScore } from './bazi';
 import type { ScoreValue } from './scoring';
 
@@ -278,5 +278,7 @@ export interface BaziHehunResult {
   nayin: HehunNayin;
   axis: HehunAxis;
   yi_ji: HehunYiJi;
+  /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
+  plain: PlainSection[];
   provenance: HehunProvenance;
 }

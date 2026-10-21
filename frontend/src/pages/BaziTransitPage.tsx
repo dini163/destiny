@@ -9,6 +9,7 @@ import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
@@ -272,6 +273,10 @@ export function BaziTransitPage() {
       {transit.data ? (
         <>
           <TransitNatalBar natal={transit.data} />
+
+          <ResultCard title="岁运白话" eyebrow="OVERALL READING · YEAR RANGE" icon="sparkle" elevated>
+            <PlainSectionList sections={transit.data.plain} />
+          </ResultCard>
 
           <ResultCard
             eyebrow="ANNUAL LEDGER"

@@ -12,6 +12,7 @@ import { TransitNatalBar } from '../components/bazi/transit/TransitNatalBar';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
@@ -237,6 +238,10 @@ export function BaziLiushiPage() {
       {result ? (
         <>
           <TransitNatalBar natal={result} />
+
+          <ResultCard title="流时白话" eyebrow="OVERALL READING · DAY" icon="sparkle" elevated>
+            <PlainSectionList sections={result.plain} />
+          </ResultCard>
 
           <LiushiDayHeader
             result={result}

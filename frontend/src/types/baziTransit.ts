@@ -20,6 +20,7 @@ import type {
   RelationPair,
   ShenShaEntry,
 } from './bazi';
+import type { PlainSection } from './common';
 import type { ScoreValue } from './scoring';
 
 /** 岁运页入参：命盘入参 + 三个可空年份（补齐在服务端）。 */
@@ -121,6 +122,8 @@ export interface BaziTransitResult {
   dayun_covered: DayunStep[];
   years: TransitYear[];
 
+  /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
+  plain: PlainSection[];
   /** `tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。 */
   provenance: Provenance;
 }

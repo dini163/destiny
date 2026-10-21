@@ -4,6 +4,7 @@ import { GematriaConsole, GematriaResult } from '../components/kabbalah/Gematria
 import { NodeInspector } from '../components/kabbalah/NodeInspector';
 import { TreeOfLife } from '../components/kabbalah/TreeOfLife';
 import { Icon } from '../components/ui/Icon';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useGematria } from '../hooks/useGematria';
@@ -61,6 +62,10 @@ export function KabbalahPage() {
                 <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
                 <SephirahIndex tree={tree.data} selection={selection} onSelect={setSelection} />
                 <PathIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+              </ResultCard>
+
+              <ResultCard title="全树白话" eyebrow="OVERALL READING · TREE OF LIFE" icon="sparkle" elevated>
+                <PlainSectionList sections={tree.data.plain} />
               </ResultCard>
             </div>
             <div className="lg:col-span-5">

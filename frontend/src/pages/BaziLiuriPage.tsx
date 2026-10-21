@@ -10,6 +10,7 @@ import { TransitNatalBar } from '../components/bazi/transit/TransitNatalBar';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
+import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
@@ -223,6 +224,10 @@ export function BaziLiuriPage() {
             }
             onShift={handleShift}
           />
+
+          <ResultCard title="流月白话" eyebrow="OVERALL READING · MONTH SEGMENT" icon="sparkle" elevated>
+            <PlainSectionList sections={result.plain} />
+          </ResultCard>
 
           <ResultCard
             eyebrow="DAILY MATRIX"
