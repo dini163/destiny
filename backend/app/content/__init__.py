@@ -114,12 +114,13 @@ TRANSIT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 
 #: 岁运三片的白话转述表。**刻意不并进 `TRANSIT_CONTENT_SOURCES`**：那张清单被
 #: `HEHUN_CONTENT_SOURCES` 用 `*` 展开复用，加进去等于让合婚页声称读了它没读的表
-#: （AGENTS §7，理由同本文件 `NAME_CONTENT_SOURCES` 头注）；`bazi_liuri` 的溯源同样展开它，
-#: 流日/流时两页会一起替一张没读过的表背书。今天它只在 `bazi_transit.compute_transit`
-#: 一处展开，`bazi_liuri.liuri_provenance` 的同源展开由 J-T5 落地。
+#: （AGENTS §7，理由同本文件 `NAME_CONTENT_SOURCES` 头注）：并进去之后，合婚页会替一张
+#: 它没读过的表背书，而这条纪律与「谁展开谁读过」无关，只看清单被谁复用。
+#: 它自己的两处展开都真读了这张表：`bazi_transit.compute_transit`（岁运页）与
+#: `bazi_liuri.liuri_provenance`（J-T5 起；流日、流时两页共用这一处出处）。
 #: 展开点复测（只扫 `app/engines/`，本注释自己不在扫描面里）：
-#: `cd backend && grep -rn "\\*BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/engines/` → 今天 1 处
-#: （`bazi_transit.py`），J-T5 起 2 处。
+#: `cd backend && grep -rn "\\*BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/engines/` → 2 处
+#: （J-T5 实测：`bazi_transit.py:892`、`bazi_liuri.py:306`）。
 BAZI_TRANSIT_PLAIN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),
 )
