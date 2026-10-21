@@ -138,6 +138,6 @@ class BaziTransitResult(BaseModel):
     )
 
     provenance: Provenance = Field(
-        description="`tables` = 主命盘九张 + 岁运两张 + 白话转述一张（`bazi_changsheng`、"
-        "`bazi_transit_rules`、`bazi_transit_plain`）。"
+        description="`tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）"
+        "+ 白话转述一张（`bazi_transit_plain`）= 12。"
     )

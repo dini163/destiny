@@ -151,7 +151,9 @@ def slot_value(line: str, frame: str, name: str) -> str:
     往后取」：岁运第二节里 `，` 出现四次，`{best_value}` 的前缀正是一个裸逗号——按第一次出现取会
     拿到上一槽的尾巴（2026-10-21 写这条测时踩到的，下面的 `test_slot_value_*` 钉住它）。
     对不上就抛 `ValueError` 而不是回空串：空串让断言以「不相等」红在一片噪声里，而这条测想说的
-    从来是「装配把句子拼错了」。重复槽只读第一处，这是口径不是缺陷。
+    从来是「装配把句子拼错了」。槽名不在框架里同样抛 `ValueError`（复评轮 R-4：写错槽名时
+    `.index()` 那句「'x' is not in list」读起来像尺子坏了，而真要说的只是测自己点错了名）。
+    重复槽只读第一处，这是口径不是缺陷。
     """
     literals = _PLACEHOLDER.split(frame)
     names = frame_slots(frame)
@@ -161,6 +163,8 @@ def slot_value(line: str, frame: str, name: str) -> str:
     match = re.search(pattern, line)
     if match is None:
         raise ValueError(f"框架与渲染句对不上：{frame!r} 套不进 {line!r}")
+    if name not in names:
+        raise ValueError(f"框架 {frame!r} 的槽位是 {names}，没有 {name!r} 这个槽名")
     return match.group(names.index(name) + 1)
 
 
@@ -277,3 +281,5 @@ def test_slot_value_reads_the_first_segment_and_keeps_two_slots_apart() -> None:
     assert slot_value(comma_line, comma_frame, "dayun") == "戊午"
     with pytest.raises(ValueError, match="框架与渲染句对不上"):
         slot_value(comma_line.replace("己酉", "乙酉"), comma_frame + "，多出来的一槽 {extra}", "extra")
+    with pytest.raises(ValueError, match="的槽位是"):
+        slot_value(line, frame, "c")

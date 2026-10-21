@@ -309,11 +309,16 @@ def test_the_provenance_row_is_the_name_this_table_is_really_called() -> None:
 
     J-T4 评审轮 F-02 的账：装配测原先写成 `[*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES,
     *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES]`——那是让引擎的展开式比对自己，把这一行改名成任何
-    别的表名（`bazi_hehun_rules` 之类），页面就替岁运声称引了它没读过的表，而四处展开点全绿。
+    别的表名（`bazi_hehun_rules` 之类），页面就替岁运声称引了它没读过的表，而引它的那处
+    `*BAZI_TRANSIT_PLAIN_CONTENT_SOURCES` 照样绿（复测展开点：
+    `cd backend && grep -rn "\\*BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/engines/`，
+    今天只有 `app/engines/bazi_transit.py` 一处，J-T5 起流日 `liuri_provenance` 加第二处）。
     名字与正文长在本表这一侧；十二行的**顺序与张数**由 `tests/test_bazi_transit.py` 里那份逐字
     名单管，两边不重复断言同一件事。
     """
-    assert BAZI_TRANSIT_PLAIN_CONTENT_SOURCES == (("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),)
+    assert BAZI_TRANSIT_PLAIN_CONTENT_SOURCES == (
+        ("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),
+    )
 
 
 def test_tone_keys_are_what_the_engine_says() -> None:

@@ -1003,7 +1003,8 @@ def test_the_plain_block_gains_the_month_section_when_a_focus_year_is_given() ->
 
 
 def test_the_month_frame_names_the_earlier_cell_when_two_months_tie_at_the_bottom() -> None:
-    """月句那句「并列时取月表里排在最前那一格」在 2027 页没有格子并列，换一种取法测不出来；
+    """月句那句「并列时取月表里排在最前那一格」在 2027 页的**极值处**没有并列（那一页内部有两格
+    同为 38.0，但最高 80.0、最低 34.0 都唯一，换一种取法测不出来）；
     2026 页才有并列（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
     "import tests.test_bazi_transit as T; r=T._transit(start_year=2026, end_year=2030, focus_year=2026); m=next(y.months for y in r.years if y.months); print([(x.index, x.ganzhi, x.score.value) for x in m])"`
     → 癸巳（index 3）与 甲午（index 4）同为 0.0，最高格辛丑 46.0 唯一）。
@@ -1063,10 +1064,11 @@ def test_the_plain_block_extremes_match_the_year_table() -> None:
     assert (best.year, best.pillar.ganzhi, best.score.value) == (2029, "己酉", 74.0)
     assert (worst.year, worst.pillar.ganzhi, worst.score.value) == (2026, "丙午", 29.0)
     thread = result.plain[1].text
+    slots = BAZI_TRANSIT_THREAD_FRAME
     for slot, year in (("best", best), ("worst", worst)):
-        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_year") == num(year.year)
-        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_ganzhi") == year.pillar.ganzhi
-        assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_value") == num(year.score.value)
+        assert slot_value(thread, slots, f"{slot}_year") == num(year.year)
+        assert slot_value(thread, slots, f"{slot}_ganzhi") == year.pillar.ganzhi
+        assert slot_value(thread, slots, f"{slot}_value") == num(year.score.value)
     assert "、".join(step.ganzhi for step in result.dayun_covered if step.ganzhi) == "戊午"
     assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "dayun") == "戊午"
 
@@ -1094,6 +1096,38 @@ def test_the_thread_frame_prints_the_same_year_twice_on_a_single_year_page() -> 
         assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, f"{slot}_value") == num(74.0)
 
 
+def test_the_thread_frame_names_the_earlier_year_when_two_tie_at_the_bottom() -> None:
+    """低分那头的并列取法在**两个不同年份**之间取到证据：2026–2035 这页 2034 甲寅与 2035 乙卯
+    同为 23.0（复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "import tests.test_bazi_transit as T; r=T._transit(start_year=2026, end_year=2035); print([(y.year, y.pillar.ganzhi, y.score.value) for y in r.years])"`
+    → 末两格同为 23.0，最高 2029 己酉 74.0 唯一）。
+    单年页那条只钉得住「best 与 worst 同年」，把 `min` 换成倒序取它照样绿；这一条才管住
+    「两头并列时都按排在最前的那一年报」这半句（J-T4 复评轮 R-2 的账）。"""
+    result = _transit(start_year=2026, end_year=2035)
+    tied = [year for year in result.years if year.score.value == 23.0]
+    assert [(year.year, year.pillar.ganzhi) for year in tied] == [(2034, "甲寅"), (2035, "乙卯")]
+    thread = result.plain[1].text
+    assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "worst_year") == num(2034)
+    assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "worst_ganzhi") == "甲寅"
+    assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "worst_value") == num(23.0)
+    assert slot_value(thread, BAZI_TRANSIT_THREAD_FRAME, "best_year") == num(2029)
+
+
+def test_the_range_frame_counts_a_year_sitting_exactly_on_the_high_cut() -> None:
+    """高分那一格正好落在分界上：2030–2039 这页 2039 己未 = 65.0 = `STRONG_CUT`，
+    `>=` 数到 1 格、`>` 数到 0 格（复测：同一页 `strong` 印 '1'、`strong_cut` 印 '65'）。
+    本计划此前所有页都没有一年的分正好等于 65.0 或 45.0，边界算子因此不可杀；
+    这一条把「够得着高分界」那半边补齐（低分界 45.0 那一半在本八字上取不到等于它的年，
+    仍属数据面缺口，见计划偏差表第 36 行）。"""
+    result = _transit(start_year=2030, end_year=2039)
+    top = max(result.years, key=lambda year: year.score.value)
+    assert (top.year, top.pillar.ganzhi, top.score.value) == (2039, "己未", 65.0)
+    assert top.score.value == STRONG_CUT
+    overview = result.plain[0].text.split("\n")[0]
+    assert slot_value(overview, BAZI_TRANSIT_RANGE_FRAME, "strong_cut") == num(STRONG_CUT)
+    assert slot_value(overview, BAZI_TRANSIT_RANGE_FRAME, "strong") == num(1)
+
+
 def test_the_plain_block_says_not_yet_running_before_the_first_dayun() -> None:
     """起运前（1990–1992）`dayun_covered` 只有一格且 `ganzhi` 为空串：槽值落「尚未起运」，
     不是空句（偏差表第 9 行的 `or` 分支——少了它，页面这一槽是空白）。"""
@@ -1115,8 +1149,11 @@ def test_the_plain_block_carries_no_ledger_word_and_no_advice() -> None:
     复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content.bazi_transit_rules import TRANSIT_RULES as R; from tests.plain_wording import FORBIDDEN as F, LEDGER_WORDS as L, PREDICTION_FORBIDDEN as P, WU_DECISION_FORBIDDEN as W, TIER_WORDS as T, advice_hits as A; rs=[(k,x.reading) for k,x in R.items()]; tok=P+W+L+T+F; print(len(rs), sum(1 for k,t in rs if A(t) or any(w in t for w in tok)), sum(1 for k,t in rs if F[1] in t), max(sum(f in t for f in F) for k,t in rs))"`
     → `46 42 37 1`。
     """
+    forbidden = (
+        *PREDICTION_FORBIDDEN, *WU_DECISION_FORBIDDEN, *LEDGER_WORDS, *TIER_WORDS, *FORBIDDEN
+    )
     for result in (_default(), _transit(start_year=2026, end_year=2030, focus_year=2027)):
         for section in result.plain:
             assert advice_hits(section.text) == []
-            for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN + LEDGER_WORDS + TIER_WORDS + FORBIDDEN:
+            for token in forbidden:
                 assert token not in section.text
