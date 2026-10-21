@@ -6,24 +6,34 @@
 `build_ledger`、给每个维度按同一批命中键拼白话段（`build_plain`）。白话与判语同属
 逐字搬运受控表（`content/bazi_plain` 与 `content/bazi_dimensions`），本模块不现编中文。
 所有阈值（`STAR_PRESENT` 等）都是模型参数，判语里凡涉喜忌之处一律署"本系统"。
+2026-10-21 verdict-card spec：结论卡片（档位 + 星级 + 结论句 + 分项 + 建议）的档位
+由六维账本均值经 `app/engines/verdict.grade_for` 派生，四段文案由 `bazi_plain` 的
+框架句 + 槽位语料装配，本模块只排装配、不写新句。
 """
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from statistics import mean
 
 from app.content.bazi_dimensions import DIMENSION_BASE, DIMENSION_ORDER, DIMENSION_RULES, dim_rule
-from app.content.bazi_plain import PLAIN_SUMMARY_FRAME
+from app.content.bazi_plain import (
+    PLAIN_SUMMARY_FRAME,
+    TIER_ADVICE,
+    VERDICT_ADVICE_FRAME,
+    VERDICT_OUTLOOK,
+)
 from app.content.bazi_relations import RELATION_TABLES
 from app.content.wuxing import CONTROLS, CONTROLLED_BY, ELEMENT_ORDER, GENERATED_BY, GENERATES
 from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi_strength import StrengthAssessment, element_weight_scores, hidden_stem_weight
 from app.engines.plain_compose import compose, overview
 from app.engines.plain_corpora import BAZI
+from app.engines.verdict import grade_for
 from app.schemas.bazi import BaziPillar
 from app.schemas.bazi_interpret import BaziInterpretation, DimensionReading
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.bazi_strength import GeJu, Yongshen
-from app.schemas.common import Gender
+from app.schemas.common import Gender, Verdict
 from app.schemas.scoring import ScoreFactor, build_ledger
 
 TRANSPARENT_STEM_WEIGHT = 1.0  # 模型参数：天干一字一力，无藏干权重（§6.4 得势同款）
@@ -279,8 +289,31 @@ def interpret_chart(
     dimensions = [name for name in DIMENSION_ORDER if name != "婚姻" or gender is not None]
     readings = [_dimension_reading(signals, name) for name in dimensions]
     summary = "、".join(f"{r.dimension}{r.score.tier}" for r in readings)
+    # 结论卡片（verdict-card spec §3/§4）：档位从六维账本均值派生（不许拍脑袋），
+    # 四段文案全部来自 `bazi_plain` 的框架句 + 槽位语料，本函数不现编中文。
+    grade, stars = grade_for(mean(r.score.value for r in readings))
+    counts = {tier: sum(1 for r in readings if r.score.tier == tier) for tier in ("顺", "平", "滞")}
+    headline = overview(PLAIN_SUMMARY_FRAME, {
+        "grade": grade,
+        "shun": str(counts["顺"]),
+        "ping": str(counts["平"]),
+        "zhi": str(counts["滞"]),
+        "outlook": VERDICT_OUTLOOK[grade],
+    })
+    weakest = min(readings, key=lambda r: r.score.value)
+    advice = overview(VERDICT_ADVICE_FRAME, {
+        "dimension": weakest.dimension,
+        "tier_advice": TIER_ADVICE[weakest.score.tier],
+    })
     return BaziInterpretation(
         six_dimensions=readings,
         summary=summary,
-        plain_summary=overview(PLAIN_SUMMARY_FRAME, {"summary": summary}),
+        plain_summary=headline,
+        verdict=Verdict(
+            grade=grade,
+            stars=stars,
+            headline=headline,
+            points=[f"{r.dimension}：{r.score.tier}" for r in readings],
+            advice=advice,
+        ),
     )
