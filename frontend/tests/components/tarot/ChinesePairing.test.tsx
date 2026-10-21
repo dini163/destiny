@@ -16,8 +16,8 @@
  * 「综合解读」说成取自牌库——页面已原样印引擎的 `note`，第二份手抄正是 R37 抓过的那类漂移），
  * 它锁的是「不许说什么」，不锁「怎么说」。
  * **夹具内容凭据**：`tables` 的行序就是这份清单自己的展示契约（面板按数组渲染，与
- * `lenormand`/`qimen`/`ziwei` 那三家同一条形状，四行顺序改了必须红在这里）；「前端把这四行递给
- * 面板」是上一条源码扫的凭据，不记在本条名下；目录漂移钉把夹具那一阵的 `spread_id` /
+ * `lenormand`/`qimen`/`ziwei` 那三家同一条形状，四行顺序改了必须红在这里）；溯源块已按
+ * 2026-10-21 UI 需求从页面移除，「前端把这四行递给面板」那半截凭据不再记挂；目录漂移钉把夹具那一阵的 `spread_id` /
  * `spread_name_zh` / `cards.length` 与 `SPREAD_CATALOG` 里同 id 条目逐字对上
  * ——残留的两份阵名（偏差表第 8 行）就靠这一条看着。
  * **查不到**：语义忠实（中文是不是说歪了）与视觉效果（脚注的字有多小、折不折行）——
@@ -96,20 +96,18 @@ describe('塔罗中英配对呈现', () => {
     expect(text).toContain(spread.spread_name_zh);
   });
 
-  it('页面把表清单挂进出处块，选择器不再自带英文描述', () => {
+  it('选择器不再自带英文描述；页面溯源块已按 2026-10-21 UI 需求移除', () => {
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
     const controls = readFileSync(fileURLToPath(new URL(CONTROLS, import.meta.url)), 'utf8');
-    expect(page).toContain('<ProvenancePanel tables={spread.provenance.tables} />');
-    // 锚点用**看得见的字**：塔罗这一块自己的标题是「洗牌溯源与免责」（`TarotPage.tsx:204`——
-    // 终审发现 6 改页面头注那笔让它从 :202 漂到 :204，行号按 AGENTS.md §8 复测过），
-    // 别照 LenormandPage 的「抽牌溯源与口径」抄——那两个块的标题本来就不一样。
-    pinLiteralOrder(page, ['洗牌溯源与免责', '<ProvenancePanel tables=']);
+    // 溯源块（「洗牌溯源与免责」标题、`<Provenance>`、`<ProvenancePanel>`）已按 2026-10-21
+    // UI 需求从页面移除，这里改钉「不出现」。
+    expect(page).not.toContain('<ProvenancePanel');
+    expect(page).not.toContain('<Provenance ');
+    expect(page).not.toContain('洗牌溯源与免责');
     // 目录不产句子（G18）：选择器里既没有 `spread.description` 也没有 `spread.name}`。
     expect(controls).not.toContain('spread.description');
     expect(controls).not.toContain('spread.name}');
-    // 出处口径的第二份手抄（终审发现 11）：页面已经把引擎的 `note` 原样印出
-    // （`src/pages/TarotPage.tsx:210`），`SpreadControls.tsx:148` 那句是它的复写，已经漂过
-    // 一次（`09858f8` 才修好）。这里只钉**不许说什么**：不许把「综合解读」说成取自牌库——
+    // 出处口径的第二份手抄（终审发现 11）负向钉：不许把「综合解读」说成取自牌库——
     // 那正是 R37 抓的那类过度归因。负向钉，正向文案仍可自由改写（本文件头注里
     // 「同一句里没钉的那一半要说清」那一段对这半句依然成立）。
     expect(controls).not.toMatch(/综合解读[^。]*取自主策展/);
@@ -133,11 +131,8 @@ describe('塔罗中英配对呈现', () => {
     // 后端 golden 钉的是同一份清单的另一头（`backend/tests/golden/test_tarot_golden.py` 那条四行等序钉），
     // 与 `lenormand`/`qimen`/`ziwei` 三家同形状。
     // 这一条**只钉夹具那四行自己的展示序**（测体读的是 `readFixture('tarot')` 的 JSON，把
-    // `TarotPage.tsx` 改坏不会红在这里）；「前端真的把这四行递给面板」那件凭据在上一条
-    // 「页面把表清单挂进出处块」里：`expect(page).toContain('<ProvenancePanel tables={spread.provenance.tables} />')`
-    // 的字面钉 + 那条 `pinLiteralOrder(page, …)` 的挂点次序钉（本文件内部不写行号——行号随增删
-    // 漂，认测名与断言字面，不认号；漂了谎报行号的先例见计划偏离表第 14 行）。两头合起来才是
-    // 完整的凭据链，标题按测体写，不写测体不持有的那半边。
+    // `TarotPage.tsx` 改坏不会红在这里）。溯源块已按 2026-10-21 UI 需求从页面移除，
+    // 「前端把这四行递给面板」那半截凭据随之作废，不再在此记挂。
     expect(spread.provenance.tables.map((table) => table.name)).toEqual([
       'tarot_major',
       'tarot_minor',

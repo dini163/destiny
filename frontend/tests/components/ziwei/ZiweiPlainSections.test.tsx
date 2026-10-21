@@ -52,7 +52,7 @@ it('the board grid renders no plain text at all', () => {
   }
 });
 
-it('the page wires the palaces into the block and the tables into the panel', () => {
+it('the page wires the palaces into the block; the provenance block was removed per the 2026-10-21 UI requirement', () => {
   /** 上面两条只证「件怎么排」；页面有没有把 `.plain` 喂进来是另一件事，而标题那个表达式
    *  在这里被重新发明一遍的话，页面写成别的也照样绿——漂移恰好从没人钉的那一侧发生。
    *  整页渲染要走 hook + HTTP，本仓零 mock（AGENTS §9），所以挂载点照
@@ -68,22 +68,21 @@ it('the page wires the palaces into the block and the tables into the panel', ()
   expect(src).toContain('title="十二宫白话"');
   expect(src).toContain('title="全盘白话"');
   expect(src).toContain('sections={chart.plain}');
-  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
-  /** Step 3 的挂点规则是两句：「在盘面卡之后」且「在 `<Provenance>` 之前」，两句都钉。
-   *  存在性钉不在此处手写——次序钉经 `tests/lib/sourcePin.ts` 的 `pinLiteralOrder` 下，
-   *  它先把每个锚点各自钉一遍存在性再逐对比次序（裸 `indexOf` 比较在锚点被整行删掉后
-   *  因 -1 照样绿，终审 I-1 记的就是这个坑）。
-   *  `<Provenance chart={chart} />` 写全是为了不和 `<ProvenancePanel …>` 的前缀相撞。 */
+  /** 溯源块（`<Provenance>` / `<ProvenancePanel>`）已按 2026-10-21 UI 需求从页面移除，
+   *  这里改钉「不出现」，不再挂表清单。 */
+  expect(src).not.toContain('<ProvenancePanel');
+  expect(src).not.toContain('<Provenance ');
+  /** 次序钉经 `tests/lib/sourcePin.ts` 的 `pinLiteralOrder` 下，它先把每个锚点各自钉一遍
+   *  存在性再逐对比次序（裸 `indexOf` 比较在锚点被整行删掉后因 -1 照样绿，终审 I-1 记的就是这个坑）。 */
   pinLiteralOrder(src, [
     '<ChartSummary chart={chart} />',
     'title="全盘白话"',
     'sections={chart.plain}',
     '<ZiweiChartGrid chart={chart} />',
     'sections={chart.palaces.map(',
-    '<Provenance chart={chart} />',
   ]);
 });
 
-it('the provenance block lists both tables the endpoint read', () => {
+it('the fixture provenance payload still lists both tables the endpoint read', () => {
   expect(chart.provenance.tables.map((t) => t.name)).toEqual(['ziwei', 'ziwei_plain']);
 });

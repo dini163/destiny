@@ -59,7 +59,7 @@ it('the board grid renders no plain text at all', () => {
   }
 });
 
-it('the page wires the nine palaces into the block and the tables into the panel', () => {
+it('the page wires the nine palaces into the block; the provenance block was removed per the 2026-10-21 UI requirement', () => {
   /** 标题那串「卦名 + 宫数 + 方位」是本任务唯一一处**在页面里拼**的字面量：brief 给的理由是
    *  只给卦名会和盘面格内的写法漂。上面那条 byte-for-byte 测把同一个模板重新发明了一遍，
    *  所以页面少写 `宫` 或换成 `${p.gua}${p.number}` 也照样绿——这条去钉真页面。
@@ -73,9 +73,11 @@ it('the page wires the nine palaces into the block and the tables into the panel
   expect(src).toContain('title="九宫白话"');
   expect(src).toContain('title="全局白话"');
   expect(src).toContain('sections={chart.plain}');
-  expect(src).toContain('<ProvenancePanel tables={chart.provenance.tables} />');
-  /** 同紫微那条：「盘面卡之后」与「`<Provenance>` 之前」两句都钉。
-   *  存在性钉不在此处手写——`pinLiteralOrder`（`tests/lib/sourcePin.ts`）先钉存在性再比次序，
+  /** 溯源块（`<Provenance>` / `<ProvenancePanel>`）已按 2026-10-21 UI 需求从页面移除，
+   *  这里改钉「不出现」，不再挂表清单。 */
+  expect(src).not.toContain('<ProvenancePanel');
+  expect(src).not.toContain('<Provenance ');
+  /** 存在性钉不在此处手写——`pinLiteralOrder`（`tests/lib/sourcePin.ts`）先钉存在性再比次序，
    *  裸 `indexOf` 比较那种「锚点被删后因 -1 照样绿」的空钉形状是终审 I-1 收掉的东西。 */
   pinLiteralOrder(src, [
     '<JuSummary chart={chart} />',
@@ -83,10 +85,9 @@ it('the page wires the nine palaces into the block and the tables into the panel
     'sections={chart.plain}',
     '<QimenBoard chart={chart} />',
     'sections={chart.palaces.map(',
-    '<Provenance chart={chart} />',
   ]);
 });
 
-it('the provenance block lists both tables the endpoint read', () => {
+it('the fixture provenance payload still lists both tables the endpoint read', () => {
   expect(chart.provenance.tables.map((t) => t.name)).toEqual(['qimen', 'qimen_plain']);
 });

@@ -5,7 +5,8 @@
  * **渲染凭据**管 DOM——今译与原句两处都在、今译在前。次序同样走 `pinLiteralOrder`
  * （G24：前端顺序钉一律走那个 helper，不分源码/DOM——`container.textContent` 就是普通
  * `string`，helper 只吃字符串、不认结构，存在性由它自带的两遍 `toContain` 负责）。
- * **源码扫凭据**管挂点：页面把五张表递给 `ProvenancePanel`、两件里今译走 `PlainProse`。
+ * **源码扫凭据**管挂点：两件里今译走 `PlainProse`；溯源块已按 2026-10-21 UI 需求移除，
+ * 改由负向钉看守。
  * **夹具内容凭据**：`tables` 的行序就是本页的展示契约（面板按数组渲染，与 tarot /
  * lenormand / qimen / ziwei 四家同形状）；夹具是 `scripts/record_frontend_fixtures.py`
  * 打真实 `:8000` 录的那一手（`CastMethod.MANUAL` + 固定六掷 → 丰 55 之咸 31、互卦大过 28），
@@ -38,7 +39,7 @@ const cast = readFixture('zhouyi') as ZhouyiCast;
 
 afterEach(cleanup);
 
-describe('周易就地今译与出处块', () => {
+describe('周易就地今译', () => {
   it('夹具三张卦都带自己的今译，且今译不等于原句', () => {
     for (const hexagram of [cast.ben, cast.hu]) {
       expect(hexagram.plain_gua_ci).toBeTruthy();
@@ -94,7 +95,7 @@ describe('周易就地今译与出处块', () => {
     pinLiteralOrder(page, ['<CastSummary cast={cast} />', 'title="整卦白话"', 'title="纳甲六亲盘"']);
   });
 
-  it('页面把五张表递给出处块，展示序就是清单序', () => {
+  it('夹具五张表按展示序排列；页面溯源块已按 2026-10-21 UI 需求移除', () => {
     expect(cast.provenance.tables.map((table) => table.name)).toEqual([
       'zhouyi_trigrams',
       'zhouyi_hexagrams',
@@ -103,16 +104,15 @@ describe('周易就地今译与出处块', () => {
       'zhouyi_plain',
     ]);
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
-    expect(page).toContain('<ProvenancePanel tables={cast.provenance.tables} />');
-    pinLiteralOrder(page, ['起卦溯源与免责', '<ProvenancePanel tables=', '历法 · ']);
-    // 两个同名不同职的 `engine`（顶层 = 本端点推导器名，`provenance.engine` = 历法库）不许混成
-    // 一句话：历法那一格只能出现在面板之下的小字行里。三锚点形状照雷诺曼那一家的先例
-    // （`tests/components/lenormand/PlainSummary.test.tsx:83`）。
-    expect(page).toContain('历法 · {cast.provenance.engine}');
-    // 另一个同名 engine（顶层 = 本端点推导器名）也钉住，两个 engine 标签如今两端都锁死。
-    expect(page).toContain('ENGINE · {cast.engine}');
-    // 出处口径不许有两份手抄（R37 那一类）：页面正文那段说「依《周易》通行本与京房纳甲法
-    // 真实推演」，具体是哪五张表一律由面板从响应渲染，源码里不许出现表名。
+    // 溯源块（「起卦溯源与免责」标题、`<Provenance>`、`<ProvenancePanel>`、`ENGINE ·`、
+    // `历法 ·` 两行小字）已按 2026-10-21 UI 需求从页面移除，这里改钉「不出现」。
+    expect(page).not.toContain('<ProvenancePanel');
+    expect(page).not.toContain('<Provenance ');
+    expect(page).not.toContain('起卦溯源与免责');
+    expect(page).not.toContain('ENGINE · ');
+    expect(page).not.toContain('历法 · ');
+    // 出处口径不许有两份手抄（R37 那一类）：具体是哪五张表一律由后端响应携带，
+    // 源码里不许出现表名。
     expect(page).not.toContain('zhouyi_plain');
   });
 
