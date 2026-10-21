@@ -114,7 +114,8 @@ def test_three_transit_schemas_carry_their_own_field_lists() -> None:
         "dayun_current", "interpretation", "provenance", "engine",
     ]
     assert list(BaziTransitResult.model_fields) == [
-        *nine, "start_year", "end_year", "focus_year", "dayun_covered", "years", "provenance",
+        *nine, "start_year", "end_year", "focus_year", "dayun_covered", "years", "plain",
+        "provenance",
     ]
     assert list(BaziLiuriResult.model_fields) == [
         *nine, "anchor_date", "year", "year_ganzhi", "year_age", "dayun_index", "dayun_ganzhi",

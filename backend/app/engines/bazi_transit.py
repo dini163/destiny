@@ -22,9 +22,21 @@ from datetime import date, time, timedelta
 
 from lunar_python import Solar
 
-from app.content import CONTENT_SOURCES, CONTENT_VERSION, TRANSIT_CONTENT_SOURCES
+from app.content import (
+    BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
+    CONTENT_SOURCES,
+    CONTENT_VERSION,
+    TRANSIT_CONTENT_SOURCES,
+)
 from app.content.bazi_relations import relation_pairs
 from app.content.bazi_shishen import ten_god_meaning
+from app.content.bazi_transit_plain import (
+    BAZI_TRANSIT_MONTH_FRAME,
+    BAZI_TRANSIT_RANGE_FRAME,
+    BAZI_TRANSIT_THREAD_FRAME,
+    BAZI_TRANSIT_TITLES,
+    BAZI_TRANSIT_TONE_KEYS,
+)
 from app.content.bazi_transit_rules import (
     TRANSIT_BASE,
     TRANSIT_RULE_SOURCE,
@@ -43,6 +55,8 @@ from app.engines.bazi_rules import (
     is_fanyin,
 )
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
+from app.engines.plain_compose import num, overview, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
@@ -53,7 +67,7 @@ from app.schemas.bazi_transit import (
     TransitTenGod,
     TransitYear,
 )
-from app.schemas.common import CalendarType, Gender
+from app.schemas.common import CalendarType, Gender, PlainSection
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -711,6 +725,76 @@ def _covered_dayun(chart: BaziChart, span: TransitRange) -> list[DayunStep]:
     ]
 
 
+def _transit_plain(years: Sequence[TransitYear], dayun_covered: Sequence[DayunStep]) -> list[PlainSection]:
+    """岁运页的整体白话 2–3 节（spec §7.3）。
+
+    区间档位取**均值再过 `_tier`**（spec §4.3）：五格里三平一顺一滞与四顺一滞，页面上
+    该说不同的话。极值取 `max` / `min` over 升序的 `years`，并列即取最早那一年。
+    第三节只有 `focus_year` 给了才装配——引擎只在该年挂 `months`，所以这里不再收
+    `focus_year` 入参（本计划偏差表第 3 行）。
+    """
+    titles = BAZI_TRANSIT_TITLES["transit"]
+    mean = sum(year.score.value for year in years) / len(years)
+    best = max(years, key=lambda year: year.score.value)
+    worst = min(years, key=lambda year: year.score.value)
+    dayun = "、".join(step.ganzhi for step in dayun_covered if step.ganzhi) or "尚未起运"
+    sections = [
+        PlainSection(
+            title=titles[0],
+            text=overview(
+                BAZI_TRANSIT_RANGE_FRAME,
+                {
+                    "start": num(years[0].year),
+                    "end": num(years[-1].year),
+                    "count": num(len(years)),
+                    "strong": num(sum(1 for year in years if year.score.value >= STRONG_CUT)),
+                    "weak": num(sum(1 for year in years if year.score.value < WEAK_CUT)),
+                    "strong_cut": num(STRONG_CUT),
+                    "weak_cut": num(WEAK_CUT),
+                },
+            )
+            + "\n"
+            + reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[_tier(mean)]),
+        ),
+        PlainSection(
+            title=titles[1],
+            text=overview(
+                BAZI_TRANSIT_THREAD_FRAME,
+                {
+                    "dayun": dayun,
+                    "best_year": num(best.year),
+                    "best_ganzhi": best.pillar.ganzhi,
+                    "best_value": num(best.score.value),
+                    "worst_year": num(worst.year),
+                    "worst_ganzhi": worst.pillar.ganzhi,
+                    "worst_value": num(worst.score.value),
+                },
+            ),
+        ),
+    ]
+    focused = next((year for year in years if year.months), None)
+    if focused is not None:
+        months = focused.months
+        top = max(months, key=lambda month: month.score.value)
+        low = min(months, key=lambda month: month.score.value)
+        sections.append(
+            PlainSection(
+                title=titles[2],
+                text=overview(
+                    BAZI_TRANSIT_MONTH_FRAME,
+                    {
+                        "year": num(focused.year),
+                        "top_ganzhi": top.ganzhi,
+                        "top_value": num(top.score.value),
+                        "low_ganzhi": low.ganzhi,
+                        "low_value": num(low.score.value),
+                    },
+                ),
+            )
+        )
+    return sections
+
+
 def compute_transit(
     *,
     birth_date: date,
@@ -770,6 +854,11 @@ def compute_transit(
         supported_to=max(luck),
     )
     natal = natal_projection(chart)
+    years_list = [
+        _transit_year(natal, luck[year], focus=year == span.focus_year)
+        for year in range(span.start_year, span.end_year + 1)
+    ]
+    covered = _covered_dayun(chart, span)
     return BaziTransitResult(
         four_pillars=chart.four_pillars,
         pillars=list(chart.pillars),
@@ -783,17 +872,19 @@ def compute_transit(
         start_year=span.start_year,
         end_year=span.end_year,
         focus_year=span.focus_year,
-        dayun_covered=_covered_dayun(chart, span),
-        years=[
-            _transit_year(natal, luck[year], focus=year == span.focus_year)
-            for year in range(span.start_year, span.end_year + 1)
-        ],
+        dayun_covered=covered,
+        years=years_list,
+        plain=_transit_plain(years_list, covered),
         provenance=Provenance(
             reference_date=reference.isoformat(),
             engine="lunar-python",
             tables=[
                 ProvenanceTable(name=module, version=CONTENT_VERSION, source=source)
-                for module, source in (*CONTENT_SOURCES, *TRANSIT_CONTENT_SOURCES)
+                for module, source in (
+                    *CONTENT_SOURCES,
+                    *TRANSIT_CONTENT_SOURCES,
+                    *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
+                )
             ],
         ),
     )

@@ -15,6 +15,7 @@ from app.content.bazi_changsheng import CHANG_SHENG_SOURCE
 from app.content.bazi_hehun_rules import HEHUN_RULE_SOURCE
 from app.content.bazi_plain import PLAIN_SOURCE
 from app.content.bazi_tiaohou import TIAOHOU_SOURCE
+from app.content.bazi_transit_plain import BAZI_TRANSIT_PLAIN_SOURCE
 from app.content.bazi_transit_rules import TRANSIT_RULE_SOURCE
 from app.content.hehun_plain import HEHUN_PLAIN_SOURCE
 from app.content.kabbalah import KABBALAH_SOURCE
@@ -109,6 +110,14 @@ NAME_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 TRANSIT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("bazi_changsheng", CHANG_SHENG_SOURCE),
     ("bazi_transit_rules", TRANSIT_RULE_SOURCE),
+)
+
+#: 岁运三片的白话转述表。**刻意不并进 `TRANSIT_CONTENT_SOURCES`**：那张清单被
+#: `HEHUN_CONTENT_SOURCES` 用 `*` 展开复用，加进去等于让合婚页声称读了它没读的表
+#: （AGENTS §7、本文件 :50-51 注）。它只在 `compute_transit` 与 `liuri_provenance` 两处展开。
+#: 复测：`cd backend && grep -n "BAZI_TRANSIT_PLAIN_CONTENT_SOURCES" app/content/__init__.py app/engines/bazi_transit.py app/engines/bazi_liuri.py`
+BAZI_TRANSIT_PLAIN_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
+    ("bazi_transit_plain", BAZI_TRANSIT_PLAIN_SOURCE),
 )
 
 #: 历注宜忌一张表。单列的理由同 `TRANSIT_CONTENT_SOURCES`：矩阵页之外没有人引用它。

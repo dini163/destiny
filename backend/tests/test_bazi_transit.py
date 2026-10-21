@@ -36,10 +36,16 @@ from functools import cache
 
 import pytest
 
-from app.content import CONTENT_SOURCES, CONTENT_VERSION, TRANSIT_CONTENT_SOURCES
+from app.content import (
+    BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
+    CONTENT_SOURCES,
+    CONTENT_VERSION,
+    TRANSIT_CONTENT_SOURCES,
+)
 from app.content.bazi_changsheng import CHANG_SHENG_ORDER
 from app.content.bazi_relations import RELATION_TABLES, transforming_element
 from app.content.bazi_shishen import ten_god_meaning
+from app.content.bazi_transit_plain import BAZI_TRANSIT_TITLES, BAZI_TRANSIT_TONE_KEYS
 from app.content.bazi_transit_rules import TRANSIT_BASE, TRANSIT_RULES, transit_rule
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
@@ -68,11 +74,21 @@ from app.engines.bazi_transit import (
     compute_transit,
     resolve_transit_range,
 )
+from app.engines.plain_compose import num, reading
+from app.engines.plain_corpora import BAZI_TRANSIT
 from app.schemas.bazi import BaziChart
 from app.schemas.bazi_rules import BranchGroup, BranchMember, RelationPair
 from app.schemas.bazi_transit import BaziTransitResult, TransitMonth, TransitYear
 from app.schemas.common import CalendarType, Gender
 from app.schemas.scoring import ScoreFactor, ScoreValue
+from tests.plain_wording import (
+    FORBIDDEN,
+    LEDGER_WORDS,
+    PREDICTION_FORBIDDEN,
+    TIER_WORDS,
+    WU_DECISION_FORBIDDEN,
+    advice_hits,
+)
 
 _WINDOW = {"supported_from": 1988, "supported_to": 2083}
 
@@ -909,12 +925,17 @@ def test_the_ten_god_block_quotes_the_corpus_verbatim() -> None:
         )
 
 
-def test_the_provenance_lists_the_natal_tables_plus_the_two_transit_ones() -> None:
-    """溯源=真用过的表：主命盘九张在前、岁运两张在后，一张不多一张不少（spec §7.3）。"""
+def test_the_provenance_lists_the_natal_tables_plus_the_two_transit_and_the_plain_ones() -> None:
+    """溯源=真用过的表：主命盘九张在前、岁运两张在后、白话转述一张收尾，一张不多一张不少（spec §7.3）。
+
+    十二行复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
+    "import tests.test_bazi_transit as T; print(len(T._default().provenance.tables))"` → `12`。
+    """
     tables = _default().provenance.tables
     assert [(table.name, table.source) for table in tables] == [
         *CONTENT_SOURCES,
         *TRANSIT_CONTENT_SOURCES,
+        *BAZI_TRANSIT_PLAIN_CONTENT_SOURCES,
     ]
     assert {table.version for table in tables} == {CONTENT_VERSION}
     assert _default().provenance.reference_date == _REFERENCE.isoformat()
@@ -930,3 +951,77 @@ def test_every_ledger_in_the_response_adds_up_to_its_own_value() -> None:
     for score in ledgers:
         assert score.factors[0].rule == "transit.base"
         assert sum(factor.delta for factor in score.factors) == pytest.approx(score.value)
+
+
+def test_the_plain_block_is_two_sections_without_a_focus_year() -> None:
+    """缺省请求无 focus_year：两节，第一节两行、第二节一行（spec §4.1 的一节两行形状）。"""
+    result = _default()
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["transit"][:2])
+    assert result.plain[0].text.count("\n") == 1
+    assert result.plain[1].text.count("\n") == 0
+
+
+def test_the_plain_block_gains_the_month_section_when_a_focus_year_is_given() -> None:
+    """给了 focus_year 才出第三节，月极值逐字对得上引擎挂出的那一格。"""
+    result = _transit(start_year=2026, end_year=2030, focus_year=2027)
+    assert [section.title for section in result.plain] == list(BAZI_TRANSIT_TITLES["transit"])
+    months = next(year.months for year in result.years if year.months)
+    assert months is not None and len(months) == 12
+    third = result.plain[2].text
+    assert third.count("\n") == 0 and num(2027) in third
+    for cell in (max(months, key=lambda month: month.score.value),
+                 min(months, key=lambda month: month.score.value)):
+        assert cell.ganzhi in third and num(cell.score.value) in third
+
+
+def test_the_plain_block_tiers_come_from_the_mean_of_the_year_ledgers() -> None:
+    """档位句取均值过尺：五年 29/61/56/74/59 的均值 55.8 是「平」，而首年 29.0 是「滞」、
+    最高 74.0 是「顺」——三档各不同，所以这一条能同时否掉「取首年」「取极值」两种取法。"""
+    result = _default()
+    values = [year.score.value for year in result.years]
+    assert values == [29.0, 61.0, 56.0, 74.0, 59.0]
+    line = result.plain[0].text.split("\n")[1]
+    assert _tier(sum(values) / len(values)) == "平"
+    assert line == reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[_tier(sum(values) / len(values))])
+    for other in ("顺", "滞"):
+        assert line != reading(BAZI_TRANSIT, BAZI_TRANSIT_TONE_KEYS[other])
+
+
+def test_the_plain_block_extremes_match_the_year_table() -> None:
+    """首行报起止、流年数与两道分界；第二节报极值那一年的三件套与所覆盖大运——每个串都真在那一格上。"""
+    result = _default()
+    overview = result.plain[0].text
+    assert num(result.years[0].year) in overview and num(result.years[-1].year) in overview
+    assert num(len(result.years)) in overview
+    assert num(STRONG_CUT) in overview and num(WEAK_CUT) in overview
+    assert (sum(1 for year in result.years if year.score.value >= STRONG_CUT),
+            sum(1 for year in result.years if year.score.value < WEAK_CUT)) == (1, 1)
+    best = max(result.years, key=lambda year: year.score.value)
+    worst = min(result.years, key=lambda year: year.score.value)
+    assert (best.year, best.pillar.ganzhi, best.score.value) == (2029, "己酉", 74.0)
+    assert (worst.year, worst.pillar.ganzhi, worst.score.value) == (2026, "丙午", 29.0)
+    thread = result.plain[1].text
+    for year in (best, worst):
+        assert num(year.year) in thread
+        assert year.pillar.ganzhi in thread
+        assert num(year.score.value) in thread
+    assert "、".join(step.ganzhi for step in result.dayun_covered if step.ganzhi) == "戊午"
+    assert "戊午" in thread
+
+
+def test_the_plain_block_says_not_yet_running_before_the_first_dayun() -> None:
+    """起运前（1990–1992）`dayun_covered` 只有一格且 `ganzhi` 为空串：槽值落「尚未起运」，
+    不是空句（偏差表第 9 行的 `or` 分支——少了它，页面这一槽是空白）。"""
+    result = _transit(start_year=1990, end_year=1992)
+    assert [step.ganzhi for step in result.dayun_covered] == [""]
+    assert "尚未起运" in result.plain[1].text
+
+
+def test_the_plain_block_carries_no_ledger_word_and_no_advice() -> None:
+    """装配后的整段（框架句 + 档位句 + 槽值）自己过门：单字档名、规则短名、
+    `FORBIDDEN` 三条（`TransitFired.reading` 一旦混进来必踩其中两条）、建议词与取向禁串全零。"""
+    for result in (_default(), _transit(start_year=2026, end_year=2030, focus_year=2027)):
+        for section in result.plain:
+            assert advice_hits(section.text) == []
+            for token in PREDICTION_FORBIDDEN + WU_DECISION_FORBIDDEN + LEDGER_WORDS + TIER_WORDS + FORBIDDEN:
+                assert token not in section.text

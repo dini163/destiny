@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 from app.schemas.bazi import BaziNatalRequest, BaziPillar, DayunStep
 from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
+from app.schemas.common import PlainSection
 from app.schemas.scoring import ScoreValue
 
 
@@ -132,6 +133,11 @@ class BaziTransitResult(BaseModel):
     )
     years: list[TransitYear]
 
+    plain: list[PlainSection] = Field(
+        description="岁运页白话 2–3 节：区间总览（两行）、岁运主线、给了 focus_year 时再加流年十二个月（批次二 spec §7）。"
+    )
+
     provenance: Provenance = Field(
-        description="`tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。"
+        description="`tables` = 主命盘九张 + 岁运两张 + 白话转述一张（`bazi_changsheng`、"
+        "`bazi_transit_rules`、`bazi_transit_plain`）。"
     )
