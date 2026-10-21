@@ -70,7 +70,7 @@ export function NameInputForm({ pending, error, onSubmit }: NameInputFormProps) 
                 姓名参玄研判
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                kangxi · 五格剖象
+                康熙 · 五格剖象
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">

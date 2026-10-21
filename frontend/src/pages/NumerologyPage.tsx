@@ -9,7 +9,6 @@ import { PersonalCyclePanel } from '../components/numerology/PersonalCyclePanel'
 import { PinnacleLadder } from '../components/numerology/PinnacleLadder';
 import { Icon } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SourceNote } from '../components/ui/SourceNote';
 import { useNumerology } from '../hooks/useNumerology';
@@ -29,8 +28,8 @@ const CONTEXT_LABEL: Record<string, string> = { field: '出错字段' };
 /**
  * 毕达哥拉斯数字命理页（PRD §6.9，设计稿 数字命理全景矩阵，spec 2026-09-24）。
  *
- * 结果卡顺序照设计稿：核心数仪表盘 → 两张九宫 → 顶峰/挑战阶梯 → 个人周期 → 字母映射表
- * → 溯源。设计稿右上那四个按钮一个都不渲染（spec §4.2）：存档属 Stage 9、导出 PDF 与
+ * 结果卡顺序照设计稿：核心数仪表盘 → 两张九宫 → 顶峰/挑战阶梯 → 个人周期 → 字母映射表。
+ * 「数据溯源」整块按 2026-10-21 UI 需求隐藏（后端 provenance payload 原样不动）。设计稿右上那四个按钮一个都不渲染（spec §4.2）：存档属 Stage 9、导出 PDF 与
  * 合参比对属 Stage 10，而"重新测算"就是重新提交上面那张表单 —— 放一个假按钮或一个
  * 「即将上线」的占位，都是在页面上写一句系统兑现不了的话。
  *
@@ -178,48 +177,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
         }
       >
         <LetterMapTable columns={chart.letter_map} letters={chart.letters} input={chart.input} />
-      </ResultCard>
-
-      <ResultCard eyebrow="PROVENANCE" title="数据溯源" icon="vault">
-        <ProvenancePanel
-          tables={chart.provenance.tables}
-          meta={[
-            {
-              label: '档案号',
-              value: chart.provenance.badge,
-              title: '只印方法标识，不印流水号：一个每人不同又无推导依据的号只能靠编（决策 16）',
-            },
-            { label: '推演引擎', value: chart.provenance.engine },
-            {
-              label: '参考日',
-              value: chart.provenance.reference_date,
-              title: '请求未指定时取服务器当日（定当前顶峰与个人年月日）',
-            },
-            {
-              label: '参与字母数',
-              value: String(chart.input.letter_count),
-              title: '只有 A–Z 计入；其余字符如实报出、不折算成 0（决策 8）',
-            },
-            {
-              label: '跳过字符数',
-              value: String(chart.input.skipped_count),
-            },
-            {
-              label: 'Y 元音判定',
-              value: chart.input.y_as_vowel ? '计入元音' : '计为辅音',
-              title: '决策 7：Y 的元音性依名字而定，无权威统一口径，故交给用户并说明判据',
-            },
-          ]}
-          notes={[
-            chart.provenance.method,
-            '本页不出综合评分，也不出均衡度百分比：毕达哥拉斯数理没有权威的吉凶总分传统，硬凑一个加权分等于声称有人替它赋过分（决策 13、14）。',
-            '约简只在后端做，前端一个算术都不重算：每张卡印的账本就是它自己的推导过程，拿计算器可以逐行复核（决策 5）。',
-            '主数 11/22/33 一律保留不约简，唯一例外是四挑战 —— 例外本身写在挑战的算式串上（决策 3）。',
-            '顶峰与挑战的时段是来源给的定性文本，不是精确到年的断言（spec §5.3）。',
-            '迦勒底映射本轮不做：其字母表不同且 9 不分配给任何字母，混进同一张表会污染单测（决策 15）。',
-            '总和为 0 的核心数如实留空并印出原因，不填 0 充数（决策 17）。',
-          ]}
-        />
       </ResultCard>
     </>
   );

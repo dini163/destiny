@@ -7,20 +7,10 @@ import { ElementBalance } from '../components/western/ElementBalance';
 import { HouseTable } from '../components/western/HouseTable';
 import { Icon } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useSynastry } from '../hooks/useSynastry';
 import { aspectStyle } from '../lib/astro';
 import type { SynastryChart, SynastryRequest } from '../types/synastry';
-
-/** House-system code → label, for the summary strip (mirrors the console's options). */
-const HOUSE_SYSTEM_LABELS: Record<string, string> = {
-  P: '普拉西度 Placidus',
-  K: '科赫 Koch',
-  R: '雷吉奥蒙塔努斯 Regiomontanus',
-  E: '等宫制 Equal',
-  W: '全星座 Whole Sign',
-};
 
 /** The five major aspects, for the wheel's colour legend. */
 const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
@@ -35,7 +25,8 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
  * 西洋合盘页（Synastry & Composite）。
  *
  * 一页 = 双人输入台 + 相契度总分环 + 合盘双轮盘 + 人对人相位清单 + 组合盘（中点盘）
- * + 组合盘元素形态与宫头 + 溯源。所有星体黄经、四轴与宫头皆由瑞士星历实时计算，组合盘
+ * + 组合盘元素形态与宫头。「算法与星历溯源」整块按 2026-10-21 UI 需求隐藏（后端
+ * provenance payload 原样不动）。所有星体黄经、四轴与宫头皆由瑞士星历实时计算，组合盘
  * 取两造同名点的短弧中点（纯几何、可复算），相契度只由「人对人」的合盘相位按模型参数加权
  * 累加，账本逐条可核（PRD 无 mock 铁律）。页面上唯一的意志是两造生辰、定位与共用分宫制。
  */
@@ -163,22 +154,6 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
           </ResultCard>
         </div>
       </div>
-
-      <ResultCard eyebrow="PROVENANCE" title="算法与星历溯源" icon="seal">
-        <ProvenancePanel
-          tables={chart.provenance.tables}
-          meta={[
-            { label: '推演引擎', value: chart.provenance.engine },
-            { label: '黄道基准', value: chart.person_a.zodiac === 'tropical' ? '热带黄道 (Tropical)' : chart.person_a.zodiac },
-            {
-              label: '分宫制',
-              value: HOUSE_SYSTEM_LABELS[chart.person_a.house_system] ?? chart.person_a.house_system,
-            },
-            { label: '组合盘法', value: composite.method },
-          ]}
-          notes={[chart.provenance.note, chart.provenance.method]}
-        />
-      </ResultCard>
     </>
   );
 }

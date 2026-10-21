@@ -5,10 +5,9 @@ import { LenormandBoard } from '../components/lenormand/LenormandBoard';
 import { LenormandCard } from '../components/lenormand/LenormandCard';
 import { LenormandControls } from '../components/lenormand/LenormandControls';
 import { Icon } from '../components/ui/Icon';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useLenormand } from '../hooks/useLenormand';
-import { polarityChip, significatorRequestValue, spreadLabel } from '../lib/lenormand';
+import { polarityChip, significatorRequestValue } from '../lib/lenormand';
 import type { DrawnCard, LenormandReading, LenormandRequest, SignificatorChoice } from '../types/lenormand';
 
 /**
@@ -131,8 +130,6 @@ function LenormandResults({
       <ResultCard title="综合判读" eyebrow="SYNTHESIS" icon="sparkle">
         <p className="font-display text-sm leading-relaxed text-ink-variant sm:text-base">{reading.synthesis}</p>
       </ResultCard>
-
-      <Provenance reading={reading} />
     </>
   );
 }
@@ -178,33 +175,6 @@ function CardInspector({ card, onDeselect }: { card: DrawnCard; onDeselect: () =
         名词核心：<span className="text-gold-soft">{card.essence}</span>
         ；作后牌修饰前牌时：<span className="text-gold-soft">{card.as_modifier}</span>。
       </p>
-    </div>
-  );
-}
-
-/** Methodology + provenance note anchored to the real draw engine. */
-function Provenance({ reading }: { reading: LenormandReading }) {
-  const { engine, source, note, content_version } = reading.provenance;
-  return (
-    <div className="panel flex flex-col gap-3 p-5">
-      <div className="flex items-start gap-3">
-        <Icon name="vault" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">抽牌溯源与口径</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本次以 <span className="text-gold-soft">{spreadLabel(reading.spread_id)}</span> 起盘，由{' '}
-            <span className="text-gold-soft">{engine}</span> 依 <span className="text-gold-soft">{source}</span> 真实推演。
-          </p>
-          <p className="max-w-3xl text-xs leading-relaxed text-ink-muted">{note}</p>
-        </div>
-      </div>
-      <ProvenancePanel tables={reading.provenance.tables} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-muted">
-        <span className="label-caps">ENGINE · {engine}</span>
-        <span className="label-caps">RNG · {reading.rng}</span>
-        <span className="label-caps">CONTENT · {content_version}</span>
-        <span>雷诺曼为传统占卜自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。</span>
-      </div>
     </div>
   );
 }

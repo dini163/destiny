@@ -5,7 +5,6 @@ import { MeihuaControls } from '../components/meihua/MeihuaControls';
 import { MeihuaScoreLedger } from '../components/meihua/MeihuaScoreLedger';
 import { TiYongPanel } from '../components/meihua/TiYongPanel';
 import { Icon } from '../components/ui/Icon';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useMeihua } from '../hooks/useMeihua';
 import { meihuaMethodLabel, movingPositionLabel } from '../lib/meihua';
@@ -125,8 +124,6 @@ function MeihuaResults({ cast }: { cast: MeihuaCast }) {
           <AnalysisBlock label="变卦 · 事之归宿" text={cast.bian_analysis} />
         </div>
       </ResultCard>
-
-      <Provenance cast={cast} />
     </>
   );
 }
@@ -201,31 +198,6 @@ function AnalysisBlock({ label, text }: { label: string; text: string }) {
     <div className="flex flex-col gap-1.5 rounded-element border border-rim-soft bg-surface/50 px-3 py-2.5">
       <span className="label-caps text-ink-muted">{label}</span>
       <p className="font-display text-sm leading-relaxed text-ink-variant">{text}</p>
-    </div>
-  );
-}
-
-/** 出处与免责：页面只印本地成立的两件事实，出处一律取后端的 `provenance` 块。 */
-function Provenance({ cast }: { cast: MeihuaCast }) {
-  return (
-    <div className="panel flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-start gap-3">
-        <Icon name="seal" size={22} className="mt-0.5 shrink-0 text-gold" />
-        <div className="flex flex-col gap-1">
-          <span className="font-display text-base text-ink">起卦溯源与免责</span>
-          <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            本次以 <span className="text-gold-soft">{meihuaMethodLabel(cast.method)}</span> 起卦，由{' '}
-            <span className="text-gold-soft">{cast.engine}</span> 真实推演，起卦与体用的算式和它读过的每一张表都在下面这张清单里。
-            梅花易数为传统象数自省工具，结果仅供文化参考，不构成医疗、法律、财务或人生重大决策建议。
-          </p>
-          <ProvenancePanel
-            tables={cast.provenance.tables}
-            meta={[{ label: '历法引擎', value: cast.provenance.engine }]}
-            notes={[cast.provenance.method]}
-          />
-        </div>
-      </div>
-      <span className="label-caps shrink-0 text-ink-muted">ENGINE · {cast.engine}</span>
     </div>
   );
 }

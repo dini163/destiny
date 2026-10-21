@@ -168,7 +168,7 @@ export function SynastryConsole({ pending, onSubmit }: SynastryConsoleProps) {
                 西洋合盘 · 双人比较盘
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                pyswisseph 瑞士星历
+                瑞士星历
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">

@@ -8,7 +8,6 @@ import { SancaiStrip } from '../components/name/SancaiStrip';
 import { Icon } from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
-import { ProvenancePanel } from '../components/ui/ProvenancePanel';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useNameAnalysis } from '../hooks/useNameAnalysis';
 import type { NameAnalysis } from '../types/name';
@@ -16,7 +15,8 @@ import type { NameAnalysis } from '../types/name';
 /**
  * 姓名学五格剖象页（PRD §6.5，设计稿 #NAME-KX-812025）。
  *
- * 一次提交换一整套可核对的推导：字级笔画算式 → 五格 → 三才 → 综合指数 → 溯源。
+ * 一次提交换一整套可核对的推导：字级笔画算式 → 五格 → 三才 → 综合指数。
+ * 「数据溯源」整块按 2026-10-21 UI 需求隐藏（后端 provenance payload 原样不动）。
  * 设计稿里的 字性流注 / 姓名内五行环流 / 贵人辅弼系数 / 财禄拓疆潜能 / 改名备选字库
  * 一律不做——它们没有可署名的规则（spec §2.5、决策七），宁可页面少一块。
  */
@@ -100,34 +100,6 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
           body: <NameSummaryScore score={analysis.score} />,
         }
       : null,
-    {
-      id: 'provenance',
-      label: '数据溯源',
-      title: '数据溯源',
-      eyebrow: 'PROVENANCE',
-      icon: 'vault',
-      body: (
-        <ProvenancePanel
-          tables={analysis.provenance.tables}
-          meta={[
-            {
-              label: '笔画语料',
-              value: `Unihan ${analysis.provenance.corpus.unicode_version}（${analysis.provenance.corpus.size.toLocaleString('en-US')} 条）`,
-              title: analysis.provenance.corpus.source,
-            },
-            {
-              label: '语料生成日',
-              value: analysis.provenance.corpus.corpus_date,
-              title: '固化入库的 Unihan 发布日期，非本次请求时间',
-            },
-          ]}
-          notes={[
-            '字级五行、姓名内五行环流与贵人/财禄系数未实现：无可署名的规则来源（spec 决策七）。',
-            '一简对多繁由用户指定正体后才有笔画；本系统不代作主张（spec 决策六）。',
-          ]}
-        />
-      ),
-    },
   ];
 
   return specs.filter((spec): spec is SectionSpec => spec !== null);
