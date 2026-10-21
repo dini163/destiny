@@ -6,10 +6,12 @@ import { afterEach, expect, it } from 'vitest';
 
 import { LiushiHourLadder } from '../../../src/components/bazi/liushi/LiushiHourLadder';
 import { TransitYearCard } from '../../../src/components/bazi/transit/TransitYearCard';
+import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
 import { readFixture } from '../../lib/readFixture';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import type { BaziTransitResult } from '../../../src/types/baziTransit';
 import type { BaziLiushiResult } from '../../../src/types/baziLiushi';
+import type { PlainSection } from '../../../src/types/common';
 
 afterEach(cleanup);
 
@@ -59,4 +61,42 @@ it('两张卡各渲染一次不抛（props 逐字照组件签名）', () => {
     <LiushiHourLadder hours={liushi.hours} peakIndex={0} focusZhi={null} onSelect={() => {}} />,
   );
   expect(ladder.textContent ?? '').toContain(liushi.hours[0].zhi);
+});
+
+const PLAIN_FIXTURES: ReadonlyArray<{ slug: string; title: string }> = [
+  { slug: 'bazi-hehun', title: '合盘白话' },
+  { slug: 'bazi-liuyue', title: '岁运白话' },
+  { slug: 'bazi-liuri-matrix', title: '流月白话' },
+  { slug: 'bazi-liushi-day', title: '流时白话' },
+  { slug: 'kabbalah-tree', title: '全树白话' },
+];
+
+it.each(PLAIN_FIXTURES)('$title 的 plain 逐节 byte-for-byte 进块', ({ slug }) => {
+  // `PlainSectionList` 一节一个 article：h3 是节名，`PlainProse` 把整段文本塞进**一个** `p`
+  // （`whitespace-pre-line` 负责按 `\n` 断行，不拆元素）。所以两侧都是逐节一一对应，
+  // 不是逐行——照逐行写会红，且红得像是组件的错。
+  const payload = readFixture(slug) as { plain: PlainSection[] };
+  const { container } = render(<PlainSectionList sections={payload.plain} />);
+  expect([...container.querySelectorAll('h3')].map((node) => node.textContent)).toEqual(
+    payload.plain.map((section) => section.title),
+  );
+  expect([...container.querySelectorAll('p')].map((node) => node.textContent)).toEqual(
+    payload.plain.map((section) => section.text),
+  );
+});
+
+it('流年卡与时辰 ladder 不渲染任何白话段', () => {
+  // 反向判据的渲染侧那一半（批次一在 ziwei / qimen 各钉过的那条形）：整段句子只住页面层。
+  const transit = readFixture('bazi-liuyue') as BaziTransitResult;
+  const { container: yearCard } = render(<TransitYearCard year={transit.years[0]} />);
+  for (const section of transit.plain) {
+    expect(yearCard.textContent ?? '').not.toContain(section.text);
+  }
+  const liushi = readFixture('bazi-liushi-day') as BaziLiushiResult;
+  const { container: ladder } = render(
+    <LiushiHourLadder hours={liushi.hours} peakIndex={0} focusZhi={null} onSelect={() => {}} />,
+  );
+  for (const section of liushi.plain) {
+    expect(ladder.textContent ?? '').not.toContain(section.text);
+  }
 });
