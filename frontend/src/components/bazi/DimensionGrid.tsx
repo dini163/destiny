@@ -1,29 +1,27 @@
 import { PlainProse } from '../ui/PlainProse';
 import { ScoreLedger } from '../ui/ScoreLedger';
 import { SourceNote } from '../ui/SourceNote';
+import { VerdictCard } from '../ui/VerdictCard';
 import type { BaziInterpretation, DimensionReading } from '../../types/bazi';
 
 /**
  * 六维详批. `narrative` is the engine's join of the fired rules' own readings and
  * `plain` is the engine's join of their plain-language mirrors — the grid composes
- * no sentence of its own either way; it only fixes the reading order (plain first,
- * technical as the footnote). Spec §6.7, §8.2, plain-reading spec §6.
+ * no sentence of its own either way; it only fixes the reading order (conclusion
+ * card first, then plain, then the technical ledger as the footnote).
+ * 2026-10-21 verdict-card spec §6：结论卡片（结论先行）在六维卡之前；总论段并入卡片
+ * headline（`plain_summary` 与 `verdict.headline` 同串），不再单挂一段。Spec §6.7, §8.2,
+ * plain-reading spec §6.
  */
 export function DimensionGrid({ reading }: { reading: BaziInterpretation }) {
   return (
     <div className="flex flex-col gap-4">
+      <VerdictCard verdict={reading.verdict} />
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {reading.six_dimensions.map((dimension) => (
           <DimensionCard key={dimension.dimension} dimension={dimension} />
         ))}
       </div>
-      {/* R7 收编（白话 spec §10）：`PlainProse` 缺省串与原 `<p>` 类集相同、只是顺序不同；
-       *  这里判据安全是一条实测事实——`tests/components/bazi/DimensionGrid.test.tsx:4` 头注
-       *  自述刻意不按 class 断言，段落一律 `paragraphByExact` 全文相等 + `precedes` 钉 DOM 序。 */}
-      <PlainProse
-        text={reading.plain_summary}
-        className="rounded-card border border-rim bg-surface p-4"
-      />
       <p className="text-sm text-ink-variant">{reading.summary}</p>
     </div>
   );

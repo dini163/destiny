@@ -4,7 +4,7 @@
  * snake_case is preserved end-to-end so the frontend consumes chart responses
  * without a mapping layer.
  */
-import type { BirthInput, CalendarType, Gender, ProvenanceTable } from './common';
+import type { BirthInput, CalendarType, Gender, ProvenanceTable, Verdict } from './common';
 import type { ScoreValue } from './scoring';
 
 /** Which of the four pillars a {@link BaziPillar} represents. */
@@ -245,8 +245,10 @@ export interface DimensionReading {
 export interface BaziInterpretation {
   six_dimensions: DimensionReading[];
   summary: string;
-  /** The six tiers restated in plain language; carries no extra verdict. */
+  /** 结论先行的一句话（与 `verdict.headline` 同串），由总论框架句装配（verdict-card spec §4）。 */
   plain_summary: string;
+  /** 结论卡片：档位 + 星级 + 结论句 + 分项要点 + 一句建议（verdict-card spec §1）。 */
+  verdict: Verdict;
 }
 
 /** Complete BaZi natal chart produced by the backend engine. */

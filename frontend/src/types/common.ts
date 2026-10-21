@@ -60,3 +60,15 @@ export interface PlainSection {
   title: string;
   text: string;
 }
+
+/** 结论卡片，镜像 `backend/app/schemas/common.py:Verdict`（系统无关，verdict-card spec §1）。
+ *  `grade` 用系统的档位词表（如 大吉/吉/平/小凶/凶），`stars` 1-5 与档位一一对应；
+ *  `headline` 是结论先行的一句话；`points` 是分项要点；`advice` 是一句建议。
+ *  四个文本字段全部来自后端受控语料，前端一个字也不生成。 */
+export interface Verdict {
+  grade: string;
+  stars: number;
+  headline: string;
+  points: string[];
+  advice: string;
+}
