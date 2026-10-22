@@ -16,11 +16,17 @@ from lunar_python import Solar
 
 from app.content.bazi_shishen import ten_god_meaning
 from app.content.bazi_transit_plain import (
+    BAZI_LIUSHI_ANCHOR_DAY,
+    BAZI_LIUSHI_ANCHOR_FOCUS,
     BAZI_LIUSHI_DAY_FRAME,
     BAZI_LIUSHI_FOCUS_FRAME,
     BAZI_LIUSHI_HOURS_FRAME,
+    BAZI_LIUSHI_VERDICT_ADVICE_FRAME,
+    BAZI_LIUSHI_VERDICT_FRAME,
+    BAZI_TRANSIT_TIER_ADVICE,
     BAZI_TRANSIT_TITLES,
     BAZI_TRANSIT_TONE_KEYS,
+    BAZI_TRANSIT_VERDICT_OUTLOOK,
 )
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
@@ -49,6 +55,7 @@ from app.engines.bazi_transit import (
 )
 from app.engines.plain_compose import num, overview, reading
 from app.engines.plain_corpora import BAZI_TRANSIT
+from app.engines.verdict import grade_for
 from app.schemas.bazi_liuri import AlmanacYiJi
 from app.schemas.bazi_liushi import (
     BaziLiushiResult,
@@ -57,7 +64,7 @@ from app.schemas.bazi_liushi import (
     TransitHourHit,
 )
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
-from app.schemas.common import CalendarType, Gender, PlainSection
+from app.schemas.common import CalendarType, Gender, PlainSection, Verdict
 from app.schemas.scoring import ScoreValue
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -251,6 +258,63 @@ def _liushi_plain(
     return sections
 
 
+def _liushi_verdict(
+    *,
+    day_ganzhi: str,
+    day_score: ScoreValue,
+    hours: list[TransitHourCell],
+    focused: TransitHourDetail | None,
+) -> Verdict:
+    """页级结论卡（verdict-card spec §4）：锚点 = 聚焦时辰账本分，无聚焦则取日段账本分。
+
+    与流日同一条二选一：给了聚焦时辰读者看的就是那一格；白话用 `day_score.tier` 的顺/平/滞，
+    卡片用 `grade_for` 的五档词。points 只报日段与聚焦时辰两条账本事实；advice 指向十二格里
+    分最低的那一格（并列取时辰序首格，与白话极值同一条 `min` 尺）。
+    """
+    if focused is not None:
+        anchor_fact = overview(
+            BAZI_LIUSHI_ANCHOR_FOCUS,
+            {
+                "zhi": focused.zhi,
+                "clock": focused.start_clock,
+                "value": num(focused.score.value),
+            },
+        )
+        anchor_score = focused.score.value
+    else:
+        anchor_fact = overview(
+            BAZI_LIUSHI_ANCHOR_DAY,
+            {"ganzhi": day_ganzhi, "value": num(day_score.value)},
+        )
+        anchor_score = day_score.value
+    grade, stars = grade_for(anchor_score)
+    headline = overview(
+        BAZI_LIUSHI_VERDICT_FRAME,
+        {
+            "grade": grade,
+            "anchor_fact": anchor_fact,
+            "outlook": BAZI_TRANSIT_VERDICT_OUTLOOK[grade],
+        },
+    )
+    weakest = min(hours, key=lambda cell: cell.value)
+    advice = overview(
+        BAZI_LIUSHI_VERDICT_ADVICE_FRAME,
+        {
+            "zhi": weakest.zhi,
+            "clock": weakest.start_clock,
+            "value": num(weakest.value),
+            "tier_advice": BAZI_TRANSIT_TIER_ADVICE[weakest.tier],
+        },
+    )
+    points = [f"日段 {day_ganzhi}：{num(day_score.value)} 分"]
+    if focused is not None:
+        points.append(
+            f"聚焦 {focused.zhi} 时 {focused.start_clock}：{num(focused.score.value)} 分"
+            f"（命中 {num(len(focused.hour_hits))} 条）"
+        )
+    return Verdict(grade=grade, stars=stars, headline=headline, points=points, advice=advice)
+
+
 def compute_liushi_day(
     *,
     birth_date: date,
@@ -330,6 +394,12 @@ def compute_liushi_day(
         focused=detail,
         plain=_liushi_plain(
             solar_date=day_row.solar_date,
+            day_ganzhi=day_row.ganzhi,
+            day_score=day_row.score,
+            hours=cells,
+            focused=detail,
+        ),
+        verdict=_liushi_verdict(
             day_ganzhi=day_row.ganzhi,
             day_score=day_row.score,
             hours=cells,
