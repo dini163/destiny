@@ -9,7 +9,7 @@ library, never invented at runtime.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 
 
 class LenormandRequest(BaseModel):
@@ -112,6 +112,8 @@ class LenormandReading(BaseModel):
     neutral_count: int = Field(description="How many drawn cards are 中性.")
     negative_count: int = Field(description="How many drawn cards are 消极.")
     plain_summary: str = Field(description="整阵白话：牌阵开篇句 + 按位序逐张牌义，行以 \\n 分隔。")
+
+    verdict: Verdict = Field(description="综合结论卡片：档位/星级/结论句/分项/建议，由极性计数判定层合成。")
 
     rng: str = Field(default="secrets", description="Randomness source: Python secrets (CSPRNG).")
     engine: str = Field(default="lenormand-combination")

@@ -87,3 +87,37 @@ LENORMAND_CARD_MEANINGS: dict[str, str] = {
 #: 「源表改编号时会漂」的间接。复测对账住 `tests/content/test_lenormand_plain_corpus.py`
 #: 的 `test_universe_is_the_thirty_six_card_ids_verbatim`。
 LENORMAND_READINGS: dict[str, str] = LENORMAND_CARD_MEANINGS
+
+# --- 结论卡片（verdict）装配语料（2026-10-22 verdict-card spec §2b/§4，雷诺曼判定层） ---
+#: 下面三组常量**不进** `LENORMAND_READINGS`（工厂键全集仍为 36），由引擎用 `overview()`
+#: 实例化，故工厂的条目/开篇句措辞门扫不到它们，自守门在
+#: `tests/content/test_lenormand_verdict_corpus.py`。
+
+#: 总论框架：档位词 + 积极/消极/中性三计数 + 一句取向。`{grade}` 取 `verdict.grade_for`
+#: 的档位词；`{positive}/{negative}/{neutral}` 是引擎数出的三类牌张数（盘面事实计数）；
+#: `{outlook}` 取 `LENORMAND_VERDICT_OUTLOOK[grade]`。本表不写死任何数字。
+LENORMAND_VERDICT_FRAME = (
+    "你这一阵抽出的牌属{grade}：积极牌{positive}张、消极牌{negative}张、中性牌{neutral}张，{outlook}。"
+)
+
+#: 各档位收束取向，键 = `app/engines/verdict.GRADE_BANDS` 五档档位词（与 bazi/ziwei
+#: VERDICT_OUTLOOK 同键，对应关系由自测钉）。槽位词条：不成句、不带「。」、不带建议词。
+LENORMAND_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "好牌占了上风，顺势推进",
+    "吉": "积极的一面占优，值得把握",
+    "平": "好坏大致相抵，稳住节奏再看",
+    "小凶": "拖累的一面更多，先看清楚再动",
+    "凶": "先把基本盘稳住，别急着出手",
+}
+
+#: 建议句框架：净计数非负走「相抵有余」，净计数为负走「负向偏多」。`{advice}` 取
+#: `LENORMAND_VERDICT_ADVICE[键]`，键由引擎按净计数选定。
+LENORMAND_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这一阵抽到的牌面已经摆在眼前，{advice}。"
+)
+
+#: 两档建议词条，键 = 引擎净计数分支名；槽位词条不成句、不带「。」、不带建议词。
+LENORMAND_VERDICT_ADVICE: dict[str, str] = {
+    "favorable": "积极与拖累相抵有余，按自己的节奏往下走即可",
+    "adverse": "负向牌偏多，先把眼前的阻滞看清楚，暂缓推进",
+}

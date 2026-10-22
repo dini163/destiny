@@ -28,8 +28,15 @@ from fastapi.testclient import TestClient
 
 from app.content.lenormand import CARDS, SIGNIFICATOR_BY_GENDER, SPREADS
 from app.core.errors import UnsupportedMethodError
-from app.engines.lenormand import _box_combinations, _tableau_combinations, draw_lenormand
+from app.engines.lenormand import (
+    POLARITY_WEIGHT,
+    _box_combinations,
+    _tableau_combinations,
+    build_verdict,
+    draw_lenormand,
+)
 from app.engines.plain_corpora import LENORMAND
+from app.engines.verdict import grade_for
 from app.schemas.lenormand import Combination, DrawnCard
 
 SPREAD_SIZES = {"single": 1, "three_card": 3, "five_card": 5, "nine_card": 9, "grand_tableau": 36}
@@ -507,4 +514,55 @@ def test_the_plain_summary_and_the_synthesis_are_two_different_texts() -> None:
     reading = draw_lenormand(spread_id="three_card")
     assert reading.synthesis
     assert reading.plain_summary != reading.synthesis
+
+
+# --- 综合结论卡片（verdict）：纯计数快照钉五档，真实发牌只钉结构自洽 ---------------------
+
+#: (积极, 消极, 中性) → (档位, 星级)。发牌是 CSPRNG 不可控，故档位分布由纯函数 `build_verdict`
+#: 的构造计数钉住（无 mock：计数是引擎同一公式的输入，不桩响应）。五档各落一例。
+VERDICT_SNAPSHOTS: tuple[tuple[int, int, int, str, int], ...] = (
+    (5, 0, 0, "大吉", 5),
+    (3, 0, 0, "吉", 4),
+    (2, 1, 0, "平", 3),
+    (1, 2, 0, "小凶", 2),
+    (0, 3, 0, "凶", 1),
+)
+
+
+@pytest.mark.parametrize("positive, negative, neutral, grade, stars", VERDICT_SNAPSHOTS)
+def test_verdict_snapshot_is_pinned(
+    positive: int, negative: int, neutral: int, grade: str, stars: int
+) -> None:
+    """五个计数组合的结论卡片逐字段钉死（确定性快照，不经过随机发牌）。"""
+    verdict = build_verdict(positive, negative, neutral)
+    assert verdict.grade == grade
+    assert verdict.stars == stars
+    assert verdict.headline.startswith(f"你这一阵抽出的牌属{grade}：")
+    assert verdict.points == [
+        f"积极牌 {positive} 张",
+        f"消极牌 {negative} 张",
+        f"中性牌 {neutral} 张",
+    ]
+    assert verdict.advice.endswith("。")
+
+
+@pytest.mark.parametrize("spread_id", sorted(SPREAD_SIZES))
+def test_real_draw_verdict_is_self_consistent(spread_id: str) -> None:
+    """真实发牌只钉结构自洽：档位/星级与计数推出的分数一致，headline 复述档位与三项计数。"""
+    reading = draw_lenormand(spread_id=spread_id)
+    verdict = reading.verdict
+    expected_grade, expected_stars = grade_for(
+        max(0.0, min(100.0, 50.0 + POLARITY_WEIGHT * (reading.positive_count - reading.negative_count)))
+    )
+    assert verdict.grade == expected_grade
+    assert verdict.stars == expected_stars
+    assert f"积极牌{reading.positive_count}张" in verdict.headline
+    assert f"消极牌{reading.negative_count}张" in verdict.headline
+    assert f"中性牌{reading.neutral_count}张" in verdict.headline
+    assert verdict.points == [
+        f"积极牌 {reading.positive_count} 张",
+        f"消极牌 {reading.negative_count} 张",
+        f"中性牌 {reading.neutral_count} 张",
+    ]
+
 

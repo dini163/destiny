@@ -36,7 +36,7 @@ URL = "/api/v1/lenormand/draw"
 TOP_LEVEL_KEYS = {
     "spread_id", "spread_name_zh", "spread_name_en", "layout", "description", "question",
     "cards", "drawn_ids", "combinations", "significator", "synthesis",
-    "positive_count", "neutral_count", "negative_count", "plain_summary",
+    "positive_count", "neutral_count", "negative_count", "plain_summary", "verdict",
     "rng", "engine", "provenance",
 }
 
