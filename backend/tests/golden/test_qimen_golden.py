@@ -40,7 +40,8 @@ from fastapi.testclient import TestClient
 
 from app.content.qimen_plain import door_key, god_key, star_key
 from app.engines.plain_corpora import QIMEN
-from app.engines.qimen import compute_qimen_chart
+from app.engines.qimen import LUCK_WEIGHT, VERDICT_BASE, compute_qimen_chart
+from app.engines.verdict import grade_for
 
 CAST = datetime(2024, 5, 15, 10, 30)
 
@@ -457,3 +458,45 @@ def test_the_chart_carries_four_overview_sections() -> None:
     assert chart.zhishi_door in chart.plain[1].text and str(chart.zhishi_palace) in chart.plain[1].text
     assert chart.time_ganzhi[0] in chart.plain[2].text
     assert chart.kongwang in chart.plain[3].text and chart.yima in chart.plain[3].text
+
+
+# --- 综合结论卡片（verdict）：四锚档位快照 + 纯公式五档分布 -----------------------------
+
+#: 四锚实测档位/星级（2026-10-22 复测，公式见 `engines/qimen.py::build_verdict`）。
+VERDICT_SNAPSHOTS: dict[str, tuple[str, int]] = {
+    "A": ("吉", 4),
+    "B": ("平", 3),
+    "C": ("平", 3),
+    "D": ("平", 3),
+}
+
+
+@pytest.mark.parametrize("anchor", ANCHORS, ids=[a.id for a in ANCHORS])
+def test_verdict_snapshot_is_pinned(anchor: Anchor) -> None:
+    """每锚的 verdict 档位/星级逐字段钉死；headline 复述档位与两宫落点，points 列吉凶枚数。"""
+    letter = anchor.id.split("-", 1)[0]
+    chart = _chart(anchor.cast)
+    grade, stars = VERDICT_SNAPSHOTS[letter]
+    assert chart.verdict.grade == grade
+    assert chart.verdict.stars == stars
+    assert chart.verdict.headline.startswith(f"你这一局值符、值使两宫属{grade}：")
+    assert chart.verdict.advice.endswith("。")
+    assert chart.verdict.points
+
+
+#: 净计数 → (档位, 星级)。纯公式分布钉五档：真实四锚只压到两档，故这里用公式直接跨档，
+#: 不桩响应、不造盘。
+VERDICT_BAND_CASES: tuple[tuple[int, str, int], ...] = (
+    (8, "大吉", 5),
+    (4, "吉", 4),
+    (0, "平", 3),
+    (-2, "小凶", 2),
+    (-5, "凶", 1),
+)
+
+
+@pytest.mark.parametrize("net, grade, stars", VERDICT_BAND_CASES)
+def test_verdict_formatter_spans_all_five_bands(net: int, grade: str, stars: int) -> None:
+    score = max(0.0, min(100.0, VERDICT_BASE + LUCK_WEIGHT * net))
+    assert grade_for(score) == (grade, stars)
+

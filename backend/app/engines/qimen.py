@@ -46,10 +46,21 @@ from app.content.qimen import (
     ZHI,
     DIPAN_SEQUENCE,
 )
-from app.content.qimen_plain import door_key, god_key, overview_key, star_key
-from app.engines.plain_compose import compose, compose_template, reading
+from app.content.qimen_plain import (
+    QIMEN_VERDICT_ADVICE,
+    QIMEN_VERDICT_ADVICE_FRAME,
+    QIMEN_VERDICT_FRAME,
+    QIMEN_VERDICT_OUTLOOK,
+    door_key,
+    god_key,
+    overview_key,
+    star_key,
+)
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, compose_template, overview, reading
 from app.engines.plain_corpora import QIMEN
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.engines.verdict import grade_for
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 from app.schemas.qimen import (
     DoorInfo,
     GodInfo,
@@ -73,6 +84,74 @@ _PALACE_ORDER: tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7, 8, 9)
 def _ring_pos(palace: int) -> int:
     """Ring position on the eight-palace rotation ring; 中五宫 寄坤二."""
     return RING8_POS[2 if palace == 5 else palace]
+
+
+# --- 综合结论 verdict（2026-10-22 verdict-card spec §2b：无账本系统的新增判定层） ---
+#: 洛书数 → 中文宫名（headline/points 用）。
+_PALACE_CN: dict[int, str] = {1: "一", 2: "二", 3: "三", 4: "四", 5: "五", 6: "六", 7: "七", 8: "八", 9: "九"}
+
+#: 用神宫吉凶计数权重（模型参数，MODEL_PARAM_SOURCE）：值符宫、值使宫内每枚「吉」星/门/神 +k、
+#: 每枚「凶」−k，「中平」0。为什么只数这两宫而不是全盘：九星/八门/八神在每一局都各出现一次，
+#: 全盘吉凶总数随旋转恒定，数全盘每局同分、档位永不变化；值符（天盘主）、值使（人盘主）才是
+#: 转盘法读局的用神宫，落点随用事时刻变。传统只给定性吉凶（`content/qimen.py` 的 luck），
+#: 不给数字，故 k 自署模型参数。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.qimen import LUCK_WEIGHT; print(LUCK_WEIGHT)"` → `4.0`。
+LUCK_WEIGHT: float = 4.0
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位。
+VERDICT_BASE: float = 50.0
+
+#: 上面权重与起点的共同署名：模型参数（非古籍赋分），传统只给定性吉凶不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+
+def _palace_luck(palace: QimenPalace) -> tuple[int, int]:
+    """一宫内星/门/神的吉、凶枚数（中平不计）。"""
+    good = sum(1 for star in palace.stars if star.luck == "吉")
+    bad = sum(1 for star in palace.stars if star.luck == "凶")
+    if palace.door:
+        good += 1 if palace.door.luck == "吉" else 0
+        bad += 1 if palace.door.luck == "凶" else 0
+    if palace.god:
+        good += 1 if palace.god.luck == "吉" else 0
+        bad += 1 if palace.god.luck == "凶" else 0
+    return good, bad
+
+
+def build_verdict(palaces: list[QimenPalace]) -> Verdict:
+    """从值符/值使两宫的吉凶计数确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    不重新判局、不现编中文：档位/星级由 `grade_for(50 + k×(吉−凶))` 派生，headline/advice
+    套 `qimen_plain` 的框架句，points 是两宫各自的吉凶枚数。
+    """
+    zhifu = next(p for p in palaces if p.is_zhifu_palace)
+    zhishi = next(p for p in palaces if p.is_zhishi_palace)
+    same = zhifu.number == zhishi.number
+    zhi_good, zhi_bad = _palace_luck(zhifu)
+    shi_good, shi_bad = _palace_luck(zhishi)
+    # 值符值使同宫时只数一遍：两旗标指同一宫，重复计数会把该宫净值翻倍。
+    net = (zhi_good - zhi_bad) if same else (zhi_good - zhi_bad) + (shi_good - shi_bad)
+    score = max(0.0, min(100.0, VERDICT_BASE + LUCK_WEIGHT * net))
+    grade, stars = grade_for(score)
+    same = zhifu.number == zhishi.number
+    zhi_label = f"{_PALACE_CN[zhifu.number]}宫"
+    shi_label = f"{_PALACE_CN[zhishi.number]}宫"
+    headline = overview(QIMEN_VERDICT_FRAME, {
+        "grade": grade,
+        "zhi": zhi_label,
+        "shi": shi_label,
+        "outlook": QIMEN_VERDICT_OUTLOOK[grade],
+    })
+    advice_key = "favorable" if net >= 0 else "adverse"
+    advice = overview(QIMEN_VERDICT_ADVICE_FRAME, {"advice": QIMEN_VERDICT_ADVICE[advice_key]})
+    if same:
+        points = [f"值符值使同落{zhi_label}：吉{zhi_good} · 凶{zhi_bad}"]
+    else:
+        points = [
+            f"值符落{zhi_label}：吉{zhi_good} · 凶{zhi_bad}",
+            f"值使落{shi_label}：吉{shi_good} · 凶{shi_bad}",
+        ]
+    return Verdict(grade=grade, stars=stars, headline=headline, points=points, advice=advice)
 
 
 def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> QimenChart:
@@ -234,6 +313,7 @@ def compute_qimen_chart(*, cast_time: datetime, question: str | None = None) -> 
         yima=yima,
         palaces=palaces,
         plain=plain,
+        verdict=build_verdict(palaces),
         provenance=QimenProvenance(
             engine="qimen-luoshu-rotating",
             content_version=CONTENT_VERSION,

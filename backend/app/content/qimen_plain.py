@@ -119,3 +119,35 @@ QIMEN_READINGS: dict[str, str] = {
     **{god_key(name): text for name, text in QIMEN_GOD_MEANINGS.items()},
     **{overview_key(name): text for name, text in QIMEN_OVERVIEW_MEANINGS.items()},
 }
+
+# --- 结论卡片（verdict）装配语料（2026-10-22 verdict-card spec §2b/§4，奇门判定层） ---
+#: 下面三组常量**不进** `QIMEN_READINGS`（工厂键全集仍为 29），由引擎用 `overview()` 实例化，
+#: 故工厂条目/开篇句措辞门扫不到它们，自守门在 `tests/content/test_qimen_verdict_corpus.py`。
+
+#: 总论框架：档位词 + 值符/值使两宫落点 + 一句取向。`{grade}` 取 `verdict.grade_for` 档位词；
+#: `{zhi}`/`{shi}` 由引擎填「N宫」；`{outlook}` 取 `QIMEN_VERDICT_OUTLOOK[grade]`。
+QIMEN_VERDICT_FRAME = (
+    "你这一局值符、值使两宫属{grade}：值符落{zhi}，值使落{shi}，{outlook}。"
+)
+
+#: 各档位收束取向，键 = `verdict.GRADE_BANDS` 五档档位词。槽位词条不成句、不带「。」、
+#: 不带建议词（亦不出现档位字本身，档位由 {grade} 槽注入）。
+QIMEN_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "用神得地，顺势而为",
+    "吉": "用神偏旺，可作主动",
+    "平": "两宫相抵，稳中求进",
+    "小凶": "用神受制，先避让锋芒",
+    "凶": "两宫皆陷，守成为上",
+}
+
+#: 建议句框架：净计数非负走「得地」，净计数为负走「受制」。`{advice}` 取
+#: `QIMEN_VERDICT_ADVICE[键]`，键由引擎按净计数选定。
+QIMEN_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这一局以值符、值使两宫为锚，{advice}。"
+)
+
+#: 两档建议词条，键 = 引擎净计数分支名；槽位词条不成句、不带「。」、不带建议词。
+QIMEN_VERDICT_ADVICE: dict[str, str] = {
+    "favorable": "用神得地，把握主动、顺势推进",
+    "adverse": "用神受制，先稳住阵脚、暂缓出手",
+}

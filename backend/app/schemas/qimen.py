@@ -11,7 +11,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 
 
 class QimenRequest(BaseModel):
@@ -121,6 +121,8 @@ class QimenChart(BaseModel):
     plain: list[PlainSection] = Field(
         description="全局白话：值符主线、值使门线、时干落宫、旬空与驿马四节（逐字取自 content/qimen_plain.py 的框架句）。"
     )
+
+    verdict: Verdict = Field(description="综合结论卡片：档位/星级/结论句/分项/建议，由值符值使两宫吉凶计数判定层合成。")
 
     engine: str = Field(default="qimen-luoshu-rotating")
     provenance: QimenProvenance
