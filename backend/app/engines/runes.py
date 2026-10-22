@@ -15,10 +15,15 @@ filtering them out afterwards:
   returns ``"upright"`` without drawing. The eight rotationally symmetric runes
   therefore never appear reversed in any response, so the reversed-side accessor
   that raises on them is unreachable from here.
-* **A score or a percentage.** Nothing in this module computes one, and the
-  response schema has no field for one. The only statistic shipped is
-  ``aett_balance``, which is a count of what actually fell -- something the
-  reader can verify by counting the stones on screen.
+* **A percentage or an exposed numeric score.** Nothing in this module ships
+  either, and the response schema has no field for them. The only bare
+  statistics shipped are ``aett_balance`` and the verdict's three polarity
+  counts -- counts of what actually fell, which the reader can verify by
+  counting the stones on screen. The verdict card (2026-10-22 增补) carries
+  only a grade band, stars, a composed sentence, count chips and one piece of
+  advice; the internal 0-100 aggregation that picks the band is never exposed,
+  and no percentage appears anywhere (决策 7 仍然有效).
+  极性只按符文本身（``content/rune_polarity.py``），朝向（正逆）不参与吉凶判定。
 
 The engine never invents an adjective either. Where a rune has no reversed
 reading, nothing is written for it; where the blank stone is drawn, the text
@@ -45,10 +50,19 @@ from app.content.rune_futhark import (
     Rune,
     get_rune,
 )
+from app.content.rune_polarity import (
+    RUNE_POLARITY,
+    RUNE_VERDICT_ADVICE,
+    RUNE_VERDICT_ADVICE_FRAME,
+    RUNE_VERDICT_FRAME,
+    RUNE_VERDICT_OUTLOOK,
+)
 from app.content.rune_spreads import SPREADS, Spread, SpreadPosition, get_spread
 from app.core.errors import UnsupportedMethodError
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.plain_compose import overview
-from app.schemas.common import ProvenanceTable
+from app.engines.verdict import grade_for
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.runes import (
     AettCount,
     AettGroup,
@@ -73,6 +87,51 @@ UNASSIGNED_KEY = "wyrd"
 #: 三组的固定次序：按 Kylver 序，也按 `AETT_NAMES` 的声明序。
 AETT_ORDER: tuple[str, ...] = (AETT_FREYJA, AETT_HEIMDALL, AETT_TYR)
 
+#: 极性计数权重（模型参数，MODEL_PARAM_SOURCE）：每枚积极符 +k、每枚消极符 −k，中性符（0）
+#: 不计入抵消。三份卢恩诗只给定性释义（`content/rune_polarity.py`），不给数字，故 k 自署模型
+#: 参数，不是古籍赋分。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.runes import POLARITY_WEIGHT; print(POLARITY_WEIGHT)"` → `8.0`。
+POLARITY_WEIGHT: float = 8.0
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位，加分上抬、减分下压。
+VERDICT_BASE: float = 50.0
+
+#: 上面权重与起点的共同署名：模型参数（非古籍赋分），符文诗只给极性不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+
+def build_verdict(positive: int, negative: int, neutral: int) -> Verdict:
+    """从极性计数确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    不重新判符、不现编中文：档位/星级由 `grade_for(50 + k×(积极−消极))` 派生，
+    headline/advice 套 `rune_polarity` 的框架句，points 是三类符文枚数。中性符不计入
+    抵消（0 极性两边都不靠）。**朝向（正逆）不参与**：极性只按符文本身，逆位是反面
+    参照不是另一次结果（卢恩 spec 决策 6/7）。
+    """
+    net = positive - negative
+    score = max(0.0, min(100.0, VERDICT_BASE + POLARITY_WEIGHT * net))
+    grade, stars = grade_for(score)
+    headline = overview(RUNE_VERDICT_FRAME, {
+        "grade": grade,
+        "positive": str(positive),
+        "negative": str(negative),
+        "neutral": str(neutral),
+        "outlook": RUNE_VERDICT_OUTLOOK[grade],
+    })
+    advice_key = "favorable" if net >= 0 else "adverse"
+    advice = overview(RUNE_VERDICT_ADVICE_FRAME, {"advice": RUNE_VERDICT_ADVICE[advice_key]})
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[
+            f"积极符 {positive} 枚",
+            f"消极符 {negative} 枚",
+            f"中性符 {neutral} 枚",
+        ],
+        advice=advice,
+    )
+
 #: 抽牌口径，原文下发给读者核对（同数字命理把算式规则下发那一条纪律）。
 METHOD = (
     "牌组：Elder Futhark 24 枚，按 Kylver 石碑序；开启空白符时为 25 枚。"
@@ -80,7 +139,9 @@ METHOD = (
     "定向：仅当允许逆位、且该符文字形旋转 180° 后不与自身重合时，才再以同一种熵源独立定向；"
     "八枚对称符（Gebo、Hagalaz、Isa、Jera、Eihwaz、Sowilo、Ingwaz、Dagaz）与空白符恒为正位。"
     "释义：全部取自策展语料，引擎只做选取与串接，不生成语料之外的词句；"
-    "无任何评分、无任何百分比 —— 本页不吃出生时间与地点，没有可以推出那类数字的输入。"
+    "综合结论卡片（2026-10-22 增补）只有档位与星级，无分数、无百分比 —— 本页不吃出生时间与"
+    "地点，没有可以推出那类数字的输入；档位由 24 枚吉凶倾向表对已落符文的极性计数确定性聚合，"
+    "依据三份卢恩诗所载符文义（rune_polarity 表自持归类，模型参数），朝向（正逆）不参与判定。"
 )
 
 
@@ -122,6 +183,16 @@ def draw(
 
     balance = _aett_balance(stones)
 
+    # 极性计数只读 `rune_polarity`、只按符文本身，忽略朝向；Wyrd 不在表内，按中性计。
+    positive = negative = 0
+    for stone in stones:
+        polarity = RUNE_POLARITY.get(stone.key, 0)
+        if polarity > 0:
+            positive += 1
+        elif polarity < 0:
+            negative += 1
+    neutral = len(stones) - positive - negative
+
     return RuneCastResponse(
         spread_id=spread.id,
         spread_name=spread.name,
@@ -136,6 +207,7 @@ def draw(
         synthesis=_synthesis(spread, stones, question, balance, allow_reversed),
         shadow_counsel=_shadow_counsel(stones),
         reversible_note=REVERSIBLE_NOTE,
+        verdict=build_verdict(positive, negative, neutral),
         codex=_codex(),
         provenance=_provenance(len(deck)),
     )

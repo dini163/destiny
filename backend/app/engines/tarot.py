@@ -11,8 +11,18 @@ import secrets
 
 from app.content import CONTENT_VERSION, TAROT_CONTENT_SOURCES
 from app.content.tarot_deck import DECK, Spread, TAROT_SOURCE, get_spread
+from app.content.tarot_polarity import (
+    TAROT_POLARITY,
+    TAROT_VERDICT_ADVICE,
+    TAROT_VERDICT_ADVICE_FRAME,
+    TAROT_VERDICT_FRAME,
+    TAROT_VERDICT_OUTLOOK,
+)
 from app.core.errors import UnsupportedMethodError
-from app.schemas.common import ProvenanceTable
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import overview
+from app.engines.verdict import grade_for
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.tarot import DrawnCard, TarotProvenance, TarotSpreadResponse
 
 # A single OS-backed generator; secrets.SystemRandom is stateless across calls
@@ -33,6 +43,56 @@ NOTE = (
     "串起这些真实字段，未在运行时虚构任何句子；"
     "中文正文与英文原句同行成对呈现，英文侧的字段与取值在本次中文化里一字未改。"
 )
+
+#: 极性计数权重（模型参数，MODEL_PARAM_SOURCE）：每张积极牌 +k、每张消极牌 −k，中性牌（0）
+#: 不计入抵消。伟特牌义只给定性极性（`content/tarot_polarity.py` 的正逆两列），不给数字，
+#: 故 k 自署模型参数，不是古籍赋分。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.tarot import POLARITY_WEIGHT; print(POLARITY_WEIGHT)"` → `8.0`。
+POLARITY_WEIGHT: float = 8.0
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位，加分上抬、减分下压。
+VERDICT_BASE: float = 50.0
+
+#: 上面权重与起点的共同署名：模型参数（非古籍赋分），传统牌义只给极性不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+
+def build_verdict(
+    positive: int, negative: int, neutral: int, major: int, reversed_count: int
+) -> Verdict:
+    """从极性计数确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    不重新判牌、不现编中文：档位/星级由 `grade_for(50 + k×(积极−消极))` 派生，
+    headline/advice 套 `tarot_polarity` 的框架句，points 是三类牌张数加大牌、逆位计数。
+    中性牌不计入抵消（0 极性两边都不靠）。
+    """
+    net = positive - negative
+    score = max(0.0, min(100.0, VERDICT_BASE + POLARITY_WEIGHT * net))
+    grade, stars = grade_for(score)
+    headline = overview(TAROT_VERDICT_FRAME, {
+        "grade": grade,
+        "positive": str(positive),
+        "negative": str(negative),
+        "neutral": str(neutral),
+        "major": str(major),
+        "reversed": str(reversed_count),
+        "outlook": TAROT_VERDICT_OUTLOOK[grade],
+    })
+    advice_key = "favorable" if net >= 0 else "adverse"
+    advice = overview(TAROT_VERDICT_ADVICE_FRAME, {"advice": TAROT_VERDICT_ADVICE[advice_key]})
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[
+            f"积极牌 {positive} 张",
+            f"消极牌 {negative} 张",
+            f"中性牌 {neutral} 张",
+            f"大牌 {major} 张",
+            f"逆位 {reversed_count} 张",
+        ],
+        advice=advice,
+    )
 
 
 def draw_spread(
@@ -84,6 +144,18 @@ def draw_spread(
 
     major_count = sum(1 for c in cards if c.arcana == "major")
     reversed_count = sum(1 for c in cards if c.orientation == "reversed")
+
+    # 极性计数只读 `tarot_polarity` 的正逆两列，引擎不现判牌义；中性牌不计入抵消。
+    positive = negative = 0
+    for card in cards:
+        upright, reversed_polarity, _chapter = TAROT_POLARITY[card.card_id]
+        polarity = reversed_polarity if card.orientation == "reversed" else upright
+        if polarity > 0:
+            positive += 1
+        elif polarity < 0:
+            negative += 1
+    neutral = len(cards) - positive - negative
+
     synthesis = _synthesize(spread, cards, question, major_count, reversed_count, allow_reversed)
 
     return TarotSpreadResponse(
@@ -99,6 +171,7 @@ def draw_spread(
         synthesis=synthesis,
         major_arcana_count=major_count,
         reversed_count=reversed_count,
+        verdict=build_verdict(positive, negative, neutral, major_count, reversed_count),
         provenance=TarotProvenance(
             engine="tarot-content-library",
             content_version=CONTENT_VERSION,

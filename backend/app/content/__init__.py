@@ -35,11 +35,13 @@ from app.content.numerology_pythagorean import PYTHAGOREAN_SOURCE
 from app.content.qimen import QIMEN_SOURCE
 from app.content.qimen_plain import QIMEN_PLAIN_SOURCE
 from app.content.rune_futhark import RUNES_SOURCE
+from app.content.rune_polarity import RUNE_POLARITY_SOURCE
 from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
 from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
+from app.content.tarot_polarity import TAROT_POLARITY_SOURCE
 from app.content.transit_plain import TRANSIT_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
 from app.content.vedic_judgment import JUDGMENT_SOURCE as VEDIC_JUDGMENT_SOURCE
@@ -176,15 +178,19 @@ NUMEROLOGY_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("numerology_loshu", LOSHU_SOURCE),
 )
 
-#: 卢恩一页真正读到的两张表。单列的理由同 `NAME_CONTENT_SOURCES`：混进
-#: `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。两张不多不少：一张管
-#: 24+1 枚符文本体（序位、字形、释义），一张管三种牌阵的位次。它们分开署名而不是
-#: 合成一张，是因为两者的凭据不同：前者的字形可以拿 `unicodedata.name()` 逐字核（客观、
-#: 可单测），后者的位次只是现代通行约定（主观、不可核）—— 合表会把后者的确定性
-#: 抬高到前者的水平（卢恩 spec 决策 24）。版本仍取共用的 `CONTENT_VERSION`，同数字命理。
+#: 卢恩一页真正读到的三张表。单列的理由同 `NAME_CONTENT_SOURCES`：混进
+#: `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。三张不多不少：一张管
+#: 24+1 枚符文本体（序位、字形、释义），一张管三种牌阵的位次，第三张
+#: `rune_polarity` 管 verdict 卡片的 24 枚吉凶倾向（只按符文本身、不看朝向）。
+#: 前两张分开署名而不是合成一张，是因为两者的凭据不同：前者的字形可以拿
+#: `unicodedata.name()` 逐字核（客观、可单测），后者的位次只是现代通行约定
+#: （主观、不可核）—— 合表会把后者的确定性抬高到前者的水平（卢恩 spec 决策 24）。
+#: 第三张凭据又不同：三份卢恩诗只给定性释义，+1/0/-1 是本表自持归类（模型参数），
+#: 故单署 `RUNE_POLARITY_SOURCE`，不借符文诗的确定性。版本仍取共用的 `CONTENT_VERSION`。
 RUNE_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("rune_futhark", RUNES_SOURCE),
     ("rune_spreads", SPREADS_SOURCE),
+    ("rune_polarity", RUNE_POLARITY_SOURCE),
 )
 
 #: 紫微斗数一页真正读到的两张表：十四主星与乙级星之五行/星系、生年干四化、
@@ -225,21 +231,25 @@ LENORMAND_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("lenormand_plain", LENORMAND_PLAIN_SOURCE),
 )
 
-#: 塔罗一页真正读到的四张表：22 张大牌、56 张 minors、装配件（6 阵 29 位次）、529 条关键词
-#: 中译。单列理由同 `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它
-#: 没用过的牌库。`content/tarot_cards.py` **不列**：它带的是 dataclass、两个组装工厂和几张
+#: 塔罗一页真正读到的五张表：22 张大牌、56 张 minors、装配件（6 阵 29 位次）、529 条关键词
+#: 中译，以及 verdict 卡片的 78 张正逆吉凶倾向表 `tarot_polarity`。单列理由同
+#: `ZIWEI_CONTENT_SOURCES`：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的牌库。
+#: `content/tarot_cards.py` **不列**：它带的是 dataclass、两个组装工厂和几张
 #: 查表字典（`SUIT_ELEMENT`、`COURT_RANKS` 这类 `element`/`rank` 取值确实进了响应），但那是
 #: 结构件不是文案——它没有一行是印进页面的句子，列它等于把「读了」稀释成「import 过」
 #: （AGENTS.md §7「读了就列」说的是读文案，不是碰字典）。
 #: 前三行共用 `TAROT_SOURCE`、第四行单独用 `TAROT_KEYWORDS_ZH_SOURCE`：一张自持的现代译表
 #: 与公共领域的牌义不同凭据，抄成同一串就是让译表冒充原典（卢恩 spec 决策 24 的反向运用）。
+#: 第五行 `tarot_polarity` 又不同凭据：伟特只给定性牌义，+1/0/-1 正逆两列是本表自持归类
+#: （模型参数），故单署 `TAROT_POLARITY_SOURCE`，不借原典的确定性。
 #: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c
-#: "from app.content import TAROT_CONTENT_SOURCES; print(len(TAROT_CONTENT_SOURCES))"` → 4。
+#: "from app.content import TAROT_CONTENT_SOURCES; print(len(TAROT_CONTENT_SOURCES))"` → 5。
 TAROT_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("tarot_major", TAROT_SOURCE),
     ("tarot_minor", TAROT_SOURCE),
     ("tarot_deck", TAROT_SOURCE),
     ("tarot_keywords_zh", TAROT_KEYWORDS_ZH_SOURCE),
+    ("tarot_polarity", TAROT_POLARITY_SOURCE),
 )
 
 #: 卡巴拉一页真正读到的两张表：十原质（三柱四界、行星守护、王徽色、大天使与神名）、

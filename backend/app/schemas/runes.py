@@ -22,7 +22,7 @@ honestly (决策 19) instead of the mockup's invented "quantum chaos" claim.
 from pydantic import BaseModel, Field
 
 from app.content.rune_spreads import DEFAULT_SPREAD_ID
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 
 #: 徽标只印方法标识（决策 18）。设计稿的 `#RUNES-FUTHARK-2026-N09` 里那串流水号
 #: 没有任何东西可以推导出来，故砍掉 —— 印一个编出来的编号等于假装有一本登记册。
@@ -223,11 +223,15 @@ class RuneProvenance(BaseModel):
 
 
 class RuneCastResponse(BaseModel):
-    """完整响应。**没有 `score`，也没有任何百分比字段**（决策 6、7）。
+    """完整响应。**没有 `score`，也没有任何百分比字段**（决策 6、7，仍然有效）。
 
-    `aett_balance` 是本页唯一的「统计格」（决策 16）：它是**计数**，不是评分。
+    `aett_balance` 是本页的「统计格」（决策 16）：它是**计数**，不是评分。
     数出「三组各落几枚」是对已发生事实的清点，读者可以自己数着核对；
     而设计稿那五个百分比是凭空来的，没有任何输入可以推出它们。
+
+    `verdict` 是 2026-10-22 增补的综合结论卡片：只有档位词、星级、结论句、分项计数与
+    一句建议，**不含分数也不含百分比**；档位由 24 枚吉凶倾向表对已落符文的极性计数
+    确定性聚合而成，朝向（正逆）不参与判定。
     """
 
     # 牌阵身份
@@ -258,6 +262,9 @@ class RuneCastResponse(BaseModel):
     reversible_note: str = Field(
         description="The 180-degree criterion, printed for the reader to check."
     )
+
+    # 综合结论卡片：档位/星级由已落符文的极性计数确定性聚合，朝向不参与；无分数无百分比。
+    verdict: Verdict = Field(description="综合结论卡片（verdict-card spec §1）。")
 
     # 全典与出处
     codex: RuneCodex

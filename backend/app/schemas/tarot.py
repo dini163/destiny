@@ -6,7 +6,7 @@ so the frontend can consume responses without a mapping layer.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 
 
 class TarotSpreadRequest(BaseModel):
@@ -81,6 +81,9 @@ class TarotSpreadResponse(BaseModel):
     # Derived emphasis
     major_arcana_count: int = Field(description="How many drawn cards are Major Arcana.")
     reversed_count: int = Field(description="How many drawn cards landed reversed.")
+
+    # 综合结论卡片：档位/星级由已抽牌的极性计数确定性聚合，文本全部来自受控框架句。
+    verdict: Verdict = Field(description="综合结论卡片（verdict-card spec §1）。")
 
     provenance: TarotProvenance
 

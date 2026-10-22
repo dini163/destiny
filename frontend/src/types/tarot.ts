@@ -3,7 +3,7 @@
  * snake_case is preserved end-to-end.
  */
 
-import type { ProvenanceTable } from './common';
+import type { ProvenanceTable, Verdict } from './common';
 
 /** Minor-arcana suit; null for major arcana. */
 export type TarotSuit = 'wands' | 'cups' | 'swords' | 'pentacles';
@@ -93,6 +93,9 @@ export interface TarotSpreadResponse {
 
   major_arcana_count: number;
   reversed_count: number;
+
+  /** 综合结论卡片：档位/星级由已抽牌极性计数确定性聚合（verdict-card spec §1）。 */
+  verdict: Verdict;
 
   provenance: TarotProvenance;
 

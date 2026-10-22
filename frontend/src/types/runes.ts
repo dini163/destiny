@@ -33,7 +33,7 @@
  * 写在 `description` 里，前端按同一份闭集收窄，页面 `switch` 才能穷尽。
  */
 
-import type { ProvenanceTable } from './common';
+import type { ProvenanceTable, Verdict } from './common';
 
 /** 三种牌阵：单枚 · 诺伦三女神 · 卢恩十字。 */
 export type RuneSpreadId = 'single' | 'three' | 'five';
@@ -184,7 +184,7 @@ export interface RuneProvenance {
   badge: string;
   /** 24，或开着空白符时 25。 */
   deck_size: number;
-  /** 本端点真读的那两张表。 */
+  /** 本端点真读的那三张表（第三张 `rune_polarity` 是 verdict 吉凶倾向表）。 */
   tables: ProvenanceTable[];
   /** 抽法口径：牌组、不放回、180° 判据。下发是为了让读者能核对结果。 */
   method: string;
@@ -212,7 +212,13 @@ export interface RuneCastRequest {
   question?: string | null;
 }
 
-/** 完整响应。**没有 `score`，也没有任何百分比字段**（决策 6、7）。 */
+/**
+ * 完整响应。**没有 `score`，也没有任何百分比字段**（决策 6、7，仍然有效）。
+ *
+ * `verdict`（2026-10-22 增补）是综合结论卡片：只有档位词、星级、结论句、分项计数与一句
+ * 建议，**不含分数也不含百分比**；档位由 24 枚吉凶倾向表对已落符文的极性计数确定性聚合，
+ * 朝向（正逆）不参与判定。
+ */
 export interface RuneCastResponse {
   spread_id: RuneSpreadId;
   spread_name: string;
@@ -236,6 +242,9 @@ export interface RuneCastResponse {
   shadow_counsel: ShadowNote[] | null;
   /** 180° 判据的文案，印出来供读者自己核。 */
   reversible_note: string;
+
+  /** 综合结论卡片：档位/星级由已落符文极性计数确定性聚合，朝向不参与；无分数无百分比。 */
+  verdict: Verdict;
 
   codex: RuneCodex;
   provenance: RuneProvenance;

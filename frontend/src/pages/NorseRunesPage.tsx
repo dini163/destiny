@@ -5,6 +5,7 @@ import { RuneStoneGrid } from '../components/runes/RuneStoneGrid';
 import { RuneSynthesis } from '../components/runes/RuneSynthesis';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useRunes } from '../hooks/useRunes';
 import type { RuneCastResponse } from '../types/runes';
 
@@ -68,6 +69,8 @@ function RuneResults({ cast }: { cast: RuneCastResponse }) {
           reversibleNote={cast.reversible_note}
         />
       </ResultCard>
+
+      <VerdictCard verdict={cast.verdict} />
 
       <RuneSynthesis synthesis={cast.synthesis} aettBalance={cast.aett_balance} />
 

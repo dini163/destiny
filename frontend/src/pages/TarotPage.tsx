@@ -6,6 +6,7 @@ import { SpreadControls } from '../components/tarot/SpreadControls';
 import { SpreadSummary } from '../components/tarot/SpreadSummary';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useTarotSpread } from '../hooks/useTarotSpread';
 import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../types/tarot';
 
@@ -182,6 +183,8 @@ function TarotResults({
           </ResultCard>
         </div>
       </div>
+
+      <VerdictCard verdict={spread.verdict} />
 
       <ResultCard title="综合解读" eyebrow="SYNTHESIS" icon="seal" elevated>
         <p className="whitespace-pre-line text-sm leading-relaxed text-ink-variant">{spread.synthesis}</p>
