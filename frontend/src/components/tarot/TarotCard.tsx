@@ -1,6 +1,6 @@
 import type { DrawnCard } from '../../types/tarot';
-import { cardAccent, cardCornerLabel, orientationMeta, suitZh } from '../../lib/tarot';
-import { CardEmblem } from './CardEmblem';
+import { cardAccent, cardCornerLabel, orientationMeta } from '../../lib/tarot';
+import { CardArt } from './CardArt';
 
 interface TarotCardProps {
   /** The drawn card occupying this position. */
@@ -17,9 +17,9 @@ interface TarotCardProps {
  * A single spread position: a face-down card that flips to reveal its face.
  *
  * The whole card is a button (keyboard-focusable, `aria-pressed` tracks the
- * flip). The face is rendered purely from real deck fields — corner numeral,
- * suit emblem, bilingual name and orientation badge — with reversed cards shown
- * physically upside-down. No card artwork is fetched or fabricated.
+ * flip). The face renders real deck fields — corner numeral, full-face artwork
+ * from {@link CardArt}, bilingual name and orientation badge — with reversed
+ * cards shown physically upside-down (the whole face rotates 180°).
  */
 export function TarotCard({ card, revealed, selected, onSelect }: TarotCardProps) {
   const accent = cardAccent(card);
@@ -54,9 +54,9 @@ export function TarotCard({ card, revealed, selected, onSelect }: TarotCardProps
               }}
             >
               <div
-                className={`flex h-full flex-col justify-between ${reversed ? 'rotate-180' : ''}`}
+                className={`relative flex h-full flex-col justify-between ${reversed ? 'rotate-180' : ''}`}
               >
-                <div className="flex items-start justify-between gap-1">
+                <div className="relative z-10 flex items-start justify-between gap-1">
                   <span className="numeric text-[13px] font-bold leading-none" style={{ color: accent }}>
                     {cardCornerLabel(card)}
                   </span>
@@ -68,18 +68,12 @@ export function TarotCard({ card, revealed, selected, onSelect }: TarotCardProps
                   </span>
                 </div>
 
-                <div className="flex flex-col items-center gap-1">
-                  <CardEmblem card={card} color={accent} className="h-11 w-11 opacity-90" />
-                  {card.suit ? (
-                    <span className="label-caps text-[8px]" style={{ color: accent }}>
-                      {suitZh(card.suit)}
-                    </span>
-                  ) : (
-                    <span className="label-caps text-[8px] text-gold-soft">大阿</span>
-                  )}
+                {/* 整幅牌面图案铺满中段，编号与牌名浮在它之上 */}
+                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[5px] px-1 py-8">
+                  <CardArt card={card} className="h-full w-full" />
                 </div>
 
-                <div className="flex flex-col gap-0.5">
+                <div className="relative z-10 flex flex-col gap-0.5">
                   <span className="truncate font-display text-[12px] font-semibold leading-tight text-ink">
                     {card.name_zh}
                   </span>

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { DrawnCard } from '../../types/tarot';
 import { arcanaZh, cardAccent, elementZh, orientationMeta, rankZh, suitZh } from '../../lib/tarot';
 import { Icon } from '../ui/Icon';
-import { CardEmblem } from './CardEmblem';
+import { CardArt } from './CardArt';
 
 interface CardInspectorProps {
   /** The selected card, or null before the reader picks one. */
@@ -40,10 +40,10 @@ export function CardInspector({ card }: CardInspectorProps) {
     <div className="flex flex-col gap-5">
       <div className="flex items-start gap-4">
         <span
-          className="flex h-16 w-16 shrink-0 items-center justify-center rounded-card border"
+          className="flex h-[74px] w-[50px] shrink-0 items-center justify-center rounded-card border"
           style={{ borderColor: `${accent}55`, backgroundColor: `${accent}12` }}
         >
-          <CardEmblem card={card} color={accent} className="h-9 w-9" />
+          <CardArt card={card} className="h-[58px] w-[40px] opacity-95" />
         </span>
         <div className="flex min-w-0 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-2">
