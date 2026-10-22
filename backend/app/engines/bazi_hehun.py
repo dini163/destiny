@@ -49,10 +49,13 @@ from app.content.hehun_plain import (
     HEHUN_SCORE_FRAME,
     HEHUN_SECTION_TITLES,
     HEHUN_SYNC_KEYS,
+    HEHUN_TIER_ADVICE,
     HEHUN_TONE_KEYS,
+    HEHUN_VERDICT_ADVICE_FRAME,
 )
 from app.content.wuxing import CONTROLS, GENERATES
 from app.core.errors import DestinyError, TransitRangeError
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_rules import POSITIONS, derive_branch_groups, derive_relations, is_fanyin
@@ -99,7 +102,7 @@ from app.schemas.bazi_hehun import (
     Vigor,
     YiJiKind,
 )
-from app.schemas.common import Gender, PlainSection, ProvenanceTable
+from app.schemas.common import Gender, PlainSection, ProvenanceTable, Verdict
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
@@ -955,6 +958,43 @@ def hehun_plain(
     ]
 
 
+#: 四档 → 星级（署名模型参数，`MODEL_PARAM_SOURCE`；档位只给定性、不给星，单调不减：
+#: 天作之合 5 / 相得益彰 4 / 中和可处 3 / 欠和宜慎 2）。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.bazi_hehun import HEHUN_STARS; print([(k, HEHUN_STARS[k]) for k in ('天作之合','相得益彰','中和可处','欠和宜慎')])"`
+#: → `[('天作之合', 5), ('相得益彰', 4), ('中和可处', 3), ('欠和宜慎', 2)]`。
+HEHUN_STARS: dict[str, int] = {
+    "天作之合": 5,
+    "相得益彰": 4,
+    "中和可处": 3,
+    "欠和宜慎": 2,
+}
+
+
+def hehun_verdict(score: ScoreValue) -> Verdict:
+    """装配综合结论卡片（verdict-card spec §4）。
+
+    档位词取 `score.tier`（`hehun_tier`），星级取署名映射 `HEHUN_STARS`，headline 取现成档位句
+    `HEHUN_TONE_READINGS`（经 HEHUN 工厂 `reading`），advice 套 `HEHUN_VERDICT_ADVICE_FRAME`，
+    points 是加/抵两侧按符号合计（同 `HEHUN_SCORE_FRAME` 口径）；本函数不现编中文。
+    """
+    grade = score.tier
+    plus, minus = _sign_sums(score.factors)
+    headline = reading(HEHUN, HEHUN_TONE_KEYS[grade])
+    advice = overview(HEHUN_VERDICT_ADVICE_FRAME, {
+        "plus": num(plus),
+        "minus": num(minus),
+        "value": num(score.value),
+        "tier_advice": HEHUN_TIER_ADVICE[grade],
+    })
+    return Verdict(
+        grade=grade,
+        stars=HEHUN_STARS[grade],
+        headline=headline,
+        points=[f"往一处加：{num(plus)} 分", f"相互抵掉：{num(minus)} 分"],
+        advice=advice,
+    )
+
+
 # ---------------------------------------------------------------- 轻量轴（spec §7.3）
 #: 一造的大运全表：`公历年 -> 流年`。键的最小值即该造可推的第一年（实测等于出生年）。
 LuckTable = dict[int, AnnualLuck]
@@ -1316,6 +1356,7 @@ def compute_hehun(
         male=partner_profile(pair.male, "male"),
         female=partner_profile(pair.female, "female"),
         score=score,
+        verdict=hehun_verdict(score),
         matrix=pair_matrix(pair),
         fired=hehun_fired(rows),
         complement=complement_chart,

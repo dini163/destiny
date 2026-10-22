@@ -1329,6 +1329,7 @@ def test_the_result_is_the_eleven_sections_the_contract_promised() -> None:
         "male",
         "female",
         "score",
+        "verdict",
         "matrix",
         "fired",
         "complement",
@@ -1342,6 +1343,15 @@ def test_the_result_is_the_eleven_sections_the_contract_promised() -> None:
     assert (result.female.four_pillars, result.female.zodiac) == ("庚午 壬午 辛亥 癸巳", "马")
     assert len(result.matrix) == 16 and len(result.fired) == len(result.score.factors) - 1
     assert (result.score.value, result.score.tier) == (0.0, "欠和宜慎")
+    # 结论卡片：档位词 = score.tier，星级 = 署名映射 HEHUN_STARS，headline 取现成档位句，
+    # points 是加/抵按符号合计。
+    from app.engines.bazi_hehun import HEHUN_STARS
+
+    assert result.verdict.grade == result.score.tier == "欠和宜慎"
+    assert result.verdict.stars == HEHUN_STARS["欠和宜慎"] == 2
+    assert result.verdict.headline == reading(HEHUN, HEHUN_TONE_KEYS[result.score.tier])
+    assert len(result.verdict.points) == 2
+    assert result.verdict.advice
     assert (result.axis.start_year, result.axis.end_year, len(result.axis.rows)) == (2026, 2030, 5)
     assert result.nayin.relation == "我克"
     assert result.model_validate_json(result.model_dump_json()).model_dump() == result.model_dump()

@@ -18,7 +18,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 from app.schemas.bazi import DayunStep, WuxingScore
-from app.schemas.common import CalendarType, PlainSection, ProvenanceTable
+from app.schemas.common import CalendarType, PlainSection, ProvenanceTable, Verdict
 from app.schemas.scoring import ScoreValue
 
 #: 乾/坤。键位即性别（spec §5.1），所以 `HehunProfile` 里没有 `gender` 字段。
@@ -304,6 +304,10 @@ class BaziHehunResult(BaseModel):
     male: HehunPartner
     female: HehunPartner
     score: ScoreValue = Field(description="契合度总分与 29 条族账本（`Σ factors[].delta == value`）。")
+    verdict: Verdict = Field(
+        description="综合结论卡片：档位词（hehun_tier 四档）+ 星级 + 档位句 headline + 加/抵合计分项 + 建议。"
+        "档位词与星级由引擎从契合分派生，档位句取 HEHUN_TONE_READINGS，建议句来自 hehun_plain。"
+    )
     matrix: list[HehunCell] = Field(description="恒 16 格，乾序年→月→日→时 × 坤序年→月→日→时。")
     fired: list[HehunFired] = Field(description="账本贡献行的镜像，逐行带 direction。")
     complement: HehunComplement

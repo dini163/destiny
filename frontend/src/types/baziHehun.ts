@@ -24,7 +24,7 @@
  * 切片 3 定下的简表约定，明细走轴行那两个岁运下钻链接（§7.3）。
  */
 
-import type { CalendarType, PlainSection, ProvenanceTable } from './common';
+import type { CalendarType, PlainSection, ProvenanceTable, Verdict } from './common';
 import type { DayunStep, WuxingScore } from './bazi';
 import type { ScoreValue } from './scoring';
 
@@ -272,6 +272,8 @@ export interface BaziHehunResult {
   female: HehunPartner;
   /** 契合度总分与 29 条族账本（`Σ factors[].delta === value`，含截断行）。 */
   score: ScoreValue;
+  /** 综合结论卡片：档位词 + 星级 + 档位句 headline + 加/抵合计分项 + 建议。 */
+  verdict: Verdict;
   matrix: HehunCell[];
   fired: HehunFired[];
   complement: HehunComplement;
