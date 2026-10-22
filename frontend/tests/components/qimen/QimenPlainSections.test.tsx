@@ -6,6 +6,7 @@ import { afterEach, expect, it } from 'vitest';
 
 import { QimenBoard } from '../../../src/components/qimen/QimenBoard';
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { VerdictCard } from '../../../src/components/ui/VerdictCard';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { QimenChart } from '../../../src/types/qimen';
@@ -81,11 +82,23 @@ it('the page wires the nine palaces into the block; the provenance block was rem
    *  裸 `indexOf` 比较那种「锚点被删后因 -1 照样绿」的空钉形状是终审 I-1 收掉的东西。 */
   pinLiteralOrder(src, [
     '<JuSummary chart={chart} />',
+    '<VerdictCard verdict={chart.verdict} />',
     'title="全局白话"',
     'sections={chart.plain}',
     '<QimenBoard chart={chart} />',
     'sections={chart.palaces.map(',
   ]);
+});
+
+it('综合结论卡片按后端 verdict 渲染档位词与星级排', () => {
+  /** verdict 卡片四要素逐字来自后端（VerdictCard spec §6），夹具是重录后的真实响应。 */
+  render(<VerdictCard verdict={chart.verdict} />);
+  const body = document.body.textContent ?? '';
+  expect(body).toContain(chart.verdict.grade);
+  expect(body).toContain('★'.repeat(chart.verdict.stars));
+  expect(body).toContain('☆'.repeat(5 - chart.verdict.stars));
+  for (const point of chart.verdict.points) expect(body).toContain(point);
+  expect(body).toContain(chart.verdict.advice);
 });
 
 it('the fixture provenance payload still lists both tables the endpoint read', () => {

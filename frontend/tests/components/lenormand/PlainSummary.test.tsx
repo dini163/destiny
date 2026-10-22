@@ -26,6 +26,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { CombinationLens } from '../../../src/components/lenormand/CombinationLens';
+import { VerdictCard } from '../../../src/components/ui/VerdictCard';
 import type { LenormandReading } from '../../../src/types/lenormand';
 import { paragraphByExact, precedes } from '../../lib/prose';
 import { pinLiteralOrder } from '../../lib/sourcePin';
@@ -109,5 +110,23 @@ describe('雷诺曼整阵白话', () => {
 
   it('出处把两张读过的表都递出', () => {
     expect(reading.provenance.tables.map((t) => t.name)).toEqual(['lenormand', 'lenormand_plain']);
+  });
+
+  it('综合结论卡片按后端 verdict 渲染档位词与星级排', () => {
+    /** verdict 卡片四要素逐字来自后端，前端不增一字（VerdictCard spec §6）。夹具是重录后的
+     *  真实响应，档位/星级由后端极性计数判定层给出。 */
+    render(<VerdictCard verdict={reading.verdict} />);
+    const body = document.body.textContent ?? '';
+    expect(body).toContain(reading.verdict.grade);
+    expect(body).toContain('★'.repeat(reading.verdict.stars));
+    expect(body).toContain('☆'.repeat(5 - reading.verdict.stars));
+    for (const point of reading.verdict.points) expect(body).toContain(point);
+    expect(body).toContain(reading.verdict.advice);
+  });
+
+  it('页面把 verdict 卡片挂在综合判读卡之前', () => {
+    const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
+    expect(page).toContain('<VerdictCard verdict={reading.verdict} />');
+    pinLiteralOrder(page, ['<VerdictCard verdict={reading.verdict} />', '{reading.synthesis}']);
   });
 });

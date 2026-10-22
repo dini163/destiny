@@ -24,6 +24,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { VerdictCard } from '../../../src/components/ui/VerdictCard';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { TransitChart } from '../../../src/types/transit';
@@ -170,4 +171,24 @@ it('the provenance block is removed per the 2026-10-21 UI requirement', () => {
    *  三行表的名字/版本/出处串形状仍由上一条夹具内容凭据钉住，页面这一侧不再渲染。 */
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).not.toContain('<Provenance');
+});
+
+it('综合结论卡片按后端 verdict 渲染档位词与星级排', () => {
+  /** verdict 卡片四要素逐字来自后端（VerdictCard spec §6），夹具是重录后的真实响应。 */
+  render(<VerdictCard verdict={chart.verdict} />);
+  const body = document.body.textContent ?? '';
+  expect(body).toContain(chart.verdict.grade);
+  expect(body).toContain('★'.repeat(chart.verdict.stars));
+  expect(body).toContain('☆'.repeat(5 - chart.verdict.stars));
+  for (const point of chart.verdict.points) expect(body).toContain(point);
+  expect(body).toContain(chart.verdict.advice);
+});
+
+it('页面把 verdict 卡片挂在 SummaryStrip 之后、层切换之前', () => {
+  const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
+  expect(src).toContain('<VerdictCard verdict={chart.verdict} />');
+  pinLiteralOrder(src, [
+    '<SummaryStrip chart={chart} />',
+    '<VerdictCard verdict={chart.verdict} />',
+  ]);
 });

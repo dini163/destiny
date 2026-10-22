@@ -25,6 +25,7 @@ import { cleanup, render } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
 
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { VerdictCard } from '../../../src/components/ui/VerdictCard';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { WesternChart } from '../../../src/types/western';
@@ -108,4 +109,24 @@ it('the provenance panel is handed the three plain tables in roster order', () =
     expect(table.version).toBeTruthy();
     expect(table.source).toContain('自撰');
   }
+});
+
+it('综合结论卡片按后端 verdict 渲染档位词与星级排', () => {
+  /** verdict 卡片四要素逐字来自后端（VerdictCard spec §6），夹具是重录后的真实响应。 */
+  render(<VerdictCard verdict={chart.verdict} />);
+  const body = document.body.textContent ?? '';
+  expect(body).toContain(chart.verdict.grade);
+  expect(body).toContain('★'.repeat(chart.verdict.stars));
+  expect(body).toContain('☆'.repeat(5 - chart.verdict.stars));
+  for (const point of chart.verdict.points) expect(body).toContain(point);
+  expect(body).toContain(chart.verdict.advice);
+});
+
+it('页面把 verdict 卡片挂在 ChartSummary 之后', () => {
+  const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
+  expect(src).toContain('<VerdictCard verdict={chart.verdict} />');
+  pinLiteralOrder(src, [
+    '<ChartSummary chart={chart} />',
+    '<VerdictCard verdict={chart.verdict} />',
+  ]);
 });
