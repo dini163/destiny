@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 
 import type { CalendarType } from '../../types/common';
@@ -44,8 +44,18 @@ interface InputBarProps {
    * the birth data. Seeds the boxes once; a mounted console stays under the user's edits.
    */
   initial?: BirthInputValues;
+  /**
+   * Re-fill the fields whenever this value changes (e.g. the user picked a saved
+   * profile). Unlike `initial`, applying is explicit: every non-null change
+   * overwrites the current boxes. Pages pass `profileToBirthInput(profile)`.
+   */
+  preset?: BirthInputValues | null;
   /** System-specific controls (e.g. gender, house system) rendered in the grid. */
   children?: ReactNode;
+  /** Toolbar rendered beside the submit button (e.g. the profile picker). */
+  profilePicker?: ReactNode;
+  /** When set, renders a 存入档案 button that emits the current values for the page to persist. */
+  onSaveProfile?: (values: BirthInputValues) => void;
   /** Primary button label. */
   submitLabel: string;
   /** Disable the button and show a busy state while a request is in flight. */
@@ -72,7 +82,10 @@ export function InputBar({
   requireLatitude = false,
   footerSlot,
   initial,
+  preset,
   children,
+  profilePicker,
+  onSaveProfile,
   submitLabel,
   pending = false,
   onSubmit,
@@ -86,25 +99,42 @@ export function InputBar({
     longitude: initial?.longitude ?? null,
   });
 
+  // A picked profile overwrites every field at once (see the `preset` doc).
+  useEffect(() => {
+    if (!preset) return;
+    setBirthDate(preset.birth_date ?? '');
+    setBirthTime(preset.birth_time ?? '');
+    if (preset.calendar) setCalendar(preset.calendar);
+    setLocation({
+      city: preset.city ?? null,
+      latitude: preset.latitude ?? null,
+      longitude: preset.longitude ?? null,
+    });
+  }, [preset]);
+
   const ready =
     birthDate !== '' &&
     birthTime !== '' &&
     location.longitude != null &&
     (!requireLatitude || location.latitude != null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-    if (!ready || pending) {
-      return;
-    }
-    onSubmit({
+  function buildValues(): BirthInputValues {
+    return {
       birth_date: birthDate,
       birth_time: birthTime,
       calendar: showCalendar ? calendar : undefined,
       city: location.city ?? null,
       latitude: location.latitude ?? null,
       longitude: location.longitude ?? null,
-    });
+    };
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    if (!ready || pending) {
+      return;
+    }
+    onSubmit(buildValues());
   }
 
   return (
@@ -126,10 +156,25 @@ export function InputBar({
             ) : null}
           </div>
         </div>
-        <button type="submit" className="btn-primary shrink-0" disabled={!ready || pending}>
-          <Icon name="sparkle" size={18} />
-          {submitLabel}
-        </button>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {profilePicker}
+          {onSaveProfile ? (
+            <button
+              type="button"
+              className="btn-ghost shrink-0"
+              disabled={!birthDate || !birthTime}
+              title={birthDate && birthTime ? '把当前生辰与出生地存入本地档案' : '填写生辰后即可存入档案'}
+              onClick={() => onSaveProfile(buildValues())}
+            >
+              <Icon name="vault" size={18} />
+              存入档案
+            </button>
+          ) : null}
+          <button type="submit" className="btn-primary shrink-0" disabled={!ready || pending}>
+            <Icon name="sparkle" size={18} />
+            {submitLabel}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-12">
