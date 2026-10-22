@@ -42,8 +42,10 @@ from app.content.tarot_deck import TAROT_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.transit_plain import TRANSIT_PLAIN_SOURCE
 from app.content.vedic import VEDIC_SOURCE
+from app.content.vedic_judgment import JUDGMENT_SOURCE as VEDIC_JUDGMENT_SOURCE
 from app.content.vedic_plain import VEDIC_PLAIN_SOURCE
 from app.content.western_plain import WESTERN_PLAIN_NOTE, WESTERN_PLAIN_SOURCE
+from app.content.zhouyi_duanci import DUANCI_SOURCE as ZHOUYI_DUANCI_SOURCE
 from app.content.zhouyi_hexagrams import ZHOUYI_HEXAGRAMS_SOURCE
 from app.content.zhouyi_najia import ZHOUYI_NAJIA_SOURCE
 from app.content.zhouyi_plain import ZHOUYI_PLAIN_SOURCE
@@ -248,15 +250,16 @@ KABBALAH_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("kabbalah_plain", KABBALAH_PLAIN_SOURCE),
 )
 
-#: 吠陀占星一页真正读到的三张表：恒星黄道十二星座、九曜（Navagraha）、27 宿
+#: 吠陀占星一页真正读到的四张表：恒星黄道十二星座、九曜（Navagraha）、27 宿
 #: （Nakshatra，各含守护曜与主神）与 Vimshottari 大运值年序；外加自撰白话表的两半
 #: （落座/宿/主事星与落宫分住 `vedic_plain`、`vedic_plain_gruha`，同一张自撰表的两半，
-#: 与行运页的 `TRANSIT_OVERLAY_CONTENT_SOURCES` 同形）。单列理由同
-#: `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它们。
+#: 与行运页的 `TRANSIT_OVERLAY_CONTENT_SOURCES` 同形），以及结论卡片用的九曜自然吉凶与
+#: 擢升/陷落表 `vedic_judgment`。单列理由同 `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它们。
 VEDIC_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("vedic", VEDIC_SOURCE),
     ("vedic_plain", VEDIC_PLAIN_SOURCE),
     ("vedic_plain_gruha", VEDIC_PLAIN_SOURCE),
+    ("vedic_judgment", VEDIC_JUDGMENT_SOURCE),
 )
 
 #: 西洋合盘一页真正读到的三张表：相契度赋分权重（相位基准分、核心羁绊强调、
@@ -299,10 +302,10 @@ MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("zhouyi_text", ZHOUYI_SOURCE),
 )
 
-#: 周易一页真正读到的五张表：三张《周易》通行本（八卦、六十四卦卦序卦画、卦爻辞正文）、
-#: 一张京房纳甲与六神起例，以及逐条转述它们的今译表。单列理由同 `ZIWEI_CONTENT_SOURCES`：
-#: 主八字盘不引用它们。三张 `zhouyi_*` 的出处串与 `MEIHUA_CONTENT_SOURCES` 共用同一份常量
-#: （丁组计划偏差表第 5 行）。
+#: 周易一页真正读到的六张表：三张《周易》通行本（八卦、六十四卦卦序卦画、卦爻辞正文）、
+#: 一张京房纳甲与六神起例、一张逐条转述它们的今译表，外加结论卡片用的断占辞受控词表。
+#: 单列理由同 `ZIWEI_CONTENT_SOURCES`：主八字盘不引用它们。三张 `zhouyi_*` 的出处串与
+#: `MEIHUA_CONTENT_SOURCES` 共用同一份常量（丁组计划偏差表第 5 行）。
 #: **不列 `content/wuxing`**：全站口径是「它自维护的五行生克**文案**不转述进响应，故不进 tables」
 #: （本文件 `MEIHUA_CONTENT_SOURCES` 注里写的同一条，八字同样不列，复测：
 #: `cd backend && grep -n "wuxing" app/content/__init__.py` → 只命中注释行，一张清单都没列它）。
@@ -312,11 +315,12 @@ MEIHUA_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
 #: （`engines/zhouyi.py:224`，复测：`cd backend && grep -n "branch_element=ZHI_ELEMENT" app/engines/zhouyi.py` → 224），
 #: 丁组 spec §5 因此要求列它——本计划不因一个系统破全站口径。
 #: 代价：若日后裁定要列，周易与八字两家一起动，不在本期（偏差表第 1 行）。
-#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 5。
+#: 条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 6。
 ZHOUYI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("zhouyi_trigrams", ZHOUYI_TRIGRAMS_SOURCE),
     ("zhouyi_hexagrams", ZHOUYI_HEXAGRAMS_SOURCE),
     ("zhouyi_najia", ZHOUYI_NAJIA_SOURCE),
     ("zhouyi_text", ZHOUYI_SOURCE),
     ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE),
+    ("zhouyi_duanci", ZHOUYI_DUANCI_SOURCE),
 )

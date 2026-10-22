@@ -8,6 +8,7 @@ import { HexagramStack } from '../components/zhouyi/HexagramStack';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useZhouyiCast } from '../hooks/useZhouyiCast';
 import { defaultManualCoins, methodLabel, positionLabel } from '../lib/zhouyi';
 import type { CoinFace } from '../lib/zhouyi';
@@ -91,6 +92,8 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
   return (
     <>
       <CastSummary cast={cast} />
+
+      <VerdictCard verdict={cast.verdict} />
 
       <ResultCard title="整卦白话" eyebrow="OVERALL READING · WHOLE HEXAGRAM" icon="sparkle" elevated>
         <PlainSectionList sections={cast.plain} />

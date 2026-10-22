@@ -16,7 +16,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 
 
 class CastMethod(str, Enum):
@@ -136,6 +136,10 @@ class ZhouyiCast(BaseModel):
     # Lines
     moving_positions: list[int] = Field(description="Moving-line positions (1-6, bottom-to-top).")
     lines: list[ZhouyiLine] = Field(description="The six dressed lines of the primary hexagram.")
+
+    verdict: Verdict = Field(
+        description="综合结论卡片：卦辞与动爻爻辞断辞词频净值折算的五档结论（verdict-card spec）。"
+    )
 
     provenance: ZhouyiProvenance = Field(description="出处块：五张表 + 历法来源 + 语料版本。")
 

@@ -3,7 +3,7 @@
  * snake_case is preserved end-to-end.
  */
 
-import type { PlainSection, ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable, Verdict } from './common';
 
 /** How the hexagram is cast. */
 export type CastMethod = 'three_coin' | 'manual' | 'time';
@@ -137,6 +137,9 @@ export interface ZhouyiCast {
   moving_positions: number[];
   /** The six dressed lines of the primary hexagram. */
   lines: ZhouyiLine[];
+
+  /** 综合结论卡片：卦辞与动爻爻辞断辞词频净值折算的五档结论。 */
+  verdict: Verdict;
 
   provenance: ZhouyiProvenance;
 

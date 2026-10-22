@@ -16,8 +16,11 @@ day pillar (for 六神) and the lunar numbers (for the time method) come from
 The 卦辞/爻辞 vernacular retellings are looked up one key at a time (``reading``);
 the whole-hexagram reading is likewise a lookup (one table row per King Wen number),
 and the only formatting is the moving-line frame that states how many lines moved.
-No ``compose`` ranking: 450 line rows carry nothing to merge or rank, and a stitched
-summary would be a new judgment (spec §5).
+
+旧裁定（丁组 spec §7 规则 5「六爻无分数、无档位，白话层不新建判断」）已于 verdict
+轮推翻：白话块本身仍不合成排名（450 条逐爻今译无物可合并），综合吉凶改由独立的
+结论卡片承担——断辞词频净值经受控词表（``content/zhouyi_duanci.py``）折算成 0-100
+倾向分，再交共享 ``grade_for`` 换档，判定层与今译白话层分开。
 """
 
 from datetime import datetime
@@ -27,10 +30,14 @@ from lunar_python import Solar
 
 from app.content import CONTENT_VERSION, ZHOUYI_CONTENT_SOURCES, zhouyi_text
 from app.content.wuxing import CONTROLLED_BY, GENERATES, GENERATED_BY, ZHI_ELEMENT
+from app.content.zhouyi_duanci import NEGATIVE_WORDS, POSITIVE_WORDS
 from app.content.zhouyi_hexagrams import Hexagram, hexagram_from_lines, hexagram_from_trigrams
 from app.content.zhouyi_najia import liushen_for_day_gan, najia_for_hexagram
 from app.content.zhouyi_plain import (
     ZHOUYI_MOVE_FRAME,
+    ZHOUYI_VERDICT_ADVICE,
+    ZHOUYI_VERDICT_OUTLOOK,
+    ZHOUYI_VERDICT_SUMMARY_FRAME,
     gua_ci_key,
     overall_key,
     yao_ci_key,
@@ -38,10 +45,12 @@ from app.content.zhouyi_plain import (
 )
 from app.content.zhouyi_trigrams import TRIGRAM_BY_KEY, TRIGRAM_BY_MEIHUA
 from app.core.errors import InvalidCastInputError
+from app.core.provenance import MODEL_PARAM_SOURCE
 # 同层 engines 互引合规（AGENTS §1 只禁 `engines → api`），先例 `engines/qimen.py:50-51`。
 from app.engines.plain_compose import overview, reading
 from app.engines.plain_corpora import ZHOUYI
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.engines.verdict import grade_for
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 from app.schemas.zhouyi import CastMethod, HexagramInfo, ZhouyiCast, ZhouyiLine, ZhouyiProvenance
 
 # An OS-backed CSPRNG (never the ``random`` module) for coin/time casting.
@@ -187,6 +196,64 @@ def _hexagram_info(hexagram: Hexagram) -> HexagramInfo:
     )
 
 
+# --- 综合结论卡片（verdict）：断辞词频净值 → 倾向分 → 共享五档 -----------------
+
+#: 每条净断辞的倾向分步进。古籍只给定性吉凶、不给数，故为本系统模型参数（同
+#: `MODEL_PARAM_SOURCE` 口径），不是古籍赋分；阈值换档交给共享 `grade_for`。
+_DUANCI_WEIGHT = 6.0
+_DUANCI_BASE = 50.0
+
+
+def _duanci_counts(text: str) -> tuple[int, int]:
+    """统计一段经文里正向/负向受控断辞的条数。
+
+    「无咎」是一个完整占辞，先数并从文本剔除，裸「咎」才归负向，否则无咎被双记；
+    其余正向词（吉/亨/利）与负向词（凶/吝/悔/咎/厉）各自按出现次数累加。
+    """
+    working = text
+    positive = working.count(POSITIVE_WORDS[0])  # 首项恒为「无咎」
+    working = working.replace(POSITIVE_WORDS[0], "")
+    for word in POSITIVE_WORDS[1:]:
+        positive += working.count(word)
+    negative = sum(working.count(word) for word in NEGATIVE_WORDS)
+    return positive, negative
+
+
+def _build_verdict(*, ben: HexagramInfo, lines: list[ZhouyiLine]) -> Verdict:
+    """装配结论卡片：卦辞（含用九用六）+ 动爻爻辞的断辞净值折算倾向分。
+
+    无动爻时只数卦辞（丁组 spec 旧裁定「无动爻只用卦辞」的沿用）；headline/advice
+    全部来自 `zhouyi_plain` 的受控框架句，本函数不现编中文。
+    """
+    gua_pos, gua_neg = _duanci_counts(ben.gua_ci + (ben.yong_ci or ""))
+    moving_text = "".join(line.yao_ci for line in lines if line.moving)
+    yao_pos, yao_neg = _duanci_counts(moving_text) if moving_text else (0, 0)
+    net = (gua_pos + yao_pos) - (gua_neg + yao_neg)
+    score = min(100.0, max(0.0, _DUANCI_BASE + net * _DUANCI_WEIGHT))
+    grade, stars = grade_for(score)
+    headline = overview(ZHOUYI_VERDICT_SUMMARY_FRAME, {
+        "grade": grade,
+        "gua_pos": str(gua_pos),
+        "gua_neg": str(gua_neg),
+        "yao_pos": str(yao_pos),
+        "yao_neg": str(yao_neg),
+        "outlook": ZHOUYI_VERDICT_OUTLOOK[grade],
+    })
+    points = [
+        f"卦辞断辞：正向{gua_pos}条、负向{gua_neg}条",
+        (f"动爻爻辞断辞：正向{yao_pos}条、负向{yao_neg}条" if moving_text
+         else "六爻安静：无动爻爻辞可断"),
+        f"正向合计{gua_pos + yao_pos}条、负向合计{gua_neg + yao_neg}条，净值{net:+d}",
+    ]
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=points,
+        advice=ZHOUYI_VERDICT_ADVICE[grade],
+    )
+
+
 # --- Public entry point -----------------------------------------------------
 
 
@@ -259,17 +326,19 @@ def cast_hexagram(
             )
         )
 
+    ben_info = _hexagram_info(ben)
     return ZhouyiCast(
         method=method.value,
         question=question,
         cast_time=cast_time.strftime("%Y-%m-%d %H:%M"),
         day_ganzhi=day_ganzhi,
-        ben=_hexagram_info(ben),
+        ben=ben_info,
         bian=_hexagram_info(bian) if bian is not None else None,
         hu=_hexagram_info(hu),
         plain=plain,
         moving_positions=moving_positions,
         lines=lines,
+        verdict=_build_verdict(ben=ben_info, lines=lines),
         provenance=zhouyi_provenance(),
     )
 

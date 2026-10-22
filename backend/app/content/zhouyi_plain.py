@@ -87,6 +87,33 @@ ZHOUYI_MOVE_FRAME = (
     "下面这一句讲的是转过去之后那边的处境。"
 )
 
+# --- 结论卡片（verdict）框架句：全部受控，引擎只填槽，不现编中文 -----------------
+#: 本系统无页面档位词，档位走共享五档（`engines/verdict.GRADE_BANDS`：大吉/吉/平/小凶/凶）。
+#: `ZHOUYI_VERDICT_OUTLOOK[grade]` 是各档收束取向（不成句、不带「。」）；
+#: `ZHOUYI_VERDICT_SUMMARY_FRAME` 是结论句框架，槽位全部来自断辞计数；
+#: `ZHOUYI_VERDICT_ADVICE[grade]` 是逐档一句建议，直接取用不再填槽。
+
+ZHOUYI_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "正向断辞占优，所谋可进",
+    "吉": "正向断辞居多，顺势可成",
+    "平": "正负断辞相抵，静观其变",
+    "小凶": "负向断辞偏重，宜守不宜进",
+    "凶": "断辞多负向，先退一步稳住",
+}
+
+ZHOUYI_VERDICT_SUMMARY_FRAME = (
+    "此占断辞属{grade}：卦辞（含用九用六）得正向{gua_pos}条、负向{gua_neg}条，"
+    "动爻爻辞得正向{yao_pos}条、负向{yao_neg}条，{outlook}。"
+)
+
+ZHOUYI_VERDICT_ADVICE: dict[str, str] = {
+    "大吉": "势头正盛可放手去做，得志时仍要给边界留余地。",
+    "吉": "正向居多值得把握，推进时留意卦辞划出的边界。",
+    "平": "好坏相抵不必强求，先把眼前一步走稳再谈进展。",
+    "小凶": "负向偏重不宜冒进，先守住脚下，等局面松动再动。",
+    "凶": "此时宜守不宜攻，先把基本盘稳住，不做重大决断。",
+}
+
 #: 64 条整卦总论（批次一 spec §4）：键 = King Wen 序，句首 = 卦的全名。
 #: 只讲局势与势头，不角色化（不出现本卦/变卦/互卦/之卦——同一张表两边都用），
 #: 不下建议、不预告事件；每句的字数与措辞契约由 `tests/content/test_zhouyi_plain_corpus.py` 钉。
