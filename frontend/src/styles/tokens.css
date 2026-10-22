@@ -208,3 +208,123 @@
     animation: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Kabbalah Tree motion — Remotion-style narrative animation: the light
+ * descends from the crown, so Sephiroth fade in top-down while paths draw
+ * themselves, halos breathe slowly and a selection ripple fans out. All
+ * animations are decorative; colours stay inside the Celestial Obsidian
+ * palette. Plain CSS (outside @layer) so it is never purged.
+ * ------------------------------------------------------------------------ */
+@keyframes kabbalah-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes kabbalah-path-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes kabbalah-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes kabbalah-crown-breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+@keyframes kabbalah-pillar-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes kabbalah-ripple {
+  from {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes kabbalah-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kabbalah-node {
+  animation: kabbalah-node-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.kabbalah-path-grow {
+  animation: kabbalah-path-draw 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.kabbalah-halo {
+  animation: kabbalah-breathe 4.2s ease-in-out infinite;
+}
+.kabbalah-halo-static {
+  animation: none;
+}
+.kabbalah-crown-glow {
+  animation: kabbalah-crown-breathe 6.5s ease-in-out infinite;
+}
+.kabbalah-pillar {
+  animation: kabbalah-pillar-breathe 5.5s ease-in-out infinite;
+}
+.kabbalah-ripple {
+  animation: kabbalah-ripple 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.kabbalah-reveal {
+  animation: kabbalah-reveal 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kabbalah-node,
+  .kabbalah-path-grow,
+  .kabbalah-halo,
+  .kabbalah-halo-static,
+  .kabbalah-crown-glow,
+  .kabbalah-pillar,
+  .kabbalah-ripple,
+  .kabbalah-reveal {
+    animation: none;
+  }
+  .kabbalah-node,
+  .kabbalah-reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .kabbalah-path-grow {
+    stroke-dashoffset: 0;
+  }
+}
