@@ -9,6 +9,11 @@ interface TarotCardProps {
   revealed: boolean;
   /** Whether this card is the one shown in the inspector. */
   selected: boolean;
+  /**
+   * Play the periodic flip nudge that tells the reader a face-down card can be
+   * turned over. Ignored once the card itself is revealed.
+   */
+  hint?: boolean;
   /** Flip + select the card. */
   onSelect: () => void;
 }
@@ -19,9 +24,11 @@ interface TarotCardProps {
  * The whole card is a button (keyboard-focusable, `aria-pressed` tracks the
  * flip). The face renders real deck fields — corner numeral, full-face artwork
  * from {@link CardArt}, bilingual name and orientation badge — with reversed
- * cards shown physically upside-down (the whole face rotates 180°).
+ * cards shown physically upside-down (the whole face rotates 180°). The outer
+ * wrapper carries the optional {@link TarotCardProps.hint} tilt so it never
+ * competes with the inner flip transition.
  */
-export function TarotCard({ card, revealed, selected, onSelect }: TarotCardProps) {
+export function TarotCard({ card, revealed, selected, hint = false, onSelect }: TarotCardProps) {
   const accent = cardAccent(card);
   const orientation = orientationMeta(card.orientation);
   const reversed = card.orientation === 'reversed';
@@ -36,50 +43,54 @@ export function TarotCard({ card, revealed, selected, onSelect }: TarotCardProps
     >
       <div className="[perspective:1200px]">
         <div
-          className={`relative h-[204px] w-[128px] transition-transform duration-500 [transform-style:preserve-3d] sm:h-[250px] sm:w-[160px] ${
-            revealed ? '[transform:rotateY(180deg)]' : ''
-          }`}
+          className={`[transform-style:preserve-3d] ${hint && !revealed ? 'tarot-card-hint' : ''}`}
         >
-          <CardBack selected={selected} />
-          <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <div
-              className={`flex h-full w-full flex-col rounded-card border p-2.5 transition-colors ${
-                selected ? 'border-gold-strong' : 'border-rim group-hover:border-rim-strong'
-              }`}
-              style={{
-                background: 'linear-gradient(160deg, #1b2130 0%, #12161f 55%, #0b0d13 100%)',
-                boxShadow: selected
-                  ? '0 0 0 1px rgba(212,175,55,0.45), 0 10px 28px -10px rgba(0,0,0,0.85)'
-                  : '0 8px 22px -12px rgba(0,0,0,0.8)',
-              }}
-            >
+          <div
+            className={`relative h-[204px] w-[128px] transition-transform duration-500 [transform-style:preserve-3d] sm:h-[250px] sm:w-[160px] ${
+              revealed ? '[transform:rotateY(180deg)]' : ''
+            }`}
+          >
+            <CardBack selected={selected} />
+            <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
               <div
-                className={`relative flex h-full flex-col justify-between ${reversed ? 'rotate-180' : ''}`}
+                className={`flex h-full w-full flex-col rounded-card border p-2.5 transition-colors ${
+                  selected ? 'border-gold-strong' : 'border-rim group-hover:border-rim-strong'
+                }`}
+                style={{
+                  background: 'linear-gradient(160deg, #1b2130 0%, #12161f 55%, #0b0d13 100%)',
+                  boxShadow: selected
+                    ? '0 0 0 1px rgba(212,175,55,0.45), 0 10px 28px -10px rgba(0,0,0,0.85)'
+                    : '0 8px 22px -12px rgba(0,0,0,0.8)',
+                }}
               >
-                <div className="relative z-10 flex items-start justify-between gap-1">
-                  <span className="numeric text-[15px] font-bold leading-none" style={{ color: accent }}>
-                    {cardCornerLabel(card)}
-                  </span>
-                  <span
-                    className="rounded-[3px] px-1 py-0.5 text-[10px] font-semibold leading-none"
-                    style={{ color: orientation.color, backgroundColor: `${orientation.color}1f` }}
-                  >
-                    {orientation.label}
-                  </span>
-                </div>
+                <div
+                  className={`relative flex h-full flex-col justify-between ${reversed ? 'rotate-180' : ''}`}
+                >
+                  <div className="relative z-10 flex items-start justify-between gap-1">
+                    <span className="numeric text-[15px] font-bold leading-none" style={{ color: accent }}>
+                      {cardCornerLabel(card)}
+                    </span>
+                    <span
+                      className="rounded-[3px] px-1 py-0.5 text-[10px] font-semibold leading-none"
+                      style={{ color: orientation.color, backgroundColor: `${orientation.color}1f` }}
+                    >
+                      {orientation.label}
+                    </span>
+                  </div>
 
-                {/* 整幅牌面图案铺满中段，编号与牌名浮在它之上 */}
-                <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[5px] px-1 py-8">
-                  <CardArt card={card} className="h-full w-full" />
-                </div>
+                  {/* 整幅牌面图案铺满中段，编号与牌名浮在它之上 */}
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[5px] px-1 py-8">
+                    <CardArt card={card} className="h-full w-full" />
+                  </div>
 
-                <div className="relative z-10 flex flex-col gap-0.5">
-                  <span className="truncate font-display text-[14px] font-semibold leading-tight text-ink">
-                    {card.name_zh}
-                  </span>
-                  <span className="truncate text-[9px] uppercase leading-tight tracking-wide text-ink-muted">
-                    {card.name}
-                  </span>
+                  <div className="relative z-10 flex flex-col gap-0.5">
+                    <span className="truncate font-display text-[14px] font-semibold leading-tight text-ink">
+                      {card.name_zh}
+                    </span>
+                    <span className="truncate text-[9px] uppercase leading-tight tracking-wide text-ink-muted">
+                      {card.name}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

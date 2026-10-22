@@ -18,9 +18,13 @@ interface SpreadBoardProps {
  * A single centred flex-wrap grid adapts to every spread size (1, 3, 5 or 10
  * cards) without a per-layout special case, over a faint sacred-geometry
  * watermark echoing the oracle chamber. Flip and selection state live in the
- * page; the board only renders it.
+ * page; the board only renders it. Until the reader turns a card, the lead
+ * position plays a periodic flip nudge so the face-down backs read as cards to
+ * open rather than artwork-less fronts.
  */
 export function SpreadBoard({ cards, revealed, selected, onCardSelect }: SpreadBoardProps) {
+  const showLeadHint = revealed.size === 0;
+
   return (
     <div className="relative">
       <div
@@ -36,12 +40,13 @@ export function SpreadBoard({ cards, revealed, selected, onCardSelect }: SpreadB
       </div>
 
       <div className="relative flex flex-wrap items-start justify-center gap-x-4 gap-y-7 py-2 sm:gap-x-7">
-        {cards.map((card) => (
+        {cards.map((card, index) => (
           <TarotCard
             key={card.position_index}
             card={card}
             revealed={revealed.has(card.position_index)}
             selected={selected === card.position_index}
+            hint={index === 0 && showLeadHint}
             onSelect={() => onCardSelect(card.position_index)}
           />
         ))}
