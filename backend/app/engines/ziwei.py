@@ -15,7 +15,16 @@ algorithms reproduce the published 安紫微诀 tables (e.g. 火六局 初一→
 from datetime import date, time
 
 from app.content import CONTENT_VERSION, ZIWEI_CONTENT_SOURCES, ZIWEI_SOURCE, ziwei_plain
-from app.content.ziwei_plain import ZIWEI_LUCK_FRAME, ZIWEI_MING_FRAME, overall_key
+from app.content.ziwei_plain import (
+    ZIWEI_COMPONENT_ADVICE,
+    ZIWEI_LUCK_FRAME,
+    ZIWEI_MING_FRAME,
+    ZIWEI_VERDICT_ADVICE_FRAME,
+    ZIWEI_VERDICT_BALANCED_FRAME,
+    ZIWEI_VERDICT_FRAME,
+    ZIWEI_VERDICT_OUTLOOK,
+    overall_key,
+)
 from app.content.bazi_nayin import nayin_meaning
 from app.content.ziwei import (
     GAN,
@@ -38,10 +47,12 @@ from app.content.ziwei import (
     ZHI_INDEX,
     ZIWEI_SERIES,
 )
+from app.core.provenance import MODEL_PARAM_SOURCE
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.plain_compose import compose, overview, reading
 from app.engines.plain_corpora import ZIWEI
-from app.schemas.common import CalendarType, Gender, PlainSection, ProvenanceTable
+from app.engines.verdict import grade_for
+from app.schemas.common import CalendarType, Gender, PlainSection, ProvenanceTable, Verdict
 from app.schemas.ziwei import (
     Palace,
     SiHuaInfo,
@@ -64,6 +75,124 @@ STAR_ORDER: tuple[str, ...] = (
     "禄存", "天马",
     "擎羊", "陀罗", "火星", "铃星", "地空", "地劫",
 )
+
+# --- 综合结论 verdict（2026-10-22 verdict-card spec §2b：无账本系统的新增判定层） ---
+# 定性档（吉/平/动/忌）在 `content/ziwei.py::MajorStar.tendency`，逐星古籍出处在
+# `tendency_source`；下面把档换算成分数的**数字权重全是模型参数**（古籍只给定性、不给数，
+# 口径同 `MODEL_PARAM_SOURCE`），不是古籍赋分。三方四正 = 命宫 + 官禄(+4) + 迁移(+6)
+# + 财帛(+8)（`ZIWEI_MING_FRAME` 同偏移），只评主舞台四格，其余八宫不入总分。
+
+#: 主星倾向档 → 分（模型参数，MODEL_PARAM_SOURCE）。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.ziwei import MAJOR_TENDENCY_WEIGHT; print(MAJOR_TENDENCY_WEIGHT)"`
+MAJOR_TENDENCY_WEIGHT: dict[str, float] = {"吉": 6.0, "平": 0.0, "动": 2.0, "忌": -6.0}
+
+#: 乙级星 kind → 分（模型参数，MODEL_PARAM_SOURCE）：六吉助力、禄马次之、六煞牵制。
+MINOR_KIND_WEIGHT: dict[str, float] = {"吉": 2.5, "禄马": 2.0, "煞": -2.5}
+
+#: 生年四化标记 → 分（模型参数，MODEL_PARAM_SOURCE；禄权科为吉、化忌为凶是斗数通行口径）。
+SIHUA_WEIGHT: dict[str, float] = {"化禄": 2.5, "化权": 2.5, "化科": 2.5, "化忌": -4.0}
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位，加分上抬、减分下压。
+VERDICT_BASE: float = 50.0
+
+#: 上面四张权重表与起点的共同署名：模型参数（非古籍赋分），古籍只给定性档不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+#: 三环节名（建议句 `{component}` 槽与 `ZIWEI_COMPONENT_ADVICE` 的键一一对应）。
+COMPONENT_MAJOR = "主星格局"
+COMPONENT_MINOR = "辅佐煞曜"
+COMPONENT_SIHUA = "生年四化"
+#: 三环贡献都不为负时的中性维护建议键（`ZIWEI_COMPONENT_ADVICE["整体"]`）。
+COMPONENT_BALANCED = "整体"
+
+
+def _stage_palaces(ming_index: int) -> tuple[int, int, int, int]:
+    """命宫三方四正的地支 index：命宫、官禄(+4)、迁移(+6)、财帛(+8)。"""
+    return (
+        ming_index,
+        (ming_index + 4) % 12,
+        (ming_index + 6) % 12,
+        (ming_index + 8) % 12,
+    )
+
+
+def build_verdict(palaces: list[Palace], ming_index: int) -> Verdict:
+    """从盘面已有事实确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    只读四格内已落座的星与四化标记，不重新判命、不现编中文：档位/星级由
+    `grade_for(总分)` 派生，headline/advice 套 `ziwei_plain` 的框架句，points 是盘面
+    事实计数。三环节贡献各自累加，建议句只指向贡献为负的最弱一环；三环都不为负时走
+    中性维护句，不在没有短板的盘上虚构问题。
+    """
+    stage = set(_stage_palaces(ming_index))
+    major_contrib = minor_contrib = sihua_contrib = 0.0
+    major_ji = major_ji2 = minor_ji = minor_sha = lqk = ji_mark = 0
+    for palace in palaces:
+        if palace.index not in stage:
+            continue
+        for star in palace.stars:
+            if star.kind == "主星":
+                tendency = MAJOR_STARS[star.name].tendency
+                major_contrib += MAJOR_TENDENCY_WEIGHT[tendency]
+                if tendency == "吉":
+                    major_ji += 1
+                elif tendency == "忌":
+                    major_ji2 += 1
+            elif star.kind in MINOR_KIND_WEIGHT:
+                minor_contrib += MINOR_KIND_WEIGHT[star.kind]
+                if star.kind == "吉":
+                    minor_ji += 1
+                elif star.kind == "煞":
+                    minor_sha += 1
+            if star.sihua is not None:
+                sihua_contrib += SIHUA_WEIGHT[star.sihua]
+                if star.sihua == "化忌":
+                    ji_mark += 1
+                else:
+                    lqk += 1
+
+    score = max(0.0, min(100.0, VERDICT_BASE + major_contrib + minor_contrib + sihua_contrib))
+    grade, stars = grade_for(score)
+
+    # 建议句指向真正为负的一环（贡献最低的负项）；三环都不为负时走中性维护建议，
+    # 不在没有化忌的盘上虚构「化忌反复回头」（同 bazi 指向最弱一维，但只在有短板时指）。
+    contributions = [
+        (COMPONENT_MAJOR, major_contrib),
+        (COMPONENT_MINOR, minor_contrib),
+        (COMPONENT_SIHUA, sihua_contrib),
+    ]
+    drags = [(name, value) for name, value in contributions if value < 0]
+    if drags:
+        weakest = min(drags, key=lambda item: item[1])[0]
+        advice = overview(ZIWEI_VERDICT_ADVICE_FRAME, {
+            "component": weakest,
+            "component_advice": ZIWEI_COMPONENT_ADVICE[weakest],
+        })
+    else:
+        advice = overview(ZIWEI_VERDICT_BALANCED_FRAME, {
+            "component_advice": ZIWEI_COMPONENT_ADVICE[COMPONENT_BALANCED],
+        })
+
+    auspicious = major_ji + minor_ji
+    malefic = major_ji2 + minor_sha + ji_mark
+    headline = overview(ZIWEI_VERDICT_FRAME, {
+        "grade": grade,
+        "auspicious": str(auspicious),
+        "malefic": str(malefic),
+        "outlook": ZIWEI_VERDICT_OUTLOOK[grade],
+    })
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[
+            f"主星格局：吉{major_ji} · 忌{major_ji2}",
+            f"辅佐煞曜：吉{minor_ji} · 煞{minor_sha}",
+            f"生年四化：禄权科{lqk} · 化忌{ji_mark}",
+        ],
+        advice=advice,
+    )
+
 
 
 def compute_ziwei_chart(
@@ -232,6 +361,9 @@ def compute_ziwei_chart(
         ),
     ]
 
+    # 综合结论卡片：只读上面排好的四格盘面事实，不重新判命（verdict-card spec §2b）。
+    verdict = build_verdict(palaces, ming_index)
+
     return ZiweiChart(
         name=name,
         gender=gender.value,
@@ -261,6 +393,7 @@ def compute_ziwei_chart(
         palaces=palaces,
         sihua=SiHuaInfo(year_gan=year_gan, lu=lu, quan=quan, ke=ke, ji=ji),
         plain=plain,
+        verdict=verdict,
         dayun_direction="顺行" if forward else "逆行",
         dayun_start_age=ju_number,
         provenance=ZiweiProvenance(

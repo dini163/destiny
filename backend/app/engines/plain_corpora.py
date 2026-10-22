@@ -218,7 +218,11 @@ ZIWEI = PlainCorpus(
     # 十二宫开篇句。键 = `PALACE_NAMES` 逐字，覆盖面由
     # `tests/content/test_ziwei_plain_corpus.py::test_openers_are_exactly_the_twelve_palace_names` 钉。
     openers=ziwei_plain.ZIWEI_PALACE_OPENERS,
-    # 斗数整盘无分数、无档位（spec §13 的明面代价）：白话只说倾向，不补一句综合吉凶。
+    # closers=None 保持不变：十二宫段落仍不挂档位收尾句。2026-10-22 已推翻 spec §13
+    #「紫微整盘无分数、无档位」的旧裁定——综合结论卡片另立判定层（`engines/ziwei.py`
+    # `build_verdict`）：定性档见 `content/ziwei.py::MajorStar.tendency`（逐星《全书·诸星
+    # 问答论》出处），数字权重以 MODEL_PARAM_SOURCE 署名；本条只说段落层不补收尾，
+    # 不等于整盘不判吉凶。
     closers=None,
     # G21：`band` 分支遇 0 值符号直接 `ValueError`，而星情没有任何符号可传；次序 = 宫位序
     # （引擎按地支 index 0-11 逐宫装配，宫内按 `STAR_ORDER` 的安星序）。

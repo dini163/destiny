@@ -123,6 +123,50 @@ ZIWEI_LUCK_FRAME = (
     "大限按{direction}推进时，这四枚变化就是运限转弯的路标。"
 )
 
+#: 结论卡片装配语料（2026-10-22 verdict-card spec §2b/§4，紫微判定层），形状同
+#: `bazi_plain.py` 的 PLAIN_SUMMARY_FRAME / VERDICT_OUTLOOK / VERDICT_ADVICE_FRAME / TIER_ADVICE。
+#: 下面三组常量**不进** `ZIWEI_READINGS`（工厂键全集仍为 44），由引擎用 `overview()` 实例化，
+#: 故工厂的条目/开篇句措辞门扫不到它们，自守门在 `tests/content/test_ziwei_verdict_corpus.py`。
+
+#: 总论框架：档位词 + 三方四正助力/牵制计数 + 一句取向。`{grade}` 取 `verdict.grade_for`
+#: 的档位词；`{auspicious}`/`{malefic}` 是引擎数出的助力星/牵制星颗数（盘面事实计数）；
+#: `{outlook}` 取 `ZIWEI_VERDICT_OUTLOOK[grade]`。本表不写死任何数字。
+ZIWEI_VERDICT_FRAME = (
+    "你的整体格局属{grade}：命宫三方四正里助力星{auspicious}颗、牵制星{malefic}颗，{outlook}。"
+)
+
+#: 各档位收束取向，键 = `app/engines/verdict.GRADE_BANDS` 五档档位词（与 bazi
+#: VERDICT_OUTLOOK 同键，对应关系由自测钉）。槽位词条：不成句、不带「。」、不带建议词。
+ZIWEI_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "格局开阔，值得大胆推进",
+    "吉": "有利的一面占优，顺势把握",
+    "平": "好坏大致相抵，稳住节奏再谈扩展",
+    "小凶": "牵制的一面更多，先补薄弱处",
+    "凶": "先把基本盘守住，别急着出手",
+}
+
+#: 建议句框架（有短板时）：最弱一环 + 该环一句口语建议。`{component}` 是三环节名
+#:（主星格局 / 辅佐煞曜 / 生年四化），`{component_advice}` 取 `ZIWEI_COMPONENT_ADVICE[component]`。
+ZIWEI_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这张盘最需要先理顺的是{component}，{component_advice}。"
+)
+
+#: 建议句框架（三环都不为负时）：中性维护，不指认短板。`{component_advice}` 取
+#: `ZIWEI_COMPONENT_ADVICE["整体"]`。
+ZIWEI_VERDICT_BALANCED_FRAME = (
+    "综合建议：你这张盘各环相抵有余，{component_advice}。"
+)
+
+#: 三环节各自的一句口语建议，键 = 引擎环节名；「整体」是三环都不为负时的中性维护建议。
+#: 槽位词条不成句、不带「。」；「化忌」是具名四化名相（同 `ZIWEI_SIHUA_MEANINGS` 的
+#: 豁免口径），不算建议词。
+ZIWEI_COMPONENT_ADVICE: dict[str, str] = {
+    "主星格局": "主星的底色偏牵制，先认清自己擅长什么，再把力气花在对的方向上",
+    "辅佐煞曜": "助力接不上的地方多，遇事靠自己撑住，别等别人来补位",
+    "生年四化": "化忌落的那一格会反复回头，同一件事处理两次才踏实，别急着翻篇",
+    "整体": "稳住现有节奏，把长处继续放大即可",
+}
+
 #: 12 条全盘气象（批次一 spec §5）：键 = 紫微所在地支，句首「紫微在{zhi}」。
 #: 每句逐颗点名 14 主星各一次（位置取自 `ZIWEI_SERIES` / `TIANFU_SERIES` 的十二盘），
 #: 只给「哪几颗同处一格」这类盘面已有的事实，不写宫名、不做选择、不预告事件。

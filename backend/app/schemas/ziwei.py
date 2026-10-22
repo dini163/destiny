@@ -9,7 +9,7 @@ walked from the 安星 tables in :mod:`app.content.ziwei`.
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import BirthInput, Gender, PlainSection, ProvenanceTable
+from app.schemas.common import BirthInput, Gender, PlainSection, ProvenanceTable, Verdict
 
 
 class ZiweiRequest(BirthInput):
@@ -117,6 +117,10 @@ class ZiweiChart(BaseModel):
     sihua: SiHuaInfo = Field(description="生年干四化.")
     plain: list[PlainSection] = Field(
         description="全盘白话：全盘气象、命宫与三方四正、运限与四化三节（逐字取自 content/ziwei_plain.py）。"
+    )
+    verdict: Verdict = Field(
+        description="综合结论卡片：档位词 + 星级 + 结论句 + 分项要点 + 一句建议（verdict-card spec §2b）；"
+        "档位由三方四正盘面事实合成的 0-100 倾向分经 `app/engines/verdict.grade_for` 派生。"
     )
 
     # 大限
