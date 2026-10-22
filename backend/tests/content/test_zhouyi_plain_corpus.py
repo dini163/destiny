@@ -468,20 +468,24 @@ def test_the_universe_is_exactly_the_514_computed_from_the_source_tables() -> No
 ZHOUYI_NAJIA_SOURCE_LITERAL = "京房纳甲爻辰与六神日干起例"
 
 
-def test_provenance_roster_is_the_five_rows_in_reading_order() -> None:
+def test_provenance_roster_is_the_six_rows_in_reading_order() -> None:
     """登记表由字面量钉（上一条注释）。顺序 = 页面展示序 = `zhouyi_provenance()` 的产出序。
 
     三条 `zhouyi_*` 的字面同时钉住了梅花那一侧：两家共用同一份常量（计划偏差表第 5 行），
     改一个值本条立刻红、`MEIHUA_CONTENT_SOURCES` 的打印也随之变（梅花那侧没有逐字钉，它的
     凭据是那份逐字节 diff 的验收命令）；抄第二份则两份各红各的，谁也不会静默漂。
-    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 5。
+    末行 `zhouyi_duanci` 是 verdict 结论卡片的断占辞词表（本系统自读，梅花不列）。
+    条数复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.content import ZHOUYI_CONTENT_SOURCES; print(len(ZHOUYI_CONTENT_SOURCES))"` → 6。
     """
+    from app.content.zhouyi_duanci import DUANCI_SOURCE
+
     assert ZHOUYI_CONTENT_SOURCES == (
         ("zhouyi_trigrams", "八卦卦名、卦象与邵雍先天卦序"),
         ("zhouyi_hexagrams", "《周易》通行本文王六十四卦卦序与卦画"),
         ("zhouyi_najia", ZHOUYI_NAJIA_SOURCE_LITERAL),
         ("zhouyi_text", "《周易》卦辞 · 通行本（王弼注本）公版原文"),
         ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE),
+        ("zhouyi_duanci", DUANCI_SOURCE),
     )
 
 
@@ -496,8 +500,12 @@ def test_the_shared_source_strings_are_one_copy_with_meihua() -> None:
 
 
 def test_the_plain_source_line_is_the_registered_fifth_row() -> None:
-    """今译表进清单（AGENTS.md §7「读了就列」）：`ZHOUYI_PLAIN_SOURCE` 的自述与登记同一笔。"""
-    assert ZHOUYI_CONTENT_SOURCES[-1] == ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE)
+    """今译表进清单（AGENTS.md §7「读了就列」）：`ZHOUYI_PLAIN_SOURCE` 的自述与登记同一笔。
+
+    verdict 轮在末行追加了断占辞词表 `zhouyi_duanci`，故今译表是第五行（下标 4）而非末行。
+    """
+    assert ZHOUYI_CONTENT_SOURCES[4] == ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE)
+    assert ZHOUYI_CONTENT_SOURCES[-1][0] == "zhouyi_duanci"
 
 
 # --- 整卦总论 64 条（批次一 spec §4） ------------------------------------------

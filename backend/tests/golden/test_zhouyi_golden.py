@@ -540,10 +540,10 @@ def test_zhouyi_cast_endpoint_serves_the_plain_fields(client: TestClient) -> Non
     assert body["bian"] is None
 
 
-# --- 出处块：五张表 + 历法来源（丁组 spec §5、AGENTS.md §7） --------------------
+# --- 出处块：六张表 + 历法来源（丁组 spec §5、AGENTS.md §7；末行断占辞词表为 verdict 轮追加） ---
 
 
-def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
+def test_provenance_lists_exactly_the_six_tables_the_cast_reads() -> None:
     """响应忠于登记表：成对钉「名 + 出处串」，而不是只钉名。
 
     出处串的**字面**只住在 `tests/content/test_zhouyi_plain_corpus.py` 那一处（抄第二份字面
@@ -560,6 +560,7 @@ def test_provenance_lists_exactly_the_five_tables_the_cast_reads() -> None:
         "zhouyi_najia",
         "zhouyi_text",
         "zhouyi_plain",
+        "zhouyi_duanci",
     ]
     assert provenance.engine == "lunar-python"
     assert provenance.content_version == CONTENT_VERSION
@@ -583,3 +584,86 @@ def test_zhouyi_cast_endpoint_serves_the_provenance_block(client: TestClient) ->
     assert [(table["name"], table["source"]) for table in body["provenance"]["tables"]] == list(
         _ZHOUYI_CONTENT_SOURCES
     )
+    # 结论卡片五件齐备（verdict-card spec §1）：键集、档位词、星级都由共享 `grade_for` 派生。
+    assert set(body["verdict"]) == {"grade", "stars", "headline", "points", "advice"}
+
+
+# --- 综合结论卡片（verdict）：断辞词频净值 → 五档 -----------------------------
+
+
+def _recount_duanci(text: str) -> tuple[int, int]:
+    """测试侧独立重数：「无咎」先剔再数裸咎，与引擎 `_duanci_counts` 同一规则但重写一遍。"""
+    working = text
+    positive = working.count("无咎")
+    working = working.replace("无咎", "")
+    positive += sum(working.count(word) for word in ("吉", "亨", "利"))
+    negative = sum(working.count(word) for word in ("凶", "吝", "悔", "咎", "厉"))
+    return positive, negative
+
+
+def _expected_verdict(result):
+    """从盘面字段独立重算档位与计数，作为引擎 verdict 的对账口径。"""
+    from app.engines.verdict import grade_for
+
+    from app.engines.zhouyi import _DUANCI_WEIGHT
+
+    gua_text = result.ben.gua_ci + (result.ben.yong_ci or "")
+    gua_pos, gua_neg = _recount_duanci(gua_text)
+    moving_text = "".join(ln.yao_ci for ln in result.lines if ln.moving)
+    yao_pos, yao_neg = _recount_duanci(moving_text) if moving_text else (0, 0)
+    net = (gua_pos + yao_pos) - (gua_neg + yao_neg)
+    score = min(100.0, max(0.0, 50.0 + net * _DUANCI_WEIGHT))
+    grade, stars = grade_for(score)
+    return grade, stars, gua_pos, gua_neg, yao_pos, yao_neg, net
+
+
+def test_verdict_card_carries_the_five_contract_fields_on_every_cast() -> None:
+    """三手盘各钉五件齐备：档位词 ∈ 共享五档、星级与档位对应、结论句/建议各一个「。」。"""
+    cases = [
+        _manual([[3, 2, 2]] * 6),                       # 安静乾，无动爻
+        _manual([[3, 3, 3], [3, 3, 2], [2, 2, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2]]),  # 丰之咸
+        _manual([[3, 3, 3]] * 6),                       # 全老阳乾，六爻皆动
+    ]
+    from app.engines.verdict import GRADE_BANDS
+
+    words = {band[1]: band[2] for band in GRADE_BANDS}
+    for result in cases:
+        v = result.verdict
+        assert set(v.model_dump()) == {"grade", "stars", "headline", "points", "advice"}
+        assert v.grade in words
+        assert v.stars == words[v.grade]
+        assert 1 <= v.stars <= 5
+        assert v.headline.endswith("。") and v.headline.count("。") == 1
+        assert v.advice.endswith("。") and v.advice.count("。") == 1
+        assert len(v.points) == 3
+        for point in v.points:
+            assert point
+
+
+def test_verdict_counts_match_the_recounted_gua_and_moving_yao_text() -> None:
+    """三手盘按字段对账：卦辞/动爻爻辞的正负断辞计数、净值、档位全部与独立重算一致。"""
+    quiet = _manual([[3, 2, 2]] * 6)
+    grade, stars, gp, gn, yp, yn, net = _expected_verdict(quiet)
+    assert quiet.verdict.grade == grade
+    assert quiet.verdict.stars == stars
+    assert quiet.verdict.points[0] == f"卦辞断辞：正向{gp}条、负向{gn}条"
+    assert quiet.verdict.points[1] == "六爻安静：无动爻爻辞可断"
+    assert quiet.verdict.points[2] == f"正向合计{gp}条、负向合计{gn}条，净值{net:+d}"
+
+    feng = _manual([[3, 3, 3], [3, 3, 2], [2, 2, 3], [3, 2, 2], [2, 2, 2], [3, 3, 2]])
+    grade, stars, gp, gn, yp, yn, net = _expected_verdict(feng)
+    assert feng.verdict.grade == grade
+    assert feng.verdict.stars == stars
+    assert feng.verdict.points[0] == f"卦辞断辞：正向{gp}条、负向{gn}条"
+    assert feng.verdict.points[1] == f"动爻爻辞断辞：正向{yp}条、负向{yn}条"
+    assert feng.verdict.points[2] == f"正向合计{gp + yp}条、负向合计{gn + yn}条，净值{net:+d}"
+    # 丰之咸这一手：卦辞 1 正 0 负，动爻两条 2 正 0 负，净值 +3。
+    assert (gp, gn, yp, yn, net) == (1, 0, 2, 0, 3)
+    assert feng.verdict.grade == "吉"
+
+    qian = _manual([[3, 3, 3]] * 6)
+    grade, stars, gp, gn, yp, yn, net = _expected_verdict(qian)
+    assert qian.verdict.grade == grade
+    assert qian.verdict.stars == stars
+    assert qian.verdict.points[1] == f"动爻爻辞断辞：正向{yp}条、负向{yn}条"
+    assert yp > 0 and yn > 0  # 六爻皆动：爻辞桶非空，且乾爻辞里确有负向断辞（悔）

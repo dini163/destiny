@@ -95,13 +95,14 @@ describe('周易就地今译', () => {
     pinLiteralOrder(page, ['<CastSummary cast={cast} />', 'title="整卦白话"', 'title="纳甲六亲盘"']);
   });
 
-  it('夹具五张表按展示序排列；页面溯源块已按 2026-10-21 UI 需求移除', () => {
+  it('夹具六张表按展示序排列；页面溯源块已按 2026-10-21 UI 需求移除', () => {
     expect(cast.provenance.tables.map((table) => table.name)).toEqual([
       'zhouyi_trigrams',
       'zhouyi_hexagrams',
       'zhouyi_najia',
       'zhouyi_text',
       'zhouyi_plain',
+      'zhouyi_duanci',
     ]);
     const page = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
     // 溯源块（「起卦溯源与免责」标题、`<Provenance>`、`<ProvenancePanel>`、`ENGINE ·`、
