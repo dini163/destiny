@@ -13,6 +13,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useVedic } from '../hooks/useVedic';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { CHART_STYLES } from '../lib/vedic';
 import type { ChartStyle } from '../lib/vedic';
 import type { VedicChart, VedicNatalRequest } from '../types/vedic';
@@ -35,6 +36,7 @@ function todayISO(): string {
 export function VedicPage() {
   const [utcOffset, setUtcOffset] = useState('');
   const [targetDate, setTargetDate] = useState<string>(todayISO);
+  const profile = useProfileFill();
   const vedic = useVedic();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -57,6 +59,18 @@ export function VedicPage() {
         badge="恒星黄道"
         subtitle="以拉希里（Lahiri / Chitrapaksha）岁差校正的恒星黄道排盘：九曜（Navagraha，含罗睺计都）、自上升起算的整宫制、二十七星宿（Nakshatra），并依月宿推排一百二十年的 Vimshottari 大运时间轴。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。"
         requireLatitude
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={vedic.isPending ? '恒星排盘中…' : '即刻排定星盘'}
         pending={vedic.isPending}
         onSubmit={handleSubmit}
@@ -110,6 +124,8 @@ export function VedicPage() {
       ) : null}
 
       {vedic.data ? <VedicResults chart={vedic.data} /> : null}
+
+      {profile.editor}
     </div>
   );
 }

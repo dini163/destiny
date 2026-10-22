@@ -10,6 +10,7 @@ import { PillarCard } from '../components/bazi/PillarCard';
 import { RelationChips } from '../components/bazi/RelationChips';
 import { ShenShaList } from '../components/bazi/ShenShaList';
 import { StrengthDial } from '../components/bazi/StrengthDial';
+import { TenGodList } from '../components/bazi/TenGodList';
 import { WuxingBars } from '../components/bazi/WuxingBars';
 import { YongshenPanel } from '../components/bazi/YongshenPanel';
 import { Icon } from '../components/ui/Icon';
@@ -19,14 +20,13 @@ import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
-import { pillarSlotLabel } from '../lib/pillars';
 import { buildHehunPrefillHref, buildTransitHref } from '../lib/transitLink';
 import { useBaziNatal } from '../hooks/useBaziNatal';
+import { useProfileFill } from '../hooks/useProfileFill';
 import type {
   BaziChart,
   BaziNatalRequest,
   DayunDetail,
-  TenGodReading,
 } from '../types/bazi';
 import type { Gender } from '../types/common';
 
@@ -54,6 +54,11 @@ export function BaziNatalPage() {
   const [transitHref, setTransitHref] = useState<string | null>(null);
   /** 这一造的合婚预填链接，同样随每次排盘同步；未排过时为 null，入口随之消失。 */
   const [hehunHref, setHehunHref] = useState<string | null>(null);
+  const profile = useProfileFill({
+    onPick: (picked) => {
+      if (picked?.gender) setGender(picked.gender);
+    },
+  });
   const bazi = useBaziNatal();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -81,6 +86,20 @@ export function BaziNatalPage() {
         badge="权威历算"
         subtitle="真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            gender,
+            name: name.trim() || undefined,
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={bazi.isPending ? '排盘中…' : '开始排盘'}
         pending={bazi.isPending}
         onSubmit={handleSubmit}
@@ -127,6 +146,8 @@ export function BaziNatalPage() {
       {bazi.data ? (
         <BaziResults chart={bazi.data} transitHref={transitHref} hehunHref={hehunHref} />
       ) : null}
+
+      {profile.editor}
     </div>
   );
 }
@@ -338,26 +359,6 @@ function BaziResults({
         ))}
       </div>
     </>
-  );
-}
-
-/** 十神清点：命局出现的每个十神一条，落点与释义都来自后端。 */
-function TenGodList({ readings }: { readings: TenGodReading[] }) {
-  if (readings.length === 0) return null;
-  return (
-    <ul className="flex flex-wrap gap-2">
-      {readings.map((reading) => (
-        <li
-          key={reading.ten_god}
-          className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1.5 text-xs"
-          title={`${reading.meaning}｜${reading.source}`}
-        >
-          <span className="text-ink">{reading.ten_god}</span>
-          <span className="numeric text-gold-soft">{reading.count}</span>
-          <span className="text-ink-muted">{reading.positions.map(pillarSlotLabel).join('、')}</span>
-        </li>
-      ))}
-    </ul>
   );
 }
 

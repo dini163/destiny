@@ -15,6 +15,7 @@ import { SelectMenu } from '../components/ui/SelectMenu';
 import { ResultCard } from '../components/ui/ResultCard';
 import { aspectStyle } from '../lib/astro';
 import { useWesternNatal } from '../hooks/useWesternNatal';
+import { useProfileFill } from '../hooks/useProfileFill';
 import type { WesternChart, WesternNatalRequest } from '../types/western';
 
 /** House systems the backend engine accepts (Swiss Ephemeris codes). */
@@ -50,6 +51,7 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
 export function WesternNatalPage() {
   const [houseSystem, setHouseSystem] = useState('P');
   const [utcOffset, setUtcOffset] = useState('');
+  const profile = useProfileFill();
   const western = useWesternNatal();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -72,6 +74,18 @@ export function WesternNatalPage() {
         badge="瑞士星历"
         subtitle="精确计算本命四轴（ASC/MC/DES/IC）与十大主星落座落宫、主要相位容许度及元素形态分布。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。"
         requireLatitude
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={western.isPending ? '重构星历中…' : '即刻重构星历'}
         pending={western.isPending}
         onSubmit={handleSubmit}
@@ -125,6 +139,8 @@ export function WesternNatalPage() {
       ) : null}
 
       {western.data ? <WesternResults chart={western.data} /> : null}
+
+      {profile.editor}
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiuriHref, buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
 import type { BaziLiushiRequest, TransitHourCell } from '../types/baziLiushi';
@@ -86,6 +87,11 @@ export function BaziLiushiPage() {
 
   const [gender, setGender] = useState<Gender>(link?.gender ?? 'male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(link?.applyTrueSolarTime ?? true);
+  const profile = useProfileFill({
+    onPick: (picked) => {
+      if (picked?.gender) setGender(picked.gender);
+    },
+  });
   const [lastRequest, setLastRequest] = useState<BaziLiushiRequest | null>(null);
 
   const liushi = useBaziLiushi();
@@ -195,6 +201,19 @@ export function BaziLiushiPage() {
         subtitle="在一个八字日内逐时辰结算加减：五鼠遁时柱、四段账本、日主临时支，点一格展开该时辰详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            gender,
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={liushi.isPending ? '推演中…' : '开始推演'}
         pending={liushi.isPending}
         onSubmit={handleSubmit}
@@ -294,6 +313,8 @@ export function BaziLiushiPage() {
           )}
         </>
       ) : null}
+
+      {profile.editor}
     </div>
   );
 }

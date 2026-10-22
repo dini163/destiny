@@ -13,6 +13,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useTransit } from '../hooks/useTransit';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { aspectStyle } from '../lib/astro';
 import { TRANSIT_MODES, formatAgeYears, modeConfig, modeData } from '../lib/transit';
 import type { TransitMode } from '../lib/transit';
@@ -55,6 +56,7 @@ export function TransitPage() {
   const [houseSystem, setHouseSystem] = useState('P');
   const [utcOffset, setUtcOffset] = useState('');
   const [targetDate, setTargetDate] = useState<string>(todayISO);
+  const profile = useProfileFill();
   const transit = useTransit();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -78,6 +80,18 @@ export function TransitPage() {
         badge="瑞士星历"
         subtitle="在本命盘之上叠加三层动态时间轴：外行星过境（行运）、一日当一年（次限推运）与太阳弧推进。指定目标日期，即看移动层诸星落入本命何宫、对本命所成之相位。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0 · 目标日任选。"
         requireLatitude
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={transit.isPending ? '推演行运中…' : '即刻推演行运'}
         pending={transit.isPending}
         onSubmit={handleSubmit}
@@ -140,6 +154,8 @@ export function TransitPage() {
       ) : null}
 
       {transit.data ? <TransitResults chart={transit.data} /> : null}
+
+      {profile.editor}
     </div>
   );
 }

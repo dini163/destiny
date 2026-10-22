@@ -9,6 +9,7 @@ import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useZiwei } from '../hooks/useZiwei';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { calendarLabel, genderLabel } from '../lib/ziwei';
 import type { Gender } from '../types/common';
 import type { ZiweiChart, ZiweiRequest } from '../types/ziwei';
@@ -32,6 +33,11 @@ export function ZiweiPage() {
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
   const [name, setName] = useState('');
+  const profile = useProfileFill({
+    onPick: (picked) => {
+      if (picked?.gender) setGender(picked.gender);
+    },
+  });
   const ziwei = useZiwei();
 
   function handleSubmit(values: BirthInputValues): void {
@@ -51,6 +57,20 @@ export function ZiweiPage() {
         badge="权威历算"
         subtitle="以农历生月生时定命身二宫，纳音定五行局，安紫微天府十四主星与左辅右弼、禄马魁钺、羊陀火铃空劫诸曜，起生年四化与大限。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            gender,
+            name: name.trim() || undefined,
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={ziwei.isPending ? '排盘中…' : '排定命盘'}
         pending={ziwei.isPending}
         onSubmit={handleSubmit}
@@ -95,6 +115,8 @@ export function ZiweiPage() {
       ) : null}
 
       {ziwei.data ? <ZiweiResults chart={ziwei.data} /> : null}
+
+      {profile.editor}
     </div>
   );
 }

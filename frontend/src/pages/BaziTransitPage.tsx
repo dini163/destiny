@@ -13,6 +13,7 @@ import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziTransit } from '../hooks/useBaziTransit';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
 import type {
   BaziTransitRequest,
@@ -106,6 +107,12 @@ export function BaziTransitPage() {
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(
     link?.applyTrueSolarTime ?? true,
   );
+  const profile = useProfileFill({
+    onPick: (picked) => {
+      if (picked?.gender) setGender(picked.gender);
+    },
+  });
+
   const [startYear, setStartYear] = useState(link?.year ? String(link.year) : '');
   const [span, setSpan] = useState<'5' | '10'>('5');
   /** 点已展开的年份即收回详批卡：数据已在手上，收回不必再问一次服务端。 */
@@ -201,6 +208,19 @@ export function BaziTransitPage() {
         subtitle="沿用本命盘的喜忌，逐年逐月对岁运规则表结算加减：一年一行账，命中即可展开判语与凭据。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            gender,
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={transit.isPending ? '推演中…' : '开始推演'}
         pending={transit.isPending}
         onSubmit={handleSubmit}
@@ -294,6 +314,8 @@ export function BaziTransitPage() {
           {focused ? <TransitYearCard year={focused} hrefFor={liuriHrefFor} /> : null}
         </>
       ) : null}
+
+      {profile.editor}
     </div>
   );
 }

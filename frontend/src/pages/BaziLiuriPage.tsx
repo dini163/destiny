@@ -14,6 +14,7 @@ import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
+import { useProfileFill } from '../hooks/useProfileFill';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiushiHref, buildTransitHref, parseLiuriLink } from '../lib/transitLink';
 import type { BaziLiuriRequest } from '../types/baziLiuri';
@@ -76,6 +77,11 @@ export function BaziLiuriPage() {
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(
     link?.applyTrueSolarTime ?? true,
   );
+  const profile = useProfileFill({
+    onPick: (picked) => {
+      if (picked?.gender) setGender(picked.gender);
+    },
+  });
 
   const liuri = useBaziLiuri();
   /**
@@ -164,6 +170,19 @@ export function BaziLiuriPage() {
         subtitle="在一个节气月段内逐日结算加减：一格一天的气数、档位、命中与通书宜忌，点一格展开当日详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
         showCalendar
         initial={link?.values}
+        preset={profile.preset}
+        profilePicker={profile.picker}
+        onSaveProfile={(values) =>
+          profile.openSave({
+            gender,
+            birth_date: values.birth_date,
+            birth_time: values.birth_time,
+            calendar: values.calendar,
+            city: values.city,
+            latitude: values.latitude,
+            longitude: values.longitude,
+          })
+        }
         submitLabel={liuri.isPending ? '推演中…' : '开始推演'}
         pending={liuri.isPending}
         onSubmit={handleSubmit}
@@ -264,6 +283,8 @@ export function BaziLiuriPage() {
           )}
         </>
       ) : null}
+
+      {profile.editor}
     </div>
   );
 }
