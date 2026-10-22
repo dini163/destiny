@@ -1,5 +1,5 @@
 import type { KabbalahTree, PillarInfo, SephirahNode } from '../../types/kabbalah';
-import { TREE_VIEW, coordinateMap, pillarAccent, toView, type Selection } from '../../lib/kabbalah';
+import { TREE_VIEW, coordinateMap, pathLabelPositions, pillarAccent, toView, type Selection } from '../../lib/kabbalah';
 
 interface TreeOfLifeProps {
   /** The full tree map (10 Sephiroth + hidden Daath + 22 paths). */
@@ -17,7 +17,8 @@ const PILLAR_X: Record<string, number> = { left: 16, middle: 50, right: 84 };
 const PILLAR_TOP = 2;
 const PILLAR_BOTTOM = 148;
 /** viewBox-space padding above the columns reserved for the pillar-name labels. */
-const PILLAR_LABEL_Y = -3.2;
+const PILLAR_LABEL_Y = -8;
+const PATH_LABEL_MARKER_RADIUS = 2.7;
 
 const DISPLAY_FONT = "'Noto Serif SC', 'Noto Serif', 'Songti SC', serif";
 const GOLD = '#D4AF37';
@@ -41,13 +42,14 @@ const PARCHMENT = '#F7F3E3';
  */
 export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
   const coords = coordinateMap(tree.sephiroth);
+  const pathLabels = pathLabelPositions(tree.paths, tree.sephiroth);
   const selectedId = selection?.id ?? null;
   const crown = tree.sephiroth[0];
 
   return (
     <svg
       viewBox={`${minX} ${minY} ${width} ${height}`}
-      className="h-auto w-full select-none"
+      className="kabbalah-tree-svg mx-auto h-auto w-full max-w-[720px] select-none"
       role="img"
       aria-label={`卡巴拉生命之树：${tree.sephirah_count} 原质与 ${tree.path_count} 路径`}
     >
@@ -85,7 +87,7 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
       {crown ? (
         <circle
           className="kabbalah-crown-glow"
-          cx={toView(crown.x, crown.y).vx} cy={toView(crown.x, crown.y).vy} r={26}
+          cx={toView(crown.x, crown.y).vx} cy={toView(crown.x, crown.y).vy} r={18}
           fill="url(#crownGlow)"
         />
       ) : null}
@@ -98,19 +100,21 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
         const b = coords.get(path.to_sephirah);
         if (!a || !b) return null;
         const active = selectedId === path.id;
-        const mx = (a.vx + b.vx) / 2;
-        const my = (a.vy + b.vy) / 2;
+        const label = pathLabels.get(path.id);
+        const mx = label?.x ?? (a.vx + b.vx) / 2;
+        const my = label?.y ?? (a.vy + b.vy) / 2;
         return (
           <g
             key={path.id}
-            className="cursor-pointer"
+            data-path-id={path.id}
+            className={`kabbalah-path${active ? ' kabbalah-path-active' : ''}`}
             onClick={() => onSelect({ kind: 'path', id: path.id })}
             aria-hidden="true"
           >
             {/* Glow underlay, then the hairline stroke, then a wide transparent click target.
                 Both visible strokes draw themselves in via pathLength-normalised dashes. */}
             <line
-              className="kabbalah-path-grow"
+              className="kabbalah-path-grow kabbalah-path-glow"
               x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
               pathLength={1} strokeDasharray={1} strokeDashoffset={1}
               stroke={GOLD}
@@ -120,7 +124,7 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
               style={{ animationDelay: `${(path.number - 11) * 0.055}s` }}
             />
             <line
-              className="kabbalah-path-grow"
+              className="kabbalah-path-grow kabbalah-path-core"
               x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
               pathLength={1} strokeDasharray={1} strokeDashoffset={1}
               stroke={active ? GOLD_BRIGHT : GOLD}
@@ -129,16 +133,22 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
               strokeLinecap="round"
               style={{ animationDelay: `${(path.number - 11) * 0.055}s` }}
             />
-            <line x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy} stroke="transparent" strokeWidth={5} />
+            <line
+              className="kabbalah-path-hit"
+              x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
+              stroke="transparent" strokeWidth={5}
+            />
             {/* Hebrew-letter medallion riding the path midpoint. */}
             <circle
-              cx={mx} cy={my} r={2.7}
+              className="kabbalah-path-medallion"
+              cx={mx} cy={my} r={PATH_LABEL_MARKER_RADIUS}
               fill="#0B0D13" fillOpacity={0.92}
               stroke={active ? GOLD_BRIGHT : GOLD}
               strokeOpacity={active ? 0.9 : 0.35}
               strokeWidth={0.5}
             />
             <text
+              className="kabbalah-path-letter"
               x={mx} y={my}
               textAnchor="middle" dominantBaseline="central"
               fontSize={3.4} fontFamily={DISPLAY_FONT}
@@ -181,7 +191,7 @@ function SephirahDisc({
   const hidden = node.is_hidden;
   return (
     <g
-      className="kabbalah-node cursor-pointer"
+      className="kabbalah-node"
       style={{ animationDelay: `${0.15 + node.y * 0.45}s` }}
       onClick={() => onSelect({ kind: 'sephirah', id: node.id })}
       aria-hidden="true"
@@ -208,6 +218,7 @@ function SephirahDisc({
         </>
       ) : null}
       <circle
+        className="kabbalah-disc"
         cx={vx} cy={vy} r={nodeR}
         fill={node.color}
         fillOpacity={hidden ? 0.1 : active ? 0.55 : 0.3}
@@ -235,7 +246,7 @@ function SephirahDisc({
         {hidden ? '✧' : node.number}
       </text>
       <text
-        x={vx} y={vy + nodeR + 4.3}
+        x={vx} y={node.number === 1 ? vy - nodeR - 2.4 : vy + nodeR + 4.3}
         textAnchor="middle" fontSize={4} fontFamily={DISPLAY_FONT}
         fill={active ? GOLD_BRIGHT : INK_VARIANT}
         stroke="#0A0D15" strokeWidth={1} paintOrder="stroke" strokeLinejoin="round"
@@ -265,7 +276,6 @@ function PillarGuides({ pillars }: { pillars: PillarInfo[] }) {
               stroke={`url(#pillar-${pillar.id})`}
               strokeWidth={1.2}
             />
-            <circle cx={x} cy={0.2} r={1.1} fill={accent} fillOpacity={0.5} />
             <text
               x={x} y={PILLAR_LABEL_Y}
               textAnchor="middle" fontSize={2.8} fontFamily={DISPLAY_FONT}

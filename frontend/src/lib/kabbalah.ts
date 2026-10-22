@@ -23,13 +23,13 @@ export function pillarAccent(pillar: string): string {
   return PILLAR_ACCENT[pillar] ?? '#E8B93C';
 }
 
-/** SVG viewBox geometry for the Tree: coords map x→[0,100], y→[0,150], with margin. */
+/** SVG viewBox geometry for the Tree: normalized coordinates keep a tall portrait layout. */
 export const TREE_VIEW = {
   /** viewBox left/top offsets give the crown and root room for labels. */
   minX: -11,
-  minY: -5,
+  minY: -12,
   width: 122,
-  height: 162,
+  height: 169,
   /** Node disc radius in viewBox units. */
   nodeR: 5.6,
 } as const;
@@ -46,6 +46,63 @@ export function coordinateMap(sephiroth: readonly SephirahNode[]): Map<number, {
     map.set(s.number, toView(s.x, s.y));
   }
   return map;
+}
+
+interface PathLabelPoint {
+  id: string;
+  x: number;
+  y: number;
+  nx: number;
+  ny: number;
+}
+
+const PATH_LABEL_CLUSTER_RADIUS = 1.5;
+const PATH_LABEL_OFFSET_STEP = 8;
+
+/** Keep Hebrew labels apart when multiple paths share the same midpoint. */
+export function pathLabelPositions(
+  paths: readonly PathNode[],
+  sephiroth: readonly SephirahNode[],
+): Map<string, { x: number; y: number }> {
+  const coords = coordinateMap(sephiroth);
+  const points = paths.flatMap((path) => {
+    const from = coords.get(path.from_sephirah);
+    const to = coords.get(path.to_sephirah);
+    if (!from || !to) return [];
+    const dx = to.vx - from.vx;
+    const dy = to.vy - from.vy;
+    const length = Math.hypot(dx, dy) || 1;
+    return [{ id: path.id, x: (from.vx + to.vx) / 2, y: (from.vy + to.vy) / 2, nx: -dy / length, ny: dx / length }];
+  });
+
+  return spreadCoincidentLabels(points);
+}
+
+function spreadCoincidentLabels(points: PathLabelPoint[]): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>();
+  const placed = new Set<string>();
+
+  for (const point of points) {
+    if (placed.has(point.id)) continue;
+    const cluster = points
+      .filter(
+        (candidate) =>
+          !placed.has(candidate.id) &&
+          Math.hypot(candidate.x - point.x, candidate.y - point.y) < PATH_LABEL_CLUSTER_RADIUS,
+      )
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    cluster.forEach((candidate, index) => {
+      const offset = (index - (cluster.length - 1) / 2) * PATH_LABEL_OFFSET_STEP;
+      positions.set(candidate.id, {
+        x: candidate.x + candidate.nx * offset,
+        y: candidate.y + candidate.ny * offset,
+      });
+      placed.add(candidate.id);
+    });
+  }
+
+  return positions;
 }
 
 /** The default selection when the page first loads (the crown, Kether). */
