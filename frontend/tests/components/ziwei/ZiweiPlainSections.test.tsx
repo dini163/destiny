@@ -2,10 +2,12 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { cleanup, render } from '@testing-library/react';
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { ZiweiChartGrid } from '../../../src/components/ziwei/ZiweiChartGrid';
+import { VerdictCard } from '../../../src/components/ui/VerdictCard';
 import { PlainSectionList } from '../../../src/components/ui/PlainSectionList';
+import { paragraphByExact } from '../../lib/prose';
 import { pinLiteralOrder } from '../../lib/sourcePin';
 import { readFixture } from '../../lib/readFixture';
 import type { ZiweiChart } from '../../../src/types/ziwei';
@@ -68,6 +70,7 @@ it('the page wires the palaces into the block; the provenance block was removed 
   expect(src).toContain('title="十二宫白话"');
   expect(src).toContain('title="全盘白话"');
   expect(src).toContain('sections={chart.plain}');
+  expect(src).toContain('<VerdictCard verdict={chart.verdict} />');
   /** 溯源块（`<Provenance>` / `<ProvenancePanel>`）已按 2026-10-21 UI 需求从页面移除，
    *  这里改钉「不出现」，不再挂表清单。 */
   expect(src).not.toContain('<ProvenancePanel');
@@ -76,6 +79,7 @@ it('the page wires the palaces into the block; the provenance block was removed 
    *  存在性再逐对比次序（裸 `indexOf` 比较在锚点被整行删掉后因 -1 照样绿，终审 I-1 记的就是这个坑）。 */
   pinLiteralOrder(src, [
     '<ChartSummary chart={chart} />',
+    '<VerdictCard verdict={chart.verdict} />',
     'title="全盘白话"',
     'sections={chart.plain}',
     '<ZiweiChartGrid chart={chart} />',
@@ -85,4 +89,38 @@ it('the page wires the palaces into the block; the provenance block was removed 
 
 it('the fixture provenance payload still lists both tables the endpoint read', () => {
   expect(chart.provenance.tables.map((t) => t.name)).toEqual(['ziwei', 'ziwei_plain']);
+});
+
+describe('综合结论卡片（verdict-card spec §6，结论先行）', () => {
+  /** 档位词、星级排、headline、分项要点与建议全部逐字来自录制夹具的 `verdict`，
+   *  前端一个字不生成（AGENTS §9：夹具只来自 record_frontend_fixtures.py 的真实录制）。
+   *  整页渲染要走 hook + HTTP，这里按 bazi `VerdictCard.test.tsx` 的形状直接挂纯展示件，
+   *  页面接线（挂载点与次序）由上面那条源码测钉。
+   *
+   * 复测口径：
+   *   cd frontend && npx vitest run tests/components/ziwei/ZiweiPlainSections.test.tsx
+   */
+  const verdict = chart.verdict;
+
+  it('档位词与星级排按后端值渲染（★ 实星 / ☆ 补位）', () => {
+    if (!verdict) throw new Error('夹具缺 verdict');
+    render(<VerdictCard verdict={verdict} />);
+    const body = document.body.textContent ?? '';
+    expect(body).toContain(verdict.grade);
+    expect(body).toContain('★'.repeat(verdict.stars));
+    expect(body).toContain('☆'.repeat(5 - verdict.stars));
+  });
+
+  it('headline、分项要点与建议逐字进 DOM，且 headline 在建议之前', () => {
+    if (!verdict) throw new Error('夹具缺 verdict');
+    render(<VerdictCard verdict={verdict} />);
+    const body = document.body.textContent ?? '';
+    for (const point of verdict.points) {
+      expect(body).toContain(point);
+    }
+    expect(body).toContain(verdict.advice);
+    const headline = paragraphByExact(verdict.headline);
+    const advice = paragraphByExact(verdict.advice);
+    expect(headline.compareDocumentPosition(advice) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+  });
 });
