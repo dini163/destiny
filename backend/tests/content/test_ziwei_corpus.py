@@ -33,6 +33,7 @@ from app.content.ziwei import (
     LINGXING_BASE,
     LUCUN_BY_YEAR_GAN,
     MAJOR_STARS,
+    MAJOR_TENDENCIES,
     MINOR_STARS,
     MING_ZHU,
     PALACE_NAMES,
@@ -288,6 +289,25 @@ def test_each_major_star_carries_its_element_group_and_keyword(star_name: str) -
     assert star.yin_yang in {"阴", "阳"}
     assert star.nature and "·" in star.nature
     assert star.key and star.key.isascii() and star.key != star_name
+
+
+@pytest.mark.parametrize("star_name", CLASSICAL_MAJOR_STARS)
+def test_each_major_star_carries_a_classical_tendency_and_source(star_name: str) -> None:
+    """十四主星各带一个定性倾向档（吉/平/动/忌）与《全书·诸星问答论》出处。
+
+    档是古籍定性（帝座/福星/财库/印星/荫星 vs 囚星/暗星/将星/耗星），把档换算成分数
+    的数字权重是引擎侧模型参数，本表不造分、不给数。
+    """
+    star = MAJOR_STARS[star_name]
+    assert star.tendency in MAJOR_TENDENCIES
+    assert star.tendency_source
+    assert "紫微斗数全书" in star.tendency_source
+
+
+def test_tendency_table_balances_the_positive_and_restraining_sides() -> None:
+    """倾向档不能清一色：正面星与牵制星都至少各有一颗，否则判定层退化成常数。"""
+    labels = {star.tendency for star in MAJOR_STARS.values()}
+    assert "吉" in labels and "忌" in labels
 
 
 def test_yin_yang_column_is_populated_and_keeps_sun_moon_polarity() -> None:

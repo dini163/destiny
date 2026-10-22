@@ -559,3 +559,75 @@ def test_the_luck_section_names_the_four_sihua() -> None:
     text = chart.plain[2].text
     for star in (chart.sihua.lu, chart.sihua.quan, chart.sihua.ke, chart.sihua.ji):
         assert star in text
+
+
+# --- 综合结论卡片快照（2026-10-22 verdict-card spec §2b；权重或框架句改动会在这里红） ---
+
+#: 六个校准盘：不同年干支（庚辰/丙戌/己酉/壬戌/甲寅）、男女、闰七月（2006）；
+#: 档位覆盖大吉/吉/平/凶。逐字段钉死，确定性快照，无 mock。
+VERDICT_SNAPSHOTS: list[tuple[str, str, Gender, str, int, str, list[str], str]] = [
+    (
+        "2000-08-16", "12:00", Gender.MALE, "吉", 4,
+        "你的整体格局属吉：命宫三方四正里助力星6颗、牵制星3颗，有利的一面占优，顺势把握。",
+        ["主星格局：吉4 · 忌2", "辅佐煞曜：吉2 · 煞1", "生年四化：禄权科1 · 化忌0"],
+        "综合建议：你这张盘各环相抵有余，稳住现有节奏，把长处继续放大即可。",
+    ),
+    (
+        "2006-09-02", "12:00", Gender.MALE, "吉", 4,
+        "你的整体格局属吉：命宫三方四正里助力星5颗、牵制星1颗，有利的一面占优，顺势把握。",
+        ["主星格局：吉3 · 忌0", "辅佐煞曜：吉2 · 煞1", "生年四化：禄权科2 · 化忌0"],
+        "综合建议：你这张盘各环相抵有余，稳住现有节奏，把长处继续放大即可。",
+    ),
+    (
+        "1970-01-01", "05:15", Gender.MALE, "平", 3,
+        "你的整体格局属平：命宫三方四正里助力星3颗、牵制星3颗，好坏大致相抵，稳住节奏再谈扩展。",
+        ["主星格局：吉3 · 忌1", "辅佐煞曜：吉0 · 煞2", "生年四化：禄权科1 · 化忌0"],
+        "综合建议：你这张盘最需要先理顺的是辅佐煞曜，助力接不上的地方多，遇事靠自己撑住，别等别人来补位。",
+    ),
+    (
+        "1983-01-15", "22:00", Gender.MALE, "凶", 1,
+        "你的整体格局属凶：命宫三方四正里助力星0颗、牵制星6颗，先把基本盘守住，别急着出手。",
+        ["主星格局：吉0 · 忌3", "辅佐煞曜：吉0 · 煞3", "生年四化：禄权科0 · 化忌0"],
+        "综合建议：你这张盘最需要先理顺的是主星格局，主星的底色偏牵制，先认清自己擅长什么，再把力气花在对的方向上。",
+    ),
+    (
+        "1974-07-15", "08:00", Gender.MALE, "大吉", 5,
+        "你的整体格局属大吉：命宫三方四正里助力星8颗、牵制星1颗，格局开阔，值得大胆推进。",
+        ["主星格局：吉4 · 忌1", "辅佐煞曜：吉4 · 煞0", "生年四化：禄权科2 · 化忌0"],
+        "综合建议：你这张盘各环相抵有余，稳住现有节奏，把长处继续放大即可。",
+    ),
+    (
+        "2000-08-16", "12:00", Gender.FEMALE, "吉", 4,
+        "你的整体格局属吉：命宫三方四正里助力星6颗、牵制星3颗，有利的一面占优，顺势把握。",
+        ["主星格局：吉4 · 忌2", "辅佐煞曜：吉2 · 煞1", "生年四化：禄权科1 · 化忌0"],
+        "综合建议：你这张盘各环相抵有余，稳住现有节奏，把长处继续放大即可。",
+    ),
+]
+
+
+@pytest.mark.parametrize("birth, hour, sex, grade, stars, headline, points, advice", VERDICT_SNAPSHOTS)
+def test_verdict_snapshot_is_pinned(
+    birth: str,
+    hour: str,
+    sex: Gender,
+    grade: str,
+    stars: int,
+    headline: str,
+    points: list[str],
+    advice: str,
+) -> None:
+    """六个校准盘的结论卡片逐字段钉死（确定性快照，无 mock）。"""
+    chart = compute_ziwei_chart(
+        birth_date=date.fromisoformat(birth),
+        birth_time=time.fromisoformat(hour),
+        calendar=CalendarType.SOLAR,
+        longitude=116.4074,
+        gender=sex,
+        apply_true_solar_time=False,
+    )
+    verdict = chart.verdict
+    assert verdict.grade == grade
+    assert verdict.stars == stars
+    assert verdict.headline == headline
+    assert verdict.points == points
+    assert verdict.advice == advice

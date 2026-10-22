@@ -46,6 +46,7 @@ TOP_LEVEL_KEYS = {
     "lunar_day", "lunar_leap", "time_zhi", "ming_gong_zhi", "ming_gong_ganzhi",
     "ming_gong_nayin", "shen_gong_zhi", "shen_gong_name", "wuxing_ju", "wuxing_ju_number",
     "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua", "plain",
+    "verdict",
     "dayun_direction", "dayun_start_age", "engine", "provenance",
 }
 
@@ -70,6 +71,7 @@ FRONTEND_CHART_KEYS = {
     "lunar_day", "lunar_leap", "time_zhi", "ming_gong_zhi", "ming_gong_ganzhi",
     "ming_gong_nayin", "shen_gong_zhi", "shen_gong_name", "wuxing_ju", "wuxing_ju_number",
     "ming_zhu", "shen_zhu", "ziwei_zhi", "tianfu_zhi", "palaces", "sihua", "plain",
+    "verdict",
     "dayun_direction", "dayun_start_age", "engine", "provenance",
 }
 
@@ -113,7 +115,7 @@ def test_the_chart_comes_back_with_exactly_the_hand_written_contract(client: Tes
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 32  # 抄漏一格会让上面的相等变成自证
+    assert len(TOP_LEVEL_KEYS) == 33  # 抄漏一格会让上面的相等变成自证
     assert body["name"] is None
     assert body["gender"] == "male"
     assert body["calendar"] == "solar"
@@ -383,6 +385,65 @@ def test_the_same_request_twice_returns_the_identical_board(client: TestClient) 
     assert first.status_code == 200
     assert first.json() == second.json()
     assert first.text == second.text
+
+
+# ------------------------------------------------------------------ 综合结论卡片（verdict）
+
+
+def test_verdict_card_carries_the_five_contract_fields(client: TestClient) -> None:
+    """结论卡片五件齐备：档位词、星级、结论句、三条事实要点、一句建议（verdict-card spec §1）。
+
+    档位词与星级必须与 `verdict.grade_for` 的五档一致；文本全部来自受控框架句，本端点
+    不现编中文。
+    """
+    from app.engines.verdict import GRADE_BANDS
+
+    verdict = _post(client).json()["verdict"]
+    grade_words = {word: stars for _lower, word, stars in GRADE_BANDS}
+    assert set(verdict) == {"grade", "stars", "headline", "points", "advice"}
+    assert verdict["grade"] in grade_words
+    assert verdict["stars"] == grade_words[verdict["grade"]]
+    assert 1 <= verdict["stars"] <= 5
+    assert verdict["headline"].endswith("。") and verdict["headline"].count("。") == 1
+    assert len(verdict["points"]) == 3
+    for point in verdict["points"]:
+        assert point
+    assert verdict["advice"].endswith("。") and verdict["advice"].count("。") == 1
+
+
+def test_verdict_is_identical_across_repeated_requests(client: TestClient) -> None:
+    """判定层只读盘面事实，同请求两次卡片逐字相等（确定性，无随机）。"""
+    first = _post(client).json()["verdict"]
+    second = _post(client).json()["verdict"]
+    assert first == second
+
+
+#: 校准盘：六个生辰覆盖不同年干支、男女、闰月；档位不得全落在同一档（verdict-card
+#: spec §2b 判定层校准约束）。精确快照钉在 golden，本条只验分布不钉档位。
+VERDICT_SPREAD_BIRTHS: list[tuple[str, str, str, dict[str, object]]] = [
+    ("2000-08-16", "12:00", "male", {}),
+    ("2006-09-02", "12:00", "male", {}),          # 丙戌年闰七月
+    ("1970-01-01", "05:15", "male", {}),
+    ("1983-01-15", "22:00", "male", {}),
+    ("1974-07-15", "08:00", "male", {}),
+    ("2000-08-16", "12:00", "female", {}),
+]
+
+
+def test_verdict_spreads_over_more_than_one_grade(client: TestClient) -> None:
+    """六个校准盘的档位至少分出两档：全落一档说明判定层退化成常数。"""
+    grades = set()
+    for birth, hour, sex, overrides in VERDICT_SPREAD_BIRTHS:
+        body = _post(
+            client,
+            birth_date=birth,
+            birth_time=hour,
+            gender=sex,
+            longitude=116.4074,
+            **overrides,
+        ).json()
+        grades.add(body["verdict"]["grade"])
+    assert len(grades) >= 2, f"六个校准盘全落一档: {grades}"
 
 
 def test_there_is_no_score_or_probability_anywhere_in_the_response(client: TestClient) -> None:
