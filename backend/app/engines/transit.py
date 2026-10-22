@@ -28,14 +28,20 @@ from app.content.aspects_nature import ASPECT_NATURE
 from app.content.transit_plain import (
     TRANSIT_NONE_BRANCHES,
     TRANSIT_SECTION_TITLES,
+    TRANSIT_VERDICT_ADVICE,
+    TRANSIT_VERDICT_ADVICE_FRAME,
+    TRANSIT_VERDICT_FRAME,
+    TRANSIT_VERDICT_OUTLOOK,
     aspect_key,
     progressed_axis_key,
     progressed_moon_house_key,
     progressed_moon_sign_key,
 )
 from app.core.errors import EphemerisError, UnsupportedMethodError
-from app.engines.plain_compose import compose
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, overview
 from app.engines.plain_corpora import TRANSIT
+from app.engines.verdict import grade_for
 from app.engines.western import (  # shared, golden-tested astrology primitives
     ASPECTS,
     PLANETS,
@@ -50,7 +56,7 @@ from app.engines.western import (  # shared, golden-tested astrology primitives
     _sign_index,
     compute_western_chart,
 )
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 from app.schemas.transit import (
     AnglePoint,
     CrossAspect,
@@ -220,6 +226,59 @@ def _transit_tables() -> list[ProvenanceTable]:
     ]
 
 
+# --- 综合结论 verdict（2026-10-22 verdict-card spec §2b：无账本系统的新增判定层） ---
+#: 三层等权的相位性质计数权重（模型参数，MODEL_PARAM_SOURCE）：每层每处和谐相位 +k、每处挑战
+#: 相位 −k，融合相位 0；三层同一 k（等权）。性质取自相位自身已填充的 `nature`（共享
+#: `content/aspects_nature.py`），传统只给相位性质不给分数，故 k 自署模型参数。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.transit import NATURE_WEIGHT; print(NATURE_WEIGHT)"` → `1.0`。
+NATURE_WEIGHT: float = 1.0
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位。
+VERDICT_BASE: float = 50.0
+
+#: 上面权重与起点的共同署名：模型参数（非古籍赋分），传统只给相位性质不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+
+def build_verdict(
+    transit_aspects: list[CrossAspect],
+    progression_aspects: list[CrossAspect],
+    solar_arc_aspects: list[CrossAspect],
+) -> Verdict:
+    """三层等权合计相位性质，确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    不重新推运、不现编中文：档位/星级由 `grade_for(50 + k×(三层和谐−三层挑战))` 派生，
+    headline/advice 套 `transit_plain` 的框架句，points 是三类相位的合计处数。融合不计入抵消。
+    """
+    layers = [transit_aspects, progression_aspects, solar_arc_aspects]
+    harmonious = sum(1 for al in layers for a in al if a.nature == "harmonious")
+    challenging = sum(1 for al in layers for a in al if a.nature == "challenging")
+    fusion = sum(1 for al in layers for a in al if a.nature == "fusion")
+    net = harmonious - challenging
+    score = max(0.0, min(100.0, VERDICT_BASE + NATURE_WEIGHT * net))
+    grade, stars = grade_for(score)
+    headline = overview(TRANSIT_VERDICT_FRAME, {
+        "grade": grade,
+        "harmonious": str(harmonious),
+        "challenging": str(challenging),
+        "fusion": str(fusion),
+        "outlook": TRANSIT_VERDICT_OUTLOOK[grade],
+    })
+    advice_key = "favorable" if net >= 0 else "adverse"
+    advice = overview(TRANSIT_VERDICT_ADVICE_FRAME, {"advice": TRANSIT_VERDICT_ADVICE[advice_key]})
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[
+            f"和谐相位 {harmonious} 处",
+            f"挑战相位 {challenging} 处",
+            f"融合相位 {fusion} 处",
+        ],
+        advice=advice,
+    )
+
+
 def compute_transits(
     *,
     birth_date: date,
@@ -318,5 +377,6 @@ def compute_transits(
         progression=progression,
         solar_arc=solar_arc,
         plain=plain,
+        verdict=build_verdict(transit_aspects, progression.aspects, solar_arc.aspects),
         provenance=TransitProvenance(engine="pyswisseph", note=NOTE, tables=_transit_tables()),
     )

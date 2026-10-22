@@ -87,6 +87,41 @@ TRANSIT_SECTION_TITLES: dict[str, str] = {
     "progressed_axis": "次限上升与天顶",
 }
 
+# --- 结论卡片（verdict）装配语料（2026-10-22 verdict-card spec §2b/§4，行运判定层） ---
+#: 下面三组常量**不进** 648 条 `TRANSIT_READINGS`，由引擎用 `overview()` 实例化，工厂条目/
+#: 开篇句措辞门扫不到它们，自守门在 `tests/content/test_transit_verdict_corpus.py`。
+#: 行运页属预测门（PREDICTION_GATED）：框架句与槽位词另过预测禁词与戊组决策禁词。
+
+#: 总论框架：档位词 + 三层合计的三类相位处数 + 一句取向。`{grade}` 取 `verdict.grade_for`
+#: 档位词；`{harmonious}/{challenging}/{fusion}` 是三层合计的处数；`{outlook}` 取
+#: `TRANSIT_VERDICT_OUTLOOK[grade]`。
+TRANSIT_VERDICT_FRAME = (
+    "你这张盘三层相位合计属{grade}：和谐相位{harmonious}处、挑战相位{challenging}处、"
+    "融合相位{fusion}处，{outlook}。"
+)
+
+#: 各档位收束取向，键 = `verdict.GRADE_BANDS` 五档档位词。槽位词条不成句、不带「。」、
+#: 不带建议词与预测禁词。
+TRANSIT_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "三层顺畅关系合计占优，气场舒展",
+    "吉": "和谐的一面偏多，配合顺畅",
+    "平": "顺畅与拉扯大致相抵，各层各有节奏",
+    "小凶": "拉扯的关系更多，多处各自用力",
+    "凶": "紧绷的关系占上风，先放缓节奏",
+}
+
+#: 建议句框架：净计数非负走「配合偏多」，净计数为负走「拉扯偏多」。`{advice}` 取
+#: `TRANSIT_VERDICT_ADVICE[键]`，键由引擎按净计数选定。
+TRANSIT_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这张盘三层相位摆在眼前，{advice}。"
+)
+
+#: 两档建议词条，键 = 引擎净计数分支名；槽位词条不成句、不带「。」、不带建议词与决策禁词。
+TRANSIT_VERDICT_ADVICE: dict[str, str] = {
+    "favorable": "顺畅配合偏多，顺着自身节奏安排即可",
+    "adverse": "拉扯之处偏多，先把紧绷的关系放下，不急推进",
+}
+
 #: 能空的三相（spec §6 的 G15 续用：条件性小节必须有「本段无触发」的第二条开篇句）。
 #: 只有三层相位表真能空——月亮落座与落宫恒 1 条（`schemas/transit.py:94-95` 的 `moon_sign_zh: str`
 #: 与 `moon_natal_house: int`，都是标量不是列表）、两轴恒 2 条（同文件 `:92` 的 `angles` 就是

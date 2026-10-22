@@ -34,7 +34,8 @@ from fastapi.testclient import TestClient
 
 from app.content import transit_plain
 from app.core.errors import UnsupportedMethodError
-from app.engines.transit import _cross_aspects, build_plain, compute_transits
+from app.engines.transit import NATURE_WEIGHT, VERDICT_BASE, _cross_aspects, build_plain, compute_transits
+from app.engines.verdict import grade_for
 from app.engines.western import ASPECTS
 from app.schemas.transit import MovingPoint
 
@@ -324,3 +325,43 @@ def test_a_section_that_goes_empty_without_a_declared_none_branch_crashes() -> N
             moon_house=chart.progression.moon_natal_house,
             prog_angles=[],
         )
+
+
+# --- 综合结论卡片（verdict）：三目标日档位快照 + 纯公式五档分布 -------------------------
+
+#: 三目标日实测档位/星级（2026-10-22 复测，公式见 `engines/transit.py::build_verdict`），
+#: 同一 J2000 生辰、格林尼治、utc_offset=0。
+VERDICT_SNAPSHOTS: tuple[tuple[date, str, int], ...] = (
+    (date(2026, 9, 25), "平", 3),
+    (date(2024, 1, 15), "吉", 4),
+    (date(2030, 12, 1), "吉", 4),
+)
+
+
+@pytest.mark.parametrize("target, grade, stars", VERDICT_SNAPSHOTS, ids=[s[0].isoformat() for s in VERDICT_SNAPSHOTS])
+def test_verdict_snapshot_is_pinned(target: date, grade: str, stars: int) -> None:
+    """每目标日的 verdict 档位/星级逐字段钉死；headline 复述档位与三类相位合计处数。"""
+    chart = _chart(target)
+    assert chart.verdict.grade == grade
+    assert chart.verdict.stars == stars
+    assert chart.verdict.headline.startswith(f"你这张盘三层相位合计属{grade}：")
+    assert chart.verdict.advice.endswith("。")
+    assert chart.verdict.points
+
+
+#: 净计数 → (档位, 星级)。纯公式分布钉五档：真实三目标日只压到两档，故这里用公式直接跨档，
+#: 不桩响应、不造盘。
+VERDICT_BAND_CASES: tuple[tuple[int, str, int], ...] = (
+    (31, "大吉", 5),
+    (16, "吉", 4),
+    (0, "平", 3),
+    (-6, "小凶", 2),
+    (-16, "凶", 1),
+)
+
+
+@pytest.mark.parametrize("net, grade, stars", VERDICT_BAND_CASES)
+def test_verdict_formula_spans_all_five_bands(net: int, grade: str, stars: int) -> None:
+    score = max(0.0, min(100.0, VERDICT_BASE + NATURE_WEIGHT * net))
+    assert grade_for(score) == (grade, stars)
+
