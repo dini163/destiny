@@ -8,6 +8,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useZiwei } from '../hooks/useZiwei';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { calendarLabel, genderLabel } from '../lib/ziwei';
@@ -126,6 +127,8 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
   return (
     <>
       <ChartSummary chart={chart} />
+
+      <VerdictCard verdict={chart.verdict} />
 
       <ResultCard title="全盘白话" eyebrow="OVERALL READING · WHOLE CHART" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
