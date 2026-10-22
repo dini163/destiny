@@ -4,7 +4,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 
 
 class WesternNatalRequest(BaseModel):
@@ -144,6 +144,9 @@ class WesternChart(BaseModel):
     plain: list[PlainSection] = Field(
         description="页尾「白话详解」的八段，逐字取自自撰表 `content/western_plain*.py`（戊组 spec §8）。必填：缺白话即视为伪造响应。"
     )
+
+    verdict: Verdict = Field(description="综合结论卡片：档位/星级/结论句/分项/建议，由相位性质计数判定层合成。")
+
     provenance: WesternProvenance = Field(
         description="出处块：自撰声明与被读取的三张白话表。必填，缺出处即视为伪造响应。"
     )

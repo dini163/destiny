@@ -18,10 +18,15 @@ from datetime import date, datetime, time, timedelta
 import swisseph as swe
 
 from app.content import CONTENT_VERSION, WESTERN_CONTENT_SOURCES
+from app.content.aspects_nature import ASPECT_NATURE
 from app.content.western_plain import (
     WESTERN_NONE_BRANCHES,
     WESTERN_PLAIN_NOTE,
     WESTERN_SECTION_TITLES,
+    WESTERN_VERDICT_ADVICE,
+    WESTERN_VERDICT_ADVICE_FRAME,
+    WESTERN_VERDICT_FRAME,
+    WESTERN_VERDICT_OUTLOOK,
     aspect_key,
     axis_sign_key,
     element_key,
@@ -34,8 +39,10 @@ from app.content.western_plain import (
     retrograde_key,
 )
 from app.core.errors import EphemerisError, UnsupportedMethodError
-from app.engines.plain_compose import compose
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, overview
+from app.engines.verdict import grade_for
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 from app.schemas.western import (
     Aspect,
     AxisPoint,
@@ -259,6 +266,54 @@ def _western_tables() -> list[ProvenanceTable]:
     ]
 
 
+# --- 综合结论 verdict（2026-10-22 verdict-card spec §2b：无账本系统的新增判定层） ---
+#: 相位性质计数权重（模型参数，MODEL_PARAM_SOURCE）：每处和谐相位（六合/拱）+k、每处挑战相位
+#: （刑/冲）−k，融合相位（合相）0。性质取自共享纯表 `content/aspects_nature.py::ASPECT_NATURE`
+#: （与 transit 共读一张，不另立）；传统只给相位性质不给分数，故 k 自署模型参数。复测：
+#: `cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.western import ASPECT_WEIGHT; print(ASPECT_WEIGHT)"` → `2.0`。
+ASPECT_WEIGHT: float = 2.0
+
+#: 中性起点（模型参数，MODEL_PARAM_SOURCE）：50 为五档「平」带中位。
+VERDICT_BASE: float = 50.0
+
+#: 上面权重与起点的共同署名：模型参数（非古籍赋分），传统只给相位性质不给分数。
+VERDICT_WEIGHT_SOURCE = MODEL_PARAM_SOURCE
+
+
+def build_verdict(aspects: list[Aspect]) -> Verdict:
+    """从相位性质计数确定性合成综合结论卡片（verdict-card spec §2b）。
+
+    不重新解盘、不现编中文：档位/星级由 `grade_for(50 + k×(和谐−挑战))` 派生，
+    headline/advice 套 `western_plain` 的框架句，points 是三类相位的处数。融合相位不计入抵消。
+    """
+    harmonious = sum(1 for a in aspects if ASPECT_NATURE[a.type][0] == "harmonious")
+    challenging = sum(1 for a in aspects if ASPECT_NATURE[a.type][0] == "challenging")
+    fusion = sum(1 for a in aspects if ASPECT_NATURE[a.type][0] == "fusion")
+    net = harmonious - challenging
+    score = max(0.0, min(100.0, VERDICT_BASE + ASPECT_WEIGHT * net))
+    grade, stars = grade_for(score)
+    headline = overview(WESTERN_VERDICT_FRAME, {
+        "grade": grade,
+        "harmonious": str(harmonious),
+        "challenging": str(challenging),
+        "fusion": str(fusion),
+        "outlook": WESTERN_VERDICT_OUTLOOK[grade],
+    })
+    advice_key = "favorable" if net >= 0 else "adverse"
+    advice = overview(WESTERN_VERDICT_ADVICE_FRAME, {"advice": WESTERN_VERDICT_ADVICE[advice_key]})
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[
+            f"和谐相位 {harmonious} 处",
+            f"挑战相位 {challenging} 处",
+            f"融合相位 {fusion} 处",
+        ],
+        advice=advice,
+    )
+
+
 def compute_western_chart(
     *,
     birth_date: date,
@@ -399,5 +454,6 @@ def compute_western_chart(
         element_balance=element_balance,
         modality_balance=modality_balance,
         plain=plain,
+        verdict=build_verdict(aspects),
         provenance=WesternProvenance(note=WESTERN_PLAIN_NOTE, tables=_western_tables()),
     )

@@ -57,12 +57,15 @@ from app.engines.synastry import _synastry_aspects
 from app.engines.transit import _cross_aspects
 from app.engines.western import (
     ASPECTS,
+    ASPECT_WEIGHT,
+    VERDICT_BASE,
     _compute_aspects,
     _degree_in_sign,
     _format_degree,
     _sign_index,
     compute_western_chart,
 )
+from app.engines.verdict import grade_for
 from app.schemas.transit import MovingPoint
 from app.schemas.western import PlanetPlacement
 
@@ -616,3 +619,50 @@ def test_the_retrograde_none_opener_is_reachable_from_a_real_chart() -> None:
     # 这条盘顺带走另一个真盘空态：cardinal 计数为 0，所以「元素与形态」段只有
     # 元素三行 + 形态两行，少一个形态键。写在这里是因为它同样是「真盘上的空」而不是构造出来的空。
     assert chart.modality_balance["cardinal"] == 0
+
+
+# --- 综合结论卡片（verdict）：三真盘档位快照 + 纯公式五档分布 -------------------------
+
+#: 三盘实测档位/星级（2026-10-22 复测，公式见 `engines/western.py::build_verdict`）。
+#: 格林尼治同经度，utc_offset=0。
+VERDICT_SNAPSHOTS: tuple[tuple[str, object, str, int], ...] = (
+    ("J2000", (date(2000, 1, 1), time(12, 0)), "平", 3),
+    ("1990-05-04", (date(1990, 5, 4), time(9, 12)), "吉", 4),
+    ("2010-03-08", (date(2010, 3, 8), time(0, 45)), "小凶", 2),
+)
+
+
+@pytest.mark.parametrize("tag, when, grade, stars", VERDICT_SNAPSHOTS, ids=[s[0] for s in VERDICT_SNAPSHOTS])
+def test_verdict_snapshot_is_pinned(tag: str, when: tuple[date, time], grade: str, stars: int) -> None:
+    """每盘的 verdict 档位/星级逐字段钉死；headline 复述档位与三类相位处数。"""
+    birth_date, birth_time = when
+    chart = compute_western_chart(
+        birth_date=birth_date,
+        birth_time=birth_time,
+        latitude=GREENWICH_LAT,
+        longitude=GREENWICH_LON,
+        utc_offset_hours=0.0,
+    )
+    assert chart.verdict.grade == grade
+    assert chart.verdict.stars == stars
+    assert chart.verdict.headline.startswith(f"你这张盘的相位格局属{grade}：")
+    assert chart.verdict.advice.endswith("。")
+    assert chart.verdict.points
+
+
+#: 净计数 → (档位, 星级)。纯公式分布钉五档：真实三盘只压到三档，故这里用公式直接跨档，
+#: 不桩响应、不造盘。
+VERDICT_BAND_CASES: tuple[tuple[int, str, int], ...] = (
+    (16, "大吉", 5),
+    (8, "吉", 4),
+    (0, "平", 3),
+    (-3, "小凶", 2),
+    (-8, "凶", 1),
+)
+
+
+@pytest.mark.parametrize("net, grade, stars", VERDICT_BAND_CASES)
+def test_verdict_formula_spans_all_five_bands(net: int, grade: str, stars: int) -> None:
+    score = max(0.0, min(100.0, VERDICT_BASE + ASPECT_WEIGHT * net))
+    assert grade_for(score) == (grade, stars)
+

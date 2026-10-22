@@ -109,6 +109,41 @@ WESTERN_OPENERS: dict[str, str] = {
     "balance": "最后是四元素与三形态在你这十颗星上的分布，它说的是整张盘的底色偏向哪一种运作方式，不是缺了什么。",
 }
 
+# --- 结论卡片（verdict）装配语料（2026-10-22 verdict-card spec §2b/§4，西洋本命判定层） ---
+#: 下面三组常量**不进** `WESTERN_READINGS`（工厂键全集不变），由引擎用 `overview()` 实例化，
+#: 工厂条目/开篇句措辞门扫不到它们，自守门在 `tests/content/test_western_verdict_corpus.py`。
+#: 本命页属预测门（PREDICTION_GATED）：框架句与槽位词另过预测禁词与戊组决策禁词。
+
+#: 总论框架：档位词 + 三类相位计数 + 一句取向。`{grade}` 取 `verdict.grade_for` 档位词；
+#: `{harmonious}/{challenging}/{fusion}` 是引擎按 `ASPECT_NATURE` 数出的三类相位处数；
+#: `{outlook}` 取 `WESTERN_VERDICT_OUTLOOK[grade]`。
+WESTERN_VERDICT_FRAME = (
+    "你这张盘的相位格局属{grade}：和谐相位{harmonious}处、挑战相位{challenging}处、"
+    "融合相位{fusion}处，{outlook}。"
+)
+
+#: 各档位收束取向，键 = `verdict.GRADE_BANDS` 五档档位词。槽位词条不成句、不带「。」、
+#: 不带建议词与预测禁词。
+WESTERN_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "顺畅的关系占了多数，气场舒展",
+    "吉": "和谐的一面偏多，配合顺畅",
+    "平": "顺畅与拉扯大致相抵，各有节奏",
+    "小凶": "拉扯的关系更多，多处各自用力",
+    "凶": "紧绷的关系占上风，先放缓节奏",
+}
+
+#: 建议句框架：净计数非负走「配合偏多」，净计数为负走「拉扯偏多」。`{advice}` 取
+#: `WESTERN_VERDICT_ADVICE[键]`，键由引擎按净计数选定。
+WESTERN_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这张盘的相位关系摆在眼前，{advice}。"
+)
+
+#: 两档建议词条，键 = 引擎净计数分支名；槽位词条不成句、不带「。」、不带建议词与决策禁词。
+WESTERN_VERDICT_ADVICE: dict[str, str] = {
+    "favorable": "顺畅配合偏多，顺着自身节奏安排即可",
+    "adverse": "拉扯之处偏多，先把紧绷的关系放下，不急推进",
+}
+
 #: 轴 / 交点 / 宫题 / 元素 / 形态 / 逆行 七族（77 条），由 T7-T9 填。留空是刻意的：
 #: 聚合面与本地门从 T1 就要能跑完整形状，不然门在第一批就被绕过去。
 WESTERN_SMALL_READINGS: dict[str, str] = {
