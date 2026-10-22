@@ -5,6 +5,7 @@ import { QimenControls } from '../components/qimen/QimenControls';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useQimen } from '../hooks/useQimen';
 import type { QimenChart, QimenRequest } from '../types/qimen';
 
@@ -71,6 +72,8 @@ function QimenResults({ chart }: { chart: QimenChart }) {
   return (
     <>
       <JuSummary chart={chart} />
+
+      <VerdictCard verdict={chart.verdict} />
 
       <ResultCard title="全局白话" eyebrow="OVERALL READING · WHOLE BOARD" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />

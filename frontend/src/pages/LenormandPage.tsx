@@ -6,6 +6,7 @@ import { LenormandCard } from '../components/lenormand/LenormandCard';
 import { LenormandControls } from '../components/lenormand/LenormandControls';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useLenormand } from '../hooks/useLenormand';
 import { polarityChip, significatorRequestValue } from '../lib/lenormand';
 import type { DrawnCard, LenormandReading, LenormandRequest, SignificatorChoice } from '../types/lenormand';
@@ -126,6 +127,8 @@ function LenormandResults({
           </ResultCard>
         </div>
       </div>
+
+      <VerdictCard verdict={reading.verdict} />
 
       <ResultCard title="综合判读" eyebrow="SYNTHESIS" icon="sparkle">
         <p className="font-display text-sm leading-relaxed text-ink-variant sm:text-base">{reading.synthesis}</p>

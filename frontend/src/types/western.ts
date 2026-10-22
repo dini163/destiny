@@ -3,7 +3,7 @@
  * `backend/app/schemas/western.py`. snake_case is preserved end-to-end.
  */
 
-import type { PlainSection, ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable, Verdict } from './common';
 
 /** One of the four chart angles. */
 export type AxisName = 'ASC' | 'DES' | 'MC' | 'IC';
@@ -142,6 +142,8 @@ export interface WesternChart {
 
   /** 页尾「白话详解」八段，逐字取自 `content/western_plain*.py`；请求时不生成任何中文。 */
   plain: PlainSection[];
+  /** 综合结论卡片：档位/星级/结论句/分项/建议，由相位性质计数判定层合成。 */
+  verdict: Verdict;
   /** 出处块：自撰声明 + 三张表。 */
   provenance: WesternProvenance;
 

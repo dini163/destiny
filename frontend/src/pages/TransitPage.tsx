@@ -11,6 +11,7 @@ import { SelectMenu } from '../components/ui/SelectMenu';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { useTransit } from '../hooks/useTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
@@ -169,6 +170,8 @@ function TransitResults({ chart }: { chart: TransitChart }) {
   return (
     <>
       <SummaryStrip chart={chart} />
+
+      <VerdictCard verdict={chart.verdict} />
 
       <div className="panel-raised flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1.5">
