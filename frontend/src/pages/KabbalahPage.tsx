@@ -37,7 +37,9 @@ export function KabbalahPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
-      <Intro />
+      <div className="kabbalah-reveal">
+        <Intro />
+      </div>
 
       {tree.error ? (
         <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-4 py-3 text-sm text-ink">
@@ -52,20 +54,24 @@ export function KabbalahPage() {
         <>
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <ResultCard
-                title="生命之树"
-                eyebrow={`TREE OF LIFE · ${tree.data.sephirah_count} 原质 · ${tree.data.path_count} 路径`}
-                icon="compass"
-                elevated
-              >
-                <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
-                <SephirahIndex tree={tree.data} selection={selection} onSelect={setSelection} />
-                <PathIndex tree={tree.data} selection={selection} onSelect={setSelection} />
-              </ResultCard>
+              <div className="kabbalah-reveal" style={{ animationDelay: '0.1s' }}>
+                <ResultCard
+                  title="生命之树"
+                  eyebrow={`TREE OF LIFE · ${tree.data.sephirah_count} 原质 · ${tree.data.path_count} 路径`}
+                  icon="compass"
+                  elevated
+                >
+                  <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
+                  <SephirahIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+                  <PathIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+                </ResultCard>
+              </div>
 
-              <ResultCard title="全树白话" eyebrow="OVERALL READING · TREE OF LIFE" icon="sparkle" elevated>
-                <PlainSectionList sections={tree.data.plain} />
-              </ResultCard>
+              <div className="kabbalah-reveal" style={{ animationDelay: '0.18s' }}>
+                <ResultCard title="全树白话" eyebrow="OVERALL READING · TREE OF LIFE" icon="sparkle" elevated>
+                  <PlainSectionList sections={tree.data.plain} />
+                </ResultCard>
+              </div>
             </div>
             <div className="lg:col-span-5">
               <ResultCard title="原质 / 路径详解" eyebrow="NODE INSPECTOR" icon="search" className="lg:sticky lg:top-32">
