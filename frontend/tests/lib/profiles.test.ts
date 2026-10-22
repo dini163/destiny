@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   loadProfiles,
+  nameSliceOf,
   persistProfiles,
   profileToBirthInput,
   removeProfile,
@@ -121,5 +122,30 @@ describe('profile store (localStorage-backed person vault)', () => {
     expect(loadProfiles()).toEqual([]);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ not: 'an array' }));
     expect(loadProfiles()).toEqual([]);
+  });
+});
+
+describe('nameSliceOf (profile → 姓名学 prefill)', () => {
+  it('uses the surname/given split when present', () => {
+    expect(
+      nameSliceOf(makeProfile({ surname: '欧阳', given: '青玄' })),
+    ).toEqual({ surname: '欧阳', given: '青玄' });
+  });
+
+  it('splits a name-only profile into first char surname and the rest as given', () => {
+    expect(nameSliceOf(makeProfile({ surname: undefined, given: undefined }))).toEqual({
+      surname: '陆',
+      given: '青玄',
+    });
+  });
+
+  it('handles a single-char name by putting it in surname only', () => {
+    expect(nameSliceOf(makeProfile({ name: '王', surname: undefined, given: undefined }))).toEqual(
+      { surname: '王', given: undefined },
+    );
+  });
+
+  it('returns null when neither split nor full name exists', () => {
+    expect(nameSliceOf(makeProfile({ name: undefined, surname: undefined, given: undefined }))).toBeNull();
   });
 });

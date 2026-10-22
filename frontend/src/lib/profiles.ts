@@ -53,6 +53,24 @@ export interface ProfileName {
   given?: string;
 }
 
+/**
+ * 档案 → 姓名学预填。档案有姓/名拆分就用拆分；只有全名（无拆分字段）时按中文
+ * 名惯例取首字为姓、余字为名——这只是便利预填，可编辑，复姓等边界由读者自行修正。
+ */
+export function nameSliceOf(
+  profile: Pick<PersonProfile, 'surname' | 'given' | 'name'>,
+): ProfileName | null {
+  const { surname, given, name } = profile;
+  if (surname || given) {
+    return { surname: surname ?? undefined, given: given ?? undefined };
+  }
+  if (!name) {
+    return null;
+  }
+  const [first, ...rest] = name.trim();
+  return first ? { surname: first, given: rest.join('') || undefined } : null;
+}
+
 const STORAGE_KEY = 'destiny.personProfiles.v1';
 
 /** Read the profile list from localStorage; corrupt or absent data degrades to []. */
