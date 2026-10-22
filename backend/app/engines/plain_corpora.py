@@ -253,7 +253,11 @@ QIMEN = PlainCorpus(
     # 九宫开篇句。键 = `LUOSHU[*].gua` 逐字（含中宫的 `中`），覆盖面由
     # `test_qimen_plain_corpus.py::test_openers_are_exactly_the_nine_luoshu_gua` 钉。
     openers=qimen_plain.QIMEN_PALACE_OPENERS,
-    # 盘面不打分、不判档位（spec §13）：白话逐宫说话，不补一句综合吉凶。
+    # 【2026-10-22 已推翻】原裁定「盘面不打分、不判档位（spec §13）：白话逐宫说话，不补一句
+    # 综合吉凶」对综合结论卡片失效：verdict 卡片由值符/值使两宫吉凶计数判定层合成
+    # （`engines/qimen.py::build_verdict`，规则出处见该引擎 LUCK_WEIGHT 注释与
+    # `qimen_plain` 的 VERDICT_* 框架句；仓内仍无格局表，本轮不新增格局判定）。白话段落层
+    # 仍 `closers=None`、`grouping="keep"` 不变——判定层与白话层分开，本登记表不管 verdict。
     closers=None,
     # 偏差表第 1 行：`LUOSHU` 没有 luck 字段、`EIGHT_DOORS` 两条「中平」，`band` 分支
     # 遇 0 值符号直接 `ValueError`——所以 `keep`，次序 = 引擎的读盘序「星→门→神」。
@@ -277,7 +281,10 @@ LENORMAND = PlainCorpus(
     # 五阵开篇句。键 = `SPREADS` 的 id，覆盖面由
     # `test_lenormand_plain_corpus.py::test_openers_are_exactly_the_five_spread_ids` 钉。
     openers=lenormand_plain.LENORMAND_SPREAD_OPENERS,
-    # 综合判读由 `synthesis` 承担（`engines/lenormand.py:98`），白话不再补档位结论。
+    # 【2026-10-22 已推翻】原裁定「综合判读由 synthesis 承担，白话不再补档位结论」失效：
+    # 综合结论卡片（verdict）由极性计数判定层合成（`engines/lenormand.py::build_verdict`，
+    # 规则出处见该引擎权重注释与 `lenormand_plain` 的 VERDICT_* 框架句）。白话段落层仍
+    # `closers=None` 不变——判定层与白话层分开，本登记表不管 verdict。
     closers=None,
     # 极性三档里有 0（28 男人 / 29 女人两张指示牌），`band` 分支遇 0 值符号直接
     # `ValueError`；而牌阵的读序本来就是位序（第 1 张 → 第 n 张），`keep` 正是它。
@@ -358,8 +365,11 @@ WESTERN = PlainCorpus(
     entries=western_plain.WESTERN_READINGS,
     # 八个小节 + 两条空态开篇句，共十条；键名就是 `build_plain` 传给 `compose()` 的 section 名。
     openers=western_plain.WESTERN_OPENERS,
-    # 本命盘没有分数账本（spec 裁定 R48）：三页一律不给「这盘好不好」的总结句，
-    # 而 `plain_compose.py:72-74` 那条 `ValueError` 正是为了拦「由合成器补一句结论」。
+    # 【2026-10-22 已推翻·仅西洋本命】原 R48「本命盘没有分数账本，三页一律不给『这盘好不好』
+    # 的总结句」对综合结论卡片失效：verdict 卡片由相位性质计数判定层合成
+    # （`engines/western.py::build_verdict`，性质取自共享 `content/aspects_nature.py`）。白话段落层
+    # 仍 `closers=None`，`plain_compose.py:72-74` 的 `ValueError` 照旧拦「合成器补结论句」——判定层
+    # 与白话层分开，本登记表不管 verdict。（transit/vedic 两段 R48 各自另行处理。）
     closers=None,
     # 不分带（spec §6 三条理由：丙组三条语料今天全是 keep；`band` 分支遇 0 值符号直接崩而落座/
     # 宫题/元素没有符号；页尾块的次序应按盘面既有次序，重排本身就是一种判断）。
@@ -405,8 +415,11 @@ TRANSIT = PlainCorpus(
     entries=transit_plain.TRANSIT_READINGS,
     # 五个小节 + 三条空态开篇句，共八条；键名就是 `build_plain` 要传给 `compose()` 的 section 名。
     openers=transit_plain.TRANSIT_OPENERS,
-    # 三层都不给分数账本（spec 裁定 R48）：页面不许由合成器补一句「这段时间好不好」的总结句，
-    # 而 `plain_compose.py:72-74` 那条 `ValueError` 正是为了拦「由合成器补一句结论」。
+    # 【2026-10-22 已推翻·仅行运】原 R48「三层都不给分数账本，页面不许由合成器补一句『这段时间
+    # 好不好』的总结句」对综合结论卡片失效：verdict 卡片由三层等权相位性质计数判定层合成
+    # （`engines/transit.py::build_verdict`，性质取自相位已填充的 `nature`）。白话段落层仍
+    # `closers=None`，`plain_compose.py:72-74` 的 `ValueError` 照旧拦合成器补结论句——判定层与
+    # 白话层分开，本登记表不管 verdict。
     closers=None,
     # 不分带（`band` 分支遇 0 值符号直接 `ValueError` 而相位条目没有符号可传，`plain_compose.py:64-67`；
     # `keep` 分支不看符号，所以 `items` 的符号位一律传 `0`——这条形状写在 spec 裁定 R48）。
