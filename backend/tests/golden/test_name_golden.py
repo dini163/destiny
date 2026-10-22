@@ -19,7 +19,7 @@ from app.content.name_plain import (
     sancai_key,
     shuli_key,
 )
-from app.engines.name_numerology import GRID_ORDER, analyze_name
+from app.engines.name_numerology import GRID_ORDER, NAME_STARS, analyze_name
 
 GRID_KEYS = ["tian", "ren", "di", "wai", "zong"]
 
@@ -145,6 +145,24 @@ def test_unresolved_grid_and_response_never_fabricate_a_number() -> None:
     )
     assert _grid(ZHANG_UNRESOLVED, "ren").verdict is None
     assert ZHANG_UNRESOLVED.sancai is None and ZHANG_UNRESOLVED.score is None
+    assert ZHANG_UNRESOLVED.verdict is None
     assert ZHANG_UNRESOLVED.plain_summary == "\n".join(
         [NAME_SUMMARY_OPENER, NAME_READINGS[shuli_key(12)]]
     )
+
+
+def test_verdict_card_carries_grade_stars_points_and_none_when_unresolved() -> None:
+    """结论卡片：档位词 = score.tier，星级 = 署名映射 NAME_STARS，points 为五格 + 三才；
+    笔画未核定（score None）时 verdict 整块省略，不补占位卡。"""
+    for analysis in (ZHANG_YI, LU_QINGXUAN):
+        assert analysis.score is not None and analysis.verdict is not None
+        card = analysis.verdict
+        assert card.grade == analysis.score.tier
+        assert card.stars == NAME_STARS[card.grade]
+        assert 1 <= card.stars <= 5
+        expected_points = len(analysis.grids) + (1 if analysis.sancai is not None else 0)
+        assert len(card.points) == expected_points
+        assert card.grade in card.headline
+        assert analysis.score.tier in card.headline
+        assert card.advice
+    assert ZHANG_UNRESOLVED.verdict is None

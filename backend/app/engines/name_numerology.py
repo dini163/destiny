@@ -25,9 +25,9 @@ from app.content.kangxi_strokes import (
 )
 from app.core.errors import NameInputError
 from app.core.provenance import MODEL_PARAM_SOURCE
-from app.engines.plain_compose import compose, dedupe
+from app.engines.plain_compose import compose, dedupe, num, overview
 from app.engines.plain_corpora import NAME
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.name import (
     CorpusProvenance,
     NameAnalysis,
@@ -74,6 +74,16 @@ GRID_WEIGHTS: dict[str, float] = {
 #: 等级 → 分值。分值与权重都是本系统参数，与语料等级两段出处一起署在账本行上。
 FORTUNE_SCORES: dict[str, float] = {"大吉": 100.0, "吉": 80.0, "半吉": 50.0, "凶": 0.0}
 SCORE_TIERS: tuple[tuple[float, str], ...] = ((85, "上等"), (70, "中上"), (50, "中"), (30, "中下"), (0, "下"))
+
+#: 五档 → 星级（署名模型参数，`MODEL_PARAM_SOURCE`；古籍只给定性档、不给星，单调不减：
+#: 上等 5 / 中上 4 / 中 3 / 中下 2 / 下 1）。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.name_numerology import NAME_STARS; print([(k, NAME_STARS[k]) for k in ('上等','中上','中','中下','下')])"`
+#: → `[('上等', 5), ('中上', 4), ('中', 3), ('中下', 2), ('下', 1)]`。
+NAME_STARS: dict[str, int] = {"上等": 5, "中上": 4, "中": 3, "中下": 2, "下": 1}
+
+#: 五格 fortune 等级序（大吉 > 吉 > 半吉 > 凶），选分量最轻的一格进建议句；顺序按
+#: `FORTUNE_SCORES` 的高低，不按账本 delta（凶格 delta 恰为 0，按 delta 选会选错）。
+FORTUNE_RANK: dict[str, int] = {"大吉": 3, "吉": 2, "半吉": 1, "凶": 0}
 
 #: 白话分带符号读的是 `NameFortune` 自身的序，不是账本 delta（spec 裁定 R2）：
 #: delta = 权重 × `FORTUNE_SCORES`，而最低档「凶」是 0 分，所以 delta 恒 ≥ 0、命中凶格恰为 0，
@@ -312,6 +322,36 @@ def name_score(grids: dict[str, int | None]) -> ScoreValue | None:
     return build_ledger(base=0.0, tier=tier, contributions=contributions, base_rule="score.base")
 
 
+def name_verdict(built: list[NameGrid], sancai: Sancai | None, score: ScoreValue) -> Verdict:
+    """装配综合结论卡片（verdict-card spec §4）。
+
+    档位词取 `score.tier`（`SCORE_TIERS`），星级取署名映射 `NAME_STARS`，headline/advice 套
+    `name_plain` 的框架句，points 是五格 fortune + 三才 tier；本函数不现编中文。只在
+    `score` 非 None 时由 `analyze_name` 调用，未核定场景整块省略（None 纪律）。
+    """
+    grade = score.tier
+    weakest = min(built, key=lambda grid: FORTUNE_RANK[grid.fortune or "凶"])
+    points = [f"{grid.label}：{grid.fortune}" for grid in built]
+    if sancai is not None:
+        points.append(f"三才：{sancai.tier}")
+    headline = overview(name_plain.NAME_VERDICT_FRAME, {
+        "grade": grade,
+        "score": num(score.value),
+        "outlook": name_plain.NAME_VERDICT_OUTLOOK[grade],
+    })
+    advice = overview(name_plain.NAME_VERDICT_ADVICE_FRAME, {
+        "weak": weakest.label,
+        "tier_advice": name_plain.NAME_TIER_ADVICE[grade],
+    })
+    return Verdict(
+        grade=grade,
+        stars=NAME_STARS[grade],
+        headline=headline,
+        points=points,
+        advice=advice,
+    )
+
+
 def name_plain_summary(grids: Sequence[NameGrid], score: ScoreValue | None) -> str:
     """响应级总论：把各格卡上已经说过的那一句按顺/注意两侧重排，末尾落综合档位。
 
@@ -455,6 +495,9 @@ def analyze_name(
 
     built = [build_grid(term) for term in terms]
     score_value = name_score(grids)
+    sancai = sancai_of(grids)
+    # score 为 None（任一格笔画未核定）时 verdict 一并省略，同 score 的 None 纪律，不补占位卡。
+    verdict = name_verdict(built, sancai, score_value) if score_value is not None else None
 
     return NameAnalysis(
         input=NameInput(
@@ -469,8 +512,9 @@ def analyze_name(
             for char, value in zip(list(surname) + list(given), resolved, strict=True)
         ],
         grids=built,
-        sancai=sancai_of(grids),
+        sancai=sancai,
         score=score_value,
+        verdict=verdict,
         plain_summary=name_plain_summary(built, score_value),
         warnings=sorted(set(warnings)),
         provenance=name_provenance(),

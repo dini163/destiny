@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.scoring import ScoreValue
 
 
@@ -96,6 +96,11 @@ class NameAnalysis(BaseModel):
     grids: list[NameGrid] = Field(description="固定序：天 → 人 → 地 → 外 → 总。")
     sancai: Sancai | None = Field(default=None, description="天/人/地任一缺笔画时整块不出。")
     score: ScoreValue | None
+    verdict: Verdict | None = Field(
+        default=None,
+        description="综合结论卡片：档位词（SCORE_TIERS 五档）+ 星级 + 结论句 + 五格/三才分项 + 建议；"
+        "score 为 None（笔画未核定）时整块省略，同 score 的 None 纪律。",
+    )
     plain_summary: str = Field(
         description="响应级白话总论：五格数理按顺/注意两侧重排，末尾落在综合指数档位上；算不出分时不出档位句（白话层不新增判断）。"
     )

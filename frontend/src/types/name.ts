@@ -5,7 +5,7 @@
  * `grids` 的固定序（天→人→地→外→总）由后端保证，前端不再排序。
  */
 
-import type { ProvenanceTable } from './common';
+import type { ProvenanceTable, Verdict } from './common';
 import type { ScoreValue } from './scoring';
 
 /** 设计稿印出的四档吉凶，无第五种取值。 */
@@ -99,6 +99,8 @@ export interface NameAnalysis {
   grids: NameGrid[];
   sancai: Sancai | null;
   score: ScoreValue | null;
+  /** 综合结论卡片；score 为 null（笔画未核定）时整块省略。 */
+  verdict: Verdict | null;
   /** 响应级白话总论：顺/注意两侧重排，末尾落综合档位（算不出分时不出档位句）。 */
   plain_summary: string;
   warnings: string[];

@@ -51,6 +51,35 @@ NAME_SCORE_CLOSERS: dict[str, str] = {
     "下": "你这份配置落在下档，表的措辞在这一档最重，读这段时把它当气象分布看，别当作对个人的判词。",
 }
 
+#: 结论卡片（verdict-card spec §4）框架句与槽位语料。三组常量**不进** `NAME_READINGS`
+#: （工厂键全集仍为 87），由引擎用 `overview()` 实例化，工厂条目/开篇句措辞门扫不到它们；
+#: 五档→星级映射是署名模型参数，住引擎侧（古籍只给定性档、不给星），不在本表。
+#: 总论框架：档位词 + 综合指数分数 + 一句取向。`{grade}` 取 `SCORE_TIERS` 的档位词；
+#: `{score}` 是账本 `score.value`；`{outlook}` 取 `NAME_VERDICT_OUTLOOK[grade]`。
+NAME_VERDICT_FRAME = "这份五格配置综合属{grade}，综合指数{score}分落在这一档，{outlook}。"
+
+#: 五档收束取向，键 = `SCORE_TIERS` 的五个档位名。槽位词条不成句、不带「。」。
+NAME_VERDICT_OUTLOOK: dict[str, str] = {
+    "上等": "气象最足，顺势把握就好",
+    "中上": "顺遂为主，值得推进",
+    "中": "好坏相抵，稳中求进",
+    "中下": "吃力的一面偏重，先留意短板",
+    "下": "宜守不宜进，先把能稳的部分稳住",
+}
+
+#: 建议句框架：五格里分量最轻的一格 + 该档一句口语建议。`{weak}` 是 fortune 等级最低的
+#: 那一格 label（天格/人格/地格/外格/总格），`{tier_advice}` 取 `NAME_TIER_ADVICE[grade]`。
+NAME_VERDICT_ADVICE_FRAME = "综合建议：五格里{weak}这一格分量最轻，{tier_advice}。"
+
+#: 五档各自的一句口语建议，键同 `SCORE_TIERS`。槽位词条不成句、不带「。」。
+NAME_TIER_ADVICE: dict[str, str] = {
+    "上等": "气象已足，不必另作改动",
+    "中上": "把顺遂的一面接住，留一分余地",
+    "中": "顺与吃力相抵，稳住节奏，别急着翻局",
+    "中下": "先留意分量最轻的那一格，缓一步再扩",
+    "下": "先守住能稳的部分，这一段不宜硬往前",
+}
+
 #: 三才档位的 4 句收尾。键 = `SANCAI_TIERS` 的档位名。
 NAME_SANCAI_CLOSERS: dict[str, str] = {
     "相生和顺": "三对关系全是生与比，你身上的三股力气彼此扶持，内部不打架是这一段最实在的形容。",

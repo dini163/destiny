@@ -94,6 +94,7 @@ def test_char_outside_the_corpus_keeps_the_unaffected_grids(client: TestClient) 
     assert grids["ren"]["formula"] == "5+?"
     assert grids["wai"]["formula"] == "总格−人格+1"
     assert body["sancai"] is None and body["score"] is None
+    assert body["verdict"] is None
     text = response.text
     assert '"value":0' not in text and '"number":0' not in text
 
