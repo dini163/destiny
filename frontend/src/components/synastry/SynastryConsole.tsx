@@ -41,12 +41,16 @@ function SideColumn({
   placeholder,
   state,
   onChange,
+  onSaveProfile,
 }: {
   caption: string;
   placeholder: string;
   state: SideState;
   onChange: (next: Partial<SideState>) => void;
+  /** 提供时在列尾渲染「存入档案」：把这一列当前的输入交给页面持久化。 */
+  onSaveProfile?: (() => void) | undefined;
 }) {
+  const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
     <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
@@ -98,6 +102,19 @@ function SideColumn({
           />
         </div>
       </LabeledField>
+
+      {onSaveProfile ? (
+        <button
+          type="button"
+          className="btn-ghost"
+          disabled={!saveable}
+          title={`把这一侧的输入存入本地档案（需生辰齐备）`}
+          onClick={onSaveProfile}
+        >
+          <Icon name="vault" size={16} />
+          存入档案
+        </button>
+      ) : null}
     </fieldset>
   );
 }
@@ -109,6 +126,8 @@ interface SynastryConsoleProps {
    */
   sideAPreset?: SideState | null;
   sideBPreset?: SideState | null;
+  /** 提供时两列各渲染「存入档案」；回调解锁的是对应一列的表单状态。 */
+  onSaveProfile?: (side: 'A' | 'B', state: SideState) => void;
   pending: boolean;
   onSubmit: (request: SynastryRequest) => void;
 }
@@ -121,7 +140,13 @@ interface SynastryConsoleProps {
  * 一份的 UTC 偏移（留空即按经度推算）——西洋盘的宫头与上升依赖真实经纬度，故纬度同样必填。
  * 状态全在本件里，页面只接一份可直接下发的 {@link SynastryRequest}。
  */
-export function SynastryConsole({ sideAPreset, sideBPreset, pending, onSubmit }: SynastryConsoleProps) {
+export function SynastryConsole({
+  sideAPreset,
+  sideBPreset,
+  onSaveProfile,
+  pending,
+  onSubmit,
+}: SynastryConsoleProps) {
   const [sideA, setSideA] = useState<SideState>(EMPTY_SIDE);
   const [sideB, setSideB] = useState<SideState>(EMPTY_SIDE);
   const [houseSystem, setHouseSystem] = useState('P');
@@ -202,12 +227,18 @@ export function SynastryConsole({ sideAPreset, sideBPreset, pending, onSubmit }:
           placeholder="如：先生"
           state={sideA}
           onChange={(next) => setSideA((prev) => ({ ...prev, ...next }))}
+          onSaveProfile={
+            onSaveProfile ? () => onSaveProfile('A', sideA) : undefined
+          }
         />
         <SideColumn
           caption="乙方"
           placeholder="如：女士"
           state={sideB}
           onChange={(next) => setSideB((prev) => ({ ...prev, ...next }))}
+          onSaveProfile={
+            onSaveProfile ? () => onSaveProfile('B', sideB) : undefined
+          }
         />
       </div>
 

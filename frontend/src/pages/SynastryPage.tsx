@@ -5,15 +5,17 @@ import { SynastryBiWheel } from '../components/synastry/SynastryBiWheel';
 import { SynastryConsole, type SideState } from '../components/synastry/SynastryConsole';
 import { SynastryScoreRing } from '../components/synastry/SynastryScoreRing';
 import { ProfilePicker } from '../components/profiles/ProfilePicker';
+import { ProfileEditor } from '../components/profiles/ProfileEditor';
 import { AstroWheel } from '../components/western/AstroWheel';
 import { ElementBalance } from '../components/western/ElementBalance';
 import { HouseTable } from '../components/western/HouseTable';
 import { Icon } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useSynastry } from '../hooks/useSynastry';
 import { useProfiles } from '../hooks/useProfiles';
-import type { PersonProfile } from '../lib/profiles';
+import type { PersonProfile, ProfileDraft } from '../lib/profiles';
 import { aspectStyle } from '../lib/astro';
 import type { SynastryChart, SynastryRequest } from '../types/synastry';
 
@@ -38,7 +40,10 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
 export function SynastryPage() {
   const [sideAPreset, setSideAPreset] = useState<SideState | null>(null);
   const [sideBPreset, setSideBPreset] = useState<SideState | null>(null);
-  const { profiles } = useProfiles();
+  /** 存入档案弹层的预填值（当前一侧输入快照，无 id = 新建）。 */
+  const [draftPrefill, setDraftPrefill] = useState<ProfileDraft | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const { profiles, upsert } = useProfiles();
   const synastry = useSynastry();
 
   /** 档案 → 一侧 preset（公历、UTC 留空按经度推算）。 */
@@ -60,6 +65,20 @@ export function SynastryPage() {
     synastry.mutate(request);
   }
 
+  /** 一侧 → 存入档案弹层：称谓作姓名；合盘无造向，gender 留给读者自己选。 */
+  function handleSaveProfile(side: 'A' | 'B', state: SideState): void {
+    setDraftPrefill({
+      name: state.name.trim() || undefined,
+      birth_date: state.birthDate,
+      birth_time: state.birthTime,
+      calendar: 'solar',
+      city: state.location.city ?? null,
+      latitude: state.location.latitude ?? null,
+      longitude: state.location.longitude ?? null,
+    });
+    setEditorOpen(true);
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <div className="flex flex-wrap items-center gap-2">
@@ -77,9 +96,18 @@ export function SynastryPage() {
       <SynastryConsole
         sideAPreset={sideAPreset}
         sideBPreset={sideBPreset}
+        onSaveProfile={handleSaveProfile}
         pending={synastry.isPending}
         onSubmit={handleSubmit}
       />
+
+      {editorOpen ? (
+        <ProfileEditor
+          initial={draftPrefill}
+          onSave={(draft) => upsert(draft)}
+          onClose={() => setEditorOpen(false)}
+        />
+      ) : null}
 
       {synastry.error ? (
         <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-4 py-3 text-sm text-ink">
@@ -103,6 +131,8 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
   return (
     <>
       <SummaryStrip chart={chart} />
+
+      <VerdictCard verdict={chart.verdict} />
 
       <ResultCard
         eyebrow="COMPATIBILITY SCORE"
