@@ -15,8 +15,9 @@ from app.content import CONTENT_VERSION, TAROT_CONTENT_SOURCES
 from app.content.tarot_cards import SUIT_ELEMENT
 from app.content.tarot_deck import DECK, MAJOR_SIZE, MINOR_SIZE, SPREADS, TAROT_SOURCE, get_card
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
+from app.content.tarot_polarity import TAROT_POLARITY_SOURCE
 from app.core.errors import UnsupportedMethodError
-from app.engines.tarot import _synthesize, draw_spread
+from app.engines.tarot import _synthesize, build_verdict, draw_spread
 from app.schemas.tarot import DrawnCard, TarotSpreadResponse
 from tests.plain_wording import FORBIDDEN, advice_hits
 
@@ -290,15 +291,15 @@ def test_tarot_spread_endpoint_rejects_unknown_spread(client: TestClient) -> Non
     assert response.json()["error"]["code"] == "unsupported_method"
 
 
-def test_provenance_lists_exactly_the_four_tables_read() -> None:
-    """四行两串（G14）：三张牌表共用 `TAROT_SOURCE`，译表单独一串。
+def test_provenance_lists_exactly_the_five_tables_read() -> None:
+    """五行三串（G14）：三张牌表共用 `TAROT_SOURCE`，译表与极性表各单独一串。
 
     `tarot_cards.py` **不在清单里**：它带的是 dataclass、两个工厂与几张查表字典（`element`、
     `rank` 那两格的取值确实进了响应），但没有一行是印进页面的句子——完整理由与「读了文案 ≠
     import 过字典」这条界线见 `content/__init__.py` 的 `TAROT_CONTENT_SOURCES` 注（G13）。
     行序就是页面上的展示序（`components/ui/ProvenancePanel.tsx` 按数组渲染），所以这里钉
     **等序列表**而不是集合——集合会把「把译表挪到第一行」放过去，而那一改动在页面上看得见。
-    下面那条 `len(TAROT_CONTENT_SOURCES) == 4` 不是门，是 belt-and-braces：`_tables()` 迭代的
+    下面那条 `len(TAROT_CONTENT_SOURCES) == 5` 不是门，是 belt-and-braces：`_tables()` 迭代的
     就是那个元组，清单任何增删都会先红在上面那条等序列表——把它单独当成一条门就是「看着像
     测过」（spec §8 明令消灭的那一类）。
     """
@@ -309,13 +310,16 @@ def test_provenance_lists_exactly_the_four_tables_read() -> None:
         ("tarot_minor", TAROT_SOURCE),
         ("tarot_deck", TAROT_SOURCE),
         ("tarot_keywords_zh", TAROT_KEYWORDS_ZH_SOURCE),
+        ("tarot_polarity", TAROT_POLARITY_SOURCE),
     ]
-    assert len(TAROT_CONTENT_SOURCES) == 4
-    assert [t.version for t in tables] == [CONTENT_VERSION] * 4
+    assert len(TAROT_CONTENT_SOURCES) == 5
+    assert [t.version for t in tables] == [CONTENT_VERSION] * 5
     # 三张牌表共用一串是刻意的（凭据同一条：RWS 通行牌义 + Waite 布局），抄成三份必漂。
     assert tables[0].source == tables[1].source == tables[2].source
-    # 译表那串要能看出它不是古籍（G14 的反向运用：卢恩 spec 决策 24）。
+    # 译表与极性表各自单独署名：一张自持现代译表、一张自持吉凶归类（模型参数），都不冒充原典。
     assert tables[3].source != tables[0].source
+    assert tables[4].source != tables[0].source
+    assert tables[4].source != tables[3].source
 
 
 def test_provenance_engine_and_note_and_the_two_pinned_labels(client: TestClient) -> None:
@@ -354,6 +358,7 @@ def test_provenance_engine_and_note_and_the_two_pinned_labels(client: TestClient
         "tarot_minor",
         "tarot_deck",
         "tarot_keywords_zh",
+        "tarot_polarity",
     ]
 
 
@@ -499,3 +504,43 @@ def test_an_assembled_synthesis_passes_the_wording_gates() -> None:
             text = draw_spread(spread_id=spread_id, allow_reversed=allow_reversed).synthesis
             assert "布阵" in text, label
             _wording_clean(f"装配 {label}", text)
+
+
+# --- 综合结论卡片（verdict）：纯计数快照钉五档，真实发牌只钉结构自洽 ---------------------
+
+#: (积极, 消极, 中性, 大牌, 逆位) → (档位, 星级)。发牌是 CSPRNG 不可控，故档位分布由纯函数
+#: `build_verdict` 的构造计数钉住（无 mock：计数是引擎同一公式的输入，不桩响应）。五档各落一例。
+VERDICT_SNAPSHOTS: tuple[tuple[int, int, int, int, int, str, int], ...] = (
+    (4, 0, 0, 2, 0, "大吉", 5),
+    (2, 0, 1, 1, 0, "吉", 4),
+    (1, 1, 1, 1, 1, "平", 3),
+    (1, 2, 0, 0, 1, "小凶", 2),
+    (0, 4, 0, 1, 2, "凶", 1),
+)
+
+
+@pytest.mark.parametrize(
+    "positive, negative, neutral, major, reversed_count, grade, stars", VERDICT_SNAPSHOTS
+)
+def test_verdict_snapshot_is_pinned(
+    positive: int,
+    negative: int,
+    neutral: int,
+    major: int,
+    reversed_count: int,
+    grade: str,
+    stars: int,
+) -> None:
+    """五个计数组合的结论卡片逐字段钉死（确定性快照，不经过随机发牌）。"""
+    verdict = build_verdict(positive, negative, neutral, major, reversed_count)
+    assert verdict.grade == grade
+    assert verdict.stars == stars
+    assert verdict.headline.startswith(f"你这一阵抽出的牌属{grade}：")
+    assert verdict.points == [
+        f"积极牌 {positive} 张",
+        f"消极牌 {negative} 张",
+        f"中性牌 {neutral} 张",
+        f"大牌 {major} 张",
+        f"逆位 {reversed_count} 张",
+    ]
+    assert verdict.advice.endswith("。")

@@ -11,7 +11,8 @@
 * **无 `score`、无百分号**（决策 6/7）：设计稿在这一页印了五个百分比。卢恩铸石不吃
   出生时间与地点，没有任何输入可以推出那类数字。这类字段日后极可能被顺手加回来，
   所以这里递归扫整棵响应树，键名与字符串值都扫，而不是只看顶层。
-* **`provenance.tables` 正好两张**：多列一张等于让本端点声称引了它没读的书。
+* **`provenance.tables` 正好三张**：多列一张等于让本端点声称引了它没读的书。
+  第三张 `rune_polarity` 是 verdict 卡片的吉凶倾向表，端点确实读了它。
 * **字形逐枚对回 Unicode**：出处卡印「码位锚点」供读者自查。若传输弄坏了一个字符，
   页面上就是一枚错符文，而这正是设计稿在本页犯过四次的错。
 """
@@ -35,7 +36,7 @@ PAYLOAD: dict[str, object] = {"spread_id": "three"}
 TOP_LEVEL_KEYS = {
     "spread_id", "spread_name", "spread_name_zh", "spread_description", "question",
     "stones", "drawn_keys", "allow_reversed", "include_wyrd", "aett_balance",
-    "synthesis", "shadow_counsel", "reversible_note", "codex", "provenance",
+    "synthesis", "shadow_counsel", "reversible_note", "verdict", "codex", "provenance",
 }
 
 STONE_KEYS = {

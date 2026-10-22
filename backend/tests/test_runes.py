@@ -29,7 +29,7 @@ from app.content.rune_futhark import (
 from app.content.rune_spreads import SPREAD_IDS, SPREADS
 from app.core.errors import UnsupportedMethodError
 from app.engines import runes as runes_engine
-from app.engines.runes import UNASSIGNED_KEY, draw
+from app.engines.runes import UNASSIGNED_KEY, build_verdict, draw
 from app.schemas.runes import RuneCastResponse
 
 #: 每种牌阵抽这么多次来验「不放回」与「键序对齐」。
@@ -571,9 +571,13 @@ def test_provenance_names_the_entropy_source_honestly() -> None:
     assert "secrets" in provenance.method
 
 
-def test_provenance_lists_exactly_the_two_tables() -> None:
+def test_provenance_lists_exactly_the_three_tables() -> None:
     tables = draw(spread_id="single").provenance.tables
-    assert [table.name for table in tables] == ["rune_futhark", "rune_spreads"]
+    assert [table.name for table in tables] == [
+        "rune_futhark",
+        "rune_spreads",
+        "rune_polarity",
+    ]
     assert all(table.version and table.source for table in tables)
 
 
@@ -696,3 +700,34 @@ def test_wyrd_is_reachable_only_when_enabled() -> None:
     for _ in range(300):
         seen.update(draw(spread_id="five", include_wyrd=False).drawn_keys)
     assert "wyrd" not in seen
+
+
+# --- 综合结论卡片（verdict）：纯计数快照钉五档，真实抽签只钉结构自洽 ---------------------
+
+#: (积极, 消极, 中性) → (档位, 星级)。抽签是 CSPRNG 不可控，故档位分布由纯函数
+#: `build_verdict` 的构造计数钉住（无 mock：计数是引擎同一公式的输入，不桩响应）。
+#: 朝向（正逆）不参与，五档各落一例。
+VERDICT_SNAPSHOTS: tuple[tuple[int, int, int, str, int], ...] = (
+    (4, 0, 0, "大吉", 5),
+    (2, 0, 1, "吉", 4),
+    (1, 1, 1, "平", 3),
+    (1, 2, 0, "小凶", 2),
+    (0, 4, 0, "凶", 1),
+)
+
+
+@pytest.mark.parametrize("positive, negative, neutral, grade, stars", VERDICT_SNAPSHOTS)
+def test_verdict_snapshot_is_pinned(
+    positive: int, negative: int, neutral: int, grade: str, stars: int
+) -> None:
+    """五个计数组合的结论卡片逐字段钉死（确定性快照，不经过随机抽签）。"""
+    verdict = build_verdict(positive, negative, neutral)
+    assert verdict.grade == grade
+    assert verdict.stars == stars
+    assert verdict.headline.startswith(f"你这一阵落下的符文属{grade}：")
+    assert verdict.points == [
+        f"积极符 {positive} 枚",
+        f"消极符 {negative} 枚",
+        f"中性符 {neutral} 枚",
+    ]
+    assert verdict.advice.endswith("。")

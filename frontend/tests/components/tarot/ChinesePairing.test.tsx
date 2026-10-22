@@ -16,7 +16,7 @@
  * 「综合解读」说成取自牌库——页面已原样印引擎的 `note`，第二份手抄正是 R37 抓过的那类漂移），
  * 它锁的是「不许说什么」，不锁「怎么说」。
  * **夹具内容凭据**：`tables` 的行序就是这份清单自己的展示契约（面板按数组渲染，与
- * `lenormand`/`qimen`/`ziwei` 那三家同一条形状，四行顺序改了必须红在这里）；溯源块已按
+ * `lenormand`/`qimen`/`ziwei` 那三家同一条形状，五行顺序改了必须红在这里）；溯源块已按
  * 2026-10-21 UI 需求从页面移除，「前端把这四行递给面板」那半截凭据不再记挂；目录漂移钉把夹具那一阵的 `spread_id` /
  * `spread_name_zh` / `cards.length` 与 `SPREAD_CATALOG` 里同 id 条目逐字对上
  * ——残留的两份阵名（偏差表第 8 行）就靠这一条看着。
@@ -126,18 +126,19 @@ describe('塔罗中英配对呈现', () => {
     expect(entry.size).toBe(spread.cards.length);
   });
 
-  it('夹具里的四行出处按展示序排列', () => {
+  it('夹具里的五行出处按展示序排列', () => {
     // 行序=展示序（`components/ui/ProvenancePanel.tsx` 的 `tables.map`），所以钉的是等序列表不是集合；
-    // 后端 golden 钉的是同一份清单的另一头（`backend/tests/golden/test_tarot_golden.py` 那条四行等序钉），
-    // 与 `lenormand`/`qimen`/`ziwei` 三家同形状。
-    // 这一条**只钉夹具那四行自己的展示序**（测体读的是 `readFixture('tarot')` 的 JSON，把
+    // 后端 golden 钉的是同一份清单的另一头（`backend/tests/golden/test_tarot_golden.py` 那条五行等序钉），
+    // 与 `lenormand`/`qimen`/`ziwei` 三家同形状。第五行 `tarot_polarity` 是 verdict 吉凶倾向表。
+    // 这一条**只钉夹具那五行自己的展示序**（测体读的是 `readFixture('tarot')` 的 JSON，把
     // `TarotPage.tsx` 改坏不会红在这里）。溯源块已按 2026-10-21 UI 需求从页面移除，
-    // 「前端把这四行递给面板」那半截凭据随之作废，不再在此记挂。
+    // 「前端把这五行递给面板」那半截凭据随之作废，不再在此记挂。
     expect(spread.provenance.tables.map((table) => table.name)).toEqual([
       'tarot_major',
       'tarot_minor',
       'tarot_deck',
       'tarot_keywords_zh',
+      'tarot_polarity',
     ]);
   });
 

@@ -537,17 +537,25 @@ def test_get_spread_returns_none_for_unknown_id() -> None:
 # --- 10. 表清单 ------------------------------------------------------------
 
 
-def test_rune_content_sources_lists_exactly_the_two_tables() -> None:
-    """只列这两张：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。"""
+def test_rune_content_sources_lists_exactly_the_three_tables() -> None:
+    """只列这三张：混进 `CONTENT_SOURCES` 等于让八字声称引了它没用过的表。
+
+    第三张 `rune_polarity` 是 verdict 卡片的 24 枚吉凶倾向表（只按符文本身、不看朝向），
+    凭据为三份卢恩诗所载符文义 + 本表自持归类（模型参数），与前两张分开署名。
+    """
+    from app.content.rune_polarity import RUNE_POLARITY_SOURCE
+
     assert RUNE_CONTENT_SOURCES == (
         ("rune_futhark", RUNES_SOURCE),
         ("rune_spreads", SPREADS_SOURCE),
+        ("rune_polarity", RUNE_POLARITY_SOURCE),
     )
 
 
-def test_the_two_tables_are_named_differently() -> None:
-    """分开署名而非合成一张：两张的凭据强度不同（一张可单测核字形，一张只是现代约定）。"""
+def test_the_three_tables_are_named_differently() -> None:
+    """分开署名而非合成一张：三张的凭据强度不同（一张可单测核字形，一张只是现代约定，
+    第三张是自持吉凶归类的模型参数）。"""
     names = [name for name, _ in RUNE_CONTENT_SOURCES]
-    assert len(set(names)) == 2
+    assert len(set(names)) == 3
     sources = [source for _, source in RUNE_CONTENT_SOURCES]
-    assert len(set(sources)) == 2
+    assert len(set(sources)) == 3

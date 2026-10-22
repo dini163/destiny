@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "major-21",
-      "name": "The World",
-      "name_zh": "世界",
-      "arcana": "major",
-      "number": 21,
-      "suit": null,
+      "card_id": "wands-07",
+      "name": "Seven of Wands",
+      "name_zh": "权杖七",
+      "arcana": "minor",
+      "number": 7,
+      "suit": "wands",
       "rank": null,
-      "element": null,
-      "orientation": "reversed",
+      "element": "fire",
+      "orientation": "upright",
       "keywords": [
-        "seeking closure",
-        "shortcuts",
-        "delays",
-        "incompleteness"
+        "challenge",
+        "competition",
+        "perseverance",
+        "defensiveness"
       ],
       "keywords_zh": [
-        "讨一个了结",
-        "走捷径",
-        "拖延",
-        "未竟"
+        "挑战",
+        "竞争",
+        "坚持到底",
+        "设防心态"
       ],
-      "meaning": "Reversed, closure remains elusive and loose ends linger; a cycle is nearly, but not yet, complete.",
-      "meaning_zh": "逆位时，了结迟迟不到、松散的头绪还留着，这个循环差一点就完成，但还没完成。"
+      "meaning": "From high ground a figure fends off six wands below, holding a hard-won position through determination.",
+      "meaning_zh": "站在高处的人挡住下面六根权杖，靠决心守住一个来之不易的位置。"
     },
     {
       "position_index": 1,
@@ -44,31 +44,29 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "wands-04",
-      "name": "Four of Wands",
-      "name_zh": "权杖四",
+      "card_id": "pentacles-10",
+      "name": "Ten of Pentacles",
+      "name_zh": "星币十",
       "arcana": "minor",
-      "number": 4,
-      "suit": "wands",
+      "number": 10,
+      "suit": "pentacles",
       "rank": null,
-      "element": "fire",
-      "orientation": "upright",
+      "element": "earth",
+      "orientation": "reversed",
       "keywords": [
-        "celebration",
-        "harmony",
-        "marriage",
-        "home",
-        "community"
+        "the dark side of wealth",
+        "financial failure",
+        "loneliness",
+        "disputes"
       ],
       "keywords_zh": [
-        "庆祝",
-        "和谐",
-        "婚姻",
-        "家",
-        "群体"
+        "财富的阴暗面",
+        "财务失败",
+        "孤独",
+        "争执"
       ],
-      "meaning": "Beneath a garlanded arch of four wands a community rejoices, marking stable homecoming and shared celebration.",
-      "meaning_zh": "四根权杖扎成的拱门之下，一个群体在欢庆，标记着安稳的归家与共享的庆祝。"
+      "meaning": "Reversed, inheritance brings dispute, or material security proves empty and isolating.",
+      "meaning_zh": "逆位时，继承带来争执，或者物质的安稳落到空荡与孤立。"
     },
     {
       "position_index": 2,
@@ -77,40 +75,53 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "pentacles-08",
-      "name": "Eight of Pentacles",
-      "name_zh": "星币八",
+      "card_id": "swords-09",
+      "name": "Nine of Swords",
+      "name_zh": "宝剑九",
       "arcana": "minor",
-      "number": 8,
-      "suit": "pentacles",
+      "number": 9,
+      "suit": "swords",
       "rank": null,
-      "element": "earth",
+      "element": "air",
       "orientation": "reversed",
       "keywords": [
-        "perfectionism",
-        "misdirected activity",
-        "low standards",
-        "tedium"
+        "depression",
+        "nightmares",
+        "intense anxiety",
+        "reaching out"
       ],
       "keywords_zh": [
-        "完美主义",
-        "力气用错方向",
-        "标准松散",
-        "枯燥重复"
+        "抑郁",
+        "噩梦",
+        "强烈不安",
+        "主动求助"
       ],
-      "meaning": "Reversed, diligence tips into perfectionism, or effort is misdirected and half-hearted.",
-      "meaning_zh": "逆位时，勤勉滑向完美主义，或者力气用错了方向、做得三心二意。"
+      "meaning": "Reversed, the night terrors ease or, at their worst, demand that help be sought.",
+      "meaning_zh": "逆位时，夜里的恐怖减轻，或在最难熬的时候，逼出一次主动求助。"
     }
   ],
   "drawn_ids": [
-    "major-21",
-    "wands-04",
-    "pentacles-08"
+    "wands-07",
+    "pentacles-10",
+    "swords-09"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 世界（The World），逆位，取的是 讨一个了结、走捷径、拖延。 现在（Present）抽出 权杖四（Four of Wands），正位，取的是 庆祝、和谐、婚姻。 未来（Future）抽出 星币八（Eight of Pentacles），逆位，取的是 完美主义、力气用错方向、标准松散。 1 张大牌在这份日常处境里标出分量更重、由不得你选的线索。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
-  "major_arcana_count": 1,
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 权杖七（Seven of Wands），正位，取的是 挑战、竞争、坚持到底。 现在（Present）抽出 星币十（Ten of Pentacles），逆位，取的是 财富的阴暗面、财务失败、孤独。 未来（Future）抽出 宝剑九（Nine of Swords），逆位，取的是 抑郁、噩梦、强烈不安。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "major_arcana_count": 0,
   "reversed_count": 2,
+  "verdict": {
+    "grade": "小凶",
+    "stars": 2,
+    "headline": "你这一阵抽出的牌属小凶：积极牌0张、消极牌1张、中性牌2张，另有大牌0张、逆位2张，拖累的一面更多，先看清楚再动。",
+    "points": [
+      "积极牌 0 张",
+      "消极牌 1 张",
+      "中性牌 2 张",
+      "大牌 0 张",
+      "逆位 2 张"
+    ],
+    "advice": "综合建议：你这一阵抽出的牌面已经摆在眼前，负向牌偏多，先把眼前的阻滞看清楚，暂缓推进。"
+  },
   "provenance": {
     "engine": "tarot-content-library",
     "content_version": "2026.09",
@@ -136,6 +147,11 @@
         "name": "tarot_keywords_zh",
         "version": "2026.09",
         "source": "本系统自持译表：塔罗关键词中译（一词一译，随 Rider-Waite 通行英词表）"
+      },
+      {
+        "name": "tarot_polarity",
+        "version": "2026.09",
+        "source": "伟特体系通行牌义（A. E. Waite《The Pictorial Key to the Tarot》1910：大牌章、权杖/圣杯/宝剑/星币四花色小牌章）· 吉凶倾向为本表自持归类（模型参数，非古籍赋分）"
       }
     ]
   },
