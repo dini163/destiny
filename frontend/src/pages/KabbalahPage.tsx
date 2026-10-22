@@ -124,11 +124,15 @@ function SephirahIndex({
               type="button"
               onClick={() => onSelect({ kind: 'sephirah', id: node.id })}
               className={`inline-flex items-center gap-1.5 rounded-element border px-2 py-1 text-xs transition ${
-                active ? 'border-gold bg-gold/15 text-ink' : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
+                active
+                  ? 'border-gold bg-gold/15 text-ink shadow-[0_0_14px_-6px_rgba(212,175,55,0.5)]'
+                  : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
               }`}
             >
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: pillarAccent(node.pillar) }} />
-              <span className="numeric">{node.is_hidden ? '✧' : node.number}</span>
+              <span className={`numeric ${active ? 'text-gold-bright' : 'text-gold-soft'}`}>
+                {node.is_hidden ? '✧' : node.number}
+              </span>
               {node.name_zh}
             </button>
           );
@@ -161,10 +165,12 @@ function PathIndex({
               onClick={() => onSelect({ kind: 'path', id: path.id })}
               title={`${path.from_name_zh} → ${path.to_name_zh}`}
               className={`inline-flex items-center gap-1 rounded-element border px-2 py-1 text-xs transition ${
-                active ? 'border-gold bg-gold/15 text-ink' : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
+                active
+                  ? 'border-gold bg-gold/15 text-ink shadow-[0_0_14px_-6px_rgba(212,175,55,0.5)]'
+                  : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
               }`}
             >
-              <span className="numeric text-gold-soft">{path.number}</span>
+              <span className={`numeric ${active ? 'text-gold-bright' : 'text-gold-soft'}`}>{path.number}</span>
               <span className="text-sm leading-none">{path.letter}</span>
               <span>{path.tarot_zh}</span>
             </button>
