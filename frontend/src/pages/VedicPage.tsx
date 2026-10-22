@@ -12,6 +12,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useVedic } from '../hooks/useVedic';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { CHART_STYLES } from '../lib/vedic';
@@ -137,6 +138,8 @@ function VedicResults({ chart }: { chart: VedicChart }) {
   return (
     <>
       <SummaryStrip chart={chart} />
+
+      <VerdictCard verdict={chart.verdict} />
 
       <div className="panel-raised flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1.5">

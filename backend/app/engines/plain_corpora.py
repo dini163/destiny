@@ -435,8 +435,11 @@ def _vedic_universe() -> set[str]:
     )
 
 
-#: 吠陀白话的登记表：252 条自撰判语（spec 裁定 R46/R47/R48，与 WESTERN/TRANSIT 同一条
-#: 诚实形状）。T1-T7 建表期间刻意不进 `PLAIN_CORPORA`——提前登记会让工厂的
+#: 吠陀白话的登记表：252 条自撰判语（spec 裁定 R46/R47 继续有效：自撰诚实形状，与
+#: WESTERN/TRANSIT 同一条口径）。R48「仓内不建庙旺落陷/吉凶表、白话不综合吉凶」已被 verdict
+#: 轮推翻：白话块本身仍不补综合吉凶（`closers=None` 保留，252 条判语无可分带分数），自然吉凶
+#: 与擢升陷落改由独立判定表 `content/vedic_judgment.py` + 结论卡片承担。
+#: T1-T7 建表期间刻意不进 `PLAIN_CORPORA`——提前登记会让工厂的
 #: `set(entries) == universe()` 从第一批红到第七批；那七批的口径由
 #: `tests/content/test_vedic_plain_corpus.py` 逐条守着。登记行在 T8 落地，同一文件的三颗
 #: 登记钉继续守着「登记行被误删」与「G31/G36 分流被改名」两种静默形状。

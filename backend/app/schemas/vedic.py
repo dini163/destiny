@@ -11,7 +11,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 
 #: How the UTC offset was resolved (shared convention with the Western chart).
 UtcOffsetSource = str
@@ -124,7 +124,7 @@ class VedicProvenance(BaseModel):
     source: str
     note: str
     tables: list[ProvenanceTable] = Field(
-        description="吠陀一页真正读到的三张表（恒星盘语料 + 自撰白话两半）。"
+        description="吠陀一页真正读到的四张表（恒星盘语料 + 自撰白话两半 + 吉凶擢升判定表）。"
     )
 
 
@@ -165,6 +165,10 @@ class VedicChart(BaseModel):
 
     plain: list[PlainSection] = Field(
         description="页尾「白话详解」四段，序固定为 九曜落座 / 九曜落宫 / 星宿落点 / 现行大运与小运。"
+    )
+
+    verdict: Verdict = Field(
+        description="综合结论卡片：自然吉凶、擢升陷落与现行大运主星聚合的五档结论（verdict-card spec）。"
     )
 
     provenance: VedicProvenance

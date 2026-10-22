@@ -3,7 +3,7 @@
  * `backend/app/schemas/vedic.py`. snake_case is preserved end-to-end.
  */
 
-import type { PlainSection, ProvenanceTable } from './common';
+import type { PlainSection, ProvenanceTable, Verdict } from './common';
 
 /** How the UTC offset was resolved (shared convention with the Western chart). */
 export type UtcOffsetSource = 'explicit' | 'longitude_approximation';
@@ -151,6 +151,9 @@ export interface VedicChart {
   vimshottari: Vimshottari;
 
   plain: PlainSection[];
+
+  /** 综合结论卡片：自然吉凶、擢升陷落与现行大运主星聚合的五档结论。 */
+  verdict: Verdict;
 
   provenance: VedicProvenance;
   engine: string;

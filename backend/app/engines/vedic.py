@@ -37,11 +37,20 @@ from app.content.vedic import (
     nakshatra_of,
     pada_of,
 )
+from app.content.vedic_judgment import (
+    DIGNITY_BY_NAME,
+    QUALITY_BY_NAME,
+    VERDICT_ADVICE,
+    VERDICT_OUTLOOK,
+    VERDICT_SUMMARY_FRAME,
+)
 from app.core.errors import EphemerisError
-from app.engines.plain_compose import compose
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, overview
 from app.engines.plain_corpora import VEDIC
+from app.engines.verdict import grade_for
 from app.engines.western import _degree_in_sign, _format_degree, _normalize_longitude, _sign_index
-from app.schemas.common import PlainSection, ProvenanceTable
+from app.schemas.common import PlainSection, ProvenanceTable, Verdict
 from app.schemas.vedic import (
     Antardasha,
     CurrentDasha,
@@ -283,6 +292,74 @@ def build_plain(
     ]
 
 
+# --- 综合结论卡片（verdict）：自然吉凶 + 擢升陷落 + 现行大运主星 → 五档 -------------
+
+#: 各项权重为模型参数（古籍只给定性尊贵、不给数，同 `MODEL_PARAM_SOURCE` 口径），
+#: 不是古籍赋分；换档交给共享 `grade_for`。
+_BENEFIC_WEIGHT = 4.0
+_MALEFIC_WEIGHT = 4.0
+_EXALT_WEIGHT = 6.0
+_DEBIL_WEIGHT = 6.0
+_DASHA_LORD_WEIGHT = 2.0
+_VERDICT_BASE = 50.0
+
+
+def _build_verdict(*, planets: list[VedicPlanet], current: CurrentDasha | None) -> Verdict:
+    """装配结论卡片：自然吉星/凶星计数 + 擢升/陷落命中 + 现行大运主星天性加权。
+
+    headline/advice 全部来自 `vedic_judgment` 的受控框架句，本函数不现编中文；
+    中性曜（日/月/水）不计入吉或凶，只在擢升陷落层参与。
+    """
+    benefic = [p for p in planets if QUALITY_BY_NAME[p.name].quality == "benefic"]
+    malefic = [p for p in planets if QUALITY_BY_NAME[p.name].quality == "malefic"]
+    exalted = [p for p in planets if DIGNITY_BY_NAME[p.name].exaltation == p.sign_index]
+    debased = [p for p in planets if DIGNITY_BY_NAME[p.name].debilitation == p.sign_index]
+
+    dasha_bonus = 0.0
+    if current is not None:
+        lord = QUALITY_BY_NAME.get(current.mahadasha_lord)
+        if lord is not None and lord.quality == "benefic":
+            dasha_bonus = _DASHA_LORD_WEIGHT
+        elif lord is not None and lord.quality == "malefic":
+            dasha_bonus = -_DASHA_LORD_WEIGHT
+
+    score = min(
+        100.0,
+        max(
+            0.0,
+            _VERDICT_BASE
+            + _BENEFIC_WEIGHT * len(benefic)
+            - _MALEFIC_WEIGHT * len(malefic)
+            + _EXALT_WEIGHT * len(exalted)
+            - _DEBIL_WEIGHT * len(debased)
+            + dasha_bonus,
+        ),
+    )
+    grade, stars = grade_for(score)
+    headline = overview(VERDICT_SUMMARY_FRAME, {
+        "grade": grade,
+        "benefic": str(len(benefic)),
+        "malefic": str(len(malefic)),
+        "exalted": str(len(exalted)),
+        "debased": str(len(debased)),
+        "outlook": VERDICT_OUTLOOK[grade],
+    })
+    benefic_names = "、".join(p.name_zh for p in benefic) or "无"
+    malefic_names = "、".join(p.name_zh for p in malefic) or "无"
+    points = [
+        f"自然吉星落座：{benefic_names}",
+        f"自然凶星落座：{malefic_names}",
+        f"擢升{len(exalted)}颗、陷落{len(debased)}颗",
+    ]
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=points,
+        advice=VERDICT_ADVICE[grade],
+    )
+
+
 def compute_vedic_chart(
     *,
     birth_date: date,
@@ -387,6 +464,7 @@ def compute_vedic_chart(
         rashis=rashis,
         vimshottari=vimshottari,
         plain=plain,
+        verdict=_build_verdict(planets=planets, current=vimshottari.current),
         provenance=VedicProvenance(
             engine="pyswisseph", ayanamsa_name=_AYANAMSA_NAME,
             content_version=CONTENT_VERSION, source=VEDIC_SOURCE, note=NOTE,
