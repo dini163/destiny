@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { CharProvenanceTable } from '../components/name/CharProvenanceTable';
@@ -5,11 +6,15 @@ import { FiveGrids } from '../components/name/FiveGrids';
 import { NameInputForm } from '../components/name/NameInputForm';
 import { NameSummaryScore } from '../components/name/NameSummaryScore';
 import { SancaiStrip } from '../components/name/SancaiStrip';
+import { ProfileEditor } from '../components/profiles/ProfileEditor';
+import { ProfilePicker } from '../components/profiles/ProfilePicker';
 import { Icon } from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useNameAnalysis } from '../hooks/useNameAnalysis';
+import { useProfiles } from '../hooks/useProfiles';
+import type { ProfileDraft, ProfileName } from '../lib/profiles';
 import type { NameAnalysis } from '../types/name';
 
 /**
@@ -21,11 +26,33 @@ import type { NameAnalysis } from '../types/name';
  * 一律不做——它们没有可署名的规则（spec §2.5、决策七），宁可页面少一块。
  */
 export function NamePage() {
+  const [preset, setPreset] = useState<ProfileName | null>(null);
+  const [draftPrefill, setDraftPrefill] = useState<ProfileDraft | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const { profiles, upsert } = useProfiles();
   const name = useNameAnalysis();
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
+      <div className="flex flex-wrap items-center gap-2">
+        <ProfilePicker
+          label="选档案填姓名"
+          profiles={profiles}
+          onPick={(profile) =>
+            setPreset(
+              profile
+                ? { surname: profile.surname ?? undefined, given: profile.given ?? undefined }
+                : null,
+            )
+          }
+        />
+      </div>
       <NameInputForm
+        preset={preset}
+        onSaveProfile={({ surname: s, given: g }) => {
+          setDraftPrefill({ surname: s, given: g, name: `${s}${g}` });
+          setEditorOpen(true);
+        }}
         pending={name.isPending}
         error={name.error}
         onSubmit={(request) => name.mutate(request)}
@@ -36,6 +63,14 @@ export function NamePage() {
       ) : null}
 
       {name.data ? <NameResults analysis={name.data} /> : null}
+
+      {editorOpen ? (
+        <ProfileEditor
+          initial={draftPrefill}
+          onSave={(draft) => upsert(draft)}
+          onClose={() => setEditorOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

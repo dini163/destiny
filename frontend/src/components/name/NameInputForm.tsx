@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
+import type { ProfileName } from '../../lib/profiles';
 import type { ApiError } from '../../api/client';
 import type { NameAnalyzeRequest } from '../../types/name';
 
@@ -19,6 +20,10 @@ function ambiguousChoices(error: ApiError | null): AmbiguousChoice[] {
 }
 
 interface NameInputFormProps {
+  /** 档案填充：选档案后把姓/名覆盖进来（选择是显式动作）。 */
+  preset?: ProfileName | null;
+  /** 提供时渲染「存入档案」按钮，把当前姓名交给页面持久化。 */
+  onSaveProfile?: (values: { surname: string; given: string }) => void;
   pending: boolean;
   error: ApiError | null;
   onSubmit: (request: NameAnalyzeRequest) => void;
@@ -31,10 +36,17 @@ interface NameInputFormProps {
  * 点一次即写入 `variants` 并自动重投。`variants` 在两次提交之间保留，所以已定过的
  * 字不会被重复追问。
  */
-export function NameInputForm({ pending, error, onSubmit }: NameInputFormProps) {
+export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit }: NameInputFormProps) {
   const [surname, setSurname] = useState('');
   const [given, setGiven] = useState('');
   const [variants, setVariants] = useState<Record<string, string>>({});
+
+  // 选档案即整名覆盖；清空选择时不动。
+  useEffect(() => {
+    if (!preset) return;
+    if (preset.surname) setSurname(preset.surname);
+    if (preset.given) setGiven(preset.given);
+  }, [preset]);
 
   const choices = ambiguousChoices(error);
   const message = error && choices.length === 0 ? error.message : null;
@@ -79,10 +91,24 @@ export function NameInputForm({ pending, error, onSubmit }: NameInputFormProps) 
             </p>
           </div>
         </div>
-        <button type="submit" className="btn-primary shrink-0" disabled={pending}>
-          <Icon name="sparkle" size={18} />
-          核定笔画
-        </button>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {onSaveProfile ? (
+            <button
+              type="button"
+              className="btn-ghost shrink-0"
+              disabled={!surname.trim() || !given.trim()}
+              title="把当前姓名存入本地档案"
+              onClick={() => onSaveProfile({ surname: surname.trim(), given: given.trim() })}
+            >
+              <Icon name="vault" size={18} />
+              存入档案
+            </button>
+          ) : null}
+          <button type="submit" className="btn-primary shrink-0" disabled={pending}>
+            <Icon name="sparkle" size={18} />
+            核定笔画
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
