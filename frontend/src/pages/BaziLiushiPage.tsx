@@ -15,6 +15,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { shiftIso } from '../lib/isoDate';
@@ -257,6 +258,8 @@ export function BaziLiushiPage() {
       {result ? (
         <>
           <TransitNatalBar natal={result} />
+
+          <VerdictCard verdict={result.verdict} />
 
           <ResultCard title="流时白话" eyebrow="OVERALL READING · DAY" icon="sparkle" elevated>
             <PlainSectionList sections={result.plain} />

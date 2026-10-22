@@ -13,6 +13,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { shiftIso } from '../lib/isoDate';
@@ -226,6 +227,8 @@ export function BaziLiuriPage() {
       {result ? (
         <>
           <TransitNatalBar natal={result} />
+
+          <VerdictCard verdict={result.verdict} />
 
           {/* 回岁运带上 `result.year`：那是立春为界的流年，与岁运页的 `focus_year` 同一
               口径，落点正是这一年的年表；不带则岁运页按参考日开窗，多半不是在看这一段。 */}

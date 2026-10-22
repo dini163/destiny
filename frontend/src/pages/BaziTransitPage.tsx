@@ -12,6 +12,7 @@ import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziTransit } from '../hooks/useBaziTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
@@ -293,6 +294,8 @@ export function BaziTransitPage() {
       {transit.data ? (
         <>
           <TransitNatalBar natal={transit.data} />
+
+          <VerdictCard verdict={transit.data.verdict} />
 
           <ResultCard title="岁运白话" eyebrow="OVERALL READING · YEAR RANGE" icon="sparkle" elevated>
             <PlainSectionList sections={transit.data.plain} />

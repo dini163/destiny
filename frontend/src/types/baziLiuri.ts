@@ -25,7 +25,7 @@ import type {
   ShenShaEntry,
 } from './bazi';
 import type { TransitFired, TransitTenGod } from './baziTransit';
-import type { PlainSection } from './common';
+import type { PlainSection, Verdict } from './common';
 import type { ScoreValue } from './scoring';
 
 /** 流日页入参：命盘入参 + 两个可空日期（段定位在服务端）。 */
@@ -137,6 +137,8 @@ export interface BaziLiuriResult {
   focused: TransitDayDetail | null;
   /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
   plain: PlainSection[];
+  /** 页级结论卡：锚点 = 聚焦日账本分，无聚焦则取月段账本分；文本全部来自后端受控语料。 */
+  verdict: Verdict;
   /** `tables` = 主命盘九张 + 岁运两张 + 历注一张 = 12。 */
   provenance: Provenance;
 }

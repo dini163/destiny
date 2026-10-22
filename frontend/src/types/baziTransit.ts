@@ -20,7 +20,7 @@ import type {
   RelationPair,
   ShenShaEntry,
 } from './bazi';
-import type { PlainSection } from './common';
+import type { PlainSection, Verdict } from './common';
 import type { ScoreValue } from './scoring';
 
 /** 岁运页入参：命盘入参 + 三个可空年份（补齐在服务端）。 */
@@ -124,6 +124,8 @@ export interface BaziTransitResult {
 
   /** 页级整体白话（批次二 spec §5–§7）；顺序与节名由后端定，前端不补算也不改写。 */
   plain: PlainSection[];
+  /** 页级结论卡：档位/星级从逐年账本均值派生，文本全部来自后端受控语料（verdict-card spec §4）。 */
+  verdict: Verdict;
   /** `tables` = 主命盘九张 + 岁运两张（`bazi_changsheng`、`bazi_transit_rules`）。 */
   provenance: Provenance;
 }
