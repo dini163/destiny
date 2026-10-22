@@ -1,5 +1,5 @@
-import type { KabbalahTree, SephirahNode } from '../../types/kabbalah';
-import { TREE_VIEW, coordinateMap, toView, type Selection } from '../../lib/kabbalah';
+import type { KabbalahTree, PillarInfo, SephirahNode } from '../../types/kabbalah';
+import { TREE_VIEW, coordinateMap, pillarAccent, toView, type Selection } from '../../lib/kabbalah';
 
 interface TreeOfLifeProps {
   /** The full tree map (10 Sephiroth + hidden Daath + 22 paths). */
@@ -12,6 +12,20 @@ interface TreeOfLifeProps {
 
 const { minX, minY, width, height, nodeR } = TREE_VIEW;
 
+/** Column x positions by `pillar.side` (mirror the node columns the engine lays out). */
+const PILLAR_X: Record<string, number> = { left: 16, middle: 50, right: 84 };
+const PILLAR_TOP = 2;
+const PILLAR_BOTTOM = 148;
+/** viewBox-space padding above the columns reserved for the pillar-name labels. */
+const PILLAR_LABEL_Y = -3.2;
+
+const DISPLAY_FONT = "'Noto Serif SC', 'Noto Serif', 'Songti SC', serif";
+const GOLD = '#D4AF37';
+const GOLD_BRIGHT = '#F5D77F';
+const GOLD_SOFT = '#E6C65C';
+const INK_VARIANT = '#D0C5AF';
+const PARCHMENT = '#F7F3E3';
+
 /**
  * The 生命之树 diagram — an SVG of ten (plus the hidden Daath) glassy Sephirah discs
  * joined by the twenty-two Paths, each labelled with its Hebrew letter.
@@ -19,10 +33,16 @@ const { minX, minY, width, height, nodeR } = TREE_VIEW;
  * Nodes and paths are clickable to drive the inspector; the accessible keyboard
  * route is the chip index beside the diagram, so the SVG groups stay pointer-only.
  * Every coordinate, colour and letter comes straight from the engine (no mock).
+ *
+ * Visual layer (Celestial Obsidian): a deep-space nebula ground with a light falling
+ * from the crown, three pillar glows labelled from `tree.pillars`, dual-stroke golden
+ * paths carrying a letter medallion at the midpoint, and per-node glass discs with an
+ * ambient halo. All decorative gradients are derived from engine colours.
  */
 export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
   const coords = coordinateMap(tree.sephiroth);
   const selectedId = selection?.id ?? null;
+  const crown = tree.sephiroth[0];
 
   return (
     <svg
@@ -31,7 +51,40 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
       role="img"
       aria-label={`卡巴拉生命之树：${tree.sephirah_count} 原质与 ${tree.path_count} 路径`}
     >
-      <PillarGuides />
+      <defs>
+        <radialGradient id="treeNebula" cx="50%" cy="30%" r="80%">
+          <stop offset="0%" stopColor="#23273A" stopOpacity="0.9" />
+          <stop offset="55%" stopColor="#141824" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#0A0C12" stopOpacity="1" />
+        </radialGradient>
+        <radialGradient id="crownGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#F5D77F" stopOpacity="0.34" />
+          <stop offset="60%" stopColor="#D4AF37" stopOpacity="0.12" />
+          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
+        </radialGradient>
+        {tree.pillars.map((pillar) => (
+          <linearGradient
+            key={`pillar-${pillar.id}`}
+            id={`pillar-${pillar.id}`}
+            x1="0" y1="0" x2="0" y2="1"
+          >
+            <stop offset="0%" stopColor={pillarAccent(pillar.id)} stopOpacity="0.22" />
+            <stop offset="100%" stopColor={pillarAccent(pillar.id)} stopOpacity="0.03" />
+          </linearGradient>
+        ))}
+        {[...tree.sephiroth, ...(tree.daath ? [tree.daath] : [])].map((node) => (
+          <radialGradient key={`halo-${node.id}`} id={`halo-${node.id}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor={node.color} stopOpacity="0.5" />
+            <stop offset="100%" stopColor={node.color} stopOpacity="0" />
+          </radialGradient>
+        ))}
+      </defs>
+
+      {/* Deep-space ground with the light source resting on the crown. */}
+      <rect x={minX} y={minY} width={width} height={height} fill="url(#treeNebula)" rx={2} />
+      {crown ? <circle cx={toView(crown.x, crown.y).vx} cy={toView(crown.x, crown.y).vy} r={26} fill="url(#crownGlow)" /> : null}
+
+      <PillarGuides pillars={tree.pillars} />
 
       {/* Paths first, so the discs sit on top of the connecting lines. */}
       {tree.paths.map((path) => {
@@ -48,20 +101,35 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
             onClick={() => onSelect({ kind: 'path', id: path.id })}
             aria-hidden="true"
           >
+            {/* Glow underlay, then the hairline stroke, then a wide transparent click target. */}
             <line
               x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
-              stroke={active ? '#F5D77F' : '#E8B93C'}
-              strokeOpacity={active ? 0.95 : 0.26}
-              strokeWidth={active ? 1.9 : 1}
+              stroke={GOLD}
+              strokeOpacity={active ? 0.28 : 0.1}
+              strokeWidth={active ? 3 : 2.6}
+              strokeLinecap="round"
             />
-            {/* Wider transparent line = a comfortable click target. */}
+            <line
+              x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
+              stroke={active ? GOLD_BRIGHT : GOLD}
+              strokeOpacity={active ? 0.95 : 0.42}
+              strokeWidth={active ? 1.6 : 1}
+              strokeLinecap="round"
+            />
             <line x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy} stroke="transparent" strokeWidth={5} />
+            {/* Hebrew-letter medallion riding the path midpoint. */}
+            <circle
+              cx={mx} cy={my} r={2.7}
+              fill="#0B0D13" fillOpacity={0.92}
+              stroke={active ? GOLD_BRIGHT : GOLD}
+              strokeOpacity={active ? 0.9 : 0.35}
+              strokeWidth={0.5}
+            />
             <text
               x={mx} y={my}
               textAnchor="middle" dominantBaseline="central"
-              fontSize={active ? 4.4 : 3.6}
-              fill={active ? '#F5D77F' : '#B99A4E'}
-              stroke="#0a0d15" strokeWidth={1} paintOrder="stroke" strokeLinejoin="round"
+              fontSize={3.4} fontFamily={DISPLAY_FONT}
+              fill={active ? GOLD_BRIGHT : GOLD_SOFT}
               style={{ transition: 'fill 120ms ease' }}
             >
               {path.letter}
@@ -86,7 +154,7 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
   );
 }
 
-/** One Sephirah disc: a tinted glass circle, its number, and its Chinese name. */
+/** One Sephirah disc: an ambient halo, a tinted glass circle, and its name. */
 function SephirahDisc({
   node,
   active,
@@ -104,28 +172,52 @@ function SephirahDisc({
       onClick={() => onSelect({ kind: 'sephirah', id: node.id })}
       aria-hidden="true"
     >
-      {active ? <circle cx={vx} cy={vy} r={nodeR + 2.4} fill={node.color} opacity={0.22} /> : null}
+      {/* Ambient halo keeps the disc readable over the nebula and flares when selected. */}
+      <circle
+        cx={vx} cy={vy} r={nodeR * 2.7}
+        fill={`url(#halo-${node.id})`}
+        fillOpacity={active ? 0.9 : 0.45}
+        style={{ transition: 'fill-opacity 150ms ease' }}
+      />
+      {active ? (
+        <circle
+          cx={vx} cy={vy} r={nodeR + 2.2}
+          fill="none" stroke={GOLD_BRIGHT} strokeOpacity={0.85} strokeWidth={1.1}
+        />
+      ) : null}
       <circle
         cx={vx} cy={vy} r={nodeR}
         fill={node.color}
-        fillOpacity={hidden ? 0.1 : active ? 0.46 : 0.24}
-        stroke={active ? '#F5D77F' : node.color}
-        strokeWidth={active ? 1.9 : 1.3}
+        fillOpacity={hidden ? 0.1 : active ? 0.55 : 0.3}
+        stroke={active ? GOLD_BRIGHT : node.color}
+        strokeOpacity={hidden ? 0.5 : active ? 0.95 : 0.75}
+        strokeWidth={active ? 1.6 : 1.1}
         strokeDasharray={hidden ? '2 1.4' : undefined}
-        opacity={hidden ? 0.7 : 1}
+        style={{ transition: 'fill-opacity 150ms ease, stroke 150ms ease' }}
+      />
+      {/* Specular highlight mimicking a glass surface. */}
+      <ellipse
+        cx={vx - nodeR * 0.32} cy={vy - nodeR * 0.36}
+        rx={nodeR * 0.32} ry={nodeR * 0.18}
+        fill="#FFFFFF" fillOpacity={hidden ? 0.12 : 0.32}
+        transform={`rotate(-28 ${vx - nodeR * 0.32} ${vy - nodeR * 0.36})`}
       />
       <text
         x={vx} y={vy}
         textAnchor="middle" dominantBaseline="central"
-        fontSize={4.2} fontWeight={600} fill="#F5EFE0"
+        fontSize={4.4} fontWeight={600} fontFamily={DISPLAY_FONT}
+        fill={active ? GOLD_BRIGHT : PARCHMENT}
+        opacity={hidden ? 0.85 : 1}
+        style={{ transition: 'fill 120ms ease' }}
       >
         {hidden ? '✧' : node.number}
       </text>
       <text
-        x={vx} y={vy + nodeR + 4.2}
-        textAnchor="middle" fontSize={3.7}
-        fill={active ? '#F5D77F' : '#C9C0AC'}
-        stroke="#0a0d15" strokeWidth={0.9} paintOrder="stroke" strokeLinejoin="round"
+        x={vx} y={vy + nodeR + 4.3}
+        textAnchor="middle" fontSize={4} fontFamily={DISPLAY_FONT}
+        fill={active ? GOLD_BRIGHT : INK_VARIANT}
+        stroke="#0A0D15" strokeWidth={1} paintOrder="stroke" strokeLinejoin="round"
+        style={{ transition: 'fill 120ms ease' }}
       >
         {node.name_zh}
       </text>
@@ -133,13 +225,35 @@ function SephirahDisc({
   );
 }
 
-/** Three faint vertical guides marking the mercy / equilibrium / severity pillars. */
-function PillarGuides() {
+/**
+ * Three vertical pillar glows labelled with the engine's pillar names; each glow
+ * fades toward the base so the eye reads the descent from the crown.
+ */
+function PillarGuides({ pillars }: { pillars: PillarInfo[] }) {
   return (
-    <g aria-hidden="true" stroke="#E8B93C" strokeOpacity={0.06} strokeWidth={0.6}>
-      <line x1={16} y1={2} x2={16} y2={148} />
-      <line x1={50} y1={2} x2={50} y2={148} />
-      <line x1={84} y1={2} x2={84} y2={148} />
+    <g aria-hidden="true">
+      {pillars.map((pillar) => {
+        const x = PILLAR_X[pillar.side] ?? 50;
+        const accent = pillarAccent(pillar.id);
+        return (
+          <g key={pillar.id}>
+            <line
+              x1={x} y1={PILLAR_TOP} x2={x} y2={PILLAR_BOTTOM}
+              stroke={`url(#pillar-${pillar.id})`}
+              strokeWidth={1.2}
+            />
+            <circle cx={x} cy={0.2} r={1.1} fill={accent} fillOpacity={0.5} />
+            <text
+              x={x} y={PILLAR_LABEL_Y}
+              textAnchor="middle" fontSize={2.8} fontFamily={DISPLAY_FONT}
+              letterSpacing={0.6}
+              fill={accent} fillOpacity={0.85}
+            >
+              {pillar.name_zh}
+            </text>
+          </g>
+        );
+      })}
     </g>
   );
 }
