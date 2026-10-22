@@ -66,7 +66,7 @@ export function SynastryPage() {
   }
 
   /** 一侧 → 存入档案弹层：称谓作姓名；合盘无造向，gender 留给读者自己选。 */
-  function handleSaveProfile(side: 'A' | 'B', state: SideState): void {
+  function handleSaveProfile(_side: 'A' | 'B', state: SideState): void {
     setDraftPrefill({
       name: state.name.trim() || undefined,
       birth_date: state.birthDate,

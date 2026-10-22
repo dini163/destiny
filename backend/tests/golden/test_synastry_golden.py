@@ -157,6 +157,24 @@ def test_score_ledger_is_self_consistent() -> None:
     assert all(factor.source == MODEL_PARAM_SOURCE for factor in chart.score.factors[1:])
 
 
+def test_verdict_card_carries_grade_stars_counts_and_advice() -> None:
+    """结论卡片：档位词 = score.tier，星级 = 署名映射 SYNASTRY_STARS，points 复述计入相位数
+    与核心羁绊数（账本事实），headline/advice 套框架句。"""
+    from app.engines.synastry import SYNASTRY_STARS
+
+    chart = _chart()
+    card = chart.verdict
+    assert card.grade == chart.score.tier == "中和可处"
+    assert card.stars == SYNASTRY_STARS["中和可处"] == 3
+    counted = [a for a in chart.synastry_aspects if a.counted]
+    bonds = {tuple(sorted((a.point_a, a.point_b))) for a in chart.synastry_aspects if a.counted and a.core_bond}
+    assert any(f"计入相位：{len(counted)} 条" == p for p in card.points)
+    assert any(f"核心羁绊：{len(bonds)} 条" == p for p in card.points)
+    assert "中和可处" in card.headline
+    assert str(round(chart.score.value, 2)) in card.headline or "46.41" in card.headline
+    assert card.advice
+
+
 def test_only_personal_point_pairs_are_counted() -> None:
     chart = _chart()
     personal = {"Sun", "Moon", "Mercury", "Venus", "Mars", "ASC"}

@@ -6,7 +6,7 @@
  * the composite wheel are rendered by the existing western visualizations.
  */
 
-import type { ProvenanceTable } from './common';
+import type { ProvenanceTable, Verdict } from './common';
 import type { ScoreValue } from './scoring';
 import type { Aspect, AxisPoint, HouseCusp, PlanetPlacement, WesternChart } from './western';
 
@@ -102,6 +102,8 @@ export interface SynastryChart {
   composite: CompositeChart;
   /** 相契度总分与逐条账本（Σ factors[].delta == value）。 */
   score: ScoreValue;
+  /** 综合结论卡片：档位词 + 星级 + 结论句 + 计入相位/核心羁绊分项 + 建议。 */
+  verdict: Verdict;
   /** 命中核心羁绊的白话总论，多行文本（段间 \n）。 */
   plain_summary: string;
   provenance: SynastryProvenance;

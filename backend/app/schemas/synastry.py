@@ -26,7 +26,7 @@ from datetime import date, time
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.scoring import ScoreValue
 from app.schemas.western import (
     Aspect,
@@ -138,6 +138,10 @@ class SynastryChart(BaseModel):
     synastry_aspects: list[SynastryAspect] = Field(description="Person-to-person aspects, tightest first.")
     composite: CompositeChart
     score: ScoreValue = Field(description="相契度总分与逐条账本（Σ factors[].delta == value）。")
+    verdict: Verdict = Field(
+        description="综合结论卡片：档位词（SYNASTRY_TIERS 四档）+ 星级 + 结论句 + 计入相位/核心羁绊分项 + 建议。"
+        "档位词与星级由引擎从相契度派生，框架句来自 synastry_plain。"
+    )
     plain_summary: str = Field(
         description="命中核心羁绊的白话总论：按赋分表的顺逆分带重排，末尾一句是相契度档位的收尾句。"
     )

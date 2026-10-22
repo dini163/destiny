@@ -115,6 +115,32 @@ SYNASTRY_TIER_CLOSERS: dict[str, str] = {
     "磨合为宜": "你这一份相契度偏磨合为宜，表的措辞在这一档偏重费劲的那一面，它讲配置的次序，不讲这段关系该不该继续。",
 }
 
+#: 结论卡片（verdict-card spec §4）框架句与槽位语料。三组常量**不进** `SYNASTRY_READINGS`
+#: （登记进 corpus 的仍为 22 条），由引擎用 `overview()` 实例化，工厂键全集与措辞门扫不到它们；
+#: 四档→星级映射是署名模型参数，住引擎侧（表只给定性档、不给星），不在本表。
+#: 总论框架：档位词 + 相契度分数 + 一句取向。`{grade}` 取 `synastry_tier` 的档名；
+#: `{score}` 是账本 `score.value`；`{outlook}` 取 `SYNASTRY_VERDICT_OUTLOOK[grade]`。
+SYNASTRY_VERDICT_FRAME = "这份合盘综合属{grade}，相契度{score}分落在这一档，{outlook}。"
+
+#: 四档收束取向，键 = `SYNASTRY_TIERS` 的档名。槽位词条不成句、不带「。」。
+SYNASTRY_VERDICT_OUTLOOK: dict[str, str] = {
+    "相契甚深": "彼此契合处多，顺势相处就好",
+    "和合互补": "合为主而留余地，值得经营",
+    "中和可处": "顺与费劲相抵，稳住节奏相处",
+    "磨合为宜": "费劲的一面偏重，先把最紧的那对轴对齐",
+}
+
+#: 建议句框架：计入相位数与核心羁绊数是账本事实，`{tier_advice}` 取 `SYNASTRY_TIER_ADVICE[grade]`。
+SYNASTRY_VERDICT_ADVICE_FRAME = "综合建议：账里{counted}条计入相位、{bonds}条核心羁绊，{tier_advice}。"
+
+#: 四档各自的一句口语建议，键同 `SYNASTRY_TIERS`。槽位词条不成句、不带「。」。
+SYNASTRY_TIER_ADVICE: dict[str, str] = {
+    "相契甚深": "契合处已足，不必另作改动",
+    "和合互补": "把合的一面接住，留一分余地",
+    "中和可处": "顺与费劲相抵，别急着翻局",
+    "磨合为宜": "先对齐最紧的那对轴，缓一步再求顺",
+}
+
 #: 登记进 corpus 的 22 条 = 12 点义 + 5 框架句 + 5 羁绊句。三张源表都只存裸名字，
 #: 键前缀在这里由构造式加上——`universe()`（Step 2）也用同一批构造式现算，两边不可能漂。
 SYNASTRY_READINGS: dict[str, str] = {

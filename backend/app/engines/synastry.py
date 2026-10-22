@@ -35,7 +35,7 @@ from app.content.synastry import (
     SYNASTRY_SOURCE,
     synastry_tier,
 )
-from app.engines.plain_compose import compose, compose_template, dedupe, reading
+from app.engines.plain_compose import compose, compose_template, dedupe, num, overview, reading
 from app.engines.plain_corpora import SYNASTRY
 from app.engines.western import (  # shared, golden-tested astrology primitives
     ASPECTS,
@@ -53,7 +53,7 @@ from app.engines.western import (  # shared, golden-tested astrology primitives
     _sign_index,
     compute_western_chart,
 )
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.schemas.synastry import (
     CompositeChart,
@@ -122,6 +122,51 @@ def _aspect_plain(point_a: str, point_b: str, aspect_type: str) -> str:
             "a": reading(SYNASTRY, synastry_plain.point_key(point_a)),
             "b": reading(SYNASTRY, synastry_plain.point_key(point_b)),
         },
+    )
+
+
+#: 四档 → 星级（署名模型参数，`MODEL_PARAM_SOURCE`；表只给定性档、不给星，单调不减：
+#: 相契甚深 5 / 和合互补 4 / 中和可处 3 / 磨合为宜 2）。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.synastry import SYNASTRY_STARS; print([(k, SYNASTRY_STARS[k]) for k in ('相契甚深','和合互补','中和可处','磨合为宜')])"`
+#: → `[('相契甚深', 5), ('和合互补', 4), ('中和可处', 3), ('磨合为宜', 2)]`。
+SYNASTRY_STARS: dict[str, int] = {
+    "相契甚深": 5,
+    "和合互补": 4,
+    "中和可处": 3,
+    "磨合为宜": 2,
+}
+
+
+def synastry_verdict(aspects: Sequence[SynastryAspect], score: ScoreValue) -> Verdict:
+    """装配综合结论卡片（verdict-card spec §4）。
+
+    档位词取 `score.tier`（`synastry_tier`），星级取署名映射 `SYNASTRY_STARS`，headline/advice
+    套 `synastry_plain` 框架句，points 是计入相位条数与核心羁绊条数（账本事实）；本函数不现编中文。
+    核心羁绊去重口径同 `synastry_plain_summary`：`core_bond and counted`，轴无序排序后去重。
+    """
+    grade = score.tier
+    counted = [aspect for aspect in aspects if aspect.counted]
+    bonds = {
+        tuple(sorted((aspect.point_a, aspect.point_b)))
+        for aspect in aspects
+        if aspect.counted and aspect.core_bond
+    }
+    headline = overview(synastry_plain.SYNASTRY_VERDICT_FRAME, {
+        "grade": grade,
+        "score": num(score.value),
+        "outlook": synastry_plain.SYNASTRY_VERDICT_OUTLOOK[grade],
+    })
+    advice = overview(synastry_plain.SYNASTRY_VERDICT_ADVICE_FRAME, {
+        "counted": len(counted),
+        "bonds": len(bonds),
+        "tier_advice": synastry_plain.SYNASTRY_TIER_ADVICE[grade],
+    })
+    return Verdict(
+        grade=grade,
+        stars=SYNASTRY_STARS[grade],
+        headline=headline,
+        points=[f"计入相位：{len(counted)} 条", f"核心羁绊：{len(bonds)} 条"],
+        advice=advice,
     )
 
 
@@ -365,6 +410,7 @@ def compute_synastry(
         synastry_aspects=aspects,
         composite=composite,
         score=score,
+        verdict=synastry_verdict(aspects, score),
         plain_summary=synastry_plain_summary(aspects, score.tier),
         provenance=SynastryProvenance(
             engine="pyswisseph", note=NOTE, method=SYNASTRY_METHOD, tables=tables
