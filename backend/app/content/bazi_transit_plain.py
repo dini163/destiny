@@ -198,3 +198,63 @@ BAZI_LIUSHI_FOCUS_FRAME = (
     "落在它身上的流时规则命中 {hits} 条，条数是账本行数不是判语，"
     "一条也没有也照样是这一格的形状，你读到的是这一格在时辰表上占的位置。"
 )
+
+# ---------------------------------------------------------------- 结论卡片（verdict-card spec §4）
+#: 页级结论卡与上面三条档位句是两把尺：逐年/逐日/逐格层仍用 `_tier` 的顺/平/滞，页级
+#: 结论一律把锚点分交给 `engines/verdict.grade_for` 换五档词（大吉/吉/平/小凶/凶）。框架句、
+#: 取向词条与建议词条都住本表，引擎只填槽位，不现编中文。这一节不进上面九句框架的门测
+#: （档位词 吉/凶 由 `{grade}` 槽在运行时带入，与九句的禁插清单口径不同），键集由各系统
+#: 装配测自守。
+
+#: 五档收束取向，键 = `engines/verdict.GRADE_BANDS` 的五个档位词（与 `bazi_plain.VERDICT_OUTLOOK`
+#: 同键，缺一档即 KeyError）。槽位词条不成句、不带「。」，自身不含建议词与档位字。
+BAZI_TRANSIT_VERDICT_OUTLOOK: dict[str, str] = {
+    "大吉": "势头正旺，想推的事放手去做",
+    "吉": "向上的一面占优，值得把握",
+    "平": "好坏大致相抵，稳中求进",
+    "小凶": "吃力的一面更多，先补薄弱处",
+    "凶": "先把基本盘守住，别急着出手",
+}
+
+#: 三档（顺/平/滞）一句口语建议，键 = `bazi_transit._tier` 的三个返回值；建议句 `{tier_advice}`
+#: 槽按最弱那一格的档位取词。槽位词条不成句、不带「。」。
+BAZI_TRANSIT_TIER_ADVICE: dict[str, str] = {
+    "顺": "这一处势头正好，有想推进的事落在它身上更省力",
+    "平": "这一处不上不下，按部就班走，别在它身上硬求突破",
+    "滞": "这一处吃力的账更多，先把手头稳住，别在它身上铺新摊子",
+}
+
+#: 岁运页总论框架：`{grade}` 五档词，`{shun}/{ping}/{zhi}` 是逐年账本的三档计数，
+#: `{outlook}` 取 `BAZI_TRANSIT_VERDICT_OUTLOOK[grade]`；计数由引擎算术给出，本表不写死数字。
+BAZI_TRANSIT_RANGE_VERDICT_FRAME = (
+    "你这一段年表整体属{grade}：{shun} 年够得着高分界，{ping} 年落在两道线之间，"
+    "{zhi} 年落不到低分界，{outlook}。"
+)
+
+#: 岁运建议句框架：指向区间内分最低的那一年（`min` 打在升序年表上，并列取最早）。
+BAZI_TRANSIT_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这一段里分最低的是 {year} 年（{ganzhi}，{value} 分），{tier_advice}。"
+)
+
+#: 流日页总论框架：`{anchor_fact}` 是引擎按「有无聚焦日」二选一装配好的锚点事实短语。
+BAZI_LIURI_VERDICT_FRAME = "你看的这一段整体属{grade}：{anchor_fact}，{outlook}。"
+
+#: 流日锚点事实两形：给了聚焦日用 FOCUS（聚焦日自己的账），没给用 MONTH（月段自己的账）。
+BAZI_LIURI_ANCHOR_MONTH = "月段 {ganzhi} 自己记到 {value} 分"
+BAZI_LIURI_ANCHOR_FOCUS = "聚焦的 {date}（{ganzhi}）记到 {value} 分"
+
+#: 流日建议句框架：指向月内分最低的那一天（`min` 打在日表自然序上，并列取最早）。
+BAZI_LIURI_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这一月里分最低的是 {date}（{ganzhi}，{value} 分），{tier_advice}。"
+)
+
+#: 流时页总论框架：`{anchor_fact}` 按「有无聚焦时辰」二选一，口径同流日。
+BAZI_LIUSHI_VERDICT_FRAME = "你看的这一天整体属{grade}：{anchor_fact}，{outlook}。"
+
+BAZI_LIUSHI_ANCHOR_DAY = "日段 {ganzhi} 自己记到 {value} 分"
+BAZI_LIUSHI_ANCHOR_FOCUS = "聚焦的 {zhi} 时（钟面 {clock} 起）记到 {value} 分"
+
+#: 流时建议句框架：指向十二格里分最低的那一格（并列取时辰序首格）。
+BAZI_LIUSHI_VERDICT_ADVICE_FRAME = (
+    "综合建议：你这一天里分最低的是 {zhi} 时（钟面 {clock} 起，{value} 分），{tier_advice}。"
+)
