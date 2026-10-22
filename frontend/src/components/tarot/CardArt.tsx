@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import type { DrawnCard, TarotRank, TarotSuit } from '../../types/tarot';
 import { cardAccent } from '../../lib/tarot';
@@ -12,14 +12,35 @@ interface CardArtProps {
 }
 
 /**
- * The full card-face artwork on a 100×150 grid: a constellation of gold/suit
- * strokes that reads as a real tarot print. Major Arcana draw their canonical
- * symbol (太阳/月亮/高塔…) from {@link MAJOR_ART}; Minor Arcana repeat the suit
- * pip by rank (1–10) or show a court figure. Nothing is fetched or fabricated —
- * every stroke is derived from the deck's own fields. Reversal is handled by
- * the parent (the face container rotates 180°), so the artwork needs no branch.
+ * The full card-face artwork.
+ *
+ * Artwork is now bitmap-first: each card_id maps to a generated illustration at
+ * `/cards/tarot/<card_id>.jpg` (78 images, one per card, drawn in a unified
+ * mystic-oil style and family-safe). While the image is missing or fails to
+ * load, the card falls back to the deterministic vector artwork below, so a
+ * broken asset never blanks a face. Reversal is handled by the parent (the face
+ * container rotates 180°), so neither branch needs its own orientation logic.
  */
 export function CardArt({ card, className }: CardArtProps) {
+  const [useBitmap, setUseBitmap] = useState(true);
+  if (!useBitmap) {
+    return <CardArtSvg card={card} className={className} />;
+  }
+  return (
+    <img
+      src={`/cards/tarot/${card.card_id}.jpg`}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      loading="lazy"
+      className={`h-full w-full object-cover ${className ?? ''}`}
+      onError={() => setUseBitmap(false)}
+    />
+  );
+}
+
+/** Vector fallback: gold/suit strokes that read as a real tarot print. */
+function CardArtSvg({ card, className }: CardArtProps) {
   const accent = cardAccent(card);
   return (
     <svg
