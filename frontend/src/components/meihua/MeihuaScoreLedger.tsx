@@ -16,7 +16,8 @@ interface MeihuaScoreLedgerProps {
  * all labels, details and deltas are the backend's own.
  */
 export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
-  const { score, verdict, score_factors, summary } = cast;
+  const { score, score_factors, summary } = cast;
+  const band = cast.verdict.grade;
 
   return (
     <div className="flex flex-col gap-4">
@@ -29,7 +30,7 @@ export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
               <span className="numeric text-sm text-ink-muted">/ 100</span>
             </div>
           </div>
-          <span className={`font-display text-xl font-semibold ${verdictText(verdict)}`}>{verdict}</span>
+          <span className={`font-display text-xl font-semibold ${verdictText(band)}`}>{band}</span>
         </div>
 
         <div className="h-2 w-full overflow-hidden rounded-full bg-[#0e111a] ring-1 ring-inset ring-rim">

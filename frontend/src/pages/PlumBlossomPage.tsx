@@ -6,6 +6,7 @@ import { MeihuaScoreLedger } from '../components/meihua/MeihuaScoreLedger';
 import { TiYongPanel } from '../components/meihua/TiYongPanel';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useMeihua } from '../hooks/useMeihua';
 import { meihuaMethodLabel, movingPositionLabel } from '../lib/meihua';
 import type { MeihuaCast, MeihuaCastRequest, MeihuaMethod } from '../types/meihua';
@@ -95,6 +96,8 @@ function MeihuaResults({ cast }: { cast: MeihuaCast }) {
   return (
     <>
       <CastSummary cast={cast} />
+
+      <VerdictCard verdict={cast.verdict} />
 
       <ResultCard title="卦象三盘" eyebrow="本 · 互 · 变" icon="seal" elevated>
         <HexagramTriad cast={cast} />

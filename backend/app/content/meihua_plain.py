@@ -113,6 +113,38 @@ MEIHUA_TIER_CLOSERS: dict[str, str] = {
     "凶": "合起来读，你这一卦落在凶这一档，表的措辞在这一档最硬，读它时把它当作这一卦当前的阻力分布，不是说这件事永远不行。",
 }
 
+#: 结论卡片（verdict-card spec §4）的框架句与槽位语料。三组常量**不进** `MEIHUA_READINGS`
+#: （工厂键全集仍为 18），由引擎用 `overview()` 实例化，故工厂条目/开篇句措辞门扫不到它们；
+#: 档位→星级映射是署名模型参数，住引擎侧（古籍只给定性档、不给星），不在本表。
+#: 总论框架：档位词 + 指数分数 + 一句取向。`{grade}` 取 `_verdict_band` 的档位词；
+#: `{score}` 是引擎算出的 0-100 指数；`{outlook}` 取 `MEIHUA_VERDICT_OUTLOOK[grade]`。
+MEIHUA_VERDICT_FRAME = "这一卦综合属{grade}，吉凶指数{score}分落在这一档，{outlook}。"
+
+#: 六档收束取向，键 = `_verdict_band` 的六个档位名。槽位词条不成句、不带「。」。
+MEIHUA_VERDICT_OUTLOOK: dict[str, str] = {
+    "上吉": "好势头正足，顺势承接就好",
+    "吉": "向上的一面占优，值得把握推进",
+    "小吉": "成而有限度，稳步走就有收成",
+    "中平": "好坏大致相抵，稳住节奏再谈扩展",
+    "小凶": "吃力的一面偏重，先绕开锋芒缓一步",
+    "凶": "宜守不宜进，先把能守住的部分稳住",
+}
+
+#: 建议句框架：最吃重的一本账 + 该档一句口语建议。`{drag}` 是四本账里 delta 最小的
+#: factor.label（体用生克 / 卦气旺衰 / 互卦(过程) / 变卦(结局)），`{tier_advice}` 取
+#: `MEIHUA_TIER_ADVICE[grade]`。
+MEIHUA_VERDICT_ADVICE_FRAME = "综合建议：四本账里{drag}这一笔最吃重，{tier_advice}。"
+
+#: 六档各自的一句口语建议，键同 `_verdict_band`。槽位词条不成句、不带「。」。
+MEIHUA_TIER_ADVICE: dict[str, str] = {
+    "上吉": "顺势承接，不必另起波澜",
+    "吉": "把有利的一面接住，推进时留一分余地",
+    "小吉": "走稳了再谈加码，别在有限度的局面里硬冲",
+    "中平": "顺与吃力相抵，稳住节奏，别急着翻局",
+    "小凶": "先避开最吃力的那一笔，缓一步再动",
+    "凶": "先守住能守的部分，这一段不宜硬往前",
+}
+
 #: 登记表吃的就是这一个 dict（18 条）。
 MEIHUA_READINGS: dict[str, str] = {
     **{tiyong_key(k): t for k, t in MEIHUA_TIYONG_MEANINGS.items()},

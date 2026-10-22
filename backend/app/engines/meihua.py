@@ -32,7 +32,15 @@ from app.content.meihua import (
     leixiang_summary,
     wangshuai_state,
 )
-from app.content.meihua_plain import leixiang_key, tiyong_key, wangshuai_key
+from app.content.meihua_plain import (
+    MEIHUA_TIER_ADVICE,
+    MEIHUA_VERDICT_ADVICE_FRAME,
+    MEIHUA_VERDICT_FRAME,
+    MEIHUA_VERDICT_OUTLOOK,
+    leixiang_key,
+    tiyong_key,
+    wangshuai_key,
+)
 from app.content.wuxing import CONTROLS, GENERATES, ZHI_ELEMENT
 from app.content.zhouyi_hexagrams import (
     HEXAGRAM_BY_TRIGRAMS,
@@ -42,9 +50,10 @@ from app.content.zhouyi_hexagrams import (
 )
 from app.content.zhouyi_trigrams import TRIGRAM_BY_KEY, TRIGRAM_BY_MEIHUA, Trigram
 from app.core.errors import InvalidCastInputError
-from app.engines.plain_compose import compose, dedupe
+from app.core.provenance import MODEL_PARAM_SOURCE
+from app.engines.plain_compose import compose, dedupe, overview
 from app.engines.plain_corpora import MEIHUA
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 from app.schemas.meihua import (
     MeihuaCast,
     MeihuaDerivation,
@@ -295,6 +304,26 @@ def cast_meihua(
     verdict = _verdict_band(score)
     plain_summary = meihua_plain_summary(ti, yong, relation.key, verdict)
 
+    # 结论卡片（verdict-card spec §4）：档位词取 _verdict_band，星级取署名映射 MEIHUA_STARS，
+    # headline/advice 套 meihua_plain 的框架句，points 是四本账 label + 净增减，引擎不现编中文。
+    drag = min(factors, key=lambda factor: factor.delta)
+    headline = overview(MEIHUA_VERDICT_FRAME, {
+        "grade": verdict,
+        "score": str(score),
+        "outlook": MEIHUA_VERDICT_OUTLOOK[verdict],
+    })
+    advice = overview(MEIHUA_VERDICT_ADVICE_FRAME, {
+        "drag": drag.label,
+        "tier_advice": MEIHUA_TIER_ADVICE[verdict],
+    })
+    card = Verdict(
+        grade=verdict,
+        stars=MEIHUA_STARS[verdict],
+        headline=headline,
+        points=[f"{factor.label}（{factor.delta:+d}）" for factor in factors],
+        advice=advice,
+    )
+
     summary = (
         f"{verdict}。本卦{ben.full_name_zh}，{ti_trigram.name_zh}{ti_trigram.nature_zh}为体、"
         f"{yong_trigram.name_zh}{yong_trigram.nature_zh}为用，{relation.name_zh}——{relation.text}"
@@ -320,7 +349,7 @@ def cast_meihua(
         bian_analysis=bian_analysis,
         score=score,
         score_factors=factors,
-        verdict=verdict,
+        verdict=card,
         summary=summary,
         plain_summary=plain_summary,
         provenance=meihua_provenance(),
@@ -392,6 +421,20 @@ def meihua_provenance() -> MeihuaProvenance:
 def _wangshuai_delta(state: str) -> int:
     """Signed 卦气 contribution: 旺/相 strengthen, 囚/死 weaken the 体卦."""
     return {"旺": 8, "相": 5, "休": 0, "囚": -5, "死": -8}[state]
+
+
+#: 六档 → 星级（署名模型参数，`MODEL_PARAM_SOURCE`；古籍只给定性档、不给星，故这张映射
+#: 自定且单调不减：分越高星越多，上吉 5 / 吉 4 / 小吉 3 / 中平 3 / 小凶 2 / 凶 1）。
+#: 复测：`cd backend && PYTHONIOENCODING=utf-8 .venv/Scripts/python.exe -c "from app.engines.meihua import MEIHUA_STARS; print([(k, MEIHUA_STARS[k]) for k in ('上吉','吉','小吉','中平','小凶','凶')])"`
+#: → `[('上吉', 5), ('吉', 4), ('小吉', 3), ('中平', 3), ('小凶', 2), ('凶', 1)]`。
+MEIHUA_STARS: dict[str, int] = {
+    "上吉": 5,
+    "吉": 4,
+    "小吉": 3,
+    "中平": 3,
+    "小凶": 2,
+    "凶": 1,
+}
 
 
 def _verdict_band(score: int) -> str:

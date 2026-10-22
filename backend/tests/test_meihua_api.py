@@ -225,7 +225,7 @@ def test_the_ledger_is_four_lines_and_is_the_score(client: TestClient) -> None:
     assert all(f["detail"] for f in factors)
     assert body["score"] == 50 + sum(f["delta"] for f in factors)
     assert 0 <= body["score"] <= 100
-    assert body["verdict"] in BANDS
+    assert body["verdict"]["grade"] in BANDS
 
 
 def test_the_response_is_snake_case_end_to_end(client: TestClient) -> None:

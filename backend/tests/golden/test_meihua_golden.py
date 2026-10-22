@@ -29,7 +29,7 @@ from lunar_python import Solar
 from app.content import CONTENT_VERSION
 from app.content.meihua_plain import wangshuai_key
 from app.core.errors import InvalidCastInputError
-from app.engines.meihua import _verdict_band, cast_meihua
+from app.engines.meihua import MEIHUA_STARS, _verdict_band, cast_meihua
 from app.engines.plain_corpora import PLAIN_CORPORA, MEIHUA
 
 CAST = datetime(2024, 5, 15, 10, 30)
@@ -299,7 +299,27 @@ def test_verdict_band_matches_the_declared_cut_offs(case: Case) -> None:
     score = result.score
     expected = ("上吉" if score >= 85 else "吉" if score >= 70 else "小吉" if score >= 55
                 else "中平" if score >= 45 else "小凶" if score >= 30 else "凶")
-    assert result.verdict == expected == case.band
+    assert result.verdict.grade == expected == case.band
+
+
+@pytest.mark.parametrize("case", CASES, ids=IDS)
+def test_verdict_card_carries_grade_stars_points_and_advice(case: Case) -> None:
+    """结论卡片：档位词 = 账本 band，星级 = 署名映射 MEIHUA_STARS，points 恰为四本账，
+    headline/advice 由框架句装配且复述档位词，引擎不现编中文。"""
+    result = _cast(case)
+    card = result.verdict
+    assert card.grade == result.verdict.grade == case.band
+    assert card.stars == MEIHUA_STARS[case.band]
+    assert 1 <= card.stars <= 5
+    assert len(card.points) == len(result.score_factors) == 4
+    assert [p for p in card.points]
+    assert case.band in card.headline
+    assert str(result.score) in card.headline
+    assert card.advice
+    # 每本账的 label 都进了一条分项，净增减印在同一条上（透明性同账本）。
+    for factor, point in zip(result.score_factors, card.points, strict=True):
+        assert factor.label in point
+        assert f"{factor.delta:+d}" in point
 
 
 @pytest.mark.parametrize("case", CASES, ids=IDS)

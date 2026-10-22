@@ -13,7 +13,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from app.schemas.common import ProvenanceTable
+from app.schemas.common import ProvenanceTable, Verdict
 
 
 class MeihuaMethod(str, Enum):
@@ -154,7 +154,10 @@ class MeihuaCast(BaseModel):
     # Ledger
     score: int = Field(description="吉凶指数 0-100 (higher = more favourable).")
     score_factors: list[ScoreFactor] = Field(description="The factors that produced the index.")
-    verdict: str = Field(description="综合吉凶 verdict label.")
+    verdict: Verdict = Field(
+        description="综合结论卡片：档位词（_verdict_band 六档）+ 星级 + 结论句 + 四本账分项 + 建议。"
+        "档位词与星级由引擎从指数派生，框架句来自 meihua_plain。"
+    )
     summary: str = Field(description="综合断语 synthesising 体用/卦气/互变.")
     plain_summary: str = Field(
         description="白话总论：体用生克 + 两侧取象与卦气 + 档位收尾，逐字来自 meihua_plain。"
