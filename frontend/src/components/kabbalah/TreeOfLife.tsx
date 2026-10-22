@@ -82,7 +82,13 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
 
       {/* Deep-space ground with the light source resting on the crown. */}
       <rect x={minX} y={minY} width={width} height={height} fill="url(#treeNebula)" rx={2} />
-      {crown ? <circle cx={toView(crown.x, crown.y).vx} cy={toView(crown.x, crown.y).vy} r={26} fill="url(#crownGlow)" /> : null}
+      {crown ? (
+        <circle
+          className="kabbalah-crown-glow"
+          cx={toView(crown.x, crown.y).vx} cy={toView(crown.x, crown.y).vy} r={26}
+          fill="url(#crownGlow)"
+        />
+      ) : null}
 
       <PillarGuides pillars={tree.pillars} />
 
@@ -101,20 +107,27 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
             onClick={() => onSelect({ kind: 'path', id: path.id })}
             aria-hidden="true"
           >
-            {/* Glow underlay, then the hairline stroke, then a wide transparent click target. */}
+            {/* Glow underlay, then the hairline stroke, then a wide transparent click target.
+                Both visible strokes draw themselves in via pathLength-normalised dashes. */}
             <line
+              className="kabbalah-path-grow"
               x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
+              pathLength={1} strokeDasharray={1} strokeDashoffset={1}
               stroke={GOLD}
               strokeOpacity={active ? 0.28 : 0.1}
               strokeWidth={active ? 3 : 2.6}
               strokeLinecap="round"
+              style={{ animationDelay: `${(path.number - 11) * 0.055}s` }}
             />
             <line
+              className="kabbalah-path-grow"
               x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy}
+              pathLength={1} strokeDasharray={1} strokeDashoffset={1}
               stroke={active ? GOLD_BRIGHT : GOLD}
               strokeOpacity={active ? 0.95 : 0.42}
               strokeWidth={active ? 1.6 : 1}
               strokeLinecap="round"
+              style={{ animationDelay: `${(path.number - 11) * 0.055}s` }}
             />
             <line x1={a.vx} y1={a.vy} x2={b.vx} y2={b.vy} stroke="transparent" strokeWidth={5} />
             {/* Hebrew-letter medallion riding the path midpoint. */}
@@ -168,22 +181,31 @@ function SephirahDisc({
   const hidden = node.is_hidden;
   return (
     <g
-      className="cursor-pointer"
+      className="kabbalah-node cursor-pointer"
+      style={{ animationDelay: `${0.15 + node.y * 0.45}s` }}
       onClick={() => onSelect({ kind: 'sephirah', id: node.id })}
       aria-hidden="true"
     >
-      {/* Ambient halo keeps the disc readable over the nebula and flares when selected. */}
+      {/* Ambient halo keeps the disc readable over the nebula, breathes, and flares when selected. */}
       <circle
+        className={active ? 'kabbalah-halo kabbalah-halo-static' : 'kabbalah-halo'}
         cx={vx} cy={vy} r={nodeR * 2.7}
         fill={`url(#halo-${node.id})`}
         fillOpacity={active ? 0.9 : 0.45}
-        style={{ transition: 'fill-opacity 150ms ease' }}
       />
       {active ? (
-        <circle
-          cx={vx} cy={vy} r={nodeR + 2.2}
-          fill="none" stroke={GOLD_BRIGHT} strokeOpacity={0.85} strokeWidth={1.1}
-        />
+        <>
+          <circle
+            cx={vx} cy={vy} r={nodeR + 2.2}
+            fill="none" stroke={GOLD_BRIGHT} strokeOpacity={0.85} strokeWidth={1.1}
+          />
+          {/* One-shot selection ripple fanning out from the disc. */}
+          <circle
+            className="kabbalah-ripple"
+            cx={vx} cy={vy} r={nodeR + 2.2}
+            fill="none" stroke={GOLD_BRIGHT} strokeOpacity={0.6} strokeWidth={1.2}
+          />
+        </>
       ) : null}
       <circle
         cx={vx} cy={vy} r={nodeR}
@@ -238,6 +260,7 @@ function PillarGuides({ pillars }: { pillars: PillarInfo[] }) {
         return (
           <g key={pillar.id}>
             <line
+              className="kabbalah-pillar"
               x1={x} y1={PILLAR_TOP} x2={x} y2={PILLAR_BOTTOM}
               stroke={`url(#pillar-${pillar.id})`}
               strokeWidth={1.2}
