@@ -62,7 +62,7 @@ TOP_LEVEL_KEYS = {
     "lagna_degree_text", "lagna_nakshatra", "lagna_nakshatra_zh",
     "moon_sign", "moon_sign_zh", "moon_nakshatra", "moon_nakshatra_zh",
     "moon_nakshatra_lord", "moon_nakshatra_lord_zh", "moon_pada",
-    "planets", "rashis", "vimshottari", "plain", "provenance", "engine",
+    "planets", "rashis", "vimshottari", "plain", "verdict", "provenance", "engine",
 }
 
 PLANET_KEYS = {
@@ -92,7 +92,7 @@ REQUEST_KEYS = {
 }
 
 KEY_SIZES = {
-    "TOP_LEVEL_KEYS": (TOP_LEVEL_KEYS, 30),
+    "TOP_LEVEL_KEYS": (TOP_LEVEL_KEYS, 31),
     "PLANET_KEYS": (PLANET_KEYS, 20),
     "RASHI_KEYS": (RASHI_KEYS, 7),
     "VIMSHOTTARI_KEYS": (VIMSHOTTARI_KEYS, 9),
@@ -114,7 +114,7 @@ FRONTEND_CHART_KEYS = {
     "lagna_degree_text", "lagna_nakshatra", "lagna_nakshatra_zh",
     "moon_sign", "moon_sign_zh", "moon_nakshatra", "moon_nakshatra_zh",
     "moon_nakshatra_lord", "moon_nakshatra_lord_zh", "moon_pada",
-    "planets", "rashis", "vimshottari", "plain", "provenance", "engine",
+    "planets", "rashis", "vimshottari", "plain", "verdict", "provenance", "engine",
 }
 
 FRONTEND_PLANET_KEYS = {
@@ -210,7 +210,7 @@ def test_the_chart_comes_back_with_exactly_the_hand_written_contract(client: Tes
     assert response.status_code == 200
     body = response.json()
     assert set(body) == TOP_LEVEL_KEYS
-    assert len(TOP_LEVEL_KEYS) == 30  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
+    assert len(TOP_LEVEL_KEYS) == 31  # 尺寸哨兵：抄漏一格上面那条相等就直接红，这条管的是两侧同时缩水
     assert body["engine"] == "pyswisseph"  # 引擎名在两处出现，见出处那一条测
     assert body["zodiac"] == "sidereal"
     assert body["ayanamsa_name"] == "Lahiri (Chitrapaksha)"
@@ -626,15 +626,29 @@ def test_the_plain_block_arrives_in_the_declared_section_order(client: TestClien
     assert [len(section["text"].splitlines()) for section in body["plain"]] == [10, 10, 10, 3]
 
 
-def test_the_provenance_declares_exactly_the_three_vedic_tables(client: TestClient) -> None:
-    """`provenance.tables` 三行按 `VEDIC_CONTENT_SOURCES` 的字面序回显（T10）。
+def test_the_provenance_declares_exactly_the_four_vedic_tables(client: TestClient) -> None:
+    """`provenance.tables` 四行按 `VEDIC_CONTENT_SOURCES` 的字面序回显（T10；verdict 轮追加吉凶表）。
 
     序以名单为准，两边必须一致——这里钉的是「响应如实回显登记」，登记表自身那一半由
     本地门 `test_the_provenance_registration_names_the_three_tables_in_order` 负责。
     """
     body = _body(client)
     tables = body["provenance"]["tables"]
-    assert [table["name"] for table in tables] == ["vedic", "vedic_plain", "vedic_plain_gruha"]
-    assert len(tables) == 3
+    assert [table["name"] for table in tables] == [
+        "vedic", "vedic_plain", "vedic_plain_gruha", "vedic_judgment",
+    ]
+    assert len(tables) == 4
     assert all(table["version"] for table in tables)
     assert len({table["version"] for table in tables}) == 1
+
+
+def test_the_verdict_card_carries_the_five_contract_fields(client: TestClient) -> None:
+    """结论卡片五件齐备（verdict-card spec §1）：档位词 ∈ 共享五档、星级对应、句末单「。」。"""
+    body = _body(client)
+    verdict = body["verdict"]
+    assert set(verdict) == {"grade", "stars", "headline", "points", "advice"}
+    assert verdict["grade"] in {"大吉", "吉", "平", "小凶", "凶"}
+    assert 1 <= verdict["stars"] <= 5
+    assert verdict["headline"].endswith("。")
+    assert verdict["advice"].endswith("。")
+    assert len(verdict["points"]) == 3

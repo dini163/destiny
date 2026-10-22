@@ -104,12 +104,13 @@ it('the page wires chart.plain after the timeline, and the provenance block is r
   ]);
 });
 
-it('the fixture carries the three vedic tables, and the page no longer renders the provenance block', () => {
+it('the fixture carries the four vedic tables, and the page no longer renders the provenance block', () => {
   const tables = chart.provenance.tables;
   expect(tables.map((table) => table.name)).toEqual([
     'vedic',
     'vedic_plain',
     'vedic_plain_gruha',
+    'vedic_judgment',
   ]);
   const versions = new Set(tables.map((table) => table.version));
   expect(versions.size).toBe(1);
@@ -117,11 +118,13 @@ it('the fixture carries the three vedic tables, and the page no longer renders t
   expect(tables[1].source).toBe(tables[2].source);
   expect(tables[1].source).toContain('平台自撰');
   expect(tables[0].source).not.toBe(tables[1].source);
-  for (const table of tables.slice(1)) {
+  // 两半自撰表（下标 1、2）仍是无书名号的平台自撰口径；末行吉凶表带经典章属双署。
+  for (const table of tables.slice(1, 3)) {
     expect(table.source).not.toContain('《');
     expect(table.source).not.toContain('依');
   }
-  // 溯源块已按 2026-10-21 UI 需求移除：页面不再把三行表递进共享 `ProvenancePanel`。
+  expect(tables[3].source).toContain('Brihat Parashara');
+  // 溯源块已按 2026-10-21 UI 需求移除：页面不再把表递进共享 `ProvenancePanel`。
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).not.toContain('<Provenance');
 });

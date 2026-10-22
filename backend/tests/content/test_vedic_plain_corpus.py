@@ -370,22 +370,27 @@ def test_the_assembly_shape_is_keep_unclosed_and_unsorted() -> None:
     assert VEDIC.closers is None, VEDIC.closers
 
 
-def test_the_provenance_registration_names_the_three_tables_in_order() -> None:
-    """`VEDIC_CONTENT_SOURCES` 三行的字面序逐字节钉，且每个 name 都有对应模块文件。
+def test_the_provenance_registration_names_the_four_tables_in_order() -> None:
+    """`VEDIC_CONTENT_SOURCES` 四行的字面序逐字节钉，且每个 name 都有对应模块文件。
 
-    两行自撰表共用 `VEDIC_PLAIN_SOURCE`（同一张自撰表的两半）；主表单独用 `VEDIC_SOURCE`。
+    两行自撰表共用 `VEDIC_PLAIN_SOURCE`（同一张自撰表的两半）；主表单独用 `VEDIC_SOURCE`；
+    末行 `vedic_judgment` 是 verdict 轮追加的九曜吉凶与擢升陷落表，用 `JUDGMENT_SOURCE`。
     引擎 `_vedic_tables()` 原样映射这份名单，响应 `provenance.tables` 的字面序由此而来。
     """
     from pathlib import Path
 
     from app.content import VEDIC_CONTENT_SOURCES, VEDIC_SOURCE
+    from app.content.vedic_judgment import JUDGMENT_SOURCE
     from app.content.vedic_plain import VEDIC_PLAIN_SOURCE
 
     rows = list(VEDIC_CONTENT_SOURCES)
-    assert [name for name, _source in rows] == ["vedic", "vedic_plain", "vedic_plain_gruha"]
+    assert [name for name, _source in rows] == [
+        "vedic", "vedic_plain", "vedic_plain_gruha", "vedic_judgment",
+    ]
     assert rows[0][1] == VEDIC_SOURCE
     assert rows[1][1] == rows[2][1] == VEDIC_PLAIN_SOURCE
     assert rows[0][1] != rows[1][1]
+    assert rows[3][1] == JUDGMENT_SOURCE
 
     content_dir = Path(__file__).resolve().parents[2] / "app" / "content"
     for name in [name for name, _source in rows]:

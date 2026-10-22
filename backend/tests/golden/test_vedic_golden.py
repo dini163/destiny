@@ -817,3 +817,76 @@ def test_every_plain_line_is_a_prewritten_corpus_line() -> None:
     for section in chart.plain:
         for line in section.text.splitlines():
             assert line in known, line
+
+
+# --- 综合结论卡片（verdict）：吉凶 + 擢升陷落 + 大运主星 → 五档 ---------------
+
+
+def _expected_verdict(chart):
+    """从盘面字段独立重算吉凶/擢升陷落计数与档位，作为引擎 verdict 的对账口径。"""
+    from app.content.vedic_judgment import DIGNITY_BY_NAME, QUALITY_BY_NAME
+    from app.engines.vedic import (
+        _BENEFIC_WEIGHT,
+        _DASHA_LORD_WEIGHT,
+        _DEBIL_WEIGHT,
+        _EXALT_WEIGHT,
+        _MALEFIC_WEIGHT,
+        _VERDICT_BASE,
+    )
+    from app.engines.verdict import grade_for
+
+    benefic = [p for p in chart.planets if QUALITY_BY_NAME[p.name].quality == "benefic"]
+    malefic = [p for p in chart.planets if QUALITY_BY_NAME[p.name].quality == "malefic"]
+    exalted = [p for p in chart.planets if DIGNITY_BY_NAME[p.name].exaltation == p.sign_index]
+    debased = [p for p in chart.planets if DIGNITY_BY_NAME[p.name].debilitation == p.sign_index]
+    current = chart.vimshottari.current
+    bonus = 0.0
+    if current is not None:
+        lord = QUALITY_BY_NAME.get(current.mahadasha_lord)
+        if lord is not None and lord.quality == "benefic":
+            bonus = _DASHA_LORD_WEIGHT
+        elif lord is not None and lord.quality == "malefic":
+            bonus = -_DASHA_LORD_WEIGHT
+    score = min(
+        100.0,
+        max(
+            0.0,
+            _VERDICT_BASE
+            + _BENEFIC_WEIGHT * len(benefic)
+            - _MALEFIC_WEIGHT * len(malefic)
+            + _EXALT_WEIGHT * len(exalted)
+            - _DEBIL_WEIGHT * len(debased)
+            + bonus,
+        ),
+    )
+    grade, stars = grade_for(score)
+    return grade, stars, benefic, malefic, exalted, debased
+
+
+def test_verdict_card_carries_the_five_contract_fields_on_three_hands() -> None:
+    """三手盘（J2000 / 1900 / 2100 各一）各钉五件齐备：档位词 ∈ 共享五档、星级对应、句末单「。」。"""
+    from app.engines.verdict import GRADE_BANDS
+
+    words = {band[1]: band[2] for band in GRADE_BANDS}
+    for chart in (_chart(), _chart_at(1900), _chart_at(2100)):
+        v = chart.verdict
+        assert set(v.model_dump()) == {"grade", "stars", "headline", "points", "advice"}
+        assert v.grade in words
+        assert v.stars == words[v.grade]
+        assert v.headline.endswith("。") and v.headline.count("。") == 1
+        assert v.advice.endswith("。") and v.advice.count("。") == 1
+        assert len(v.points) == 3
+
+
+def test_verdict_counts_match_independently_recounted_quality_and_dignity() -> None:
+    """三手盘按字段对账：吉凶星计数、擢升/陷落颗数、档位全部与独立重算一致。"""
+    for chart in (_chart(), _chart_at(1900), _chart_at(2100)):
+        grade, stars, benefic, malefic, exalted, debased = _expected_verdict(chart)
+        v = chart.verdict
+        assert v.grade == grade
+        assert v.stars == stars
+        assert v.points[0] == "自然吉星落座：" + ("、".join(p.name_zh for p in benefic) or "无")
+        assert v.points[1] == "自然凶星落座：" + ("、".join(p.name_zh for p in malefic) or "无")
+        assert v.points[2] == f"擢升{len(exalted)}颗、陷落{len(debased)}颗"
+        assert str(len(benefic)) in v.headline
+        assert str(len(exalted)) in v.headline
