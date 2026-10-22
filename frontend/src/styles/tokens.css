@@ -308,6 +308,148 @@
   animation: kabbalah-reveal 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.kabbalah-atlas {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  border-radius: 12px;
+  padding: clamp(1rem, 2.8vw, 2rem);
+  background:
+    radial-gradient(ellipse at 50% 8%, rgba(245, 215, 127, 0.08), transparent 48%),
+    linear-gradient(155deg, rgba(19, 23, 36, 0.96), rgba(8, 11, 18, 0.98));
+  box-shadow: inset 0 1px 0 rgba(245, 215, 127, 0.12), 0 16px 48px -32px rgba(0, 0, 0, 0.92);
+}
+
+.kabbalah-atlas::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 22%, rgba(245, 215, 127, 0.48) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 78% 36%, rgba(226, 226, 235, 0.4) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 31% 73%, rgba(245, 215, 127, 0.35) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 86% 82%, rgba(226, 226, 235, 0.3) 0 1px, transparent 1.5px);
+  content: '';
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.kabbalah-atlas-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+.kabbalah-tree-svg {
+  display: block;
+  overflow: visible;
+}
+
+.kabbalah-index {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.14);
+}
+
+.kabbalah-index-chip {
+  align-items: center;
+  min-height: 44px;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.kabbalah-index-chip:hover {
+  transform: translateY(-1px);
+}
+
+.kabbalah-index-chip:active {
+  transform: scale(0.98);
+}
+
+.kabbalah-index-chip:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
+}
+
+.kabbalah-path {
+  cursor: pointer;
+}
+
+.kabbalah-path-glow,
+.kabbalah-path-core,
+.kabbalah-path-medallion,
+.kabbalah-path-letter {
+  transition:
+    stroke-opacity 180ms ease,
+    stroke-width 180ms ease,
+    fill 180ms ease,
+    opacity 180ms ease;
+}
+
+.kabbalah-path:hover .kabbalah-path-glow,
+.kabbalah-path-active .kabbalah-path-glow {
+  stroke-opacity: 0.34;
+}
+
+.kabbalah-path:hover .kabbalah-path-core,
+.kabbalah-path-active .kabbalah-path-core {
+  stroke-opacity: 1;
+  stroke-width: 1.7;
+}
+
+.kabbalah-path:hover .kabbalah-path-medallion,
+.kabbalah-path-active .kabbalah-path-medallion {
+  stroke-opacity: 1;
+}
+
+.kabbalah-path:hover .kabbalah-path-letter {
+  fill: var(--gold-bright);
+}
+
+.kabbalah-node {
+  cursor: pointer;
+}
+
+.kabbalah-node .kabbalah-disc {
+  transition:
+    fill-opacity 180ms ease,
+    stroke-opacity 180ms ease,
+    stroke-width 180ms ease;
+}
+
+.kabbalah-node:hover .kabbalah-disc {
+  fill-opacity: 0.56;
+  stroke-opacity: 1;
+  stroke-width: 1.7;
+}
+
+.kabbalah-inspector-transition {
+  animation: kabbalah-inspector-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes kabbalah-inspector-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .kabbalah-node,
   .kabbalah-path-grow,
@@ -323,6 +465,21 @@
   .kabbalah-reveal {
     opacity: 1;
     transform: none;
+  }
+  .kabbalah-inspector-transition {
+    animation: none;
+  }
+  .kabbalah-index-chip {
+    transform: none;
+    transition: none;
+  }
+  .kabbalah-path-glow,
+  .kabbalah-path-core,
+  .kabbalah-path-medallion,
+  .kabbalah-path-letter,
+  .kabbalah-node circle,
+  .kabbalah-node text {
+    transition: none !important;
   }
   .kabbalah-path-grow {
     stroke-dashoffset: 0;

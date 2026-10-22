@@ -53,7 +53,7 @@ export function KabbalahPage() {
       {tree.data ? (
         <>
           <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-            <div className="lg:col-span-7">
+            <div className="min-w-0 lg:col-span-7 2xl:col-span-8">
               <div className="kabbalah-reveal" style={{ animationDelay: '0.1s' }}>
                 <ResultCard
                   title="生命之树"
@@ -61,9 +61,18 @@ export function KabbalahPage() {
                   icon="compass"
                   elevated
                 >
-                  <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
-                  <SephirahIndex tree={tree.data} selection={selection} onSelect={setSelection} />
-                  <PathIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+                  <div className="kabbalah-atlas">
+                    <div className="kabbalah-atlas-heading">
+                      <span className="label-caps text-gold-soft">ILLUSTRATED MAP · GOLDEN DAWN</span>
+                      <span className="text-xs text-ink-variant">点选原质或路径，展开象征对应</span>
+                    </div>
+                    <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
+                  </div>
+                  <div className="kabbalah-index">
+                    <SephirahIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+                    <div className="gold-rule" />
+                    <PathIndex tree={tree.data} selection={selection} onSelect={setSelection} />
+                  </div>
                 </ResultCard>
               </div>
 
@@ -73,9 +82,19 @@ export function KabbalahPage() {
                 </ResultCard>
               </div>
             </div>
-            <div className="lg:col-span-5">
-              <ResultCard title="原质 / 路径详解" eyebrow="NODE INSPECTOR" icon="search" className="lg:sticky lg:top-32">
-                <NodeInspector resolved={resolveSelection(selection, tree.data)} />
+            <div className="min-w-0 lg:col-span-5 2xl:col-span-4">
+              <ResultCard
+                title="原质 / 路径详解"
+                eyebrow="NODE INSPECTOR"
+                icon="search"
+                className="lg:sticky lg:top-36 lg:self-start"
+              >
+                <div
+                  key={`${selection?.kind ?? 'none'}:${selection?.id ?? 'none'}`}
+                  className="kabbalah-inspector-transition"
+                >
+                  <NodeInspector resolved={resolveSelection(selection, tree.data)} />
+                </div>
               </ResultCard>
             </div>
           </div>
@@ -129,7 +148,8 @@ function SephirahIndex({
               key={node.id}
               type="button"
               onClick={() => onSelect({ kind: 'sephirah', id: node.id })}
-              className={`inline-flex items-center gap-1.5 rounded-element border px-2 py-1 text-xs transition ${
+              aria-pressed={active}
+              className={`kabbalah-index-chip inline-flex items-center gap-2 rounded-element border px-3 py-1.5 text-xs ${
                 active
                   ? 'border-gold bg-gold/15 text-ink shadow-[0_0_14px_-6px_rgba(212,175,55,0.5)]'
                   : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
@@ -170,7 +190,8 @@ function PathIndex({
               type="button"
               onClick={() => onSelect({ kind: 'path', id: path.id })}
               title={`${path.from_name_zh} → ${path.to_name_zh}`}
-              className={`inline-flex items-center gap-1 rounded-element border px-2 py-1 text-xs transition ${
+              aria-pressed={active}
+              className={`kabbalah-index-chip inline-flex items-center gap-1.5 rounded-element border px-3 py-1.5 text-xs ${
                 active
                   ? 'border-gold bg-gold/15 text-ink shadow-[0_0_14px_-6px_rgba(212,175,55,0.5)]'
                   : 'border-rim-soft bg-surface text-ink-muted hover:text-ink'
