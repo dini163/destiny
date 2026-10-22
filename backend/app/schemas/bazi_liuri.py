@@ -20,7 +20,7 @@ from app.schemas.bazi import BaziNatalRequest, BaziPillar
 from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, Verdict
 from app.schemas.scoring import ScoreValue
 
 
@@ -117,6 +117,10 @@ class BaziLiuriResult(BaseModel):
     plain: list[PlainSection] = Field(
         description="流日页白话 2–3 节：本月总览（两行）、逐日分布，给了 `focus_date` 时再加聚焦之日"
         "（批次二 spec §7.4；三节标题取自 `content/bazi_transit_plain.BAZI_TRANSIT_TITLES` 的 liuri 一组）。"
+    )
+    verdict: Verdict = Field(
+        description="页级结论卡：锚点分 = 聚焦日账本分，无聚焦日则取月段账本分，过 `verdict.grade_for` "
+        "换五档；headline/points/advice 来自 `content/bazi_transit_plain` 的结论卡框架句（verdict-card spec §4）。"
     )
     provenance: Provenance = Field(
         description="`tables` = 主命盘九张 + 岁运两张 + 白话一张 + 历注一张 = 13"

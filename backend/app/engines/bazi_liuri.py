@@ -29,11 +29,17 @@ from app.content import (
 )
 from app.content.bazi_shishen import ten_god_meaning
 from app.content.bazi_transit_plain import (
+    BAZI_LIURI_ANCHOR_FOCUS,
+    BAZI_LIURI_ANCHOR_MONTH,
     BAZI_LIURI_DAYS_FRAME,
     BAZI_LIURI_FOCUS_FRAME,
     BAZI_LIURI_MONTH_FRAME,
+    BAZI_LIURI_VERDICT_ADVICE_FRAME,
+    BAZI_LIURI_VERDICT_FRAME,
+    BAZI_TRANSIT_TIER_ADVICE,
     BAZI_TRANSIT_TITLES,
     BAZI_TRANSIT_TONE_KEYS,
+    BAZI_TRANSIT_VERDICT_OUTLOOK,
 )
 from app.core.errors import TransitRangeError
 from app.engines.bazi import compute_bazi_chart
@@ -55,6 +61,7 @@ from app.engines.bazi_transit import (
 )
 from app.engines.plain_compose import num, overview, reading
 from app.engines.plain_corpora import BAZI_TRANSIT
+from app.engines.verdict import grade_for
 from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
 from app.schemas.bazi_liuri import (
     AlmanacYiJi,
@@ -64,7 +71,7 @@ from app.schemas.bazi_liuri import (
     TransitDayHit,
 )
 from app.schemas.bazi_transit import TransitFired, TransitTenGod
-from app.schemas.common import CalendarType, Gender, PlainSection
+from app.schemas.common import CalendarType, Gender, PlainSection, Verdict
 from app.schemas.scoring import ScoreValue
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -381,6 +388,63 @@ def _liuri_plain(
     return sections
 
 
+def _liuri_verdict(
+    *,
+    month_ganzhi: str,
+    month_score: ScoreValue,
+    days: list[TransitDayCell],
+    focused: TransitDayDetail | None,
+) -> Verdict:
+    """页级结论卡（verdict-card spec §4）：锚点 = 聚焦日账本分，无聚焦日则取月段账本分。
+
+    锚点二选一与白话第一节的关注对象同源（给了聚焦日读者看的就是那一天），但档位尺不同：
+    白话用 `month_score.tier` 的顺/平/滞，卡片用 `grade_for` 的五档词。points 只报月段与
+    聚焦日两条账本事实；advice 指向月内分最低的那一天（`min` 打在日表自然序上，并列取最早）。
+    """
+    if focused is not None:
+        anchor_fact = overview(
+            BAZI_LIURI_ANCHOR_FOCUS,
+            {
+                "date": focused.solar_date,
+                "ganzhi": focused.ganzhi,
+                "value": num(focused.score.value),
+            },
+        )
+        anchor_score = focused.score.value
+    else:
+        anchor_fact = overview(
+            BAZI_LIURI_ANCHOR_MONTH,
+            {"ganzhi": month_ganzhi, "value": num(month_score.value)},
+        )
+        anchor_score = month_score.value
+    grade, stars = grade_for(anchor_score)
+    headline = overview(
+        BAZI_LIURI_VERDICT_FRAME,
+        {
+            "grade": grade,
+            "anchor_fact": anchor_fact,
+            "outlook": BAZI_TRANSIT_VERDICT_OUTLOOK[grade],
+        },
+    )
+    weakest = min(days, key=lambda cell: cell.value)
+    advice = overview(
+        BAZI_LIURI_VERDICT_ADVICE_FRAME,
+        {
+            "date": weakest.solar_date,
+            "ganzhi": weakest.ganzhi,
+            "value": num(weakest.value),
+            "tier_advice": BAZI_TRANSIT_TIER_ADVICE[weakest.tier],
+        },
+    )
+    points = [f"月段 {month_ganzhi}：{num(month_score.value)} 分"]
+    if focused is not None:
+        points.append(
+            f"聚焦 {focused.solar_date} {focused.ganzhi}：{num(focused.score.value)} 分"
+            f"（命中 {num(len(focused.day_hits))} 条）"
+        )
+    return Verdict(grade=grade, stars=stars, headline=headline, points=points, advice=advice)
+
+
 def compute_liuri_matrix(
     *,
     birth_date: date,
@@ -460,6 +524,12 @@ def compute_liuri_matrix(
             month_ganzhi=segment.month_ganzhi,
             month_start_solar=segment.start.isoformat(),
             month_end_solar=segment.end.isoformat(),
+            month_score=base.score,
+            days=cells,
+            focused=detail,
+        ),
+        verdict=_liuri_verdict(
+            month_ganzhi=segment.month_ganzhi,
             month_score=base.score,
             days=cells,
             focused=detail,
