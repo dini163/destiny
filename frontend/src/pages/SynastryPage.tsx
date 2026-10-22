@@ -1,7 +1,10 @@
+import { useState } from 'react';
+
 import { SynastryAspectList } from '../components/synastry/SynastryAspectList';
 import { SynastryBiWheel } from '../components/synastry/SynastryBiWheel';
-import { SynastryConsole } from '../components/synastry/SynastryConsole';
+import { SynastryConsole, type SideState } from '../components/synastry/SynastryConsole';
 import { SynastryScoreRing } from '../components/synastry/SynastryScoreRing';
+import { ProfilePicker } from '../components/profiles/ProfilePicker';
 import { AstroWheel } from '../components/western/AstroWheel';
 import { ElementBalance } from '../components/western/ElementBalance';
 import { HouseTable } from '../components/western/HouseTable';
@@ -9,6 +12,8 @@ import { Icon } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useSynastry } from '../hooks/useSynastry';
+import { useProfiles } from '../hooks/useProfiles';
+import type { PersonProfile } from '../lib/profiles';
 import { aspectStyle } from '../lib/astro';
 import type { SynastryChart, SynastryRequest } from '../types/synastry';
 
@@ -31,7 +36,25 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
  * 累加，账本逐条可核（PRD 无 mock 铁律）。页面上唯一的意志是两造生辰、定位与共用分宫制。
  */
 export function SynastryPage() {
+  const [sideAPreset, setSideAPreset] = useState<SideState | null>(null);
+  const [sideBPreset, setSideBPreset] = useState<SideState | null>(null);
+  const { profiles } = useProfiles();
   const synastry = useSynastry();
+
+  /** 档案 → 一侧 preset（公历、UTC 留空按经度推算）。 */
+  function presetOf(profile: PersonProfile): SideState {
+    return {
+      name: profile.name ?? '',
+      birthDate: profile.birth_date ?? '',
+      birthTime: profile.birth_time ?? '',
+      location: {
+        city: profile.city ?? null,
+        latitude: profile.latitude ?? null,
+        longitude: profile.longitude ?? null,
+      },
+      utcOffset: '',
+    };
+  }
 
   function handleSubmit(request: SynastryRequest): void {
     synastry.mutate(request);
@@ -39,7 +62,24 @@ export function SynastryPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
-      <SynastryConsole pending={synastry.isPending} onSubmit={handleSubmit} />
+      <div className="flex flex-wrap items-center gap-2">
+        <ProfilePicker
+          label="甲方 · 选档案"
+          profiles={profiles}
+          onPick={(profile) => setSideAPreset(profile ? presetOf(profile) : null)}
+        />
+        <ProfilePicker
+          label="乙方 · 选档案"
+          profiles={profiles}
+          onPick={(profile) => setSideBPreset(profile ? presetOf(profile) : null)}
+        />
+      </div>
+      <SynastryConsole
+        sideAPreset={sideAPreset}
+        sideBPreset={sideBPreset}
+        pending={synastry.isPending}
+        onSubmit={handleSubmit}
+      />
 
       {synastry.error ? (
         <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-4 py-3 text-sm text-ink">

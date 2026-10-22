@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { Icon } from '../../ui/Icon';
@@ -133,6 +133,12 @@ function SideColumn({ side, state, onChange }: SideColumnProps) {
 interface DualBirthConsoleProps {
   /** 链接里的两半，任一半可为空（`以此造合婚` 只带来一张盘）。 */
   initial: HehunSides;
+  /**
+   * 外部档案填充（profile picker）：每造一个 preset，变化时覆盖对应一列。
+   * 选档案是显式动作，故每次变化都重写整列；null 不动。
+   */
+  malePreset?: HehunSideLink | null;
+  femalePreset?: HehunSideLink | null;
   pending: boolean;
   onSubmit: (sides: CompleteSides) => void;
 }
@@ -148,7 +154,13 @@ interface DualBirthConsoleProps {
  * 状态在本件里，初值由 `initial` 落一次（`useState` 的初值只在挂载时取一次）：挂载之后这一列就归
  * 用户编辑，链接再变（`send` 自己写回的那两键）都不该把已填的字段抹回去。
  */
-export function DualBirthConsole({ initial, pending, onSubmit }: DualBirthConsoleProps) {
+export function DualBirthConsole({
+  initial,
+  malePreset,
+  femalePreset,
+  pending,
+  onSubmit,
+}: DualBirthConsoleProps) {
   const [sides, setSides] = useState<Record<HehunSide, SideState>>({
     male: seedOf(initial.male),
     female: seedOf(initial.female),
@@ -157,6 +169,13 @@ export function DualBirthConsole({ initial, pending, onSubmit }: DualBirthConsol
   function patch(side: HehunSide, next: Partial<SideState>): void {
     setSides((prev) => ({ ...prev, [side]: { ...prev[side], ...next } }));
   }
+
+  useEffect(() => {
+    if (malePreset) patch('male', seedOf(malePreset));
+  }, [malePreset]);
+  useEffect(() => {
+    if (femalePreset) patch('female', seedOf(femalePreset));
+  }, [femalePreset]);
 
   const missing = (['male', 'female'] as const).filter((side) => {
     const state = sides[side];

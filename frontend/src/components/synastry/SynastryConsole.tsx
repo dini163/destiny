@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 
 import { Icon } from '../ui/Icon';
@@ -19,7 +19,7 @@ const HOUSE_SYSTEM_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
 ];
 
 /** 一台两列共用一份分宫制：合盘的两人必须落在同一套宫位口径上，比较才有意义。 */
-interface SideState {
+export interface SideState {
   name: string;
   birthDate: string;
   birthTime: string;
@@ -103,6 +103,12 @@ function SideColumn({
 }
 
 interface SynastryConsoleProps {
+  /**
+   * 外部档案填充（profile picker）：甲/乙各一个 preset，变化时覆盖对应一列。
+   * 选档案是显式动作，故每次变化都重写整列；null 不动。
+   */
+  sideAPreset?: SideState | null;
+  sideBPreset?: SideState | null;
   pending: boolean;
   onSubmit: (request: SynastryRequest) => void;
 }
@@ -115,10 +121,17 @@ interface SynastryConsoleProps {
  * 一份的 UTC 偏移（留空即按经度推算）——西洋盘的宫头与上升依赖真实经纬度，故纬度同样必填。
  * 状态全在本件里，页面只接一份可直接下发的 {@link SynastryRequest}。
  */
-export function SynastryConsole({ pending, onSubmit }: SynastryConsoleProps) {
+export function SynastryConsole({ sideAPreset, sideBPreset, pending, onSubmit }: SynastryConsoleProps) {
   const [sideA, setSideA] = useState<SideState>(EMPTY_SIDE);
   const [sideB, setSideB] = useState<SideState>(EMPTY_SIDE);
   const [houseSystem, setHouseSystem] = useState('P');
+
+  useEffect(() => {
+    if (sideAPreset) setSideA(sideAPreset);
+  }, [sideAPreset]);
+  useEffect(() => {
+    if (sideBPreset) setSideB(sideBPreset);
+  }, [sideBPreset]);
 
   const incomplete = (state: SideState): boolean =>
     state.birthDate === '' ||

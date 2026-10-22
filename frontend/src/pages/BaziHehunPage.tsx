@@ -16,6 +16,9 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transitLink';
 import type { HehunSideLink } from '../lib/transitLink';
 import { useBaziHehun } from '../hooks/useBaziHehun';
+import { useProfiles } from '../hooks/useProfiles';
+import { profileToBirthInput, type PersonProfile } from '../lib/profiles';
+import { ProfilePicker } from '../components/profiles/ProfilePicker';
 import type { BaziHehunRequest, HehunProfile, HehunSide } from '../types/baziHehun';
 
 /** 轴的两个本地状态。`null` = 交回服务端按 §9.3 的口径决定。 */
@@ -126,8 +129,28 @@ export function BaziHehunPage() {
   const [lastRequest, setLastRequest] = useState<BaziHehunRequest | null>(null);
   /** 轴的两个本地状态；手动查询即清空（回到服务端口径，见 `handleSubmit`）。 */
   const [axis, setAxis] = useState<AxisState>({ startYear: null, years: null });
+  /** 档案填充：乾/坤两造的 preset，映射为 HehunSideLink 注入 DualBirthConsole。 */
+  const [malePreset, setMalePreset] = useState<HehunSideLink | null>(null);
+  const [femalePreset, setFemalePreset] = useState<HehunSideLink | null>(null);
+  const { profiles } = useProfiles();
   const hehun = useBaziHehun();
   const autoSubmitted = useRef(false);
+
+  /** 档案 → 一造 preset；gender 决定它落到乾造还是坤造，无 gender 默认乾造。 */
+  function handlePickProfile(profile: PersonProfile | null, side: HehunSide): void {
+    if (!profile) {
+      if (side === 'male') setMalePreset(null);
+      else setFemalePreset(null);
+      return;
+    }
+    const preset: HehunSideLink = {
+      values: profileToBirthInput(profile),
+      applyTrueSolarTime: true,
+      name: profile.name ?? null,
+    };
+    if (side === 'male') setMalePreset(preset);
+    else setFemalePreset(preset);
+  }
 
   useEffect(() => {
     if (autoSubmitted.current || !link?.male || !link.female) {
@@ -205,8 +228,22 @@ export function BaziHehunPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
+      <div className="flex flex-wrap items-center gap-2">
+        <ProfilePicker
+          label="乾造 · 选档案"
+          profiles={profiles}
+          onPick={(profile) => handlePickProfile(profile, 'male')}
+        />
+        <ProfilePicker
+          label="坤造 · 选档案"
+          profiles={profiles}
+          onPick={(profile) => handlePickProfile(profile, 'female')}
+        />
+      </div>
       <DualBirthConsole
         initial={{ male: link?.male ?? null, female: link?.female ?? null }}
+        malePreset={malePreset}
+        femalePreset={femalePreset}
         pending={hehun.isPending}
         onSubmit={handleSubmit}
       />
