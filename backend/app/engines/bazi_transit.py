@@ -33,9 +33,13 @@ from app.content.bazi_shishen import ten_god_meaning
 from app.content.bazi_transit_plain import (
     BAZI_TRANSIT_MONTH_FRAME,
     BAZI_TRANSIT_RANGE_FRAME,
+    BAZI_TRANSIT_RANGE_VERDICT_FRAME,
     BAZI_TRANSIT_THREAD_FRAME,
+    BAZI_TRANSIT_TIER_ADVICE,
     BAZI_TRANSIT_TITLES,
     BAZI_TRANSIT_TONE_KEYS,
+    BAZI_TRANSIT_VERDICT_ADVICE_FRAME,
+    BAZI_TRANSIT_VERDICT_OUTLOOK,
 )
 from app.content.bazi_transit_rules import (
     TRANSIT_BASE,
@@ -57,6 +61,7 @@ from app.engines.bazi_rules import (
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.plain_compose import num, overview, reading
 from app.engines.plain_corpora import BAZI_TRANSIT
+from app.engines.verdict import grade_for
 from app.schemas.bazi import BaziChart, BaziPillar, DayunStep
 from app.schemas.bazi_breakdown import Provenance, ProvenanceTable
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
@@ -67,7 +72,7 @@ from app.schemas.bazi_transit import (
     TransitTenGod,
     TransitYear,
 )
-from app.schemas.common import CalendarType, Gender, PlainSection
+from app.schemas.common import CalendarType, Gender, PlainSection, Verdict
 from app.schemas.scoring import ScoreFactor, ScoreValue, build_ledger
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -801,6 +806,46 @@ def _transit_plain(
     return sections
 
 
+def _transit_verdict(years: Sequence[TransitYear]) -> Verdict:
+    """页级结论卡（verdict-card spec §4）：锚点 = 逐年账本均值，过 `grade_for` 换五档。
+
+    与 `_transit_plain` 的档位句同取均值，但那一把尺是 `_tier` 的顺/平/滞（散文不念档名），
+    这一把是 `grade_for` 的五档词（卡片正面报档）——两把尺各管一层，不互换。points 只报三档
+    年数计数这一账本事实；advice 指向区间内分最低的那一年（`min` 打在升序年表上，并列取最早，
+    与白话极值同一条尺）。
+    """
+    anchor = sum(year.score.value for year in years) / len(years)
+    grade, stars = grade_for(anchor)
+    counts = {tier: sum(1 for year in years if year.score.tier == tier) for tier in ("顺", "平", "滞")}
+    headline = overview(
+        BAZI_TRANSIT_RANGE_VERDICT_FRAME,
+        {
+            "grade": grade,
+            "shun": num(counts["顺"]),
+            "ping": num(counts["平"]),
+            "zhi": num(counts["滞"]),
+            "outlook": BAZI_TRANSIT_VERDICT_OUTLOOK[grade],
+        },
+    )
+    weakest = min(years, key=lambda year: year.score.value)
+    advice = overview(
+        BAZI_TRANSIT_VERDICT_ADVICE_FRAME,
+        {
+            "year": num(weakest.year),
+            "ganzhi": weakest.pillar.ganzhi,
+            "value": num(weakest.score.value),
+            "tier_advice": BAZI_TRANSIT_TIER_ADVICE[weakest.score.tier],
+        },
+    )
+    return Verdict(
+        grade=grade,
+        stars=stars,
+        headline=headline,
+        points=[f"顺：{counts['顺']} 年", f"平：{counts['平']} 年", f"滞：{counts['滞']} 年"],
+        advice=advice,
+    )
+
+
 def compute_transit(
     *,
     birth_date: date,
@@ -881,6 +926,7 @@ def compute_transit(
         dayun_covered=covered,
         years=years_list,
         plain=_transit_plain(years_list, covered),
+        verdict=_transit_verdict(years_list),
         provenance=Provenance(
             reference_date=reference.isoformat(),
             engine="lunar-python",

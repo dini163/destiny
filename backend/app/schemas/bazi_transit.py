@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 from app.schemas.bazi import BaziNatalRequest, BaziPillar, DayunStep
 from app.schemas.bazi_breakdown import Provenance
 from app.schemas.bazi_rules import BranchGroup, RelationPair, ShenShaEntry
-from app.schemas.common import PlainSection
+from app.schemas.common import PlainSection, Verdict
 from app.schemas.scoring import ScoreValue
 
 
@@ -135,6 +135,11 @@ class BaziTransitResult(BaseModel):
 
     plain: list[PlainSection] = Field(
         description="岁运页白话 2–3 节：区间总览（两行）、岁运主线、给了 focus_year 时再加流年十二个月（批次二 spec §7）。"
+    )
+
+    verdict: Verdict = Field(
+        description="页级结论卡：档位/星级从逐年账本均值过 `verdict.grade_for` 派生，"
+        "headline/points/advice 来自 `content/bazi_transit_plain` 的结论卡框架句（verdict-card spec §4）。"
     )
 
     provenance: Provenance = Field(
