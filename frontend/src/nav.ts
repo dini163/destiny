@@ -55,6 +55,8 @@ export const ROUTES = {
   /** 北欧卢恩（切片 7）。归在「吠陀与北欧」：该组本就有这一格（与吠陀乔蒂什同组），
    * 故不必为它新开一个只有一个成员的组 —— 设计稿把它放在「北欧符文与吠陀」下，同一个意思。 */
   norseRunes: '/norse-runes',
+  /** 我的档案：本机 localStorage 里的人名生辰档案库，供各测算控制台一键填充。 */
+  profiles: '/profiles',
 } as const;
 
 /** A single navigation entry. `to === null` marks a roadmap system not yet built. */

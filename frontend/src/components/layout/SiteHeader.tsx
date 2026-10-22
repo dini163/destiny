@@ -28,8 +28,16 @@ export function SiteHeader() {
 
           <div className="flex shrink-0 items-center gap-3">
             <UtcClock />
+            <Link
+              to={ROUTES.profiles}
+              aria-label="我的档案"
+              className="flex h-9 items-center gap-1.5 rounded-element border border-rim bg-surface/60 px-3 text-sm text-ink-variant transition-colors hover:border-rim-strong hover:text-ink"
+            >
+              <Icon name="vault" size={18} />
+              <span className="hidden 2xl:inline">档案</span>
+            </Link>
             <UtilityButton icon="history" label="历史测算记录" />
-            <UtilityButton icon="vault" label="命盘收藏夹" />
+            <UtilityButton icon="sparkle" label="命盘收藏夹" />
           </div>
         </div>
 

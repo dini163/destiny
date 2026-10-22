@@ -15,6 +15,7 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { NumerologyPage } from './pages/NumerologyPage';
 import { PlumBlossomPage } from './pages/PlumBlossomPage';
 import { PortalPage } from './pages/PortalPage';
+import { ProfilesPage } from './pages/ProfilesPage';
 import { QimenPage } from './pages/QimenPage';
 import { SynastryPage } from './pages/SynastryPage';
 import { TarotPage } from './pages/TarotPage';
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
       { path: segment(ROUTES.numerologyMatrix), element: <NumerologyPage /> },
       { path: segment(ROUTES.norseRunes), element: <NorseRunesPage /> },
       { path: segment(ROUTES.vedic), element: <VedicPage /> },
+      { path: segment(ROUTES.profiles), element: <ProfilesPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
