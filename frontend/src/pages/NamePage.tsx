@@ -12,9 +12,10 @@ import { Icon } from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { PlainProse } from '../components/ui/PlainProse';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { useNameAnalysis } from '../hooks/useNameAnalysis';
 import { useProfiles } from '../hooks/useProfiles';
-import type { ProfileDraft, ProfileName } from '../lib/profiles';
+import { nameSliceOf, type ProfileDraft, type ProfileName } from '../lib/profiles';
 import type { NameAnalysis } from '../types/name';
 
 /**
@@ -39,11 +40,7 @@ export function NamePage() {
           label="选档案填姓名"
           profiles={profiles}
           onPick={(profile) =>
-            setPreset(
-              profile
-                ? { surname: profile.surname ?? undefined, given: profile.given ?? undefined }
-                : null,
-            )
+            setPreset(profile ? nameSliceOf(profile) : null)
           }
         />
       </div>
@@ -146,6 +143,8 @@ function NameResults({ analysis }: { analysis: NameAnalysis }) {
   return (
     <>
       <NameSummary analysis={analysis} />
+
+      {analysis.verdict ? <VerdictCard verdict={analysis.verdict} /> : null}
 
       <nav
         aria-label="姓名学分区"
