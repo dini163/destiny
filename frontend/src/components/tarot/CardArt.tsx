@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 
 import type { DrawnCard, TarotRank, TarotSuit } from '../../types/tarot';
 import { cardAccent } from '../../lib/tarot';
