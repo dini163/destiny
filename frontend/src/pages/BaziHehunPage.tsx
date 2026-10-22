@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { DualBirthConsole } from '../components/bazi/hehun/DualBirthConsole';
-import type { CompleteSides } from '../components/bazi/hehun/DualBirthConsole';
+import type { CompleteSides, SideState } from '../components/bazi/hehun/DualBirthConsole';
 import { HehunAxisTimeline } from '../components/bazi/hehun/HehunAxisTimeline';
 import { HehunComplementChart } from '../components/bazi/hehun/HehunComplementChart';
 import { HehunFiredList } from '../components/bazi/hehun/HehunFiredList';
@@ -13,11 +13,13 @@ import { HehunYiJiPanel } from '../components/bazi/hehun/HehunYiJiPanel';
 import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transitLink';
 import type { HehunSideLink } from '../lib/transitLink';
 import { useBaziHehun } from '../hooks/useBaziHehun';
 import { useProfiles } from '../hooks/useProfiles';
-import { profileToBirthInput, type PersonProfile } from '../lib/profiles';
+import { profileToBirthInput, type PersonProfile, type ProfileDraft } from '../lib/profiles';
+import { ProfileEditor } from '../components/profiles/ProfileEditor';
 import { ProfilePicker } from '../components/profiles/ProfilePicker';
 import type { BaziHehunRequest, HehunProfile, HehunSide } from '../types/baziHehun';
 
@@ -132,7 +134,10 @@ export function BaziHehunPage() {
   /** 档案填充：乾/坤两造的 preset，映射为 HehunSideLink 注入 DualBirthConsole。 */
   const [malePreset, setMalePreset] = useState<HehunSideLink | null>(null);
   const [femalePreset, setFemalePreset] = useState<HehunSideLink | null>(null);
-  const { profiles } = useProfiles();
+  /** 存入档案弹层的预填值（当前一造输入快照，无 id = 新建）。 */
+  const [draftPrefill, setDraftPrefill] = useState<ProfileDraft | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const { profiles, upsert } = useProfiles();
   const hehun = useBaziHehun();
   const autoSubmitted = useRef(false);
 
@@ -150,6 +155,21 @@ export function BaziHehunPage() {
     };
     if (side === 'male') setMalePreset(preset);
     else setFemalePreset(preset);
+  }
+
+  /** 一造 → 存入档案弹层：gender 由造向决定，称谓作姓名。 */
+  function handleSaveProfile(side: HehunSide, state: SideState): void {
+    setDraftPrefill({
+      gender: side === 'male' ? 'male' : 'female',
+      name: state.name.trim() || undefined,
+      birth_date: state.birthDate,
+      birth_time: state.birthTime,
+      calendar: state.calendar,
+      city: state.location.city ?? null,
+      latitude: state.location.latitude ?? null,
+      longitude: state.location.longitude ?? null,
+    });
+    setEditorOpen(true);
   }
 
   useEffect(() => {
@@ -244,9 +264,18 @@ export function BaziHehunPage() {
         initial={{ male: link?.male ?? null, female: link?.female ?? null }}
         malePreset={malePreset}
         femalePreset={femalePreset}
+        onSaveProfile={handleSaveProfile}
         pending={hehun.isPending}
         onSubmit={handleSubmit}
       />
+
+      {editorOpen ? (
+        <ProfileEditor
+          initial={draftPrefill}
+          onSave={(draft) => upsert(draft)}
+          onClose={() => setEditorOpen(false)}
+        />
+      ) : null}
 
       {showLinkNotice ? (
         <p className="label-caps text-ink-muted">链接参数不完整，请手动填写两造生辰后查询。</p>
@@ -277,6 +306,7 @@ export function BaziHehunPage() {
             }
           >
             <HehunScoreRing score={result.score} />
+            <VerdictCard verdict={result.verdict} />
           </ResultCard>
 
           <ResultCard title="合盘白话" eyebrow="OVERALL READING · COMPATIBILITY" icon="sparkle" elevated>

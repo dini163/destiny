@@ -21,7 +21,7 @@ const CALENDAR_OPTIONS: ReadonlyArray<{ value: CalendarType; label: string }> = 
 ];
 
 /** 一列的表单状态。与 `HehunSideLink` 同义，只是各字段的形状跟着控件走。 */
-interface SideState {
+export interface SideState {
   name: string;
   birthDate: string;
   birthTime: string;
@@ -62,11 +62,14 @@ interface SideColumnProps {
   side: HehunSide;
   state: SideState;
   onChange: (next: Partial<SideState>) => void;
+  /** 提供时在列尾渲染「存入档案」：把这一列当前的输入交给页面持久化。 */
+  onSaveProfile?: (() => void) | undefined;
 }
 
 /** 一造的字段块。`side` 只作标题与 accessible name —— 造向是键位，不是字段。 */
-function SideColumn({ side, state, onChange }: SideColumnProps) {
+function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
   const caption = side === 'male' ? '乾造' : '坤造';
+  const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
     <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
@@ -126,6 +129,19 @@ function SideColumn({ side, state, onChange }: SideColumnProps) {
         time={state.birthTime || null}
         longitude={state.location.longitude ?? null}
       />
+
+      {onSaveProfile ? (
+        <button
+          type="button"
+          className="btn-ghost"
+          disabled={!saveable}
+          title={`把这一造的输入存入本地档案（需生辰齐备）`}
+          onClick={onSaveProfile}
+        >
+          <Icon name="vault" size={16} />
+          存入档案
+        </button>
+      ) : null}
     </fieldset>
   );
 }
@@ -139,6 +155,8 @@ interface DualBirthConsoleProps {
    */
   malePreset?: HehunSideLink | null;
   femalePreset?: HehunSideLink | null;
+  /** 提供时两列各渲染「存入档案」；回调解锁的是对应一列的表单状态。 */
+  onSaveProfile?: (side: HehunSide, state: SideState) => void;
   pending: boolean;
   onSubmit: (sides: CompleteSides) => void;
 }
@@ -158,6 +176,7 @@ export function DualBirthConsole({
   initial,
   malePreset,
   femalePreset,
+  onSaveProfile,
   pending,
   onSubmit,
 }: DualBirthConsoleProps) {
@@ -234,8 +253,22 @@ export function DualBirthConsole({
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <SideColumn side="male" state={sides.male} onChange={(next) => patch('male', next)} />
-        <SideColumn side="female" state={sides.female} onChange={(next) => patch('female', next)} />
+        <SideColumn
+          side="male"
+          state={sides.male}
+          onChange={(next) => patch('male', next)}
+          onSaveProfile={
+            onSaveProfile ? () => onSaveProfile('male', sides.male) : undefined
+          }
+        />
+        <SideColumn
+          side="female"
+          state={sides.female}
+          onChange={(next) => patch('female', next)}
+          onSaveProfile={
+            onSaveProfile ? () => onSaveProfile('female', sides.female) : undefined
+          }
+        />
       </div>
 
       {missing.length > 0 ? (
