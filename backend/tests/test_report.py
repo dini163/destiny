@@ -81,6 +81,27 @@ def test_r2_generate_shape() -> None:
     experiments = next(s for s in d["sections"] if s["id"] == "experiments")
     assert len(experiments["bullets"]) == 3
     assert all("30天" in b or "实验" in b for b in experiments["bullets"])
+    # 模板占位符 `{area}` 必须由装配器填掉（2026-10-23 走查发现 R2 实验章残留原文）。
+    assert all("{" not in b and "}" not in b for b in experiments["bullets"])
+
+
+def test_no_unfilled_template_placeholders() -> None:
+    """防回归：三份报告的正文/要点/证据卡都不许残留 `{...}` 占位符。"""
+    cases = [
+        ("r1", _hehun_request().model_dump(mode="json")),
+        ("r2", _natal_request().model_dump(mode="json")),
+        ("r3", _transit_request().model_dump(mode="json")),
+    ]
+    for product, payload in cases:
+        d = client.post(f"/api/v1/report/{product}/generate", json=payload)
+        assert d.status_code == 200, d.text
+        for section in d.json()["sections"]:
+            joined = " ".join(section["body"]) + " ".join(section["bullets"])
+            for card in section["evidence_cards"]:
+                joined += card["claim"] + card["chart_fact"] + card["falsifier"]
+            assert "{" not in joined and "}" not in joined, (
+                f"{product}/{section['id']} 残留模板占位符"
+            )
 
 
 def test_r3_generate_shape() -> None:
