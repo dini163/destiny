@@ -6,7 +6,7 @@ included here, keeping ``main.py`` stable as systems are added.
 
 from fastapi import APIRouter
 
-from app.api.v1 import bazi, kabbalah, lenormand, meihua, meta, name, numerology, qimen, runes, synastry, tarot, transit, vedic, western, ziwei, zhouyi
+from app.api.v1 import bazi, kabbalah, lenormand, meihua, meta, name, numerology, qimen, report, runes, synastry, tarot, transit, vedic, western, ziwei, zhouyi
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -26,6 +26,7 @@ api_router.include_router(vedic.router, tags=["vedic"])
 api_router.include_router(name.router, tags=["name"])
 api_router.include_router(numerology.router, tags=["numerology"])
 api_router.include_router(runes.router, tags=["runes"])
+api_router.include_router(report.router, tags=["report"])
 
 # Phase-1 MVP systems plus 姓名学、数字命理、北欧卢恩、紫微、奇门、雷诺曼、卡巴拉、行运推运、吠陀占星、
 # 西洋合盘 are mounted. Any later-phase system is added here in the same way as it is implemented.
