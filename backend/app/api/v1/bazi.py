@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from app.core.chart_input import chart_longitude
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import compute_hehun
 from app.engines.bazi_liuri import compute_liuri_matrix
@@ -12,22 +13,8 @@ from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult
 from app.schemas.bazi_liuri import BaziLiuriRequest, BaziLiuriResult
 from app.schemas.bazi_liushi import BaziLiushiRequest, BaziLiushiResult
 from app.schemas.bazi_transit import BaziTransitRequest, BaziTransitResult
-from app.solar.geo import resolve_longitude
-from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
 router = APIRouter(prefix="/bazi")
-
-
-def _chart_longitude(request: BaziNatalRequest) -> float:
-    """校正开启时经度必须由城市或显式经度定下来；关闭时两者皆可省，取标准经线。
-
-    两个端点共用这一段判断，所以"同一条命在命盘页和岁运页用同一条经线"这件事只有一处
-    实现，改一处不会漏另一处。抛 `InvalidBirthDataError` 的是 `resolve_longitude`：城市
-    认不出来就是一项入参错误，与岁运区间无关。
-    """
-    if request.apply_true_solar_time:
-        return resolve_longitude(request.city, request.longitude)
-    return request.longitude if request.longitude is not None else STANDARD_MERIDIAN_CN
 
 
 @router.post("/natal", response_model=BaziChart, summary="Compute a BaZi natal chart")
@@ -44,7 +31,7 @@ async def bazi_natal(request: BaziNatalRequest) -> BaziChart:
         birth_date=request.birth_date,
         birth_time=request.birth_time,
         calendar=request.calendar,
-        longitude=_chart_longitude(request),
+        longitude=chart_longitude(request.city, request.longitude, request.apply_true_solar_time),
         gender=request.gender,
         apply_true_solar_time=request.apply_true_solar_time,
         reference_date=request.reference_date,
@@ -70,7 +57,7 @@ async def bazi_liuyue(request: BaziTransitRequest) -> BaziTransitResult:
         birth_date=request.birth_date,
         birth_time=request.birth_time,
         calendar=request.calendar,
-        longitude=_chart_longitude(request),
+        longitude=chart_longitude(request.city, request.longitude, request.apply_true_solar_time),
         gender=request.gender,
         apply_true_solar_time=request.apply_true_solar_time,
         start_year=request.start_year,
@@ -98,7 +85,7 @@ async def bazi_liuri_matrix(request: BaziLiuriRequest) -> BaziLiuriResult:
         birth_date=request.birth_date,
         birth_time=request.birth_time,
         calendar=request.calendar,
-        longitude=_chart_longitude(request),
+        longitude=chart_longitude(request.city, request.longitude, request.apply_true_solar_time),
         gender=request.gender,
         apply_true_solar_time=request.apply_true_solar_time,
         anchor_date=request.anchor_date,
@@ -125,7 +112,7 @@ async def bazi_liushi_day(request: BaziLiushiRequest) -> BaziLiushiResult:
         birth_date=request.birth_date,
         birth_time=request.birth_time,
         calendar=request.calendar,
-        longitude=_chart_longitude(request),
+        longitude=chart_longitude(request.city, request.longitude, request.apply_true_solar_time),
         gender=request.gender,
         apply_true_solar_time=request.apply_true_solar_time,
         solar_date=request.solar_date,
@@ -144,7 +131,7 @@ async def bazi_hehun(request: BaziHehunRequest) -> BaziHehunResult:
     """双人合盘：一次请求给全一页（总分、16 格矩阵、互补图、纳音、同频轴、宜忌）。
 
     这里薄到只剩转参数：两造各自的经线由引擎按 profile 决定（`profile_longitude`），
-    不复用本文件的 `_chart_longitude` —— 那一个读的是单造请求上的那一份校正开关，
+    不复用 `app.core.chart_input.chart_longitude` —— 那一个读的是单造请求上的那一份校正开关，
     而合婚的 `apply_true_solar_time` 是各造一份的（spec §5.1）。
     参考日也原样传下去：它的缺省只在引擎里解析一次，并经 `provenance.reference_date` 回显。
     """
