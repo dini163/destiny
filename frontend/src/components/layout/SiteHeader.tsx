@@ -9,12 +9,13 @@ import { EpochBadge, UtcClock } from './StatusClock';
 /**
  * Persistent top navigation (PRD §2): brand, primary Phase-1 bar, live status
  * telemetry and utility shortcuts on row 1; the full multi-civilization catalog on
- * row 2. Fixed to the viewport so every route shares one chrome.
+ * row 2. Sticky to the viewport so every route shares one chrome; the catalog row
+ * wraps onto extra lines on narrow screens instead of scrolling out of view.
  */
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-rim bg-void/90 shadow-[0_4px_24px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-      <div className="mx-auto flex h-28 w-full max-w-[1536px] flex-col justify-between px-gutter">
+    <header className="sticky top-0 z-50 border-b border-rim bg-void/90 shadow-[0_4px_24px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-[1536px] flex-col justify-between px-gutter py-3">
         <div className="flex h-16 items-center justify-between gap-gutter">
           <Link to={ROUTES.overview} className="shrink-0" aria-label="Destiny 测算大厅">
             <BrandMark />
@@ -41,9 +42,9 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="flex h-12 items-center justify-between gap-gutter">
+        <div className="flex items-center justify-between gap-gutter pt-1">
           <nav
-            className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex flex-wrap items-center gap-1"
             aria-label="全体系导航"
           >
             {SECONDARY_NAV.map((group, index) => (
