@@ -17,6 +17,7 @@ import { PlumBlossomPage } from './pages/PlumBlossomPage';
 import { PortalPage } from './pages/PortalPage';
 import { ProfilesPage } from './pages/ProfilesPage';
 import { QimenPage } from './pages/QimenPage';
+import { ReportPage } from './pages/ReportPage';
 import { SynastryPage } from './pages/SynastryPage';
 import { TarotPage } from './pages/TarotPage';
 import { TransitPage } from './pages/TransitPage';
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
       { path: segment(ROUTES.norseRunes), element: <NorseRunesPage /> },
       { path: segment(ROUTES.vedic), element: <VedicPage /> },
       { path: segment(ROUTES.profiles), element: <ProfilesPage /> },
+      { path: '/report/:product', element: <ReportPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
