@@ -154,7 +154,7 @@ bash scripts/verify.sh
 
 | 层 | 手段 | 规模（2026-10-23 实测） |
 |---|---|---|
-| 后端 | pytest（golden 直调 `compute_*` + `TestClient` 真实响应） | 96 个测试文件 / 16,644 用例全绿 |
+| 后端 | pytest（golden 直调 `compute_*` + `TestClient` 真实响应） | 96 个测试文件 / 16,645 用例全绿 |
 | 前端 | vitest + Testing Library，架构不变式单独一套 | 50 个测试文件 / 223 用例全绿 |
 | 架构 | `test_architecture.py` + `conventions.test.ts` 双侧断言，互不重复 | import 方向 / 后端四件齐备 / 随机源 / 账本印刷形状 |
 

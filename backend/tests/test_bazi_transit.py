@@ -54,7 +54,7 @@ from app.content.bazi_transit_plain import (
 )
 from app.content.bazi_transit_rules import TRANSIT_BASE, TRANSIT_RULES, transit_rule
 from app.core.errors import TransitRangeError
-from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi import compute_bazi_chart, liunian_ganzhi
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_strength import STRONG_CUT, WEAK_CUT
 from app.engines.bazi_transit import (
@@ -519,6 +519,22 @@ def _luck() -> dict[int, AnnualLuck]:
         apply_true_solar_time=True,
     )
     return annual_luck_by_year(moment.eight_char, Gender.MALE)
+
+
+def test_liunian_ganzhi_matches_the_library_across_every_dayun() -> None:
+    """The step-wise sequence must equal lunar-python's own per-year lookup."""
+    moment = resolve_natal_moment(
+        birth_date=_BIRTH[0],
+        birth_time=_BIRTH[1],
+        calendar=CalendarType.SOLAR,
+        longitude=104.1,
+        apply_true_solar_time=True,
+    )
+    for step in moment.eight_char.getYun(1).getDaYun():
+        items = step.getLiuNian()
+        assert liunian_ganzhi(items) == [item.getGanZhi() for item in items]
+
+    assert liunian_ganzhi([]) == []
 
 
 @cache

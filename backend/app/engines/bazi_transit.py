@@ -49,7 +49,7 @@ from app.content.bazi_transit_rules import (
 )
 from app.content.wuxing import GAN_ELEMENT, GENERATES
 from app.core.errors import TransitRangeError
-from app.engines.bazi import compute_bazi_chart
+from app.engines.bazi import compute_bazi_chart, liunian_ganzhi
 from app.engines.bazi_moment import resolve_natal_moment
 from app.engines.bazi_pillar import build_transit_pillar
 from app.engines.bazi_rules import (
@@ -554,16 +554,19 @@ def annual_luck_by_year(
     第 0 项里，摊平这一步顺带记下"这一年属于第几步运"，而大运族正要论这件事。
     `getGanZhi()` 在童年段是空串，这里翻成 None —— "无运可论"与"运干为空字符串"两件
     事里，前者才是事实。性别未知则方向都定不下来，返回空表而不是猜一个（spec §8.4）。
+    同一步大运的十个流年逐年递增，干支序列由 `liunian_ganzhi` 一次查表后顺推，
+    避免每个流年各重建一次立春历法对象。
     """
     if gender is None:
         return {}
     luck: dict[int, AnnualLuck] = {}
     for step in eight_char.getYun(1 if gender is Gender.MALE else 0).getDaYun():
-        for liu_nian in step.getLiuNian():
+        items = step.getLiuNian()
+        for liu_nian, ganzhi in zip(items, liunian_ganzhi(items), strict=True):
             luck[liu_nian.getYear()] = AnnualLuck(
                 year=liu_nian.getYear(),
                 age=liu_nian.getAge(),
-                ganzhi=liu_nian.getGanZhi(),
+                ganzhi=ganzhi,
                 dayun_index=step.getIndex(),
                 dayun_ganzhi=step.getGanZhi() or None,
                 liunian=liu_nian,

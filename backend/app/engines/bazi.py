@@ -31,7 +31,10 @@ the transit engine imports this one for the natal chart, and a shared symbol hos
 either side would close that circle.
 """
 
+from collections.abc import Sequence
 from datetime import date, time
+
+from lunar_python.util import LunarUtil
 
 from app.content import CONTENT_SOURCES, CONTENT_VERSION
 from app.content.bazi_shishen import TEN_GOD_MEANING, ten_god_meaning
@@ -197,6 +200,21 @@ def _dayun_current(dayun: list[DayunStep], pillars: list[BaziPillar]) -> DayunDe
     )
 
 
+def liunian_ganzhi(items: Sequence[object]) -> list[str]:
+    """Return one dayun's annual stem-branch sequence.
+
+    ``LiuNian.getGanZhi`` rebuilds the 立春 ``Lunar`` object on every call, even
+    though all entries of one dayun share it. The entries are consecutive years,
+    so the first authoritative lookup plus the library's JIA_ZI cycle is
+    equivalent and avoids rebuilding the same invariant once per entry.
+    """
+    if not items:
+        return []
+    first = LunarUtil.getJiaZiIndex(items[0].getGanZhi())
+    cycle = LunarUtil.JIA_ZI
+    return [cycle[(first + offset) % len(cycle)] for offset in range(len(items))]
+
+
 def _build_dayun(
     ec: object, gender: Gender | None, reference: date
 ) -> tuple[str | None, str | None, list[DayunStep], list[LiunianYear]]:
@@ -232,9 +250,10 @@ def _build_dayun(
     for position, step in enumerate(steps):
         if step.start_year <= reference.year <= step.end_year:
             step.is_current = True
+            items = raw_dayun[position].getLiuNian()
             current_liunian = [
-                LiunianYear(year=item.getYear(), age=item.getAge(), ganzhi=item.getGanZhi())
-                for item in raw_dayun[position].getLiuNian()
+                LiunianYear(year=item.getYear(), age=item.getAge(), ganzhi=ganzhi)
+                for item, ganzhi in zip(items, liunian_ganzhi(items), strict=True)
             ]
             break
     return direction, start_solar, steps, current_liunian
