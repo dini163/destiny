@@ -15,6 +15,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziTransit } from '../hooks/useBaziTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { GENDER_OPTIONS } from '../lib/gender';
 import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
 import type {
   BaziTransitRequest,
@@ -23,11 +24,6 @@ import type {
   TransitYear,
 } from '../types/baziTransit';
 import type { Gender } from '../types/common';
-
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: 'male', label: '乾造' },
-  { value: 'female', label: '坤造' },
-];
 
 /**
  * 跨度只有两档，取自服务端的 `TRANSIT_DEFAULT_YEARS` 与 `TRANSIT_MAX_YEARS`。
@@ -206,7 +202,7 @@ export function BaziTransitPage() {
       <InputBar
         title="岁运推演 · 流年与流月"
         badge="权威历算"
-        subtitle="沿用本命盘的喜忌，逐年逐月对岁运规则表结算加减：一年一行账，命中即可展开判语与凭据。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        subtitle="沿用本命盘的喜忌，逐年逐月对岁运规则表结算加减：一年一行账，命中即可展开判语与凭据。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
         showCalendar
         initial={link?.values}
         preset={profile.preset}

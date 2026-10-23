@@ -1,3 +1,4 @@
+import { annotateGenderTerms } from '../../../lib/gender';
 import { wuxingChip } from '../../../lib/wuxing';
 import type {
   HehunComplement,
@@ -43,9 +44,9 @@ export function HehunComplementChart({ complement }: { complement: HehunCompleme
 function ViewBlock({ view }: { view: HehunComplementView }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="label-caps text-gold">{view.label}</span>
+      <span className="label-caps text-gold">{annotateGenderTerms(view.label)}</span>
       <table className="w-full border-separate border-spacing-1 text-xs">
-        <caption className="sr-only">{`${view.label}的五行互补四象限`}</caption>
+        <caption className="sr-only">{`${annotateGenderTerms(view.label)}的五行互补四象限`}</caption>
         <thead>
           <tr>
             <th scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">

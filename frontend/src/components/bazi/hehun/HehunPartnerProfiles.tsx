@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { SourceNote } from '../../ui/SourceNote';
+import { GENDER_LABEL, GENDER_SHORT, annotateGenderTerms } from '../../../lib/gender';
 import { wuxingChip, wuxingText } from '../../../lib/wuxing';
 import type { HehunNayin, HehunPartner, HehunSide } from '../../../types/baziHehun';
 
@@ -26,7 +27,7 @@ export function HehunPartnerProfiles({
 }
 
 function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSide }) {
-  const caption = side === 'male' ? '乾造' : '坤造';
+  const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const current = partner.dayun.find((step) => step.is_current) ?? partner.dayun[0];
   return (
     <div className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
@@ -119,7 +120,10 @@ function NayinBlock({ nayin }: { nayin: HehunNayin }) {
     <div className="flex flex-col gap-2 rounded-card border border-rim bg-surface p-4">
       <span className="label-caps text-ink-muted">年命纳音 · 宜忌之外的第三条轴</span>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {([['乾', nayin.male], ['坤', nayin.female]] as const).map(([caption, side]) => (
+        {([
+          [GENDER_SHORT.male, nayin.male],
+          [GENDER_SHORT.female, nayin.female],
+        ] as const).map(([caption, side]) => (
           <div key={caption} className="flex flex-col gap-1">
             <span className="text-sm text-ink">
               <span className="text-ink-muted">{caption} · </span>
@@ -140,7 +144,9 @@ function NayinBlock({ nayin }: { nayin: HehunNayin }) {
           {nayin.delta < 0 ? `-${Math.abs(nayin.delta).toFixed(1)}` : `+${nayin.delta.toFixed(1)}`}
         </span>
       </div>
-      <p className="text-xs leading-relaxed text-ink-muted">{nayin.reading}</p>
+      <p className="text-xs leading-relaxed text-ink-muted">
+        {annotateGenderTerms(nayin.reading)}
+      </p>
     </div>
   );
 }

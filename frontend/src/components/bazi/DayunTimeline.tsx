@@ -23,7 +23,7 @@ export function DayunTimeline({ direction, startSolar, steps, liunian }: DayunTi
   if (steps.length === 0) {
     return (
       <p className="text-sm text-ink-muted">
-        未提供性别，无法排定大运顺逆。请在上方选择乾造 / 坤造后重新排盘。
+        未提供性别，无法排定大运顺逆。请在上方选择乾造（男）/ 坤造（女）后重新排盘。
       </p>
     );
   }

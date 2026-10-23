@@ -9,6 +9,8 @@
 
 import type { CSSProperties } from 'react';
 
+import { GENDER_LABEL } from './gender';
+
 /** Grid position (1-based col/row) of each 地支 in the classical 紫微 square. */
 export interface GridCell {
   col: number;
@@ -96,9 +98,13 @@ export function sihuaShort(sihua: string): string {
 
 // --- Misc labels ------------------------------------------------------------
 
-/** Chinese label for the chart gender. */
+/** Chinese label for the chart gender, glossed with the sex it denotes. */
 export function genderLabel(gender: string): string {
-  return gender === 'male' ? '乾造' : gender === 'female' ? '坤造' : gender;
+  return gender === 'male'
+    ? GENDER_LABEL.male
+    : gender === 'female'
+      ? GENDER_LABEL.female
+      : gender;
 }
 
 /** Chinese label for the supplied calendar. */

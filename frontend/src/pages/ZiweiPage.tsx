@@ -11,14 +11,10 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useZiwei } from '../hooks/useZiwei';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { GENDER_OPTIONS } from '../lib/gender';
 import { calendarLabel, genderLabel } from '../lib/ziwei';
 import type { Gender } from '../types/common';
 import type { ZiweiChart, ZiweiRequest } from '../types/ziwei';
-
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: 'male', label: '乾造' },
-  { value: 'female', label: '坤造' },
-];
 
 /**
  * 紫微斗数 chart page (Zi Wei Dou Shu).
@@ -56,7 +52,7 @@ export function ZiweiPage() {
       <InputBar
         title="紫微斗数命盘"
         badge="权威历算"
-        subtitle="以农历生月生时定命身二宫，纳音定五行局，安紫微天府十四主星与左辅右弼、禄马魁钺、羊陀火铃空劫诸曜，起生年四化与大限。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        subtitle="以农历生月生时定命身二宫，纳音定五行局，安紫微天府十四主星与左辅右弼、禄马魁钺、羊陀火铃空劫诸曜，起生年四化与大限。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
         showCalendar
         preset={profile.preset}
         profilePicker={profile.picker}

@@ -18,15 +18,11 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { GENDER_OPTIONS } from '../lib/gender';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiuriHref, buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
 import type { BaziLiushiRequest, TransitHourCell } from '../types/baziLiushi';
 import type { Gender } from '../types/common';
-
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: 'male', label: '乾造' },
-  { value: 'female', label: '坤造' },
-];
 
 /** 本页两个 422 码的 `context` 键名 → 中文标签；值一律取自 `error.context`，不补算。 */
 const CONTEXT_LABEL: Record<string, string> = {
@@ -199,7 +195,7 @@ export function BaziLiushiPage() {
       <InputBar
         title="流时十二辰 · 一日逐时"
         badge="权威历算"
-        subtitle="在一个八字日内逐时辰结算加减：五鼠遁时柱、四段账本、日主临时支，点一格展开该时辰详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        subtitle="在一个八字日内逐时辰结算加减：五鼠遁时柱、四段账本、日主临时支，点一格展开该时辰详批。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
         showCalendar
         initial={link?.values}
         preset={profile.preset}

@@ -1,8 +1,9 @@
 import { Icon } from '../../ui/Icon';
+import { GENDER_LABEL } from '../../../lib/gender';
 import type { ApiError } from '../../../api/client';
 
 /** `context` 里那些"取值本身也是机器词"的键：合婚的 `partner` 是唯一的例子。 */
-const VALUE_LABEL: Record<string, string> = { male: '乾造', female: '坤造' };
+const VALUE_LABEL: Record<string, string> = { male: GENDER_LABEL.male, female: GENDER_LABEL.female };
 
 /**
  * 域错误（岁运、流日、流时、合婚与数字命理共用的 `transit_*` / `liuri_*` / `liushi_*` /

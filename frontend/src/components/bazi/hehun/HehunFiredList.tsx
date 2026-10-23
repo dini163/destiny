@@ -1,3 +1,4 @@
+import { GENDER_SHORT, annotateGenderTerms } from '../../../lib/gender';
 import { formatDelta } from '../../../lib/scoring';
 import type { HehunFired } from '../../../types/baziHehun';
 
@@ -12,8 +13,8 @@ const FAMILY_CAPTION: Record<string, string> = {
 
 /** 视角的短名，与四象限那两块的标题同一套词。 */
 const DIRECTION_CAPTION: Record<string, string> = {
-  male_to_female: '乾视坤',
-  female_to_male: '坤视乾',
+  male_to_female: `${GENDER_SHORT.male}视${GENDER_SHORT.female}`,
+  female_to_male: `${GENDER_SHORT.female}视${GENDER_SHORT.male}`,
   mutual: '两造',
 };
 
@@ -57,12 +58,14 @@ function FamilyBlock({ family, rows }: { family: string; rows: HehunFired[] }) {
             key={`${row.rule}#${index}`}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-element bg-[#0e111a] px-3 py-2 text-xs"
           >
-            <span className="text-ink">{row.label}</span>
+            <span className="text-ink">{annotateGenderTerms(row.label)}</span>
             <span className="label-caps text-ink-muted">{DIRECTION_CAPTION[row.direction] ?? row.direction}</span>
             <span className={`numeric ${row.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>
               {formatDelta(row.delta)}
             </span>
-            <span className="w-full text-ink-variant sm:w-auto sm:max-w-2xl">{row.reading}</span>
+            <span className="w-full text-ink-variant sm:w-auto sm:max-w-2xl">
+              {annotateGenderTerms(row.reading)}
+            </span>
           </li>
         ))}
       </ul>

@@ -17,7 +17,7 @@ interface SegmentedControlProps<T extends string> {
 }
 
 /**
- * A compact segmented toggle (e.g. 公历/农历, 乾造/坤造).
+ * A compact segmented toggle (e.g. 公历/农历, 乾造（男）/坤造（女）).
  *
  * Uses real radiogroup semantics for accessibility while presenting the
  * observatory's pill-group styling; the active segment is filled with brass gold.

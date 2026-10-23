@@ -14,6 +14,7 @@ import { TransitErrorNote } from '../components/bazi/transit/TransitErrorNote';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
+import { GENDER_LABEL, annotatePlainSections } from '../lib/gender';
 import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transitLink';
 import type { HehunSideLink } from '../lib/transitLink';
 import { useBaziHehun } from '../hooks/useBaziHehun';
@@ -41,8 +42,8 @@ const CONTEXT_LABEL: Record<string, string> = {
   partner: '造向',
   requested_from: '所请起',
   requested_to: '所请终',
-  male_available_from: '乾造可推起',
-  female_available_from: '坤造可推起',
+  male_available_from: '乾造（男）可推起',
+  female_available_from: '坤造（女）可推起',
   supported_to: '可推终',
 };
 
@@ -113,7 +114,7 @@ function makeRequest(sides: CompleteSides, axis: AxisState): BaziHehunRequest {
 /**
  * 双人合盘页（PRD §6.1.5、spec §8）。
  *
- * 一页 = 双造输入台 + 契合度总分环 + 乾坤档案对位（年命纳音随档案同区）+ 16 格对冲矩阵
+ * 一页 = 双造输入台 + 契合度总分环 + 男女档案对位（年命纳音随档案同区）+ 16 格对冲矩阵
  * + 命中清单 +（Task 12）互补图 + 同频轴 + 宜忌。页面上只有三件事是本页的意志：
  * 两半生辰、轴起哪一年、轴长几年；其余全部交回服务端口径。数据溯源段按 2026-10-21
  * UI 需求隐藏（后端 `provenance` 载荷原样不动）。
@@ -250,12 +251,12 @@ export function BaziHehunPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <div className="flex flex-wrap items-center gap-2">
         <ProfilePicker
-          label="乾造 · 选档案"
+          label={`${GENDER_LABEL.male} · 选档案`}
           profiles={profiles}
           onPick={(profile) => handlePickProfile(profile, 'male')}
         />
         <ProfilePicker
-          label="坤造 · 选档案"
+          label={`${GENDER_LABEL.female} · 选档案`}
           profiles={profiles}
           onPick={(profile) => handlePickProfile(profile, 'female')}
         />
@@ -285,7 +286,7 @@ export function BaziHehunPage() {
         <TransitErrorNote
           error={hehun.error}
           captions={CONTEXT_LABEL}
-          hint="改轴起年份或轴长后重新推演；一造排不出时会指明是乾造还是坤造。"
+          hint="改轴起年份或轴长后重新推演；一造排不出时会指明是乾造（男）还是坤造（女）。"
         />
       ) : null}
 
@@ -310,12 +311,12 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard title="合盘白话" eyebrow="OVERALL READING · COMPATIBILITY" icon="sparkle" elevated>
-            <PlainSectionList sections={result.plain} />
+            <PlainSectionList sections={annotatePlainSections(result.plain)} />
           </ResultCard>
 
           <ResultCard
             eyebrow="TWO CHARTS"
-            title="乾坤档案对位"
+            title="男女档案对位"
             icon="vault"
             actions={<span className="label-caps text-ink-muted">喜忌与五行分布直取各造本命盘</span>}
           >

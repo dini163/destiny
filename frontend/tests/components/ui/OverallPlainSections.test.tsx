@@ -23,7 +23,7 @@ const sourceOf = (relative: string) => {
 
 const PAGES: ReadonlyArray<{ title: string; source: string; anchors: string[] }> = [
   { title: '合盘白话', source: 'src/pages/BaziHehunPage.tsx',
-    anchors: ['title="契合度总分"', 'title="合盘白话"', 'sections={result.plain}', 'title="乾坤档案对位"'] },
+    anchors: ['title="契合度总分"', 'title="合盘白话"', 'sections={annotatePlainSections(result.plain)}', 'title="男女档案对位"'] },
   { title: '岁运白话', source: 'src/pages/BaziTransitPage.tsx',
     anchors: ['<TransitNatalBar natal={transit.data} />', 'title="岁运白话"', 'sections={transit.data.plain}', 'title="流年区间账本"'] },
   { title: '流月白话', source: 'src/pages/BaziLiuriPage.tsx',

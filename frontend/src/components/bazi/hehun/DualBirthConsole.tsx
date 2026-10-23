@@ -8,6 +8,7 @@ import { LocationField } from '../../ui/LocationField';
 import type { LocationValue } from '../../ui/LocationField';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import { TrueSolarTimeBadge } from '../../ui/TrueSolarTimeBadge';
+import { GENDER_LABEL } from '../../../lib/gender';
 import type { CalendarType } from '../../../types/common';
 import type { HehunSide } from '../../../types/baziHehun';
 import type { HehunSideLink, HehunSides } from '../../../lib/transitLink';
@@ -68,7 +69,7 @@ interface SideColumnProps {
 
 /** 一造的字段块。`side` 只作标题与 accessible name —— 造向是键位，不是字段。 */
 function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
-  const caption = side === 'male' ? '乾造' : '坤造';
+  const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
     <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
@@ -242,7 +243,8 @@ export function DualBirthConsole({
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
               两张盘同屏：跨造关系扫描、五行互补、年命纳音、同频演进轴与宜忌，一次推演给全，
-              每一条命中都落进可核对的账本。示例：乾 1988-02-15 23:30 成都 × 坤 1985-07-22 14:30 上海。
+              每一条命中都落进可核对的账本。示例：{GENDER_LABEL.male} 1988-02-15 23:30 成都 ×{' '}
+              {GENDER_LABEL.female} 1985-07-22 14:30 上海。
             </p>
           </div>
         </div>
@@ -273,7 +275,7 @@ export function DualBirthConsole({
 
       {missing.length > 0 ? (
         <p className="label-caps text-ink-muted">
-          {missing.map((side) => (side === 'male' ? '乾造' : '坤造')).join('与')}
+          {missing.map((side) => (side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female)).join('与')}
           的生辰或定位未填齐 —— 合婚需要两张盘。
         </p>
       ) : null}

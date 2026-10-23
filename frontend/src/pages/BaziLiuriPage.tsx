@@ -16,15 +16,11 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { GENDER_OPTIONS } from '../lib/gender';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiushiHref, buildTransitHref, parseLiuriLink } from '../lib/transitLink';
 import type { BaziLiuriRequest } from '../types/baziLiuri';
 import type { Gender } from '../types/common';
-
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: 'male', label: '乾造' },
-  { value: 'female', label: '坤造' },
-];
 
 /**
  * 本页两个 422 码的 `context` 键名 → 中文标签。
@@ -168,7 +164,7 @@ export function BaziLiuriPage() {
       <InputBar
         title="流日矩阵 · 全月逐日"
         badge="权威历算"
-        subtitle="在一个节气月段内逐日结算加减：一格一天的气数、档位、命中与通书宜忌，点一格展开当日详批。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        subtitle="在一个节气月段内逐日结算加减：一格一天的气数、档位、命中与通书宜忌，点一格展开当日详批。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
         showCalendar
         initial={link?.values}
         preset={profile.preset}

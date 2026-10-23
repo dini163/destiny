@@ -20,6 +20,7 @@ import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { GENDER_OPTIONS } from '../lib/gender';
 import { buildHehunPrefillHref, buildTransitHref } from '../lib/transitLink';
 import { useBaziNatal } from '../hooks/useBaziNatal';
 import { useProfileFill } from '../hooks/useProfileFill';
@@ -29,11 +30,6 @@ import type {
   DayunDetail,
 } from '../types/bazi';
 import type { Gender } from '../types/common';
-
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: 'male', label: '乾造' },
-  { value: 'female', label: '坤造' },
-];
 
 /**
  * BaZi natal chart page (四柱推命).
@@ -84,7 +80,7 @@ export function BaziNatalPage() {
       <InputBar
         title="四柱八字精算排盘"
         badge="权威历算"
-        subtitle="真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造。"
+        subtitle="真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
         showCalendar
         preset={profile.preset}
         profilePicker={profile.picker}

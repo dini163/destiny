@@ -1,3 +1,4 @@
+import { GENDER_LABEL, GENDER_SHORT } from '../../../lib/gender';
 import { pillarColumnLabel } from '../../../lib/pillars';
 import type { HehunCell } from '../../../types/baziHehun';
 
@@ -22,11 +23,13 @@ export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[46rem] border-separate border-spacing-1 text-xs">
-        <caption className="sr-only">乾造四柱对坤造四柱的跨造关系矩阵</caption>
+        <caption className="sr-only">
+          {GENDER_LABEL.male}四柱对{GENDER_LABEL.female}四柱的跨造关系矩阵
+        </caption>
         <thead>
           <tr>
             <th scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">
-              乾 ＼ 坤
+              {GENDER_SHORT.male} ＼ {GENDER_SHORT.female}
             </th>
             {POSITIONS.map((position) => (
               <th key={position} scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">

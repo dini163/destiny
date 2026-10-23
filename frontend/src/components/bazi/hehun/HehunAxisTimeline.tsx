@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { tierClass } from '../liuri/tier';
 import { Icon } from '../../ui/Icon';
 import { SegmentedControl } from '../../ui/SegmentedControl';
+import { GENDER_SHORT, annotateGenderTerms } from '../../../lib/gender';
 import type { HehunAxis, HehunAxisRow, HehunAxisSegment, HehunSide } from '../../../types/baziHehun';
 
 /** 轴长档位。`default` = 交回服务端按 §9.3 决定（两造的窗口不同，页面算不出缺省）。 */
@@ -39,9 +40,9 @@ interface HehunAxisTimelineProps {
  * 带两个下钻链接：`hrefFor('male', 2029)` 落到岁运页并聚焦那一年 —— 轴是简表，明细在
  * 那一页，两造各自的下钻因此必须分列，不能合成一个"看这一年"。
  *
- * 段的 `label` 逐字取自响应：那是两造各自第几步大运的并置事实，页面重排一次就会把
- * 「乾·第 4 运 戊午」写成别的什么。`dayun === null` 标「童限」，那是起运前的段，
- * 不是缺数据。
+ * 段的 `label` 取自响应：那是两造各自第几步大运的并置事实，页面只补男女注记、不重排，
+ * 否则就会把「乾（男）·第 4 运 戊午」写成别的什么。`dayun === null` 标「童限」，
+ * 那是起运前的段，不是缺数据。
  *
  * 控件（轴长与上一窗/下一窗）在卡头：这一页只有它是轴的意志。窗口越界是**设计要给的**
  * 结果 —— 从缺省轴点两次「上一窗」即触出 `hehun_axis_out_of_range`，那五个 `context`
@@ -113,7 +114,7 @@ function SegmentBlock({
   return (
     <div className="flex flex-col gap-2 rounded-card border border-rim bg-[#0e111a] p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-sm text-ink">{segment.label}</span>
+        <span className="text-sm text-ink">{annotateGenderTerms(segment.label)}</span>
         <span className="numeric text-xs text-ink-muted">
           {segment.start_year}—{segment.end_year}
         </span>
@@ -123,17 +124,19 @@ function SegmentBlock({
           恰恰是读者滚到某一年之后最想再点的东西。 */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[40rem] text-xs">
-          <caption className="sr-only">{`${segment.label} 内的逐年双造分数`}</caption>
+          <caption className="sr-only">
+            {`${annotateGenderTerms(segment.label)} 内的逐年双造分数`}
+          </caption>
           <thead>
             <tr className="text-left text-ink-muted">
               <th scope="col" className="font-normal">
                 流年
               </th>
               <th scope="col" className="font-normal">
-                乾
+                {GENDER_SHORT.male}
               </th>
               <th scope="col" className="font-normal">
-                坤
+                {GENDER_SHORT.female}
               </th>
               <th scope="col" className="text-right font-normal">
                 分差
@@ -197,7 +200,7 @@ function SideCell({
       {hrefFor ? (
         <Link to={hrefFor(side, row.year)} className="label-caps text-gold-soft hover:text-gold-bright">
           <Icon name="arrowRight" size={12} className="inline" />
-          {side === 'male' ? '乾岁运' : '坤岁运'}
+          {side === 'male' ? `${GENDER_SHORT.male}岁运` : `${GENDER_SHORT.female}岁运`}
         </Link>
       ) : null}
     </div>
