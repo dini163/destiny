@@ -22,6 +22,8 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { buildHehunPrefillHref, buildTransitHref } from '../lib/transitLink';
+import { reportEntryHref } from '../lib/reportEntry';
+import { ReportEntryBar } from '../components/report/ReportEntryBar';
 import { useBaziNatal } from '../hooks/useBaziNatal';
 import { useProfileFill } from '../hooks/useProfileFill';
 import type {
@@ -50,6 +52,8 @@ export function BaziNatalPage() {
   const [transitHref, setTransitHref] = useState<string | null>(null);
   /** 这一造的合婚预填链接，同样随每次排盘同步；未排过时为 null，入口随之消失。 */
   const [hehunHref, setHehunHref] = useState<string | null>(null);
+  /** R2 报告入口链接，随每次排盘同步；未排过时为 null，入口随之消失。 */
+  const [reportHref, setReportHref] = useState<string | null>(null);
   const profile = useProfileFill({
     onPick: (picked) => {
       if (picked?.gender) setGender(picked.gender);
@@ -72,6 +76,7 @@ export function BaziNatalPage() {
         name: name.trim() || null,
       }),
     );
+    setReportHref(reportEntryHref('r2', request));
     bazi.mutate(request);
   }
 
@@ -141,6 +146,10 @@ export function BaziNatalPage() {
 
       {bazi.data ? (
         <BaziResults chart={bazi.data} transitHref={transitHref} hehunHref={hehunHref} />
+      ) : null}
+
+      {bazi.data && reportHref ? (
+        <ReportEntryBar href={reportHref} productName="本命使用说明书" />
       ) : null}
 
       {profile.editor}

@@ -22,6 +22,8 @@ import { useProfiles } from '../hooks/useProfiles';
 import { profileToBirthInput, type PersonProfile, type ProfileDraft } from '../lib/profiles';
 import { ProfileEditor } from '../components/profiles/ProfileEditor';
 import { ProfilePicker } from '../components/profiles/ProfilePicker';
+import { ReportEntryBar } from '../components/report/ReportEntryBar';
+import { reportEntryHref } from '../lib/reportEntry';
 import type { BaziHehunRequest, HehunProfile, HehunSide } from '../types/baziHehun';
 
 /** 轴的两个本地状态。`null` = 交回服务端按 §9.3 的口径决定。 */
@@ -130,6 +132,8 @@ export function BaziHehunPage() {
   const link = useMemo(() => parseHehunLink(searchParams), [searchParams]);
 
   const [lastRequest, setLastRequest] = useState<BaziHehunRequest | null>(null);
+  /** R1 报告入口链接，随每次发盘同步；未排过时为 null，入口随之消失。 */
+  const [reportHref, setReportHref] = useState<string | null>(null);
   /** 轴的两个本地状态；手动查询即清空（回到服务端口径，见 `handleSubmit`）。 */
   const [axis, setAxis] = useState<AxisState>({ startYear: null, years: null });
   /** 档案填充：乾/坤两造的 preset，映射为 HehunSideLink 注入 DualBirthConsole。 */
@@ -190,6 +194,7 @@ export function BaziHehunPage() {
     const request = makeRequest(sides, axis);
     setLastRequest(request);
     setAxis(axis);
+    setReportHref(reportEntryHref('r1', request));
     setSearchParams(buildHehunQuery(sides, { axisStartYear: axis.startYear, axisYears: axis.years }), {
       replace: true,
     });
@@ -374,6 +379,10 @@ export function BaziHehunPage() {
           >
             <HehunYiJiPanel yiJi={result.yi_ji} />
           </ResultCard>
+
+          {reportHref ? (
+            <ReportEntryBar href={reportHref} productName="双人关系说明书" />
+          ) : null}
         </>
       ) : null}
     </div>

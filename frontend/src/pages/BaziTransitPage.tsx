@@ -17,6 +17,8 @@ import { useBaziTransit } from '../hooks/useBaziTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
+import { reportEntryHref } from '../lib/reportEntry';
+import { ReportEntryBar } from '../components/report/ReportEntryBar';
 import type {
   BaziTransitRequest,
   BaziTransitResult,
@@ -121,6 +123,8 @@ export function BaziTransitPage() {
    * 渲染期读得到的 state 而不是 ref —— href 在 render 里算，ref 读到的只会是上一次的。
    */
   const [lastValues, setLastValues] = useState<BirthInputValues | null>(null);
+  /** R3 报告入口链接，随每次推演同步；未推过时为 null，入口随之消失。 */
+  const [reportHref, setReportHref] = useState<string | null>(null);
   const autoSubmitted = useRef(false);
 
   useEffect(() => {
@@ -159,7 +163,9 @@ export function BaziTransitPage() {
   function handleSubmit(values: BirthInputValues): void {
     setLastValues(values);
     setCollapsed(false);
-    transit.mutate(makeRequest(values, gender, applyTrueSolarTime, rangeFields(), null));
+    const request = makeRequest(values, gender, applyTrueSolarTime, rangeFields(), null);
+    setReportHref(reportEntryHref('r3', request));
+    transit.mutate(request);
   }
 
   /** 点行 = 请这一年下钻；再点当前年 = 收回。聚焦年之后由服务端回显，不是本地状态。 */
@@ -311,6 +317,10 @@ export function BaziTransitPage() {
           </ResultCard>
 
           {focused ? <TransitYearCard year={focused} hrefFor={liuriHrefFor} /> : null}
+
+          {reportHref ? (
+            <ReportEntryBar href={reportHref} productName="未来12个月时间地图" />
+          ) : null}
         </>
       ) : null}
 
