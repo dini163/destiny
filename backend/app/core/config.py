@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     backend_port: int = 8000
     cors_origins: str = "http://localhost:5173"
     sweph_ephe_path: str = ""
+    #: 报告签名链接的密钥与有效期（小时）。密钥只从环境变量读；开发占位值生产必须替换
+    #: （见 app/core/report_orders.py 的安全说明与根目录 .env.example）。
+    report_secret: str = "dev-report-secret-change-me"
+    report_link_ttl_hours: int = 168
 
     @property
     def cors_origin_list(self) -> list[str]:
