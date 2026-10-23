@@ -414,14 +414,17 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
         ],
     )
 
+    #: R2 §6 的 {area} 填充值：喜用五行 → 建议关注的生活领域。模板用 `{area} 相关的活动`
+    #: 与「做 {area} 里」两种句式，领域名按词填入即可自然成立（本地模型参数，PRD §3A.3）。
     experiments = _section(
         "experiments",
         T.REPORT_SECTION_NAMES["r2"]["experiments"],
         "chapter",
         body=[f"三个 30 天小实验都以你的喜用（{favorable[0]}）为关注点，可记录、可推翻："],
         bullets=[
-            f"{e['title']}：{e['body']} {e['verify']} {e['falsify']}"
+            f"{e['title']}：{e['body'].replace('{area}', area)} {e['verify'].replace('{area}', area)} {e['falsify']}"
             for e in T.R2_EXPERIMENTS
+            for area in [_r2_focus_area(favorable)]
         ],
     )
 
@@ -747,6 +750,17 @@ def _month_tone(value: float) -> str:
     if value >= _MONTH_TONE_THRESHOLDS[2]:
         return "wrap"
     return "rest"
+
+
+def _r2_focus_area(favorable: list[str]) -> str:
+    """R2 §6 实验的关注领域：喜用主行 → 生活领域名，供模板 `{area}` 填空。"""
+    return {
+        "木": "成长与学习",
+        "火": "表达与社交",
+        "土": "稳定推进的工作",
+        "金": "秩序与执行",
+        "水": "沟通与流动",
+    }.get(favorable[0] if favorable else "", "日常生活")
 
 
 def _focus_months(result: BaziTransitResult) -> list[dict]:
