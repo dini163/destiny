@@ -4,12 +4,12 @@
 
 ![Destiny](docs/assets/destiny-readme-hero.png)
 
-[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](backend/pyproject.toml) [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com) [![React 18](https://img.shields.io/badge/React-18.3-61DAFB)](frontend/package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6)](frontend/package.json) [![Docker](https://img.shields.io/badge/Docker-compose%20ready-2496ED)](docker-compose.yml) [![Tests 2700+](https://img.shields.io/badge/tests-2700%2B-brightgreen)](scripts/verify.sh)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](backend/pyproject.toml) [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com) [![React 18](https://img.shields.io/badge/React-18.3-61DAFB)](frontend/package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6)](frontend/package.json) [![Docker](https://img.shields.io/badge/Docker-compose%20ready-2496ED)](docker-compose.yml) [![Tests 16.8k+](https://img.shields.io/badge/tests-16.8k%2B-brightgreen)](scripts/verify.sh)
 
 **一座聚合中华古典术数、西方占星、印度吠陀与北欧符文的全息推演平台。**
 所有排盘由权威计算库（`lunar-python` 干支节气 / `pyswisseph` DE431 星历）与自建考据语料产出，**绝对禁止 LLM 手搓核心算法，全栈零 mock**。
 
-[快速开始](#快速开始) · [体系矩阵](#体系矩阵16-个测算系统) · [架构](#架构) · [工程铁律](#工程铁律) · [API 与错误契约](#api-与错误契约) · [测试](#测试) · [目录结构](#目录结构)
+[快速开始](#快速开始) · [体系矩阵](#体系矩阵) · [架构](#架构) · [工程铁律](#工程铁律) · [API 与错误契约](#api-与错误契约) · [测试](#测试) · [目录结构](#目录结构)
 
 ---
 
@@ -26,7 +26,7 @@
 | 前端拿到假数据开发，上线全走形 | 前端测试夹具全部由脚本打真实后端录制（`scripts/record_frontend_fixtures.py`），零 mock |
 | 界面花哨但口径混乱 | 统一设计系统 `Celestial Obsidian`（曜石暗金），全站 App Shell 同一导航与状态栏 |
 
-**测算大厅（首页）** —— 顶部双文明圈导航 + 实时真太阳时授时卡 + 16 体系聚合矩阵：
+**测算大厅（首页）** —— 顶部双文明圈导航 + 实时真太阳时授时卡 + 16 格体系聚合矩阵（15 个已上线）：
 
 ![测算大厅首页](docs/assets/screenshot-portal.png)
 
@@ -65,7 +65,7 @@ npm run dev                  # Vite 起在 :5173，CORS 已放行该来源
 ```mermaid
 flowchart LR
     subgraph FE["前端 React 18 + Vite"]
-        P["pages/ 21 页"] --> H["hooks/"] --> A["api/ 类型化客户端"]
+        P["pages/ 21 路由页 + 404"] --> H["hooks/"] --> A["api/ 类型化客户端"]
     end
     subgraph BE["后端 FastAPI（分层单向 import）"]
         API["api/v1 HTTP 装配"] --> E["engines/ 推导"] --> S["schemas/ pydantic 契约"] --> C["content/ 考据语料（零逻辑）"]
@@ -76,26 +76,29 @@ flowchart LR
     API -.-> X
 ```
 
-- **content/** — 41 个自建语料模块（纳音、神煞、卦爻辞、奇门局、塔罗牌义、卢恩词表…），纯表、零业务逻辑
-- **engines/** — 25 个推导引擎；被禁的反向 import 六对全部为零，是硬门不是基线
+- **content/** — 66 个自建语料模块（纳音、神煞、卦爻辞、奇门局、塔罗牌义、卢恩词表…），纯表、零业务逻辑
+- **engines/** — 28 个推导引擎；被禁的反向 import 六对全部为零，是硬门不是基线
 - **solar/** — 真太阳时与地理计算，任何层可引
 - **frontend/** — 页面不直连 HTTP，接线唯一去处是 `hooks/`；类型照后端 snake_case 响应直通声明，不重命名
 
-## 体系矩阵（16 个测算系统）
+## 体系矩阵
+
+测算大厅共 16 个体系条目，其中 15 个已上线；下表按体系聚合（八字五页并作一行，行运/合盘、卡巴拉/数字学各占一行），并列入 1 个 Phase-2 路线图。
 
 | 文明圈 | 系统 | API 组 | 前端路由 | 权威数据源 |
 |---|---|---|---|---|
-| 中华 | 八字（ natal / 流日 / 流时 / 大运 / 合婚） | `bazi` `transit` | `/bazi-natal` `/bazi-liuri` `/bazi-liushi` `/bazi-transit` `/bazi-hehun` | lunar-python + 自建规则表 |
+| 中华 | 八字（natal / 流日 / 流时 / 大运 / 合婚） | `bazi` | `/bazi-natal` `/bazi-liuri` `/bazi-liushi` `/bazi-transit` `/bazi-hehun` | lunar-python + 自建规则表 |
 | 中华 | 紫微斗数 | `ziwei` | `/ziwei-doushu` | lunar-python 安星输入 |
 | 中华 | 奇门遁甲 | `qimen` | `/qimen-dunjia` | 自建局表 |
 | 中华 | 周易六爻 | `zhouyi` | `/zhouyi-divination` | 卦爻辞语料 + `secrets` 起卦 |
 | 中华 | 梅花易数 | `meihua` | `/plum-blossom` | 报数起卦，确定性无随机 |
 | 中华 | 姓名学 | `name` | `/name-metric` | 三才五格 + 康熙字典笔画表 |
+| 中华 | 麻衣面相神鉴（Phase-2） | — | — | CV 模型校准，尚未排盘 |
 | 西洋 | 本命占星 | `western` | `/western-astrology` | pyswisseph DE431 |
 | 西洋 | 行运 / 合盘 | `transit` `synastry` | `/astrology-transit` `/astrology-synastry` | pyswisseph |
 | 西洋 | 塔罗 | `tarot` | `/tarot-oracle` | 78 张牌义语料 + `secrets` |
 | 西洋 | 雷诺曼 | `lenormand` | `/lenormand-cards` | 36 张牌义语料 + `secrets` |
-| 希伯来 | 卡巴拉 / 数字学 | `kabbalah` `numerology` | `/kabbalah-tree` `/numerology-matrix` | 毕达哥拉斯/洛书语料 + Gematria 表 |
+| 西洋 | 卡巴拉 / 数字学 | `kabbalah` `numerology` | `/kabbalah-tree` `/numerology-matrix` | 毕达哥拉斯/洛书语料 + Gematria 表 |
 | 印度 | 吠陀占星 | `vedic` | `/vedic-astrology` | pyswisseph（恒星黄道） |
 | 北欧 | 卢恩符文 | `runes` | `/norse-runes` | Elder Futhark 词表 + `secrets` |
 
@@ -143,17 +146,17 @@ curl -s http://localhost:8000/api/v1/numerology/chart \
 
 ## 测试
 
-唯一全栈门禁是 `scripts/verify.sh`：后端 pytest → 前端 typecheck → vitest → build，一次跑齐。
+唯一全栈门禁是 `scripts/verify.sh`：后端 pytest → 前端 typecheck → vitest → build，再跑测试清单对账与夹具漂移检查，一次跑齐。
 
 ```bash
 bash scripts/verify.sh
 ```
 
-| 层 | 手段 | 规模（2026-09 实测） |
+| 层 | 手段 | 规模（2026-10-23 实测） |
 |---|---|---|
-| 后端 | pytest（golden 直调 `compute_*` + `TestClient` 真实响应） | 69 个测试文件 / 2700+ 用例全绿 |
-| 前端 | vitest + Testing Library，架构不变式单独一套 | 16 个测试文件 |
-| 架构 | `test_architecture.py` + `conventions.test.ts` 双侧断言，互不重复 | import 方向 / 七件套 / 随机源 / 文案集中处 |
+| 后端 | pytest（golden 直调 `compute_*` + `TestClient` 真实响应） | 96 个测试文件 / 16,644 用例全绿 |
+| 前端 | vitest + Testing Library，架构不变式单独一套 | 50 个测试文件 / 223 用例全绿 |
+| 架构 | `test_architecture.py` + `conventions.test.ts` 双侧断言，互不重复 | import 方向 / 后端四件齐备 / 随机源 / 账本印刷形状 |
 
 ## 目录结构
 
@@ -161,17 +164,17 @@ bash scripts/verify.sh
 destiny/
 ├── backend/
 │   ├── app/
-│   │   ├── content/        41 个考据语料模块（纯表，零逻辑）
+│   │   ├── content/        66 个考据语料模块（纯表，零逻辑）
 │   │   ├── schemas/        pydantic 请求/响应契约
-│   │   ├── engines/        25 个推导引擎
-│   │   ├── api/v1/         16 个路由组 + meta 平台路由
+│   │   ├── engines/        28 个推导引擎
+│   │   ├── api/v1/         15 个系统路由 + meta 平台路由
 │   │   ├── core/           config / errors / provenance（横切）
 │   │   └── solar/          真太阳时与地理（横切）
 │   ├── data/cities.json    真实经纬度城市库
 │   └── tests/              pytest + golden + 架构门
 ├── frontend/
 │   ├── src/
-│   │   ├── pages/          21 个页面（App Shell 统一导航）
+│   │   ├── pages/          21 个路由页 + 404（App Shell 统一导航）
 │   │   ├── components/     按系统分目录 + ui 共享件
 │   │   ├── hooks/  api/  types/   接线层 / 类型化客户端 / snake_case 直通类型
 │   │   └── lib/            文案印刷形状集中处（scoring.ts）
