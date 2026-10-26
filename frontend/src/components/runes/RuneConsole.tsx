@@ -59,8 +59,9 @@ interface RuneConsoleProps {
  * `100.0% COHERENCE` 与 `DIVINATION HARMONICS: 0.984 TST-ALIGNED` 一并删掉（偏差 H/J），
  * 本页不吃时间与地理入参，没有任何东西可以对齐。
  *
- * 设计稿页头那两枚「存入神谕秘匣 / 导出符印命谱」按钮**不渲染**（偏差 Q，属 Stage 9/10）；
- * 右侧那个 Bindrune 生成器同理（偏差 K）。
+ * 设计稿把「存入神谕秘匣 / 导出符印命谱」画在页头、Bindrune 生成器放在右侧；这里不照抄
+ * 位置 —— 三者都挂在结果区（导出按钮在碑阵卡，秘匣面板与 BindruneForge 在结果流尾部），
+ * 控制台只负责发起铸石，不承担存档与组合。
  */
 export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
   const [state, setState] = useState<ConsoleState>(EMPTY);

@@ -1,12 +1,15 @@
+import { BindruneForge } from '../components/runes/BindruneForge';
 import { FutharkCodex } from '../components/runes/FutharkCodex';
 import { RuneConsole } from '../components/runes/RuneConsole';
 import { RuneShadowCounsel } from '../components/runes/RuneShadowCounsel';
 import { RuneStoneGrid } from '../components/runes/RuneStoneGrid';
 import { RuneSynthesis } from '../components/runes/RuneSynthesis';
+import { RuneVaultPanel } from '../components/runes/RuneVaultPanel';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useRunes } from '../hooks/useRunes';
+import { downloadRuneTranscript } from '../lib/runeExport';
 import type { RuneCastResponse } from '../types/runes';
 
 /**
@@ -59,7 +62,17 @@ function RuneResults({ cast }: { cast: RuneCastResponse }) {
         icon="seal"
         elevated
         actions={
-          <span className="label-caps text-ink-muted">{cast.stones.length} 枚石碑</span>
+          <>
+            <span className="label-caps text-ink-muted">{cast.stones.length} 枚石碑</span>
+            <button
+              type="button"
+              onClick={() => downloadRuneTranscript(cast)}
+              className="btn-ghost rounded-element px-3 py-1.5 text-xs"
+            >
+              <Icon name="seal" size={14} />
+              导出符印命谱
+            </button>
+          </>
         }
       >
         <p className="text-sm leading-relaxed text-ink-muted">{cast.spread_description}</p>
@@ -77,6 +90,10 @@ function RuneResults({ cast }: { cast: RuneCastResponse }) {
       <RuneShadowCounsel notes={cast.shadow_counsel} />
 
       <FutharkCodex codex={cast.codex} />
+
+      <BindruneForge codex={cast.codex} />
+
+      <RuneVaultPanel cast={cast} />
     </>
   );
 }
