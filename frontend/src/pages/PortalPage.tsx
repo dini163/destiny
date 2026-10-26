@@ -82,8 +82,8 @@ export function PortalPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
-          {systems.map((system) => (
-            <SystemCard key={system.slug} system={system} />
+          {systems.map((system, i) => (
+            <SystemCard key={system.slug} system={system} index={i} />
           ))}
         </div>
       </section>

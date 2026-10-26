@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { PortalSystem } from '../../lib/portal';
@@ -5,18 +6,20 @@ import { Icon } from '../ui/Icon';
 
 interface SystemCardProps {
   system: PortalSystem;
+  /** Position in the grid, used only to stagger the one-shot enter animation. */
+  index?: number;
 }
 
 /**
  * One tile of the entry matrix.
  *
- * A live MVP system renders as a `<Link>` to its real route with a gold "MVP 核心"
- * seal and a call to action; a Phase-2 system renders as an inert panel with a
- * muted "二期预演" seal and its honest build status. The blurb and highlight tags
- * are curated descriptions of the discipline — never a fabricated result.
+ * A live system renders as a `<Link>` to its real route with a call to action; an
+ * unbuilt system renders as an inert panel. The blurb and highlight tags are
+ * curated descriptions of the discipline — never a fabricated result.
  */
-export function SystemCard({ system }: SystemCardProps) {
+export function SystemCard({ system, index = 0 }: SystemCardProps) {
   const live = system.route !== null;
+  const enterStyle = { '--card-delay': `${Math.min(index, 12) * 45}ms` } as CSSProperties;
 
   const content = (
     <>
@@ -63,15 +66,23 @@ export function SystemCard({ system }: SystemCardProps) {
     </>
   );
 
-  const base = 'group flex flex-col justify-between gap-4 rounded-card border p-5 transition-colors';
+  const base = 'portal-card group flex flex-col justify-between gap-4 rounded-card border p-5';
 
   if (system.route !== null) {
     return (
-      <Link to={system.route} className={`${base} panel-raised border-rim hover:border-gold-strong`}>
+      <Link
+        to={system.route}
+        style={enterStyle}
+        className={`${base} portal-card-enter panel-raised border-rim hover:border-gold-strong`}
+      >
         {content}
       </Link>
     );
   }
 
-  return <div className={`${base} panel border-rim-soft`}>{content}</div>;
+  return (
+    <div style={enterStyle} className={`${base} portal-card-enter panel border-rim-soft`}>
+      {content}
+    </div>
+  );
 }

@@ -520,3 +520,50 @@
     animation: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Portal matrix cards — a one-shot fade-and-rise on mount, staggered per card
+ * via the `--card-delay` custom property. Decorative only; the hover lift is a
+ * plain transform/opacity transition and stays static under reduced-motion.
+ * ------------------------------------------------------------------------ */
+@keyframes portal-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.portal-card-enter {
+  animation: portal-card-in 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--card-delay, 0ms);
+}
+
+.portal-card {
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.portal-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 32px -14px rgba(212, 175, 55, 0.4),
+    var(--shadow-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-card-enter {
+    animation: none;
+  }
+  .portal-card {
+    transition: none;
+  }
+  .portal-card:hover {
+    transform: none;
+  }
+}
