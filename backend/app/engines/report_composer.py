@@ -297,6 +297,9 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
     top = _top_wuxing(chart)
     low = _low_wuxing(chart)
     need = _need_for(favorable, unfavorable)
+    interp = chart.interpretation
+    verdict = interp.verdict if interp else None
+    dims = interp.six_dimensions if interp else []
 
     driver_line = T.R2_DRIVER_OPENING.format(
         day_master=chart.day_master,
@@ -310,31 +313,59 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
         "balanced": T.R2_DRIVER_BALANCED,
     }.get(analysis.level, T.R2_DRIVER_BALANCED)
     stress_line = T.R2_STRESS_OPENING.format(
-        map=f"{T.R2_STRESS_EXCESS[top['element']]} {T.R2_STRESS_MISSING[low['element']]}"
+        map=(
+            _strip_end(T.R2_STRESS_EXCESS[top["element"]])
+            + "，"
+            + _strip_end(T.R2_STRESS_MISSING[low["element"]])
+        )
     )
     energy_line = (
-        T.R2_ENERGY_FAVORABLE[favorable[0]] + T.R2_ENERGY_UNFAVORABLE[unfavorable[0]]
+        _strip_end(T.R2_ENERGY_FAVORABLE[favorable[0]])
+        + "；"
+        + _strip_end(T.R2_ENERGY_UNFAVORABLE[unfavorable[0]])
     )
 
+    summary_bullets = []
+    if verdict is not None:
+        summary_bullets.append(
+            f"{T.R2_SUMMARY_LABELS['overall']}：{verdict.grade}（{verdict.stars} 星）{verdict.headline}"
+        )
+    summary_bullets.append(f"{T.R2_SUMMARY_LABELS['driver']}：{driver_line} {level_line}")
+    dim_brief = _r2_dimension_brief(dims)
+    if dim_brief:
+        summary_bullets.append(f"{T.R2_SUMMARY_LABELS['dimensions']}：{dim_brief}")
+    summary_bullets.append(f"{T.R2_SUMMARY_LABELS['stress']}：{stress_line}")
+    summary_bullets.append(f"{T.R2_SUMMARY_LABELS['practice']}：{need['need']}")
+
+    summary_cards = [
+        _card(
+            "r2-summary-01",
+            level_line,
+            f"日主 {chart.day_master}，旺弱档位 {analysis.label}（{analysis.level}）",
+            rules_src,
+            "high",
+        )
+    ]
+    if verdict is not None:
+        summary_cards.append(
+            _card(
+                "r2-summary-verdict",
+                verdict.headline,
+                f"整体 {verdict.grade}（{verdict.stars} 星），由六维账本均值派生",
+                rules_src,
+                "high",
+            )
+        )
     summary = _section(
         "summary",
         T.REPORT_SECTION_NAMES["r2"]["summary"],
         "summary",
-        bullets=[
-            f"{T.R2_SUMMARY_LABELS['driver']}：{driver_line} {level_line}",
-            f"{T.R2_SUMMARY_LABELS['stress']}：{stress_line}",
-            f"{T.R2_SUMMARY_LABELS['practice']}：{need['need']}",
-        ],
-        cards=[
-            _card(
-                "r2-summary-01",
-                level_line,
-                f"日主 {chart.day_master}，旺弱档位 {analysis.label}（{analysis.level}）",
-                rules_src,
-                "high",
-            )
-        ],
+        bullets=summary_bullets,
+        cards=summary_cards,
     )
+
+    profile = _r2_profile_section(chart, favorable, unfavorable, rules_src)
+    dimensions = _r2_dimensions_section(dims, rules_src)
 
     driver = _section(
         "driver",
@@ -393,13 +424,15 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
         ],
     )
 
+    dayun = _r2_dayun_section(chart, rules_src)
+
     relationships = _section(
         "relationships",
         T.REPORT_SECTION_NAMES["r2"]["relationships"],
         "chapter",
         body=[
             T.R2_RELATIONSHIP_OPENING.format(
-                needs=need["need"], blindspots=need["blind"]
+                needs=_strip_end(need["need"]), blindspots=_strip_end(need["blind"])
             ),
             _action(T.R2_ACTION_FOCUS["relationships"], "act"),
         ],
@@ -433,7 +466,9 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
         T.REPORT_SECTION_NAMES["r2"]["evidence"],
         "evidence",
         body=[T.EVIDENCE_SUMMARY_OPENING],
-        bullets=_evidence_summary([summary, driver, stress, energy, relationships]),
+        bullets=_evidence_summary(
+            [summary, profile, dimensions, driver, stress, energy, dayun, relationships]
+        ),
     )
     boundary = _section(
         "boundary",
@@ -445,7 +480,7 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
     return _document(
         "r2",
         request,
-        [summary, driver, stress, energy, relationships, experiments, evidence, boundary],
+        [summary, profile, dimensions, driver, stress, energy, dayun, relationships, experiments, evidence, boundary],
         input_summary=f"{chart.four_pillars}（{chart.zodiac}）",
         boundary_text=T.BOUNDARY_STATEMENTS["r2"],
     )
@@ -646,6 +681,11 @@ def _table_names(tables) -> list[str]:
     return [t.name for t in tables] if tables else []
 
 
+def _strip_end(text: str) -> str:
+    """去掉语料片段自带的句末标点，统一由框架句收尾，避免拼接出双句号。"""
+    return text.rstrip("。；！？!?； ")
+
+
 def _pick_table(names: list[str], fragment: str) -> str | None:
     return next((n for n in names if fragment in n), None)
 
@@ -750,6 +790,171 @@ def _month_tone(value: float) -> str:
     if value >= _MONTH_TONE_THRESHOLDS[2]:
         return "wrap"
     return "rest"
+
+
+def _r2_profile_section(
+    chart: BaziChart, favorable: list[str], unfavorable: list[str], rules_src: str
+) -> ReportSection:
+    """命格总览：四柱、月令格局（geju）、用神三法（yongshen）；只填引擎已算好的事实。"""
+    body = [
+        T.R2_PROFILE_OPENING.format(
+            pillars=chart.four_pillars,
+            day_master=chart.day_master,
+            element=chart.day_master_element,
+        )
+    ]
+    cards: list[ReportEvidenceCard] = []
+    geju = chart.geju
+    if geju is not None:
+        notes = "；".join(geju.notes)
+        if geju.is_success:
+            body.append(T.R2_GEJU_SUCCESS.format(geju=geju.name, notes=notes or geju.ten_god))
+        else:
+            body.append(T.R2_GEJU_FAIL.format(geju=geju.name, notes=notes or "无成格判语"))
+        cards.append(
+            _card(
+                "r2-profile-geju",
+                f"月令格局 {geju.name}（{'成格' if geju.is_success else '未全成格'}）",
+                notes or f"定格十神 {geju.ten_god}",
+                geju.source,
+                "high",
+            )
+        )
+    else:
+        body.append(T.R2_GEJU_NONE)
+
+    ys = chart.yongshen
+    if ys is not None:
+        body.append(
+            T.R2_YONGSHEN_OPENING.format(
+                favorable="、".join(ys.favorable_elements) or "—",
+                unfavorable="、".join(ys.unfavorable_elements) or "—",
+            )
+        )
+        method_lines = []
+        for m in ys.methods:
+            if m.chosen_elements:
+                method_lines.append(
+                    T.R2_YONGSHEN_METHOD.format(
+                        method=m.method, chosen="、".join(m.chosen_elements)
+                    )
+                )
+            else:
+                method_lines.append(T.R2_YONGSHEN_METHOD_NONE.format(method=m.method))
+        body.append("".join(method_lines))
+    body.append(T.R2_YONGSHEN_FOOTER)
+    cards.append(
+        _card(
+            "r2-profile-yongshen",
+            "喜用由扶抑/通关/调候三法合并派生",
+            f"喜 {favorable} / 忌 {unfavorable}",
+            rules_src,
+            "medium",
+        )
+    )
+    body.append(_action(T.R2_ACTION_FOCUS["profile"], "act"))
+    return _section(
+        "profile",
+        T.REPORT_SECTION_NAMES["r2"]["profile"],
+        "chapter",
+        body=body,
+        cards=cards,
+    )
+
+
+def _r2_dimensions_section(dims, rules_src: str) -> ReportSection:
+    """六维画像：bullets 放档位/分、优势、提醒清单，body 放引擎白话整段。"""
+    body = [T.R2_DIMENSIONS_OPENING]
+    bullets: list[str] = []
+    for d in dims:
+        bullets.append(
+            T.R2_DIMENSION_HEAD.format(
+                dimension=d.dimension, tier=d.score.tier, score=f"{d.score.value:.0f}"
+            )
+        )
+        if d.strengths:
+            bullets.append(T.R2_DIMENSION_STRENGTHS.format(items="、".join(d.strengths)))
+        if d.cautions:
+            bullets.append(T.R2_DIMENSION_CAUTIONS.format(items="、".join(d.cautions)))
+        if not d.strengths and not d.cautions:
+            bullets.append(T.R2_DIMENSION_EMPTY_FACTOR)
+        if d.plain:
+            body.append(f"【{d.dimension}】{d.plain}")
+    cards = []
+    if dims:
+        cards.append(
+            _card(
+                "r2-dimensions-ledger",
+                "六维分数由各自账本累加，档位顺/平/滞沿用 65/45 分界",
+                f"{len(dims)} 个维度；最高 {max(d.score.value for d in dims):.0f} / "
+                f"最低 {min(d.score.value for d in dims):.0f}",
+                rules_src,
+                "high",
+            )
+        )
+    body.append(_action(T.R2_ACTION_FOCUS["dimensions"], "act"))
+    return _section(
+        "dimensions",
+        T.REPORT_SECTION_NAMES["r2"]["dimensions"],
+        "chapter",
+        body=body,
+        bullets=bullets,
+        cards=cards,
+    )
+
+
+def _r2_dayun_section(chart: BaziChart, rules_src: str) -> ReportSection:
+    """当前大运：干支/年龄段/伏吟反吟关系；无有效大运时给诚实兜底句。"""
+    du = chart.dayun_current
+    if du is None:
+        return _section(
+            "dayun",
+            T.REPORT_SECTION_NAMES["r2"]["dayun"],
+            "chapter",
+            body=[T.R2_DAYUN_NONE],
+        )
+    body = [
+        T.R2_DAYUN_OPENING.format(
+            ganzhi=du.ganzhi, start_age=du.start_age, end_age=du.end_age
+        )
+    ]
+    for r in du.relations:
+        body.append(T.R2_DAYUN_RELATION.format(relation=r.kind, reading=r.reading))
+    body.append(T.R2_DAYUN_FOOTER)
+    body.append(_action(T.R2_ACTION_FOCUS["dayun"], "act"))
+    return _section(
+        "dayun",
+        T.REPORT_SECTION_NAMES["r2"]["dayun"],
+        "chapter",
+        body=body,
+        cards=[
+            _card(
+                "r2-dayun-current",
+                f"当前大运 {du.ganzhi}（{du.start_age}–{du.end_age}岁）",
+                f"与命局伏吟/反吟关系 {len(du.relations)} 条",
+                rules_src,
+                "high",
+            )
+        ],
+    )
+
+
+def _r2_dimension_brief(dims) -> str:
+    """摘要里的六维速览：顺/平/滞计数 + 最顺/最留意维度；无六维时返回空串。"""
+    if not dims:
+        return ""
+    counts: dict[str, int] = {}
+    for d in dims:
+        counts[d.score.tier] = counts.get(d.score.tier, 0) + 1
+    best = max(dims, key=lambda d: d.score.value)
+    weak = min(dims, key=lambda d: d.score.value)
+    parts = [
+        f"顺{counts.get('顺', 0)}·平{counts.get('平', 0)}·滞{counts.get('滞', 0)}",
+        f"最顺 {best.dimension}（{best.score.value:.0f}）",
+    ]
+    if weak.score.value < best.score.value:
+        parts.append(f"最留意 {weak.dimension}（{weak.score.value:.0f}）")
+    return "；".join(parts)
 
 
 def _r2_focus_area(favorable: list[str]) -> str:
