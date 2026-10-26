@@ -49,7 +49,16 @@ export function SiteHeader() {
           >
             {SECONDARY_NAV.map((group, index) => (
               <Fragment key={group.title}>
-                <SecondaryGroup group={group} first={index === 0} />
+                {index > 0 && (
+                  // The Vedic/Norse divider hides when it starts a wide-screen line;
+                  // narrow screens keep it so it reads as following 西洋秘学.
+                  <span
+                    className={`mx-1.5 h-3.5 w-px shrink-0 bg-gold/25${
+                      group.title === '吠陀与北欧' ? ' lg:hidden' : ''
+                    }`}
+                  />
+                )}
+                <SecondaryGroup group={group} />
                 {/* Wide screens start 吠陀与北欧 on its own line; on narrow screens
                     the spacer hides and natural wrapping places it after 西洋秘学. */}
                 {group.title === '西洋秘学' && (
@@ -81,17 +90,16 @@ function PrimaryLink({ item }: { item: NavItem }) {
   );
 }
 
-function SecondaryGroup({ group, first }: { group: NavGroup; first: boolean }) {
+function SecondaryGroup({ group }: { group: NavGroup }) {
   return (
-    <Fragment>
-      {!first && <span className="mx-1.5 h-3.5 w-px shrink-0 bg-gold/25" />}
+    <>
       <span className="label-caps mr-1.5 shrink-0 select-none font-bold text-gold">
         {group.title}
       </span>
       {group.items.map((item) => (
         <SecondaryLink key={item.slug} item={item} />
       ))}
-    </Fragment>
+    </>
   );
 }
 
