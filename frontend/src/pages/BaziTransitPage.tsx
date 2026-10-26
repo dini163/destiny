@@ -95,8 +95,9 @@ function parseYear(raw: string): number | null {
  * 页面上没有任何手算的平均或"综合评定"：分数一律走 `ScoreLedger` 展开的账本。数据溯源段
  * 按 2026-10-21 UI 需求隐藏（后端 `provenance` 载荷原样不动）。
  *
- * 入口在主盘页的大运区块（`?birth_date=…` 查询串），因此本路由不在导航栏里 ——
- * 它是主盘的子页，不是一新一大体系（spec 决策 8）。
+ * 入口有两条：主盘页大运区块上钻（`?birth_date=…` 查询串），以及导航华夏术数组里的
+ * 「岁运推演」直达；它仍是主盘的子页，不是一新一大体系（spec 决策 8），进导航只为降低
+ * 直达门槛。
  */
 export function BaziTransitPage() {
   const [searchParams] = useSearchParams();

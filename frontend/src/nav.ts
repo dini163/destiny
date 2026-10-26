@@ -16,8 +16,8 @@
 export const ROUTES = {
   overview: '/overview',
   baziNatal: '/bazi-natal',
-  /** 岁运推演（切片 2）。刻意不进 `SECONDARY_NAV` 与 `PORTAL_SYSTEMS`：它是主盘之外的
-   * 子页，不是一新一大体系，列进去会让"几大核心体系"这个数字虚增一格（spec 决策 8）。 */
+  /** 岁运推演（切片 2）。本命盘之外的流年/流月时间轴，不是独立新体系；v1 起纳入
+   * `SECONDARY_NAV` 华夏术数组方便直达（原先刻意收在本命页内，入口过深）。 */
   baziTransit: '/bazi-transit',
   /** 全月流日矩阵（切片 3）。与 `baziTransit` 同一条理由不进导航：它是岁运页月卡的下钻，
    * 无生辰即无意义，不是一新一大体系（spec 决策 8）。 */
@@ -91,6 +91,7 @@ export const SECONDARY_NAV: NavGroup[] = [
     title: '华夏术数',
     items: [
       { slug: 'bazi-natal', label: '八字命理', to: ROUTES.baziNatal },
+      { slug: 'bazi-transit', label: '岁运推演', to: ROUTES.baziTransit },
       { slug: 'ziwei-doushu', label: '紫微斗数', to: ROUTES.ziwei },
       { slug: 'qimen-dunjia', label: '奇门遁甲', to: ROUTES.qimen },
       { slug: 'zhouyi-divination', label: '文王六爻', to: ROUTES.zhouyi },
