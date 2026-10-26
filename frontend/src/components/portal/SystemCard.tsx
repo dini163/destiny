@@ -20,24 +20,15 @@ export function SystemCard({ system }: SystemCardProps) {
 
   const content = (
     <>
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`flex shrink-0 items-center justify-center rounded-card border ${
-            live
-              ? 'h-12 w-12 border-rim bg-gold/10 text-gold'
-              : 'h-10 w-10 border-rim-soft bg-surface text-ink-muted'
-          }`}
-        >
-          <Icon name={system.icon} size={live ? 26 : 22} />
-        </span>
-        <span
-          className={`label-caps shrink-0 rounded-element px-2 py-0.5 ${
-            live ? 'bg-gold text-[#3c2f00]' : 'bg-surface text-ink-muted'
-          }`}
-        >
-          {live ? 'MVP 核心' : '二期预演'}
-        </span>
-      </div>
+      <span
+        className={`flex shrink-0 items-center justify-center rounded-card border ${
+          live
+            ? 'h-12 w-12 border-rim bg-gold/10 text-gold'
+            : 'h-10 w-10 border-rim-soft bg-surface text-ink-muted'
+        }`}
+      >
+        <Icon name={system.icon} size={live ? 26 : 22} />
+      </span>
 
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
@@ -67,9 +58,7 @@ export function SystemCard({ system }: SystemCardProps) {
             {system.cta}
             <Icon name="arrowRight" size={14} />
           </span>
-        ) : (
-          <span className="shrink-0 text-[11px] text-ink-muted">{system.status}</span>
-        )}
+        ) : null}
       </div>
     </>
   );
