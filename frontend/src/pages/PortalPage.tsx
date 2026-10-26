@@ -108,7 +108,9 @@ function Hero() {
           <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl">
             洞见命运的几何密码
             <br />
-            <span className="text-gold-bright text-glow-gold">探寻多重文明智慧</span>
+            <span className="hero-glow-breathe text-gold-bright text-glow-gold">
+              探寻多重文明智慧
+            </span>
           </h1>
         </div>
 
@@ -139,7 +141,7 @@ function Astrolabe() {
       fill="none"
       stroke="currentColor"
       aria-hidden="true"
-      className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 text-gold opacity-10"
+      className="astrolabe-slow-spin pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 text-gold opacity-10"
     >
       <circle cx="100" cy="100" r="95" strokeDasharray="2 3" strokeWidth="0.75" />
       <circle cx="100" cy="100" r="82" strokeWidth="0.5" />

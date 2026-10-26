@@ -567,3 +567,37 @@
     transform: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Hero ambience — the wireframe astrolabe drifts almost imperceptibly slow,
+ * and the gold tagline breathes. Decorative only; frozen under reduced-motion.
+ * ------------------------------------------------------------------------ */
+@keyframes astrolabe-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes hero-glow-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.astrolabe-slow-spin {
+  animation: astrolabe-spin 90s linear infinite;
+  transform-origin: center;
+}
+.hero-glow-breathe {
+  animation: hero-glow-breathe 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astrolabe-slow-spin,
+  .hero-glow-breathe {
+    animation: none;
+  }
+}
