@@ -1,12 +1,9 @@
 /**
  * Global navigation model for the persistent App Shell.
  *
- * Mirrors the multi-civilization nav in the design mockups: a primary bar of the
- * Phase-1 destinations plus a secondary, categorized bar spanning the full
- * 16-system roadmap. Only the five Phase-1 routes plus 姓名学、数字命理 and 北欧卢恩 are
- * navigable; every other system is declared here with `to: null` so the "全域" nav is
- * complete now and a later phase merely points a slug at a real route — no shell
- * re-architecture.
+ * Mirrors the multi-civilization nav in the design mockups: a primary bar of
+ * frequent destinations plus a secondary, categorized bar spanning the full
+ * catalogue. Every item points at a real route — there are no disabled placeholders.
  *
  * `ROUTES` is the single source of truth for router paths, shared by the nav, the
  * router and in-app links so they can never drift apart.
@@ -65,8 +62,8 @@ export interface NavItem {
   slug: string;
   /** Chinese label rendered in the bar. */
   label: string;
-  /** Absolute router path when the destination exists, otherwise null. */
-  to: string | null;
+  /** Absolute router path. */
+  to: string;
 }
 
 /** A civilization grouping in the secondary nav bar. */
@@ -85,7 +82,7 @@ export const PRIMARY_NAV: NavItem[] = [
   { slug: 'zhouyi-divination', label: '周易六爻', to: ROUTES.zhouyi },
 ];
 
-/** Secondary bar — the full catalog grouped by civilization (Phase-2 disabled). */
+/** Secondary bar — the full catalog grouped by civilization; every item has a real route. */
 export const SECONDARY_NAV: NavGroup[] = [
   {
     title: '华夏术数',

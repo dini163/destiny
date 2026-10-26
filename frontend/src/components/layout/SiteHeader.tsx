@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
 import { PRIMARY_NAV, ROUTES, SECONDARY_NAV, type NavGroup, type NavItem } from '../../nav';
-import { Icon, type IconName } from '../ui/Icon';
+import { Icon } from '../ui/Icon';
 import { BrandMark } from './BrandMark';
 import { EpochBadge, UtcClock } from './StatusClock';
 
@@ -38,8 +38,6 @@ export function SiteHeader() {
               <Icon name="vault" size={18} />
               <span className="hidden 2xl:inline">档案</span>
             </Link>
-            <UtilityButton icon="history" label="历史测算记录" />
-            <UtilityButton icon="sparkle" label="命盘收藏夹" />
           </div>
         </div>
 
@@ -97,16 +95,6 @@ const SECONDARY_ACTIVE = 'bg-surface-raised font-medium text-gold-soft';
 const SECONDARY_IDLE = 'text-ink-variant hover:bg-surface-raised hover:text-ink';
 
 function SecondaryLink({ item }: { item: NavItem }) {
-  if (item.to === null) {
-    return (
-      <span
-        className={`${SECONDARY_BASE} cursor-not-allowed text-ink-muted/50`}
-        title="二期上线 · 敬请期待"
-      >
-        {item.label}
-      </span>
-    );
-  }
   return (
     <NavLink
       to={item.to}
@@ -116,19 +104,5 @@ function SecondaryLink({ item }: { item: NavItem }) {
     >
       {item.label}
     </NavLink>
-  );
-}
-
-function UtilityButton({ icon, label }: { icon: IconName; label: string }) {
-  return (
-    <button
-      type="button"
-      disabled
-      title={`${label} · 二期上线`}
-      aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-element border border-rim bg-surface/60 text-ink-muted transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-    >
-      <Icon name={icon} size={18} />
-    </button>
   );
 }

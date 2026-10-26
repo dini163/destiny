@@ -1,12 +1,11 @@
 /**
  * Portal (聚合测算大厅) catalogue — the multi-civilisation entry matrix.
  *
- * This is curated *navigational* content (which systems exist, what each one is,
- * which are live now), not computed results, so it honours the no-mock rule: the
- * live systems point at real routes from `nav.ts` (the single source of truth
- * for paths), and every other system is declared Phase-2 with `route: null` and an
- * honest build status. Blurbs describe each discipline factually; no chart value,
- * reading or almanac verdict is invented here.
+ * This is curated *navigational* content (which systems exist, what each one is),
+ * not computed results, so it honours the no-mock rule: every system points at a
+ * real route from `nav.ts` (the single source of truth for paths). Blurbs describe
+ * each discipline factually; no chart value, reading or almanac verdict is invented
+ * here.
  */
 
 import type { IconName } from '../components/ui/Icon';
@@ -52,10 +51,8 @@ export function isLive(system: PortalSystem): boolean {
 }
 
 /**
- * The full 16-system roadmap. All are live and carry a real route except
- * 麻衣面相神鉴（physiognomy）, which remains Phase-2 (`CV 模型校准`) with an honest
- * status instead of a link. `LIVE_SYSTEM_COUNT` is derived from this array, so the
- * hero copy never drifts as systems ship.
+ * The full system catalogue. Every entry carries a real route; `LIVE_SYSTEM_COUNT`
+ * is derived from this array, so the hero copy never drifts as systems ship.
  */
 export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
   {
@@ -153,18 +150,6 @@ export const PORTAL_SYSTEMS: readonly PortalSystem[] = [
     route: ROUTES.nameMetric,
     status: null,
     icon: 'search',
-  },
-  {
-    slug: 'physiognomy',
-    nameZh: '麻衣面相神鉴',
-    nameEn: 'PHYSIOGNOMY',
-    category: 'chinese',
-    blurb: '十三部位总歌与十二宫气色流年，三停六府骨相分野，辅以计算机视觉微特征锚点。',
-    highlights: ['视觉关键点测绘'],
-    cta: '',
-    route: null,
-    status: 'CV 模型校准',
-    icon: 'pin',
   },
   {
     slug: 'lenormand-cards',
