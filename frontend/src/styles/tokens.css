@@ -673,3 +673,99 @@
   }
 }
 
+/* A single small distant star: a still glowing core with a few stardust motes
+   turning around the z-axis (the normal through the screen) in a steady planar
+   spin. No scale-in-depth approach and no drawn orbit line. Kept faint and off to
+   the side so it never competes with chart text; it sits inside the non-interactive
+   starfield layer and captures no pointer events. */
+@keyframes star-orbit-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The core itself slowly breathes — brightening and swelling as it turns toward
+   the viewer, dimming and easing back — so it reads as a gentle near/far tide
+   rather than a hard zoom. */
+@keyframes star-core-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.03);
+  }
+}
+
+.starfield-star {
+  position: fixed;
+  right: 8%;
+  bottom: 18%;
+  width: 120px;
+  height: 120px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.starfield-star::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 248, 226, 1) 0%,
+    rgba(245, 215, 127, 0.7) 7%,
+    rgba(245, 215, 127, 0.18) 22%,
+    transparent 38%
+  );
+  animation: star-core-breathe 14s ease-in-out infinite;
+}
+
+.starfield-star__orbit {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  /* The whole mote ring turns around the z-axis through the screen (a steady
+     planar spin); two further motes ride on this background so four are visible. */
+  background:
+    radial-gradient(circle at 14% 50%, rgba(245, 215, 127, 0.8) 0 3px, transparent 4px),
+    radial-gradient(circle at 82% 28%, rgba(226, 226, 235, 0.7) 0 2.5px, transparent 3.5px);
+  animation: star-orbit-spin 26s linear infinite;
+}
+
+.starfield-star__orbit::before,
+.starfield-star__orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(245, 215, 127, 0.85);
+}
+
+.starfield-star__orbit::before {
+  top: -2.5px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+}
+
+.starfield-star__orbit::after {
+  bottom: -2.5px;
+  right: 12%;
+  width: 4px;
+  height: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starfield-star,
+  .starfield-star::before,
+  .starfield-star__orbit {
+    animation: none;
+  }
+}
+
