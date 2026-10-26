@@ -620,3 +620,40 @@
     background-clip: initial;
   }
 }
+
+/* --------------------------------------------------------------------------
+ * Whole-page drifting starfield: a fixed, non-interactive layer over the void.
+ * Tiny stars glide past on an extremely slow parallax loop; kept at low opacity
+ * so chart content stays readable. Frozen under reduced-motion.
+ * ------------------------------------------------------------------------ */
+@keyframes starfield-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 240px 120px;
+  }
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 18% 30%, rgba(226, 226, 235, 0.32), transparent 60%),
+    radial-gradient(1.2px 1.2px at 70% 18%, rgba(245, 215, 127, 0.3), transparent 60%),
+    radial-gradient(1.1px 1.1px at 46% 78%, rgba(226, 226, 235, 0.28), transparent 60%),
+    radial-gradient(1px 1px at 88% 64%, rgba(245, 215, 127, 0.26), transparent 60%),
+    radial-gradient(1.3px 1.3px at 32% 58%, rgba(226, 226, 235, 0.24), transparent 60%),
+    radial-gradient(1px 1px at 62% 44%, rgba(245, 215, 127, 0.22), transparent 60%);
+  background-size: 240px 240px;
+  animation: starfield-drift 110s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+}
