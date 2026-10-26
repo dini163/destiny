@@ -136,22 +136,29 @@ function Hero() {
 /** Decorative wireframe astrolabe, positioned behind the hero copy. */
 function Astrolabe() {
   return (
-    <svg
-      viewBox="0 0 200 200"
-      fill="none"
-      stroke="currentColor"
-      aria-hidden="true"
-      className="astrolabe-slow-spin pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 text-gold opacity-10"
-    >
-      <circle cx="100" cy="100" r="95" strokeDasharray="2 3" strokeWidth="0.75" />
-      <circle cx="100" cy="100" r="82" strokeWidth="0.5" />
-      <circle cx="100" cy="100" r="64" strokeWidth="1" />
-      <circle cx="100" cy="100" r="38" strokeDasharray="4 2" strokeWidth="0.5" />
-      <path d="M100 5 V195 M5 100 H195 M33 33 L167 167 M33 167 L167 33" strokeWidth="0.5" />
-      <polygon
-        points="100,20 120,60 170,70 130,105 140,155 100,130 60,155 70,105 30,70 80,60"
-        strokeWidth="0.5"
-      />
-    </svg>
+    <>
+      <svg
+        viewBox="0 0 200 200"
+        fill="none"
+        stroke="currentColor"
+        aria-hidden="true"
+        className="astrolabe-slow-spin pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 text-gold opacity-10"
+      >
+        <circle cx="100" cy="100" r="95" strokeDasharray="2 3" strokeWidth="0.75" />
+        <circle cx="100" cy="100" r="82" strokeWidth="0.5" />
+        <circle cx="100" cy="100" r="64" strokeWidth="1" />
+        <circle cx="100" cy="100" r="38" strokeDasharray="4 2" strokeWidth="0.5" />
+        <path d="M100 5 V195 M5 100 H195 M33 33 L167 167 M33 167 L167 33" strokeWidth="0.5" />
+        <polygon
+          points="100,20 120,60 170,70 130,105 140,155 100,130 60,155 70,105 30,70 80,60"
+          strokeWidth="0.5"
+        />
+      </svg>
+      {/* Sparse twinkling stars scattered around the plate; independent of its rotation. */}
+      <span className="star-twinkle pointer-events-none absolute right-16 top-10 h-1 w-1 rounded-full bg-gold-bright shadow-[0_0_6px_rgba(245,215,127,0.9)]" style={{ animationDelay: '0s' }} />
+      <span className="star-twinkle pointer-events-none absolute right-40 top-24 h-1 w-1 rounded-full bg-gold-bright shadow-[0_0_6px_rgba(245,215,127,0.9)]" style={{ animationDelay: '1.4s' }} />
+      <span className="star-twinkle pointer-events-none absolute bottom-24 right-8 h-[3px] w-[3px] rounded-full bg-gold-bright shadow-[0_0_6px_rgba(245,215,127,0.9)]" style={{ animationDelay: '2.3s' }} />
+      <span className="star-twinkle pointer-events-none absolute bottom-40 right-32 h-[3px] w-[3px] rounded-full bg-gold-bright shadow-[0_0_6px_rgba(245,215,127,0.9)]" style={{ animationDelay: '0.8s' }} />
+    </>
   );
 }

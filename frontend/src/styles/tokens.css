@@ -580,10 +580,12 @@
 @keyframes hero-glow-breathe {
   0%,
   100% {
-    opacity: 0.82;
+    opacity: 0.8;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
   }
   50% {
     opacity: 1;
+    text-shadow: 0 0 28px rgba(245, 215, 127, 0.6);
   }
 }
 
@@ -595,9 +597,24 @@
   animation: hero-glow-breathe 6s ease-in-out infinite;
 }
 
+/* Sparse twinkling stars scattered near the astrolabe; each delays out of phase. */
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+.star-twinkle {
+  animation: star-twinkle 3.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .astrolabe-slow-spin,
-  .hero-glow-breathe {
+  .hero-glow-breathe,
+  .star-twinkle {
     animation: none;
   }
 }
