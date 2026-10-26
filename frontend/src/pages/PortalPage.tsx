@@ -13,14 +13,15 @@ import { ROUTES } from '../nav';
 type SystemFilter = PortalCategoryId | 'all';
 
 /**
- * Filter tabs with live counts derived from the catalogue (never hard-coded), so
- * adding a Phase-2 system updates the totals automatically.
+ * Filter tabs mirror the catalogue categories (never hard-coded), so adding a
+ * category to the portal picks the tab up automatically. Counts stay off the
+ * label to keep the four tabs on one line at phone widths.
  */
 const FILTER_OPTIONS: ReadonlyArray<{ value: SystemFilter; label: string }> = [
-  { value: 'all', label: `全体系 (${PORTAL_SYSTEMS.length})` },
+  { value: 'all', label: '全体系' },
   ...PORTAL_CATEGORIES.map((category) => ({
     value: category.id,
-    label: `${category.label} (${PORTAL_SYSTEMS.filter((s) => s.category === category.id).length})`,
+    label: category.label,
   })),
 ];
 
@@ -76,6 +77,7 @@ export function PortalPage() {
             value={filter}
             onChange={setFilter}
             ariaLabel="体系类目筛选"
+            className="!p-0"
           />
         </div>
 
