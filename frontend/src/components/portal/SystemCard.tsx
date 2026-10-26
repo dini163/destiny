@@ -42,7 +42,7 @@ export function SystemCard({ system }: SystemCardProps) {
       <div className="flex flex-col gap-1.5">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <h3
-            className={`font-display text-lg font-semibold ${live ? 'text-ink group-hover:text-gold-bright' : 'text-ink-variant'}`}
+            className={`whitespace-nowrap font-display text-lg font-semibold ${live ? 'text-ink group-hover:text-gold-bright' : 'text-ink-variant'}`}
           >
             {system.nameZh}
           </h3>
