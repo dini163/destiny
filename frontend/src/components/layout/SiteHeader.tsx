@@ -29,6 +29,7 @@ export function SiteHeader() {
 
           <div className="flex shrink-0 items-center gap-3">
             <UtcClock />
+            <EpochBadge />
             <Link
               to={ROUTES.profiles}
               aria-label="我的档案"
@@ -42,7 +43,7 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-gutter pt-1">
+        <div className="pt-1">
           <nav
             className="flex flex-wrap items-center gap-1"
             aria-label="全体系导航"
@@ -56,7 +57,6 @@ export function SiteHeader() {
               </Fragment>
             ))}
           </nav>
-          <EpochBadge />
         </div>
       </div>
     </header>
