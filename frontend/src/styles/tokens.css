@@ -622,38 +622,54 @@
 }
 
 /* --------------------------------------------------------------------------
- * Whole-page drifting starfield: a fixed, non-interactive layer over the void.
- * Tiny stars glide past on an extremely slow parallax loop; kept at low opacity
- * so chart content stays readable. Frozen under reduced-motion.
+ * Drifting starfield: a fixed, non-interactive layer floating above every page.
+ * Two parallax layers of tiny stars glide past at different speeds; kept small
+ * and soft so chart content stays readable. Frozen under reduced-motion.
  * ------------------------------------------------------------------------ */
 @keyframes starfield-drift {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: 240px 120px;
+    background-position: 260px 130px;
   }
 }
 
-body::before {
-  content: '';
+.starfield {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 40;
   pointer-events: none;
+}
+.starfield-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+.starfield-layer--far {
   background-image:
-    radial-gradient(1px 1px at 18% 30%, rgba(226, 226, 235, 0.32), transparent 60%),
-    radial-gradient(1.2px 1.2px at 70% 18%, rgba(245, 215, 127, 0.3), transparent 60%),
-    radial-gradient(1.1px 1.1px at 46% 78%, rgba(226, 226, 235, 0.28), transparent 60%),
-    radial-gradient(1px 1px at 88% 64%, rgba(245, 215, 127, 0.26), transparent 60%),
-    radial-gradient(1.3px 1.3px at 32% 58%, rgba(226, 226, 235, 0.24), transparent 60%),
-    radial-gradient(1px 1px at 62% 44%, rgba(245, 215, 127, 0.22), transparent 60%);
-  background-size: 240px 240px;
-  animation: starfield-drift 110s linear infinite;
+    radial-gradient(1.6px 1.6px at 18% 30%, rgba(226, 226, 235, 0.6), transparent 60%),
+    radial-gradient(1.8px 1.8px at 70% 18%, rgba(245, 215, 127, 0.55), transparent 60%),
+    radial-gradient(1.6px 1.6px at 46% 78%, rgba(226, 226, 235, 0.55), transparent 60%),
+    radial-gradient(1.6px 1.6px at 88% 64%, rgba(245, 215, 127, 0.5), transparent 60%),
+    radial-gradient(1.9px 1.9px at 32% 58%, rgba(226, 226, 235, 0.5), transparent 60%),
+    radial-gradient(1.6px 1.6px at 62% 44%, rgba(245, 215, 127, 0.5), transparent 60%);
+  background-size: 260px 260px;
+  animation: starfield-drift 120s linear infinite;
+}
+.starfield-layer--near {
+  background-image:
+    radial-gradient(2.4px 2.4px at 25% 22%, rgba(245, 215, 127, 0.8), transparent 60%),
+    radial-gradient(2px 2px at 80% 60%, rgba(226, 226, 235, 0.7), transparent 60%),
+    radial-gradient(2.2px 2.2px at 55% 85%, rgba(245, 215, 127, 0.7), transparent 60%);
+  background-size: 380px 380px;
+  animation: starfield-drift 90s linear infinite reverse;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before {
+  .starfield-layer--far,
+  .starfield-layer--near {
     animation: none;
   }
 }
+
