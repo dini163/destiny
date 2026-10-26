@@ -570,51 +570,53 @@
 
 /* --------------------------------------------------------------------------
  * Hero ambience — the wireframe astrolabe drifts almost imperceptibly slow,
- * and the gold tagline breathes. Decorative only; frozen under reduced-motion.
+ * and a sheen sweeps left to right across the gold tagline. Decorative only;
+ * frozen under reduced-motion.
  * ------------------------------------------------------------------------ */
 @keyframes astrolabe-spin {
   to {
     transform: rotate(360deg);
   }
 }
-@keyframes hero-glow-breathe {
-  0%,
-  100% {
-    opacity: 0.8;
-    text-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-  }
-  50% {
-    opacity: 1;
-    text-shadow: 0 0 28px rgba(245, 215, 127, 0.6);
-  }
-}
-
 .astrolabe-slow-spin {
   animation: astrolabe-spin 90s linear infinite;
   transform-origin: center;
 }
-.hero-glow-breathe {
-  animation: hero-glow-breathe 6s ease-in-out infinite;
-}
 
-/* Sparse twinkling stars scattered near the astrolabe; each delays out of phase. */
-@keyframes star-twinkle {
-  0%,
-  100% {
-    opacity: 0.15;
+/* A slow sheen sweeps left to right across the gold tagline; clipped to the text. */
+@keyframes hero-shimmer {
+  0% {
+    background-position: 200% 0;
   }
-  50% {
-    opacity: 0.95;
+  100% {
+    background-position: -200% 0;
   }
 }
-.star-twinkle {
-  animation: star-twinkle 3.6s ease-in-out infinite;
+.hero-shimmer {
+  background: linear-gradient(
+    90deg,
+    #d4af37 0%,
+    #f5d77f 28%,
+    #fff3c4 50%,
+    #f5d77f 72%,
+    #d4af37 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: hero-shimmer 5.5s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .astrolabe-slow-spin,
-  .hero-glow-breathe,
-  .star-twinkle {
+  .hero-shimmer {
     animation: none;
+  }
+  .hero-shimmer {
+    color: #f5d77f;
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
   }
 }
