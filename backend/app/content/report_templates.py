@@ -45,9 +45,12 @@ REPORT_SECTION_NAMES: dict[str, dict[str, str]] = {
     },
     "r2": {
         "summary": "一页摘要",
+        "profile": "命格总览：格局与用神",
+        "dimensions": "六维运势画像",
         "driver": "你的核心驱动力",
         "stress": "压力下的反应",
         "energy": "能量管理",
+        "dayun": "当前大运",
         "relationships": "关系需求与盲点",
         "experiments": "三个30天小实验",
         "evidence": "证据附录",
@@ -72,7 +75,9 @@ R1_SUMMARY_LABELS: dict[str, str] = {
     "advice": "三条优先建议",
 }
 R2_SUMMARY_LABELS: dict[str, str] = {
+    "overall": "整体命格",
     "driver": "核心驱动力",
+    "dimensions": "六维速览",
     "stress": "压力模式",
     "practice": "最值得练习的一件事",
 }
@@ -154,6 +159,30 @@ R1_WINDOW_OPENING = "未来12个月里，以下年份双方同步分较低、容
 R1_WINDOW_GOOD = "以下年份双方同步分较高，适合谈清楚重要事项或一起做新尝试：{years}。"
 R1_WINDOW_FOOTER = "时间窗口只提示节奏，不预示事件必然发生；真到那几个月，用约定好的信号沟通即可。"
 
+#: R2 §1 命格总览：四柱、格局（geju）与用神三法（yongshen）。所有事实由装配器从
+#: `chart.geju` / `chart.yongshen` 填入，本表不现编格局判语。
+R2_PROFILE_OPENING = "你的四柱为{pillars}，日主{day_master}（五行属{element}）。"
+R2_GEJU_SUCCESS = "月令取{geju}，属成格之象：{notes}"
+R2_GEJU_FAIL = (
+    "月令取{geju}，未构成完整成格（{notes}）；看命局以旺弱喜忌为主线，不以格局成败断吉凶。"
+)
+R2_GEJU_NONE = "本盘未取到月令格局，看命局以旺弱喜忌为主线。"
+R2_YONGSHEN_OPENING = "用神三法（扶抑 / 通关 / 调候）合并后：喜{favorable}、忌{unfavorable}。"
+R2_YONGSHEN_METHOD = "其中{method}一法选定{chosen}；"
+R2_YONGSHEN_METHOD_NONE = "{method}一法未另作增减；"
+R2_YONGSHEN_FOOTER = "喜用是「做什么有劲」的方向参考，不是职业或财运的保证。"
+
+#: R2 §2 六维运势画像：事业/财运/婚姻/健康/学业/人际，分数与档位（顺/平/滞）由
+#: `chart.interpretation.six_dimensions` 提供，plain 白话整段来自语料，装配器不组新句。
+R2_DIMENSIONS_OPENING = (
+    "六个生活维度按同一套账本打分（0-100），档位分顺 / 平 / 滞；分数是倾向参考，"
+    "不是事件保证，也不作职业、医疗或财务建议。"
+)
+R2_DIMENSION_HEAD = "{dimension}（{tier}，{score}分）"
+R2_DIMENSION_STRENGTHS = "优势：{items}"
+R2_DIMENSION_CAUTIONS = "留意：{items}"
+R2_DIMENSION_EMPTY_FACTOR = "这一维没有命中显著的正向或负向因子，按日常节奏平稳推进即可。"
+
 #: R2 §2 核心驱动力框架句。{day_master}/{element}/{favorable}/{unfavorable} 来自命盘。
 R2_DRIVER_OPENING = (
     "你的日主为{day_master}（五行属{element}）。命盘五行以{favorable}为喜、以{unfavorable}为忌，"
@@ -199,7 +228,7 @@ R2_ENERGY_UNFAVORABLE = {
 R2_ENERGY_SIGNALS = "容易透支的信号：睡眠质量下降、对原本感兴趣的事失去耐心、情绪阈值变低。出现这些信号时，先按上面的恢复方式给自己留出缓冲。"
 
 #: R2 §5 关系需求与盲点框架句。
-R2_RELATIONSHIP_OPENING = "在关系里，你需要的是{needs}；容易误读的，是{blindspots}。"
+R2_RELATIONSHIP_OPENING = "在关系里，你需要的是{needs}；相处时容易踩到的认知差是{blindspots}。"
 R2_RELATIONSHIP_NEEDS = {
     "木": "成长感与空间：需要被鼓励探索，也需要不被过度安排。",
     "火": "热情与回应：需要对方的主动反馈，怕冷场与敷衍。",
@@ -214,6 +243,12 @@ R2_RELATIONSHIP_BLIND = {
     "金": "容易误读「对方开玩笑」为「对方不认真」。",
     "水": "容易误读「对方直接表达」为「对方在指责」。",
 }
+
+#: R2 §7 当前大运：干支 / 年龄段 / 与命局的伏吟反吟关系，全部来自 `chart.dayun_current`。
+R2_DAYUN_OPENING = "你当前进入{ganzhi}大运（{start_age}–{end_age}岁）。"
+R2_DAYUN_RELATION = "这步运与命局{relation}：{reading}"
+R2_DAYUN_NONE = "当前未取到有效大运区间，本命参考以旺弱喜忌为主。"
+R2_DAYUN_FOOTER = "大运提示的是十年节奏倾向，具体起伏仍结合流年与个人实际经历，不作事件保证。"
 
 #: R2 §6 三个 30 天实验：可验证、可记录、可推翻（PRD §3A.3）。{area} 由装配器按关注领域/五行填。
 R2_EXPERIMENTS: list[dict[str, str]] = [
@@ -279,9 +314,12 @@ R1_ACTION_FOCUS = {
     "agreement": "把本章约定逐条写下来，放在两人都能看到的地方",
 }
 R2_ACTION_FOCUS = {
+    "profile": "把格局与喜用记在心里，先从喜用方向的一件小事试起",
+    "dimensions": "挑最顺的一维放大，给最留意的一维补一个缓冲动作",
     "driver": "把「有劲」的活动列一份清单，排进本周日程",
     "stress": "识别自己压力下的第一反应，提前为它准备一个缓冲动作",
     "energy": "按喜用五行调整本周的工作节奏与恢复方式",
+    "dayun": "在当前大运里先确定一件想推进的主线，不贪多",
     "relationships": "在下次关系沟通中，先说出自己的需求，再核对对方的需求",
 }
 R3_ACTION_FOCUS = {
