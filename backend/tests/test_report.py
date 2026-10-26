@@ -69,20 +69,32 @@ def test_r1_preview_and_generate_shape() -> None:
 
 
 def test_r2_generate_shape() -> None:
-    """R2：八章序固定，实验章三条可执行条目。"""
+    """R2：十一章序固定，实验章三条可执行条目；新章含格局/六维/大运事实。"""
     doc = client.post("/api/v1/report/r2/generate", json=_natal_request().model_dump(mode="json"))
     assert doc.status_code == 200, doc.text
     d = doc.json()
     ids = [s["id"] for s in d["sections"]]
     assert ids == [
-        "summary", "driver", "stress", "energy",
-        "relationships", "experiments", "evidence", "boundary",
+        "summary", "profile", "dimensions", "driver", "stress", "energy",
+        "dayun", "relationships", "experiments", "evidence", "boundary",
     ]
     experiments = next(s for s in d["sections"] if s["id"] == "experiments")
     assert len(experiments["bullets"]) == 3
     assert all("30天" in b or "实验" in b for b in experiments["bullets"])
     # 模板占位符 `{area}` 必须由装配器填掉（2026-10-23 走查发现 R2 实验章残留原文）。
     assert all("{" not in b and "}" not in b for b in experiments["bullets"])
+
+    profile = next(s for s in d["sections"] if s["id"] == "profile")
+    profile_text = " ".join(profile["body"])
+    assert "格局" in profile_text
+    assert "喜" in profile_text and "忌" in profile_text
+
+    dimensions = next(s for s in d["sections"] if s["id"] == "dimensions")
+    dim_heads = [b for b in dimensions["bullets"] if "（" in b and "分）" in b]
+    assert len(dim_heads) == 6, "六维各一条档位/分条"
+
+    dayun = next(s for s in d["sections"] if s["id"] == "dayun")
+    assert dayun["body"], "大运章至少有一段（无当前运时给兜底句）"
 
 
 def test_no_unfilled_template_placeholders() -> None:
