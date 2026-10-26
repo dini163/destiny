@@ -50,20 +50,9 @@ export function SiteHeader() {
             {SECONDARY_NAV.map((group, index) => (
               <Fragment key={group.title}>
                 {index > 0 && (
-                  // The Vedic/Norse divider hides when it starts a wide-screen line;
-                  // narrow screens keep it so it reads as following 西洋秘学.
-                  <span
-                    className={`mx-1.5 h-3.5 w-px shrink-0 bg-gold/25${
-                      group.title === '吠陀与北欧' ? ' lg:hidden' : ''
-                    }`}
-                  />
+                  <span className="mx-1.5 h-3.5 w-px shrink-0 bg-gold/25" />
                 )}
                 <SecondaryGroup group={group} />
-                {/* Wide screens start 吠陀与北欧 on its own line; on narrow screens
-                    the spacer hides and natural wrapping places it after 西洋秘学. */}
-                {group.title === '西洋秘学' && (
-                  <span className="hidden w-full lg:block" aria-hidden="true" />
-                )}
               </Fragment>
             ))}
           </nav>
