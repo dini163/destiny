@@ -48,7 +48,14 @@ export function SiteHeader() {
             aria-label="全体系导航"
           >
             {SECONDARY_NAV.map((group, index) => (
-              <SecondaryGroup key={group.title} group={group} first={index === 0} />
+              <Fragment key={group.title}>
+                <SecondaryGroup group={group} first={index === 0} />
+                {/* Wide screens start 吠陀与北欧 on its own line; on narrow screens
+                    the spacer hides and natural wrapping places it after 西洋秘学. */}
+                {group.title === '西洋秘学' && (
+                  <span className="hidden w-full lg:block" aria-hidden="true" />
+                )}
+              </Fragment>
             ))}
           </nav>
           <EpochBadge />
