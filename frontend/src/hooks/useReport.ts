@@ -2,9 +2,15 @@ import {
   fetchReportByLink,
   fetchReportDocument,
   fetchReportPreview,
+  fetchReportDelivery,
+  fetchReportSample,
 } from '../api/report';
 import type { ApiError } from '../api/client';
-import type { ReportDocument, ReportPreview, ReportProduct } from '../types/report';
+import type {
+  ReportDocument,
+  ReportPreview,
+  ReportProduct,
+} from '../types/report';
 import { useLastSuccessMutation } from './useLastSuccessMutation';
 
 /**
@@ -32,9 +38,30 @@ export function useReport() {
     ReportDocument,
     ApiError,
     { product: ReportProduct; orderId: string; token: string; input: unknown }
-  >(({ product, orderId, token, input }) => fetchReportByLink(product, orderId, token, input));
+  >(({ product, orderId, token, input }) =>
+    fetchReportByLink(product, orderId, token, input),
+  );
 
+  const deliveryMutation = useLastSuccessMutation<
+    ReportDocument,
+    ApiError,
+    { product: ReportProduct; id: string; token: string }
+  >(({ product, id, token }) => fetchReportDelivery(product, id, token));
+  const sampleMutation = useLastSuccessMutation<
+    ReportDocument,
+    ApiError,
+    ReportProduct
+  >(fetchReportSample);
   return {
+    deliveredDocument: deliveryMutation.data,
+    deliveryError: deliveryMutation.error,
+    isFetchingDelivery: deliveryMutation.isPending,
+    fetchDelivery: (product: ReportProduct, id: string, token: string) =>
+      deliveryMutation.mutate({ product, id, token }),
+    sampleDocument: sampleMutation.data,
+    sampleError: sampleMutation.error,
+    isFetchingSample: sampleMutation.isPending,
+    fetchSample: sampleMutation.mutate,
     preview: previewMutation.data,
     document: documentMutation.data,
     previewError: previewMutation.error,
@@ -46,7 +73,11 @@ export function useReport() {
       previewMutation.mutate({ product, input }),
     generate: (product: ReportProduct, input: unknown) =>
       documentMutation.mutate({ product, input }),
-    fetchByLink: (product: ReportProduct, orderId: string, token: string, input: unknown) =>
-      fetchMutation.mutate({ product, orderId, token, input }),
+    fetchByLink: (
+      product: ReportProduct,
+      orderId: string,
+      token: string,
+      input: unknown,
+    ) => fetchMutation.mutate({ product, orderId, token, input }),
   };
 }

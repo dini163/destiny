@@ -11,7 +11,7 @@ export type ReportProduct = 'r1' | 'r2' | 'r3';
 /** Section type, ordered by the template roster (summary → chapters → boundary). */
 export type ReportSectionKind = 'summary' | 'chapter' | 'action' | 'evidence' | 'boundary';
 
-/** Evidence confidence tier (PRD §3A.5): high 盘面事实 / medium 规则解释 / low 综合建议. */
+/** Compatible evidence categories: model ledger / traditional interpretation / practical observation. */
 export type EvidenceConfidence = 'high' | 'medium' | 'low';
 
 /** One evidence card: a claim + its chart fact + source + how it could be falsified. */
@@ -46,9 +46,10 @@ export interface ReportPreview {
   key_points: string[];
   section_count: number;
   notice: string;
+  can_generate: boolean;
 }
 
-/** Full report + stateless signed-order credentials (order_id/token/expires_at). */
+/** Full report + internal credentials or a manually issued fixed snapshot identity. */
 export interface ReportDocument {
   order_id: string;
   product: ReportProduct;

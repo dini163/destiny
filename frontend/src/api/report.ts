@@ -7,7 +7,7 @@
  * page's current form state verbatim.
  */
 
-import { apiPost } from './client';
+import { apiGet, apiPost } from './client';
 import type { ReportDocument, ReportPreview, ReportProduct } from '../types/report';
 
 /** Fetch the free preview for a product (one-page summary + key points). */
@@ -41,4 +41,11 @@ export function fetchReportByLink<TBody>(
     body,
     signal,
   );
+}
+
+export function fetchReportDelivery(product: ReportProduct, id: string, token: string): Promise<ReportDocument> {
+  return apiPost<ReportDocument>(`/report/${product}/delivery/${encodeURIComponent(id)}`, { token });
+}
+export function fetchReportSample(product: ReportProduct): Promise<ReportDocument> {
+  return apiGet<ReportDocument>(`/report/${product}/sample`);
 }

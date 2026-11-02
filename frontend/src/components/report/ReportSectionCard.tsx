@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 
 import { Icon } from '../ui/Icon';
 import type {
@@ -15,8 +15,8 @@ const CONFIDENCE_TONE: Record<EvidenceConfidence, string> = {
 };
 
 const CONFIDENCE_LABEL: Record<EvidenceConfidence, string> = {
-  high: '盘面事实',
-  medium: '规则解释',
+  high: '模型账本',
+  medium: '传统规则解释',
   low: '综合建议',
 };
 
@@ -34,22 +34,17 @@ function SummaryLine({ line }: { line: string }) {
 
 /** 一张证据卡：结论 / 盘面依据 / 出处 / 置信度 / 可推翻句。 */
 function EvidenceCard({ card }: { card: ReportEvidenceCard }) {
-  const [open, setOpen] = useState(false);
   return (
-    <article className="rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2.5">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 text-left"
-      >
+    <details className="report-evidence rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2.5">
+      <summary className="flex w-full items-center justify-between gap-2 text-left">
         <p className="text-sm font-medium leading-relaxed text-ink">{card.claim}</p>
         <span
           className={`shrink-0 rounded-full border px-2 py-0.5 text-[11px] leading-none ${CONFIDENCE_TONE[card.confidence]}`}
         >
           {CONFIDENCE_LABEL[card.confidence]}
         </span>
-      </button>
-      {open ? (
+      </summary>
+      <div className="evidence-body">
         <dl className="mt-2 flex flex-col gap-1.5 border-t border-rim-soft pt-2 text-xs text-ink-variant">
           <div>
             <dt className="label-caps text-ink-variant">盘面依据</dt>
@@ -64,8 +59,8 @@ function EvidenceCard({ card }: { card: ReportEvidenceCard }) {
             <dd className="mt-0.5 leading-relaxed">{card.falsifier}</dd>
           </div>
         </dl>
-      ) : null}
-    </article>
+      </div>
+    </details>
   );
 }
 
@@ -77,7 +72,7 @@ export function ReportSectionCard({ section, index }: { section: ReportSection; 
   const { id, title, kind } = section;
   return (
     <section
-      className="flex flex-col gap-3 rounded-card border border-gold/15 bg-gradient-to-b from-[#12161f] to-[#0e111a] p-4 sm:p-5"
+      className="report-section flex flex-col gap-3 rounded-card border border-gold/15 bg-gradient-to-b from-surface to-[var(--field-bg)] p-4 sm:p-5"
       aria-labelledby={`report-${id}`}
     >
       <div className="flex items-baseline gap-2.5">
