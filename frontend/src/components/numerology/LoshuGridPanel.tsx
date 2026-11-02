@@ -39,7 +39,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2 rounded-card border border-rim bg-[#0e111a] p-3">
+      <div className="grid grid-cols-3 gap-2 rounded-card border border-rim bg-[var(--field-bg)] p-3">
         {rows.map((row, rowIndex) =>
           row.map((cell, colIndex) => {
             if (!cell) {

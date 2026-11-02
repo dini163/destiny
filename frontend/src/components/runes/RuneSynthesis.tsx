@@ -29,7 +29,7 @@ interface RuneSynthesisProps {
 export function RuneSynthesis({ synthesis, aettBalance }: RuneSynthesisProps) {
   return (
     <ResultCard title="综合直读" eyebrow="SYNTHESIS" icon="compass">
-      <p className="rounded-element border border-rim bg-[#0e111a] p-4 text-sm leading-loose text-ink-variant">
+      <p className="rounded-element border border-rim bg-[var(--field-bg)] p-4 text-sm leading-loose text-ink-variant">
         {synthesis}
       </p>
 

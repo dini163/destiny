@@ -34,7 +34,7 @@ export function WuxingBars({ scores, missing }: WuxingBarsProps) {
                 {item.count} 见 · {percent}%
               </span>
             </div>
-            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#0e111a]">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--field-bg)]">
               <div
                 className={`h-full rounded-full ${wuxingBg(item.element)}`}
                 style={{ width: `${percent}%` }}
@@ -45,7 +45,7 @@ export function WuxingBars({ scores, missing }: WuxingBarsProps) {
         );
       })}
 
-      <p className="mt-1 flex items-center gap-2 rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2 text-xs text-ink-variant">
+      <p className="mt-1 flex items-center gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2 text-xs text-ink-variant">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
         {missing.length > 0 ? `五行缺：${missing.join('、')}` : '五行俱全，无明显偏枯。'}
       </p>

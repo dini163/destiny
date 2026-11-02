@@ -99,7 +99,7 @@ export function CoreNumberHero({ card }: { card: CoreNumber }) {
         </div>
       </div>
 
-      <div className="rounded-card border border-rim bg-[#0e111a] p-3">
+      <div className="rounded-card border border-rim bg-[var(--field-bg)] p-3">
         <ReductionLadder steps={card.steps} caption="约简运算阶梯 Recursive Breakdown" />
       </div>
 

@@ -70,7 +70,7 @@ function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
         {shown.map((row, index) => (
           <li
             key={`${row.kind}-${row.pillar_a}-${row.pillar_b}-${index}`}
-            className={`flex flex-wrap items-center justify-between gap-2 rounded-element border bg-[#0e111a] px-3 py-2 text-xs ${STRENGTH_CLASS[row.strength]}`}
+            className={`flex flex-wrap items-center justify-between gap-2 rounded-element border bg-[var(--field-bg)] px-3 py-2 text-xs ${STRENGTH_CLASS[row.strength]}`}
           >
             <span className="flex items-center gap-1.5 text-ink">
               <span>{row.character_a}</span>
@@ -114,7 +114,7 @@ function GroupBlock({ groups }: { groups: BranchGroup[] }) {
         {groups.map((group, index) => (
           <li
             key={`${group.kind}-${group.element}-${index}`}
-            className={`flex flex-wrap items-center justify-between gap-2 rounded-element border bg-[#0e111a] px-3 py-2 text-xs ${GROUP_CLASS[group.kind]}`}
+            className={`flex flex-wrap items-center justify-between gap-2 rounded-element border bg-[var(--field-bg)] px-3 py-2 text-xs ${GROUP_CLASS[group.kind]}`}
           >
             <span className="flex items-center gap-1.5 text-ink">
               <span className="label-caps text-gold-soft">{group.kind}</span>

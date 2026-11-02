@@ -30,7 +30,7 @@ export function TiYongPanel({ cast }: TiYongPanelProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2 text-xs">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2 text-xs">
         <span className="label-caps text-ink-muted">卦气 · 月令</span>
         <span className="font-display text-ink-variant">
           {wangshuai.season_zh}（{wangshuai.month_zhi}月）
@@ -54,7 +54,7 @@ export function TiYongPanel({ cast }: TiYongPanelProps) {
             {tiyong.verdict}
           </span>
         </div>
-        <PlainProse text={cast.plain_summary} className="rounded-element border border-rim-soft bg-[#0e111a] p-3" />
+        <PlainProse text={cast.plain_summary} className="rounded-element border border-rim-soft bg-[var(--field-bg)] p-3" />
         <p className="text-xs leading-relaxed text-ink-muted">{tiyong.text}</p>
       </div>
     </div>

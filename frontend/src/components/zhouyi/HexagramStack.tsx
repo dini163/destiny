@@ -79,7 +79,7 @@ function NajiaRow({ line, bian }: { line: ZhouyiLine; bian: HexagramInfo | null 
 
   const rowTone = line.moving
     ? 'bg-gold/10 ring-1 ring-inset ring-gold/25'
-    : 'bg-[#0e111a]/60 hover:bg-surface-raised';
+    : 'bg-[var(--field-bg)]/60 hover:bg-surface-raised';
 
   return (
     <div className={`${MATRIX_GRID} rounded-element px-2 py-1.5 transition-colors ${rowTone}`}>

@@ -104,7 +104,7 @@ export function DailyTimePanel() {
       <p className="mt-auto flex items-start gap-2 rounded-element border border-rim-soft bg-surface px-3 py-2 text-[11px] leading-relaxed text-ink-muted">
         <Icon name="sparkle" size={14} className="mt-0.5 shrink-0 text-gold" />
         <span>
-          本页授时以你所在时区的标准经线为基准，均时差 E(t) 由后端解析历算模型（NOAA 近似）依当前时刻实时演算，每分钟自动校准；排盘的真太阳时按输入的出生时间与出生地经度另行核算，不受本页时区影响。月相、行星落座与黄历宜忌等完整天象播报将随后续星历接口上线——当前绝不虚构。
+          本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。
         </span>
       </p>
     </div>

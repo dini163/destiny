@@ -68,18 +68,20 @@ export function QimenControls({
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <LabeledField label="占问事项 / QUESTION" hint={<span className="text-ink-muted">可选</span>}>
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+          <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <Icon name="seal" size={16} className="shrink-0 text-ink-muted" />
             <input
               type="text"
               value={question}
               onChange={(event) => onQuestionChange(event.target.value)}
-              placeholder="例如：此行洽谈可否成事？"
+              title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
+                placeholder="例如：此行洽谈可否成事？"
               className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
               aria-label="占问事项"
             />
           </div>
-        </LabeledField>
+        <p className="text-xs leading-relaxed text-ink-muted">问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。</p>
+          </LabeledField>
 
         <LabeledField label="用事时刻 / CAST TIME" hint={<span className="text-ink-muted">留空取当前</span>}>
           <ChineseDateTimeField value={castTime} onChange={onCastTimeChange} ariaLabel="用事" />

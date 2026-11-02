@@ -55,7 +55,7 @@ export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
           {entries.map((entry) => (
             <li
               key={entry.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-element border border-rim bg-[#0e111a] p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-element border border-rim bg-[var(--field-bg)] p-3"
             >
               <div className="flex min-w-0 flex-col gap-1">
                 <span className="font-display text-sm text-ink">

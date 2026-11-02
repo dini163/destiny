@@ -60,7 +60,7 @@ export function DayunTimeline({ direction, startSolar, steps, liunian }: DayunTi
             {liunian.map((year) => (
               <span
                 key={year.year}
-                className="numeric rounded-element border border-rim bg-[#0e111a] px-2.5 py-1 text-xs text-ink-variant"
+                className="numeric rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1 text-xs text-ink-variant"
               >
                 {year.year} · {year.age}岁 · <span className="text-gold-soft">{year.ganzhi}</span>
               </span>

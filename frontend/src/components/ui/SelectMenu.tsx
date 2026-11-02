@@ -216,7 +216,7 @@ export function SelectMenu({
 
   const triggerClass =
     variant === 'field'
-      ? `w-full justify-between gap-2 rounded-element border bg-[#0e111a] px-3 py-2 text-sm ${
+      ? `w-full justify-between gap-2 rounded-element border bg-[var(--field-bg)] px-3 py-2 text-sm ${
           open ? 'border-rim-strong' : 'border-rim'
         } focus-visible:border-rim-strong focus-visible:ring-1 focus-visible:ring-gold/40`
       : `min-w-0 gap-0.5 rounded-md bg-transparent px-1 py-1 text-sm ${

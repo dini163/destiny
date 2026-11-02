@@ -110,7 +110,7 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
         <span className="label-caps mr-1.5 text-gold-soft">名义</span>
         {rune.name_meaning}
         {rune.name_meaning_uncertain ? (
-          <span className="label-caps ml-2 rounded-element border border-rim bg-[#0e111a] px-1.5 py-0.5 text-ink-muted">
+          <span className="label-caps ml-2 rounded-element border border-rim bg-[var(--field-bg)] px-1.5 py-0.5 text-ink-muted">
             名义不确定
           </span>
         ) : null}
@@ -123,7 +123,7 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
             {rune.upright_keywords.map((keyword) => (
               <span
                 key={keyword}
-                className="label-caps rounded-element border border-rim bg-[#0e111a] px-1.5 py-0.5 text-ink-muted"
+                className="label-caps rounded-element border border-rim bg-[var(--field-bg)] px-1.5 py-0.5 text-ink-muted"
               >
                 {keyword}
               </span>
@@ -144,7 +144,7 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
                 {rune.reversed_keywords.map((keyword) => (
                   <span
                     key={keyword}
-                    className="label-caps rounded-element border border-rim bg-[#0e111a] px-1.5 py-0.5 text-ink-muted"
+                    className="label-caps rounded-element border border-rim bg-[var(--field-bg)] px-1.5 py-0.5 text-ink-muted"
                   >
                     {keyword}
                   </span>
@@ -216,7 +216,7 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
       />
 
       {hitCount === 0 ? (
-        <p className="rounded-element border border-rim bg-[#0e111a] p-4 text-sm text-ink-muted">
+        <p className="rounded-element border border-rim bg-[var(--field-bg)] p-4 text-sm text-ink-muted">
           没有对得上的条目。清空检索框可以看整部典。
         </p>
       ) : (
@@ -225,7 +225,7 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
             {rails.map(({ group, hits }) => (
               <section
                 key={group.key}
-                className="flex flex-col gap-3 rounded-element border border-rim bg-[#0e111a] p-3"
+                className="flex flex-col gap-3 rounded-element border border-rim bg-[var(--field-bg)] p-3"
               >
                 <header className="flex flex-col gap-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -252,7 +252,7 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
           </div>
 
           {wyrdVisible ? (
-            <section className="flex flex-col gap-3 rounded-element border border-arcane/30 bg-[#0e111a] p-3">
+            <section className="flex flex-col gap-3 rounded-element border border-arcane/30 bg-[var(--field-bg)] p-3">
               <header className="flex flex-wrap items-center gap-2">
                 <h3 className="font-display text-base text-ink">{codex.wyrd.name_zh}</h3>
                 <span className="label-caps rounded-element border border-arcane/40 bg-arcane/10 px-1.5 py-0.5 text-[#c7cbff]">

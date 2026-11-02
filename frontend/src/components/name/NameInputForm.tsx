@@ -113,7 +113,7 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <LabeledField label="姓氏（1–2 字）">
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+          <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <input
               className="w-full bg-transparent font-display text-base text-ink outline-none"
               value={surname}
@@ -124,7 +124,7 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
           </div>
         </LabeledField>
         <LabeledField label="名字（1–3 字）">
-          <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+          <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <input
               className="w-full bg-transparent font-display text-base text-ink outline-none"
               value={given}

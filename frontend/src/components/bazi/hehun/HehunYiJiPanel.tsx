@@ -19,7 +19,7 @@ export function HehunYiJiPanel({ yiJi }: { yiJi: HehunYiJi }) {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {yiJi.groups.map((group) => (
-          <div key={group.kind} className="flex flex-col gap-2 rounded-element bg-[#0e111a] p-3">
+          <div key={group.kind} className="flex flex-col gap-2 rounded-element bg-[var(--field-bg)] p-3">
             <span className="label-caps text-gold">{annotateGenderTerms(group.kind)}</span>
             {group.items.length === 0 ? (
               <span className="text-xs text-ink-muted">无</span>

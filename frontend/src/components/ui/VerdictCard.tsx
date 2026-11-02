@@ -14,7 +14,7 @@ export function VerdictCard({ verdict }: { verdict: Verdict }) {
   const stars = '★★★★★'.slice(0, verdict.stars) + '☆☆☆☆☆'.slice(0, 5 - verdict.stars);
 
   return (
-    <section className="flex flex-col gap-3 rounded-card border border-gold/25 bg-gradient-to-br from-[#141823] to-[#0e111a] p-4 sm:p-5">
+    <section className="flex flex-col gap-3 rounded-card border border-gold/25 bg-gradient-to-br from-surface-raised to-[var(--field-bg)] p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
           <span className="label-caps">综合结论</span>
@@ -33,14 +33,14 @@ export function VerdictCard({ verdict }: { verdict: Verdict }) {
           {verdict.points.map((point) => (
             <li
               key={point}
-              className="rounded-element border border-rim bg-[#0e111a] px-2.5 py-1 text-xs text-ink-variant"
+              className="rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1 text-xs text-ink-variant"
             >
               {point}
             </li>
           ))}
         </ul>
       ) : null}
-      <div className="flex items-start gap-2 rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2.5">
+      <div className="flex items-start gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2.5">
         <Icon name="sparkle" size={16} className="mt-0.5 shrink-0 text-gold" />
         <p className="text-sm leading-relaxed text-ink">{verdict.advice}</p>
       </div>

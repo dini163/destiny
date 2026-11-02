@@ -76,7 +76,7 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
 
       <ScoreLedger score={score} label="强弱三因子合计（得令 / 得地 / 得势）" />
 
-      <p className="rounded-element border border-rim-soft bg-[#0e111a] p-3 text-sm leading-relaxed text-ink-variant">
+      <p className="rounded-element border border-rim-soft bg-[var(--field-bg)] p-3 text-sm leading-relaxed text-ink-variant">
         {analysis.summary}
       </p>
     </div>

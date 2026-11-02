@@ -57,7 +57,7 @@ export function PersonalCyclePanel({ cycles }: { cycles: PersonalCycles }) {
         <article className="flex flex-col gap-3 rounded-card border border-gold/40 bg-surface-raised p-4 lg:col-span-5">
           <span className="label-caps text-gold">{cycles.year.label}</span>
           <CycleFigure cycle={cycles.year} emphasized />
-          <div className="rounded-element border border-rim bg-[#0e111a] p-2.5">
+          <div className="rounded-element border border-rim bg-[var(--field-bg)] p-2.5">
             <ReductionLadder steps={cycles.year.steps} caption="流年推导演算法" compact />
           </div>
           <div className="mt-auto">
@@ -73,7 +73,7 @@ export function PersonalCyclePanel({ cycles }: { cycles: PersonalCycles }) {
             >
               <span className="label-caps text-ink-muted">{cycle.label}</span>
               <CycleFigure cycle={cycle} emphasized={false} />
-              <div className="rounded-element border border-rim bg-[#0e111a] p-2.5">
+              <div className="rounded-element border border-rim bg-[var(--field-bg)] p-2.5">
                 <ReductionLadder steps={cycle.steps} compact />
               </div>
               <div className="mt-auto">

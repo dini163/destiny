@@ -37,7 +37,7 @@ export function LetterMapTable({ columns, letters, input }: LetterMapTableProps)
           {columns.map((column) => (
             <div
               key={column.value}
-              className="flex flex-col items-center gap-1 rounded-element border border-rim bg-[#0e111a] p-2"
+              className="flex flex-col items-center gap-1 rounded-element border border-rim bg-[var(--field-bg)] p-2"
             >
               <span className="numeric text-xl font-semibold text-gold-bright">{column.value}</span>
               <span aria-hidden="true" className="h-px w-6 bg-gold/25" />

@@ -118,7 +118,7 @@ export function BindruneForge({ codex }: BindruneForgeProps) {
 /** 组合里单枚符文的名义与正位关键词。 */
 function SelectedRuneRow({ rune }: { rune: CodexRune }) {
   return (
-    <li className="flex flex-col gap-1 rounded-element border border-rim bg-[#0e111a] p-3">
+    <li className="flex flex-col gap-1 rounded-element border border-rim bg-[var(--field-bg)] p-3">
       <div className="flex flex-wrap items-center gap-2">
         <span aria-hidden="true" className="text-2xl text-gold-bright">
           {rune.glyph}

@@ -57,7 +57,7 @@ export function RuneStone({ stone }: RuneStoneProps) {
           </span>
           <span className="text-sm font-medium text-ink">{stone.position_label_zh}</span>
         </span>
-        <span className="label-caps rounded-element border border-rim bg-[#0e111a] px-2 py-0.5 text-ink-muted">
+        <span className="label-caps rounded-element border border-rim bg-[var(--field-bg)] px-2 py-0.5 text-ink-muted">
           {stone.position_label}
         </span>
       </header>
@@ -159,7 +159,7 @@ export function RuneStone({ stone }: RuneStoneProps) {
 
         <p className="text-sm leading-relaxed text-ink">{stone.meaning}</p>
 
-        <p className="rounded-element border border-rim bg-[#0e111a] p-2.5 text-xs leading-relaxed text-ink-muted">
+        <p className="rounded-element border border-rim bg-[var(--field-bg)] p-2.5 text-xs leading-relaxed text-ink-muted">
           <span className="label-caps mr-1.5 text-gold-soft">位次</span>
           {stone.position_meaning}
         </p>

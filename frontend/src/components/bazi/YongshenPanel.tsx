@@ -27,7 +27,7 @@ export function YongshenPanel({ yongshen }: { yongshen: Yongshen }) {
 /** The merged verdict as a row of five-element chips. */
 function ElementLine({ label, elements }: { label: string; elements: string[] }) {
   return (
-    <div className="flex items-center justify-between gap-2 rounded-element bg-[#0e111a] px-3 py-2">
+    <div className="flex items-center justify-between gap-2 rounded-element bg-[var(--field-bg)] px-3 py-2">
       <span className="label-caps">{label}</span>
       <span className="flex flex-wrap items-center justify-end gap-1.5">
         {elements.length > 0 ? (
@@ -48,7 +48,7 @@ function ElementLine({ label, elements }: { label: string; elements: string[] })
 function MethodLine({ method }: { method: YongshenMethod }) {
   const silent = method.chosen_elements.length === 0;
   return (
-    <li className="flex flex-col gap-1.5 rounded-element border border-rim bg-[#0e111a] p-3">
+    <li className="flex flex-col gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-display text-base text-ink">{method.method}</span>
         <span className="numeric text-xs text-ink-muted">{method.fired_rule}</span>

@@ -36,7 +36,7 @@ export function ShenShaList({ entries }: { entries: ShenShaEntry[] }) {
 /** One hit: name, quality and landing chips on the summary line; meaning on open. */
 function ShenShaRow({ entry }: { entry: ShenShaEntry }) {
   return (
-    <li className={`rounded-element border bg-[#0e111a] ${QUALITY_CLASS[entry.quality]}`}>
+    <li className={`rounded-element border bg-[var(--field-bg)] ${QUALITY_CLASS[entry.quality]}`}>
       <details>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 [&::-webkit-details-marker]:hidden">
           <span className="flex items-baseline gap-2">

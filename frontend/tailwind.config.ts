@@ -8,45 +8,45 @@ export default {
     extend: {
       colors: {
         // Void & canvas (obsidian deep)
-        void: '#0B0D13',
+        void: 'rgb(var(--void-rgb) / <alpha-value>)',
         surface: {
-          DEFAULT: '#121622',
-          raised: '#171C2B',
+          DEFAULT: 'rgb(var(--surface-1-rgb) / <alpha-value>)',
+          raised: 'rgb(var(--surface-2-rgb) / <alpha-value>)',
         },
         // Celestial gold
         gold: {
-          DEFAULT: '#D4AF37',
-          bright: '#F5D77F',
-          soft: '#E6C65C',
-          muted: '#997B24',
+          DEFAULT: 'rgb(var(--gold-rgb) / <alpha-value>)',
+          bright: 'rgb(var(--gold-bright-rgb) / <alpha-value>)',
+          soft: 'rgb(var(--gold-soft-rgb) / <alpha-value>)',
+          muted: 'rgb(var(--gold-muted-rgb) / <alpha-value>)',
         },
         // Eastern five elements (wuxing)
         wuxing: {
-          wood: '#2DD4BF',
-          fire: '#F43F5E',
-          earth: '#EAB308',
-          metal: '#F1F5F9',
-          water: '#38BDF8',
+          wood: 'rgb(var(--wuxing-wood-rgb) / <alpha-value>)',
+          fire: 'rgb(var(--wuxing-fire-rgb) / <alpha-value>)',
+          earth: 'rgb(var(--wuxing-earth-rgb) / <alpha-value>)',
+          metal: 'rgb(var(--wuxing-metal-rgb) / <alpha-value>)',
+          water: 'rgb(var(--wuxing-water-rgb) / <alpha-value>)',
         },
         // Western celestial & esoteric accents
-        astral: '#818CF8',
-        arcane: '#A855F7',
+        astral: 'rgb(var(--astral-rgb) / <alpha-value>)',
+        arcane: 'rgb(var(--arcane-rgb) / <alpha-value>)',
         // Foreground ink (on-surface / parchment variant / muted label)
         ink: {
-          DEFAULT: '#E2E2EB',
-          variant: '#D0C5AF',
-          muted: '#948C79',
+          DEFAULT: 'rgb(var(--ink-rgb) / <alpha-value>)',
+          variant: 'rgb(var(--ink-variant-rgb) / <alpha-value>)',
+          muted: 'rgb(var(--ink-muted-rgb) / <alpha-value>)',
         },
         // Hairline gilded wireframe used to frame glass surfaces
         rim: {
-          DEFAULT: 'rgba(212, 175, 55, 0.14)',
-          soft: 'rgba(212, 175, 55, 0.10)',
-          strong: 'rgba(212, 175, 55, 0.40)',
+          DEFAULT: 'rgb(var(--rim-rgb) / 0.25)',
+          soft: 'rgb(var(--rim-rgb) / 0.15)',
+          strong: 'rgb(var(--rim-rgb) / 0.55)',
         },
       },
       fontFamily: {
         display: ['"Noto Serif SC"', '"Noto Serif"', '"Songti SC"', 'serif'],
-        body: ['Inter', '"Noto Sans SC"', 'system-ui', 'sans-serif'],
+        body: ['"Microsoft YaHei"', '"PingFang SC"', 'system-ui', 'sans-serif'],
         numeric: ['"Space Grotesk"', '"Noto Sans SC"', 'monospace'],
       },
       spacing: {

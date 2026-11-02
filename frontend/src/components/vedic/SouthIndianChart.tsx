@@ -59,7 +59,7 @@ export function SouthIndianChart({ chart }: SouthIndianChartProps) {
         })}
 
         <div
-          className="flex flex-col items-center justify-center gap-1 bg-[#0e111a] p-2 text-center"
+          className="flex flex-col items-center justify-center gap-1 bg-[var(--field-bg)] p-2 text-center"
           style={{ gridRowStart: 2, gridRowEnd: 4, gridColumnStart: 2, gridColumnEnd: 4 }}
         >
           <span className="label-caps text-ink-muted">南印盘 · SOUTH INDIAN</span>

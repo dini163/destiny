@@ -86,7 +86,7 @@ export function ZiweiPage() {
             onChange={(event) => setName(event.target.value)}
             maxLength={40}
             placeholder="如：示例命主"
-            className="w-full rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
+            className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
           />
         </LabeledField>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-ink-variant">
@@ -210,7 +210,7 @@ function ChartSummary({ chart }: { chart: ZiweiChart }) {
 /** A compact label/value chip used in the summary header. */
 function Chip({ label, value }: { label: string; value: string }) {
   return (
-    <span className="flex items-center gap-1.5 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1 text-xs">
+    <span className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1 text-xs">
       <span className="label-caps">{label}</span>
       <span className="text-ink">{value}</span>
     </span>

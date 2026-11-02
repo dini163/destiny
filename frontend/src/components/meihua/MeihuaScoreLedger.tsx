@@ -33,7 +33,7 @@ export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
           <span className={`font-display text-xl font-semibold ${verdictText(band)}`}>{band}</span>
         </div>
 
-        <div className="h-2 w-full overflow-hidden rounded-full bg-[#0e111a] ring-1 ring-inset ring-rim">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--field-bg)] ring-1 ring-inset ring-rim">
           <div className={`h-2 rounded-full ${scoreBarClass(score)}`} style={{ width: `${score}%` }} />
         </div>
       </div>

@@ -112,7 +112,7 @@ function SegmentBlock({
     (row) => row.year >= segment.start_year && row.year <= segment.end_year,
   );
   return (
-    <div className="flex flex-col gap-2 rounded-card border border-rim bg-[#0e111a] p-4">
+    <div className="flex flex-col gap-2 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-sm text-ink">{annotateGenderTerms(segment.label)}</span>
         <span className="numeric text-xs text-ink-muted">

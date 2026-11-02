@@ -34,7 +34,7 @@ export function TrueSolarTimeBadge({ date, time, longitude }: TrueSolarTimeBadge
 
   if (params === null) {
     return (
-      <p className="flex items-center gap-2 rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2 text-sm text-ink-muted">
+      <p className="flex items-center gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2 text-sm text-ink-muted">
         <Icon name="sun" size={16} className="shrink-0 text-gold-muted" />
         填写出生日期、时间并定位后，此处按经度与均时差显示真太阳时校准。
       </p>
@@ -42,7 +42,7 @@ export function TrueSolarTimeBadge({ date, time, longitude }: TrueSolarTimeBadge
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-element border border-rim bg-[#0e111a] px-4 py-3 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-element border border-rim bg-[var(--field-bg)] px-4 py-3 md:flex-row md:items-center md:justify-between">
       <div className="flex items-start gap-3">
         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
           <Icon name="sun" size={18} />

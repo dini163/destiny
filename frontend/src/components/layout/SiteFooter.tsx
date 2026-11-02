@@ -1,5 +1,6 @@
 import { Icon } from '../ui/Icon';
 import { BrandMark } from './BrandMark';
+import { LocalDataControls } from '../ui/LocalDataControls';
 
 /** PRD §4.3 — the site-wide compliance disclaimer, reproduced verbatim. */
 const DISCLAIMER =
@@ -26,7 +27,7 @@ const SEALS: Seal[] = [
   {
     title: '隐私与天机安全',
     caption: 'PRIVACY · STATELESS',
-    body: '后端为无状态纯计算 API：无账号、无数据库、不下发 cookie，排盘与推演结果算完即弃、不在服务端留存；浏览器端除「我的档案」外不做任何本地持久化 —— 档案只存于你的设备，可随时编辑删除，其余输入关闭页面即无痕。',
+    body: '普通排盘不在服务端保存。我的档案、卢恩秘匣和主题偏好保存在本机浏览器；报告输入在当前标签页暂存。人工确认交付的报告会在服务端保存固定版本直至到期清理。下钻链接可能包含生辰和地点，请勿公开转发；浏览器历史、下载文件和服务访问日志需分别管理。',
   },
 ];
 
@@ -36,7 +37,7 @@ const SEALS: Seal[] = [
  */
 export function SiteFooter() {
   return (
-    <footer className="border-t border-rim bg-void/80 backdrop-blur-xl">
+    <footer className="site-footer border-t border-rim bg-void/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1536px] flex-col gap-gutter px-gutter py-margin">
         <div className="panel flex flex-col gap-4 p-5 md:flex-row md:items-center md:gap-6">
           <div className="flex shrink-0 items-center gap-2 text-gold">
@@ -46,7 +47,7 @@ export function SiteFooter() {
           <p className="text-sm leading-relaxed text-ink-variant">{DISCLAIMER}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
+        <details className="footer-details"><summary>了解排盘依据与隐私保存</summary><div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
           {SEALS.map((seal) => (
             <div key={seal.title} className="flex flex-col gap-2">
               <span className="label-caps text-gold">{seal.caption}</span>
@@ -56,6 +57,7 @@ export function SiteFooter() {
           ))}
         </div>
 
+        </details><LocalDataControls />
         <div className="flex flex-col items-center justify-between gap-4 border-t border-rim pt-6 sm:flex-row">
           <BrandMark />
           <div className="label-caps flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
@@ -63,7 +65,7 @@ export function SiteFooter() {
             <span className="hidden h-3 w-px bg-rim sm:block" />
             <span>PRECISION CELESTIAL CALCULATOR</span>
             <span className="hidden h-3 w-px bg-rim sm:block" />
-            <span>© 2025 DESTINY</span>
+            <span>© DESTINY</span>
           </div>
         </div>
       </div>

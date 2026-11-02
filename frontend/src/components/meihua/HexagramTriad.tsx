@@ -104,7 +104,7 @@ function RoleChip({ role, trigram, accent }: { role: string; trigram: MeihuaTrig
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-element px-2 py-0.5 text-[11px] ${
-        accent ? 'bg-gold/15 text-gold' : 'border border-rim bg-[#0e111a] text-ink-variant'
+        accent ? 'bg-gold/15 text-gold' : 'border border-rim bg-[var(--field-bg)] text-ink-variant'
       }`}
     >
       <span className="font-semibold">{role}</span>

@@ -41,7 +41,7 @@ export function LiushiQiWaveform({
   const peak = hours[peakIndex];
   return (
     <div className="flex flex-col gap-2">
-      <div className="relative h-[120px] w-full rounded-element border border-rim bg-[#0e111a]">
+      <div className="relative h-[120px] w-full rounded-element border border-rim bg-[var(--field-bg)]">
         <div
           className="pointer-events-none absolute inset-x-0 border-t border-dashed border-gold/40"
           style={{ bottom: `${baseline}%` }}

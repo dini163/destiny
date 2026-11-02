@@ -98,17 +98,19 @@ export function CastControls({
 
         <div className="flex flex-col gap-4 xl:col-span-5">
           <LabeledField label="所占之事 / QUESTION" hint={<span className="text-ink-muted">可选</span>}>
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <Icon name="seal" size={16} className="shrink-0 text-ink-muted" />
               <input
                 type="text"
                 value={question}
                 onChange={(event) => onQuestionChange(event.target.value)}
+                title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
                 placeholder="例如：本月求谋可否得成？"
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 aria-label="所占之事"
               />
             </div>
+          <p className="text-xs leading-relaxed text-ink-muted">问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。</p>
           </LabeledField>
 
           <LabeledField label="起卦时刻 / CAST TIME" hint={<span className="text-ink-muted">留空取当前</span>}>
@@ -164,7 +166,7 @@ function CoinThrowEditor({
           return (
             <div
               key={throwIndex}
-              className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a]/60 px-2.5 py-2"
+              className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)]/60 px-2.5 py-2"
             >
               <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">第{throwIndex + 1}掷</span>
               <div className="flex items-center gap-1">

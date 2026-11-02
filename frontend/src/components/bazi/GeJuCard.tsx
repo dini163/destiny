@@ -31,7 +31,7 @@ export function GeJuCard({ geju }: { geju: GeJu }) {
         {geju.notes.map((note, index) => (
           <li
             key={`${geju.name}-${index}`}
-            className="rounded-element border border-rim bg-[#0e111a] p-2.5 text-sm leading-relaxed text-ink-variant"
+            className="rounded-element border border-rim bg-[var(--field-bg)] p-2.5 text-sm leading-relaxed text-ink-variant"
           >
             {note}
           </li>

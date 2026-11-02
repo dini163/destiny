@@ -60,7 +60,7 @@ function FamilyBlock({ family, rows }: { family: string; rows: TransitFired[] })
         {rows.map((row) => (
           <li
             key={row.key}
-            className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-element bg-[#0e111a] px-3 py-2 text-xs"
+            className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-element bg-[var(--field-bg)] px-3 py-2 text-xs"
           >
             <span className="text-ink">{row.label}</span>
             <span className={`numeric ${row.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>

@@ -88,7 +88,7 @@ function QuadrantCell({ cell }: { cell: HehunComplementCell | undefined }) {
     return <p className="px-3 py-2 text-xs text-wuxing-fire">契约缺格</p>;
   }
   return (
-    <div className="flex h-full flex-col gap-1.5 rounded-element bg-[#0e111a] p-2.5">
+    <div className="flex h-full flex-col gap-1.5 rounded-element bg-[var(--field-bg)] p-2.5">
       <div className="flex items-baseline justify-between gap-2">
         <span className="font-display text-sm text-ink">{cell.name}</span>
         <span className={`numeric ${cell.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>

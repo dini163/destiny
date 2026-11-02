@@ -27,7 +27,7 @@ export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTable
             className={`flex w-full flex-wrap items-center gap-x-4 gap-y-2 rounded-element border px-4 py-3 text-left transition ${
               year.year === focusYear
                 ? 'border-gold/60 bg-gold/10'
-                : 'border-rim bg-[#0e111a] hover:border-rim-strong'
+                : 'border-rim bg-[var(--field-bg)] hover:border-rim-strong'
             }`}
           >
             <span className="flex w-14 shrink-0 flex-col">

@@ -169,7 +169,7 @@ function CastSummary({ cast }: { cast: MeihuaCast }) {
         <Meta label="用卦" value={`${cast.yong.trigram.name_zh}${cast.yong.trigram.element}`} />
       </dl>
 
-      <div className="flex flex-col gap-1 rounded-element border border-rim-soft bg-[#0e111a] px-3 py-2">
+      <div className="flex flex-col gap-1 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2">
         <span className="label-caps text-ink-muted">起卦推演 · DERIVATION</span>
         <p className="numeric text-xs leading-relaxed text-ink-variant">{derivation.formula}</p>
         <p className="text-[11px] leading-relaxed text-ink-muted">{derivation.inputs}</p>

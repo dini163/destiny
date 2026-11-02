@@ -52,7 +52,7 @@ function SideColumn({
 }) {
   const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
-    <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
+    <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
 
       <LabeledField label={`称谓（${caption}，仅回显）`}>
@@ -61,7 +61,7 @@ function SideColumn({
           onChange={(event) => onChange({ name: event.target.value })}
           maxLength={40}
           placeholder={placeholder}
-          className="w-full rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
+          className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
           aria-label={`${caption}称谓`}
         />
       </LabeledField>
@@ -87,7 +87,7 @@ function SideColumn({
       </LabeledField>
 
       <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">小时</span>}>
-        <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+        <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
           <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
           <input
             type="number"

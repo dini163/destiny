@@ -33,8 +33,8 @@ export function LiushiHourCell({
         isFocused
           ? 'border-gold bg-gold/10'
           : isPeak
-            ? 'border-rim-strong bg-[#0e111a]'
-            : 'border-rim bg-[#0e111a]'
+            ? 'border-rim-strong bg-[var(--field-bg)]'
+            : 'border-rim bg-[var(--field-bg)]'
       }`}
     >
       <span className="flex items-baseline justify-between gap-1">

@@ -49,7 +49,7 @@ export function LiushiFocusCard({ detail }: { detail: TransitHourDetail }) {
 
       <div className="flex flex-col gap-3">
         <span className="label-caps text-ink-muted">流时之干论十神</span>
-        <div className="flex flex-col gap-1.5 rounded-element bg-[#0e111a] px-3 py-2.5">
+        <div className="flex flex-col gap-1.5 rounded-element bg-[var(--field-bg)] px-3 py-2.5">
           <span className="font-display text-base text-ink">{detail.ten_god.god}</span>
           <p className="text-sm leading-relaxed text-ink-variant">{detail.ten_god.meaning}</p>
           <span className="self-end">

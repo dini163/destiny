@@ -53,7 +53,7 @@ export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
                   <td
                     key={female}
                     className={`align-top rounded-element p-2 ${
-                      hits.length > 0 ? 'bg-surface-raised' : 'bg-[#0e111a]'
+                      hits.length > 0 ? 'bg-surface-raised' : 'bg-[var(--field-bg)]'
                     } ${palace ? 'outline outline-1 outline-rim-strong' : ''}`}
                   >
                     {hits.length === 0 ? (

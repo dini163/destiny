@@ -11,12 +11,13 @@ import { Starfield } from './Starfield';
  * its astronomical seals. No sidebar — every destination shares this one chrome.
  */
 export function AppShell() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   // Reset scroll on navigation so each destination starts at the top of its chart.
   useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, [pathname]);
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+    else window.scrollTo({ top: 0 });
+  }, [pathname, hash]);
 
   return (
     <>

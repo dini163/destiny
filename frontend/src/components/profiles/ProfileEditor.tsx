@@ -120,7 +120,7 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <LabeledField label="档案名（必填）" hint="如 我自己 / 父亲 / 长子">
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <input
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={label}
@@ -131,7 +131,7 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
             </div>
           </LabeledField>
           <LabeledField label="姓名" hint="供姓名学 / 毕氏灵数使用">
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <input
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={name}
@@ -145,7 +145,7 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <LabeledField label="姓氏（供姓名学拆分）">
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <input
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={surname}
@@ -156,7 +156,7 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
             </div>
           </LabeledField>
           <LabeledField label="名字">
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <input
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={given}

@@ -94,7 +94,7 @@ export function RuneStoneGrid({ spreadId, stones, reversibleNote }: RuneStoneGri
         ))}
       </div>
 
-      <p className="relative mt-4 rounded-element border border-rim bg-[#0e111a] p-3 text-xs leading-relaxed text-ink-muted">
+      <p className="relative mt-4 rounded-element border border-rim bg-[var(--field-bg)] p-3 text-xs leading-relaxed text-ink-muted">
         <span className="label-caps mr-1.5 text-gold-soft">逆位判据</span>
         {reversibleNote}
       </p>

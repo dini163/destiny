@@ -90,7 +90,7 @@ export function HexagramCard({ hexagram, moving, note }: HexagramCardProps) {
 /** A small neutral metadata pill. */
 function Chip({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-element border border-rim bg-[#0e111a] px-2 py-0.5 text-[11px] text-ink-variant">
+    <span className="inline-flex items-center rounded-element border border-rim bg-[var(--field-bg)] px-2 py-0.5 text-[11px] text-ink-variant">
       {children}
     </span>
   );

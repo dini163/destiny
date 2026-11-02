@@ -86,7 +86,7 @@ function PalaceCell({ palace }: { palace: QimenPalace }) {
       </div>
 
       {/* 天盘干 / 地盘干 */}
-      <div className="flex flex-1 flex-col items-center justify-center rounded-element border border-rim-soft bg-[#0e111a] px-1 py-1">
+      <div className="flex flex-1 flex-col items-center justify-center rounded-element border border-rim-soft bg-[var(--field-bg)] px-1 py-1">
         <div className="flex items-center gap-1.5">
           {palace.tianpan_gan.map((gan, index) => (
             <span

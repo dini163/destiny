@@ -33,7 +33,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
         （非字母字符由引擎跳过并另行如实报数）。
       </p>
 
-      <div className="grid grid-cols-3 gap-2 rounded-card border border-rim bg-[#0e111a] p-3">
+      <div className="grid grid-cols-3 gap-2 rounded-card border border-rim bg-[var(--field-bg)] p-3">
         {rows.map((row, rowIndex) =>
           row.map((cell, colIndex) => {
             if (!cell) {

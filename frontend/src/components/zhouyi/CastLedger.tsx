@@ -24,7 +24,7 @@ export function CastLedger({ lines }: CastLedgerProps) {
         return (
           <div
             key={line.position}
-            className="flex items-center gap-2 rounded-element border border-rim-soft bg-[#0e111a]/60 px-2.5 py-1.5"
+            className="flex items-center gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)]/60 px-2.5 py-1.5"
           >
             <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">第{line.position}掷</span>
             <span className="w-9 shrink-0 font-display text-xs text-ink-variant">

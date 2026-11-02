@@ -9,7 +9,7 @@ export function TenGodList({ readings }: { readings: TenGodReading[] }) {
       {readings.map((reading) => (
         <li
           key={reading.ten_god}
-          className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1.5 text-xs"
+          className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 text-xs"
           title={`${reading.meaning}｜${reading.source}`}
         >
           <span className="text-ink">{reading.ten_god}</span>

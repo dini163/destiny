@@ -178,7 +178,7 @@ describe('不变式 4：每个 pages/<X>.tsx 必须被 router.tsx 引且渲染�
       .filter((p) => {
         const name = p.replace(/^pages\//, '').replace(/\.tsx$/, '');
         return (
-          !router.includes(`from './pages/${name}'`) || !new RegExp(`<${name}[\\s/>]`).test(router)
+          !(router.includes(`from './pages/${name}'`) || router.includes(`import('./pages/${name}')`)) || !new RegExp(`<${name}[\\s/>]`).test(router)
         );
       })
       .map((p) => `${p} 未被 router.tsx import 并渲染`);

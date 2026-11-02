@@ -1,108 +1,89 @@
-import { Fragment } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-
-import { PRIMARY_NAV, ROUTES, SECONDARY_NAV, type NavGroup, type NavItem } from '../../nav';
+import { useEffect, useRef } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { ROUTES, SECONDARY_NAV } from '../../nav';
 import { Icon } from '../ui/Icon';
+import { ThemeToggle } from '../ui/ThemeToggle';
 import { BrandMark } from './BrandMark';
-import { EpochBadge, UtcClock } from './StatusClock';
 
-/**
- * Persistent top navigation (PRD §2): brand, primary Phase-1 bar, live status
- * telemetry and utility shortcuts on row 1; the full multi-civilization catalog on
- * row 2. Sticky to the viewport so every route shares one chrome; the catalog row
- * wraps onto extra lines on narrow screens instead of scrolling out of view.
- */
+/** Native dialog supplies focus trapping, Escape and focus restoration for the catalogue. */
 export function SiteHeader() {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const location = useLocation();
+  useEffect(() => {
+    if (dialog.current?.open) dialog.current.close();
+  }, [location.pathname, location.hash]);
   return (
-    <header className="sticky top-0 z-50 border-b border-rim bg-void/90 shadow-[0_4px_24px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-[1536px] flex-col justify-between px-gutter py-3">
-        <div className="flex h-16 items-center justify-between gap-gutter">
-          <Link to={ROUTES.overview} className="shrink-0" aria-label="Destiny 测算大厅">
-            <BrandMark />
-          </Link>
-
-          <nav className="hidden items-center gap-1 xl:flex" aria-label="主导航">
-            {PRIMARY_NAV.map((item) => (
-              <PrimaryLink key={item.slug} item={item} />
-            ))}
-          </nav>
-
-          <div className="flex shrink-0 items-center gap-3">
-            <UtcClock />
-            <EpochBadge />
-            <Link
-              to={ROUTES.profiles}
-              aria-label="我的档案"
-              className="flex h-9 items-center gap-1.5 rounded-element border border-rim bg-surface/60 px-3 text-sm text-ink-variant transition-colors hover:border-rim-strong hover:text-ink"
-            >
-              <Icon name="vault" size={18} />
-              <span className="hidden 2xl:inline">档案</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="pt-1">
-          <nav
-            className="flex flex-wrap items-center gap-1"
-            aria-label="全体系导航"
+    <header className="site-header">
+      <Link to={ROUTES.overview} aria-label="Destiny 测算大厅">
+        <BrandMark />
+      </Link>
+      <nav className="header-primary" aria-label="主导航">
+        <NavLink to={ROUTES.overview}>发现</NavLink>
+        <Link to={`${ROUTES.overview}#questions`}>从问题开始</Link>
+        <Link to="/report/r2?sample=1">报告样例</Link>
+        <button type="button" onClick={() => dialog.current?.showModal()}>
+          探索全部体系 <span aria-hidden="true">↗</span>
+        </button>
+      </nav>
+      <div className="header-actions">
+        <ThemeToggle />
+        <Link
+          className="archive-link"
+          to={ROUTES.profiles}
+          aria-label="我的档案"
+        >
+          <Icon name="vault" size={17} />
+          <span>我的档案</span>
+        </Link>
+        <button
+          className="catalogue-toggle"
+          type="button"
+          aria-label="打开体系导航"
+          onClick={() => dialog.current?.showModal()}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="23"
+            height="23"
+            fill="none"
+            stroke="currentColor"
+            aria-hidden="true"
           >
-            {SECONDARY_NAV.map((group, index) => (
-              <Fragment key={group.title}>
-                {index > 0 && (
-                  <span className="mx-1.5 h-3.5 w-px shrink-0 bg-gold/25" />
-                )}
-                <SecondaryGroup group={group} />
-              </Fragment>
-            ))}
-          </nav>
-        </div>
+            <path d="M4 8h16M4 16h16" />
+          </svg>
+        </button>
       </div>
+      <dialog
+        ref={dialog}
+        className="catalogue-dialog"
+        aria-labelledby="catalogue-title"
+      >
+        <div className="dialog-heading">
+          <h2 id="catalogue-title">以你熟悉的方式，开始探索。</h2>
+          <button
+            type="button"
+            aria-label="关闭体系导航"
+            onClick={() => dialog.current?.close()}
+          >
+            <Icon name="close" />
+          </button>
+        </div>
+        <nav aria-label="全体系导航">
+          {SECONDARY_NAV.map((group) => (
+            <section key={group.title}>
+              <h3>{group.title}</h3>
+              <div className="catalogue-grid">
+                {group.items.map((item) => (
+                  <NavLink key={item.slug} to={item.to}>
+                    {item.label}
+                    <span aria-hidden="true">↗</span>
+                  </NavLink>
+                ))}
+              </div>
+            </section>
+          ))}
+        </nav>
+      </dialog>
     </header>
-  );
-}
-
-const PRIMARY_BASE = 'rounded-element px-3 py-1.5 text-sm transition-colors';
-const PRIMARY_ACTIVE = 'bg-gold/15 font-semibold text-gold-bright';
-const PRIMARY_IDLE = 'text-ink-variant hover:bg-surface-raised hover:text-ink';
-
-function PrimaryLink({ item }: { item: NavItem }) {
-  if (item.to === null) return null;
-  return (
-    <NavLink
-      to={item.to}
-      className={({ isActive }) => `${PRIMARY_BASE} ${isActive ? PRIMARY_ACTIVE : PRIMARY_IDLE}`}
-    >
-      {item.label}
-    </NavLink>
-  );
-}
-
-function SecondaryGroup({ group }: { group: NavGroup }) {
-  return (
-    <>
-      <span className="label-caps mr-1.5 shrink-0 select-none font-bold text-gold">
-        {group.title}
-      </span>
-      {group.items.map((item) => (
-        <SecondaryLink key={item.slug} item={item} />
-      ))}
-    </>
-  );
-}
-
-const SECONDARY_BASE = 'shrink-0 rounded-element px-2 py-1 text-xs transition-colors';
-const SECONDARY_ACTIVE = 'bg-surface-raised font-medium text-gold-soft';
-const SECONDARY_IDLE = 'text-ink-variant hover:bg-surface-raised hover:text-ink';
-
-function SecondaryLink({ item }: { item: NavItem }) {
-  return (
-    <NavLink
-      to={item.to}
-      className={({ isActive }) =>
-        `${SECONDARY_BASE} ${isActive ? SECONDARY_ACTIVE : SECONDARY_IDLE}`
-      }
-    >
-      {item.label}
-    </NavLink>
   );
 }

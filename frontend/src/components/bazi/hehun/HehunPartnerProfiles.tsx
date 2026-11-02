@@ -30,7 +30,7 @@ function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSid
   const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const current = partner.dayun.find((step) => step.is_current) ?? partner.dayun[0];
   return (
-    <div className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
+    <div className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="label-caps text-gold">{caption}</span>
         <span className="text-sm text-ink-variant">{partner.name ?? '未署称谓'}</span>

@@ -67,7 +67,7 @@ export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
         <CharacterRow char={pillar.zhi} element={pillar.zhi_element} shishen={pillar.shishen_zhi[0]} />
       </div>
 
-      <div className="flex flex-col gap-1 rounded-element bg-[#0e111a] p-2.5">
+      <div className="flex flex-col gap-1 rounded-element bg-[var(--field-bg)] p-2.5">
         <span className="label-caps">地支藏干</span>
         {ledger.length > 0
           ? ledger.map((row) => (

@@ -52,7 +52,7 @@ export function ClassicalText({ ben, lines }: ClassicalTextProps) {
               className={`rounded-element border px-3 py-2 ${
                 line.moving
                   ? 'border-gold/30 bg-gold/10'
-                  : 'border-rim-soft bg-[#0e111a]/50'
+                  : 'border-rim-soft bg-[var(--field-bg)]/50'
               }`}
             >
               <div className="mb-1 flex items-center gap-2">

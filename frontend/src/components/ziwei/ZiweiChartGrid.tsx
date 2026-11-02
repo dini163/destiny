@@ -104,7 +104,7 @@ function ChartCenter({ chart }: { chart: ZiweiChart }) {
   return (
     <div
       style={CENTER_STYLE}
-      className="flex flex-col items-center justify-center gap-2 rounded-card border border-rim-strong bg-[#0e111a] p-3 text-center"
+      className="flex flex-col items-center justify-center gap-2 rounded-card border border-rim-strong bg-[var(--field-bg)] p-3 text-center"
     >
       <span className="label-caps text-gold">紫微斗数命盘</span>
       <div className="flex flex-col gap-0.5">

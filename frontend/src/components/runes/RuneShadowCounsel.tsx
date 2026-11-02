@@ -67,7 +67,7 @@ export function RuneShadowCounsel({ notes }: RuneShadowCounselProps) {
                   {note.shadow_keywords.map((keyword) => (
                     <span
                       key={keyword}
-                      className="label-caps rounded-element border border-rim bg-[#0e111a] px-1.5 py-0.5 text-ink-muted"
+                      className="label-caps rounded-element border border-rim bg-[var(--field-bg)] px-1.5 py-0.5 text-ink-muted"
                     >
                       {keyword}
                     </span>
@@ -77,7 +77,7 @@ export function RuneShadowCounsel({ notes }: RuneShadowCounselProps) {
 
               <p className="text-sm leading-relaxed text-ink-variant">{note.shadow_meaning}</p>
 
-              <p className="rounded-element border border-rim-soft bg-[#0e111a] p-2.5 text-xs leading-relaxed text-ink-muted">
+              <p className="rounded-element border border-rim-soft bg-[var(--field-bg)] p-2.5 text-xs leading-relaxed text-ink-muted">
                 {note.note}
               </p>
             </li>

@@ -3,6 +3,11 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import './styles/tokens.css';
+import './styles/experience.css';
+import './styles/report.css';
+import { applyTheme, readTheme } from './lib/theme';
+
+applyTheme(readTheme());
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

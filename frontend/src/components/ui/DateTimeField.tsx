@@ -24,7 +24,7 @@ const HOURS = buildRange(0, 23);
 const MINUTES = buildRange(0, 59);
 
 const BOX_CLASS =
-  'flex items-center gap-1 rounded-element border border-rim bg-[#0e111a] px-2 py-1.5 transition focus-within:border-rim-strong';
+  'flex items-center gap-1 rounded-element border border-rim bg-[var(--field-bg)] px-2 py-1.5 transition focus-within:border-rim-strong';
 const UNIT_CLASS = 'shrink-0 text-xs text-ink-muted';
 
 function buildRange(start: number, end: number): number[] {

@@ -72,7 +72,7 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
   const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
-    <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[#0e111a] p-4">
+    <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
 
       <LabeledField label={`称谓（${caption}，仅回显）`}>
@@ -81,7 +81,7 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
           onChange={(event) => onChange({ name: event.target.value })}
           maxLength={40}
           placeholder={side === 'male' ? '如：夫' : '如：妻'}
-          className="w-full rounded-element border border-rim bg-[#0e111a] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
+          className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
         />
       </LabeledField>
 

@@ -13,7 +13,7 @@ import type { TransitHourCell } from '../../../types/baziLiushi';
 export function LiushiPeakNote({ cell, dayValue }: { cell: TransitHourCell; dayValue: number }) {
   const gap = Math.round((cell.value - dayValue) * 10) / 10;
   return (
-    <div className="flex flex-col gap-2 rounded-element border border-rim bg-[#0e111a] px-4 py-3">
+    <div className="flex flex-col gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-4 py-3">
       <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="font-display text-lg text-gold-soft">{cell.ganzhi}</span>
         <span className="numeric text-xs text-ink-muted">

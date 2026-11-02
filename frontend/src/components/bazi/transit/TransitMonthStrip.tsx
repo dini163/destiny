@@ -43,7 +43,7 @@ export function TransitMonthStrip({
 function MonthCard({ month, href }: { month: TransitMonth; href?: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="flex flex-col gap-3 rounded-element border border-rim bg-[#0e111a] p-4">
+    <div className="flex flex-col gap-3 rounded-element border border-rim bg-[var(--field-bg)] p-4">
       <div className="flex items-baseline justify-between gap-2">
         <span className="flex items-baseline gap-2">
           <span className="font-display text-base text-ink">{month.month_in_chinese}月</span>
