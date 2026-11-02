@@ -640,6 +640,7 @@
   inset: 0;
   z-index: 40;
   pointer-events: none;
+  opacity: var(--starfield-opacity, 0.55);
 }
 .starfield-layer {
   position: absolute;
@@ -647,21 +648,25 @@
   background-repeat: repeat;
 }
 .starfield-layer--far {
+  /* Colors come from theme-aware `--stardust-*` triplets (defined per
+     `data-theme` in experience.css) so the same drift reads as bright stars on
+     obsidian and as dark motes on paper. Fallbacks keep the dark look if the
+     theme layer is absent. */
   background-image:
-    radial-gradient(1.6px 1.6px at 18% 30%, rgba(226, 226, 235, 0.6), transparent 60%),
-    radial-gradient(1.8px 1.8px at 70% 18%, rgba(245, 215, 127, 0.55), transparent 60%),
-    radial-gradient(1.6px 1.6px at 46% 78%, rgba(226, 226, 235, 0.55), transparent 60%),
-    radial-gradient(1.6px 1.6px at 88% 64%, rgba(245, 215, 127, 0.5), transparent 60%),
-    radial-gradient(1.9px 1.9px at 32% 58%, rgba(226, 226, 235, 0.5), transparent 60%),
-    radial-gradient(1.6px 1.6px at 62% 44%, rgba(245, 215, 127, 0.5), transparent 60%);
+    radial-gradient(1.6px 1.6px at 18% 30%, rgb(var(--stardust-cool, 226 226 235) / 0.6), transparent 60%),
+    radial-gradient(1.8px 1.8px at 70% 18%, rgb(var(--stardust-warm, 245 215 127) / 0.55), transparent 60%),
+    radial-gradient(1.6px 1.6px at 46% 78%, rgb(var(--stardust-cool, 226 226 235) / 0.55), transparent 60%),
+    radial-gradient(1.6px 1.6px at 88% 64%, rgb(var(--stardust-warm, 245 215 127) / 0.5), transparent 60%),
+    radial-gradient(1.9px 1.9px at 32% 58%, rgb(var(--stardust-cool, 226 226 235) / 0.5), transparent 60%),
+    radial-gradient(1.6px 1.6px at 62% 44%, rgb(var(--stardust-warm, 245 215 127) / 0.5), transparent 60%);
   background-size: 260px 260px;
   animation: starfield-drift 120s linear infinite;
 }
 .starfield-layer--near {
   background-image:
-    radial-gradient(2.4px 2.4px at 25% 22%, rgba(245, 215, 127, 0.8), transparent 60%),
-    radial-gradient(2px 2px at 80% 60%, rgba(226, 226, 235, 0.7), transparent 60%),
-    radial-gradient(2.2px 2.2px at 55% 85%, rgba(245, 215, 127, 0.7), transparent 60%);
+    radial-gradient(2.4px 2.4px at 25% 22%, rgb(var(--stardust-warm, 245 215 127) / 0.8), transparent 60%),
+    radial-gradient(2px 2px at 80% 60%, rgb(var(--stardust-cool, 226 226 235) / 0.7), transparent 60%),
+    radial-gradient(2.2px 2.2px at 55% 85%, rgb(var(--stardust-warm, 245 215 127) / 0.7), transparent 60%);
   background-size: 380px 380px;
   animation: starfield-drift 90s linear infinite reverse;
 }
@@ -719,9 +724,9 @@
   border-radius: 50%;
   background: radial-gradient(
     circle at center,
-    rgba(255, 248, 226, 1) 0%,
-    rgba(245, 215, 127, 0.7) 7%,
-    rgba(245, 215, 127, 0.18) 22%,
+    rgb(var(--stardust-core, 255 248 226) / 1) 0%,
+    rgb(var(--stardust-warm, 245 215 127) / 0.7) 7%,
+    rgb(var(--stardust-warm, 245 215 127) / 0.18) 22%,
     transparent 38%
   );
   animation: star-core-breathe 14s ease-in-out infinite;
@@ -734,8 +739,8 @@
   /* The whole mote ring turns around the z-axis through the screen (a steady
      planar spin); two further motes ride on this background so four are visible. */
   background:
-    radial-gradient(circle at 14% 50%, rgba(245, 215, 127, 0.8) 0 3px, transparent 4px),
-    radial-gradient(circle at 82% 28%, rgba(226, 226, 235, 0.7) 0 2.5px, transparent 3.5px);
+    radial-gradient(circle at 14% 50%, rgb(var(--stardust-warm, 245 215 127) / 0.8) 0 3px, transparent 4px),
+    radial-gradient(circle at 82% 28%, rgb(var(--stardust-cool, 226 226 235) / 0.7) 0 2.5px, transparent 3.5px);
   animation: star-orbit-spin 26s linear infinite;
 }
 
@@ -744,7 +749,7 @@
   content: "";
   position: absolute;
   border-radius: 50%;
-  background: rgba(245, 215, 127, 0.85);
+  background: rgb(var(--stardust-warm, 245 215 127) / 0.85);
 }
 
 .starfield-star__orbit::before {

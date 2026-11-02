@@ -37,6 +37,13 @@
   --arcane-rgb: 133 78 159;
   --rim: #d8dacf;
   --rim-rgb: 216 218 207;
+  /* Drifting starfield (see tokens.css): on the warm paper ground the motes must
+     be dark to read, so both stardust triplets flip to their ink-side values and
+     the layer opacity climbs so the specks survive the light background. */
+  --stardust-warm: 122 92 40;
+  --stardust-cool: 46 74 66;
+  --stardust-core: 107 84 38;
+  --starfield-opacity: 0.75;
   color-scheme: light;
 }
 :root[data-theme='obsidian'] {
@@ -78,6 +85,11 @@
   --arcane-rgb: 212 163 238;
   --rim: #889c80;
   --rim-rgb: 136 156 128;
+  /* Drifting starfield: bright warm/cool stars on the dark void, kept faint. */
+  --stardust-warm: 245 215 127;
+  --stardust-cool: 226 226 235;
+  --stardust-core: 255 248 226;
+  --starfield-opacity: 0.55;
   color-scheme: dark;
 }
 :root {
@@ -1157,34 +1169,9 @@ body {
   background-image: none;
   line-height: 1.8;
 }
-.starfield {
-  opacity: 0.48;
-}
-:root:not([data-theme='obsidian']) .starfield-layer--far {
-  background-image:
-    radial-gradient(2px 2px at 18% 30%, rgb(var(--gold-rgb) / 0.52), transparent 70%),
-    radial-gradient(2px 2px at 70% 18%, rgb(var(--ink-rgb) / 0.35), transparent 70%),
-    radial-gradient(2px 2px at 46% 78%, rgb(var(--gold-rgb) / 0.44), transparent 70%),
-    radial-gradient(2px 2px at 88% 64%, rgb(var(--ink-rgb) / 0.3), transparent 70%);
-}
-:root:not([data-theme='obsidian']) .starfield-layer--near {
-  background-image:
-    radial-gradient(2.8px 2.8px at 25% 22%, rgb(var(--gold-rgb) / 0.55), transparent 70%),
-    radial-gradient(2.4px 2.4px at 80% 60%, rgb(var(--ink-rgb) / 0.35), transparent 70%),
-    radial-gradient(2.6px 2.6px at 55% 85%, rgb(var(--gold-rgb) / 0.5), transparent 70%);
-}
-:root:not([data-theme='obsidian']) .starfield-star::before {
-  background: radial-gradient(circle, rgb(var(--gold-rgb) / 0.5), rgb(var(--gold-rgb) / 0.12) 22%, transparent 38%);
-}
-:root:not([data-theme='obsidian']) .starfield-star__orbit {
-  background:
-    radial-gradient(circle at 14% 50%, rgb(var(--gold-rgb) / 0.65) 0 2px, transparent 3px),
-    radial-gradient(circle at 82% 28%, rgb(var(--ink-rgb) / 0.45) 0 2px, transparent 3px);
-}
-:root:not([data-theme='obsidian']) .starfield-star__orbit::before,
-:root:not([data-theme='obsidian']) .starfield-star__orbit::after {
-  background: rgb(var(--gold-rgb) / 0.65);
-}
+/* The starfield is now theme-adaptive: its colors and opacity resolve from the
+   `--stardust-*` / `--starfield-opacity` triplets declared in each `data-theme`
+   block above, so no per-theme override of the gradients is needed here. */
 .panel,
 .panel-raised {
   box-shadow: none;
