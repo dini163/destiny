@@ -37,7 +37,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
   const [term, setTerm] = useState('');
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
-  const { data, isFetching } = useCities(term);
+  const { data, isFetching, isError, refetch } = useCities(term);
 
   // Dismiss the suggestion list when clicking outside the field.
   useEffect(() => {
@@ -81,7 +81,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <div ref={boxRef} className="relative">
-        <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+        <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
           <Icon name="pin" size={16} className="shrink-0 text-gold" />
           <input
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
@@ -131,7 +131,16 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
           </ul>
         ) : null}
 
-        {searching && !isFetching && results.length === 0 ? (
+        {searching && !isFetching && isError ? (
+          <div role="alert" className="absolute z-20 mt-1 w-full rounded-element border border-rim bg-surface-raised px-3 py-2 text-sm text-ink shadow-xl">
+            <p>城市查询服务暂时不可用，请检查后端服务是否启动，或在下方手动填写经纬度。</p>
+            <button type="button" className="mt-1 min-h-11 text-gold underline" onClick={() => void refetch()}>
+              重试查询
+            </button>
+          </div>
+        ) : null}
+
+        {searching && !isFetching && !isError && data && results.length === 0 ? (
           <p className="absolute z-20 mt-1 w-full rounded-element border border-rim bg-surface-raised/95 px-3 py-2 text-xs text-ink-muted backdrop-blur-xl">
             未匹配到「{term.trim()}」，请在下方手动填写经纬度。
           </p>
@@ -139,7 +148,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1.5 transition focus-within:border-rim-strong">
+        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 transition focus-within:border-rim-strong">
           <span className="label-caps shrink-0">纬度</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
@@ -154,7 +163,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
             aria-label="纬度"
           />
         </label>
-        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[#0e111a] px-2.5 py-1.5 transition focus-within:border-rim-strong">
+        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 transition focus-within:border-rim-strong">
           <span className="label-caps shrink-0">经度</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
