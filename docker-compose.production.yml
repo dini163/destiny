@@ -1,0 +1,24 @@
+# Deployment overlay; TLS terminates at the operator's reverse proxy.
+services:
+  backend:
+    environment:
+      APP_ENVIRONMENT: production
+      REPORT_SECRET: ${REPORT_SECRET:?Set an independent random REPORT_SECRET}
+      REPORT_STORE_PATH: /srv/destiny/data/local/report-deliveries.sqlite3
+    ports: !override
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - report-deliveries:/srv/destiny/data/local
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+  frontend:
+    ports: !override
+      - "127.0.0.1:8080:80"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+volumes:
+  report-deliveries:

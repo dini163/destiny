@@ -7,7 +7,7 @@
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](backend/pyproject.toml) [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com) [![React 18](https://img.shields.io/badge/React-18.3-61DAFB)](frontend/package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6)](frontend/package.json) [![Docker](https://img.shields.io/badge/Docker-compose%20ready-2496ED)](docker-compose.yml) [![Tests 16.8k+](https://img.shields.io/badge/tests-16.8k%2B-brightgreen)](scripts/verify.sh)
 
 **一座聚合中华古典术数、西方占星、印度吠陀与北欧符文的全息推演平台。**
-所有排盘由权威计算库（`lunar-python` 干支节气 / `pyswisseph` DE431 星历）与自建考据语料产出，**绝对禁止 LLM 手搓核心算法，全栈零 mock**。
+所有排盘由权威计算库（`lunar-python` 干支节气 / `pyswisseph` 星历（默认 Moshier，可配置 Swiss 数据文件））与自建考据语料产出，**绝对禁止 LLM 手搓核心算法，全栈零 mock**。
 
 [快速开始](#快速开始) · [体系矩阵](#体系矩阵) · [架构](#架构) · [工程铁律](#工程铁律) · [API 与错误契约](#api-与错误契约) · [测试](#测试) · [目录结构](#目录结构)
 
@@ -19,7 +19,7 @@
 
 | 普通测算站的痛点 | Destiny 的做法 |
 |---|---|
-| 排盘算法靠程序员手搓星表，错了没人知道 | 历法/星历一律取权威库：干支节气用 `lunar-python`，行星位置用 `pyswisseph`（DE431） |
+| 排盘算法靠程序员手搓星表，错了没人知道 | 历法/星历一律取权威库：干支节气用 `lunar-python`，行星位置用 `pyswisseph`（默认 Moshier；可配置 Swiss 文件） |
 | 全国都按东经 120° 北京时间算 | 真实经纬度城市库（`backend/data/cities.json`），逐人生**真太阳时** |
 | 结果是一大段没有依据的模板话 | 响应带 `provenance.tables` 出处清单——端点实际读了哪几张语料表就列哪几张，宁缺勿多 |
 | 抽牌结果用 `random` 生成，可预测 | 抽牌/起卦引擎只用密码学安全随机源 `secrets.SystemRandom` |
@@ -94,7 +94,7 @@ flowchart LR
 | 中华 | 梅花易数 | `meihua` | `/plum-blossom` | 报数起卦，确定性无随机 |
 | 中华 | 姓名学 | `name` | `/name-metric` | 三才五格 + 康熙字典笔画表 |
 | 中华 | 麻衣面相神鉴（Phase-2） | — | — | CV 模型校准，尚未排盘 |
-| 西洋 | 本命占星 | `western` | `/western-astrology` | pyswisseph DE431 |
+| 西洋 | 本命占星 | `western` | `/western-astrology` | pyswisseph（默认 Moshier / 可配置 Swiss 文件） |
 | 西洋 | 行运 / 合盘 | `transit` `synastry` | `/astrology-transit` `/astrology-synastry` | pyswisseph |
 | 西洋 | 塔罗 | `tarot` | `/tarot-oracle` | 78 张牌义语料 + `secrets` |
 | 西洋 | 雷诺曼 | `lenormand` | `/lenormand-cards` | 36 张牌义语料 + `secrets` |
@@ -193,3 +193,10 @@ destiny/
 ---
 
 *星辰不问赶路人，但会如实记录每个人的出生时刻。*
+
+
+## 内测报告与新阅读界面
+
+首页按问题引导，暖纸白和曜石深色可切换。报告支持公开真实样例、条件化解释、行动实验与打印；R3 按起始日滚动十二个月，R1 的时间章节明确为年度上下文。
+
+人工交付与生产权限见 [交付说明](docs/operations/manual-delivery.md)，部署与授权验收见 [发布说明](docs/operations/release-readiness.md)。支付渠道尚未接入。

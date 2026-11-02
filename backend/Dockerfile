@@ -40,6 +40,7 @@ COPY data ./data
 # Run as an unprivileged user; nothing in the image needs root at runtime.
 RUN groupadd --system destiny \
     && useradd --system --gid destiny --home-dir /srv/destiny --no-create-home destiny \
+    && mkdir -p /srv/destiny/data/local \
     && chown -R destiny:destiny /srv/destiny /opt/venv
 USER destiny
 

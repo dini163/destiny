@@ -135,6 +135,7 @@ run/
 *.sqlite3
 *.duckdb
 data/local/
+/backend/data/local/
 IndexedDB/
 *.ldif
 
