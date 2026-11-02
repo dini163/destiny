@@ -1,11 +1,8 @@
 """FastAPI application factory for the Destiny computation API.
 
-The backend is stateless: it performs authoritative astronomical / calendrical
-computation and returns charts as JSON. No chart or profile is persisted
-server-side (no database, no accounts, no cookies) and the browser keeps no
-local store, so no server database is required. PRD §9's client-side E2EE
-archive is not implemented -- do not claim it in user-facing copy until it
-exists.
+Ordinary calculations are stateless. Manual report fulfilment separately stores
+fixed documents for expiry, re-fetch and revocation; raw birth inputs are not
+retained by that store. Browser archives are local, without E2EE.
 """
 
 from fastapi import FastAPI

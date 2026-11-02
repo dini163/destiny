@@ -8,15 +8,16 @@
    装配器只做「选哪句模板、填什么事实」，不写无来源断言。
 3. **每条结论必须有依据**：每章关键结论配一张 `ReportEvidenceCard`（结论/盘面事实/出处/
    可推翻句三分离，PRD §3A.1 原则 3）。
-4. **无状态订单**：`order_id`/`token`/`expires_at` 由 `app.core.report_orders` 派生，
-   同一输入恒同，取报告时按同一输入重算（确定性可复现，AGENTS.md 第 9 条）。
+4. **计算与交付分开**：本模块只装配内容与内测凭据；人工交付在 core/report_store.py
+   保存固定快照与独立随机标识，后续读取不再依赖当前模板。
 
-报告版本号在 `content.report_templates.REPORT_VERSION`；修改模板句不影响版本（句子内容
-变更才 bump）。阈值（逐月节奏分档）是本地的模型参数，见 `_month_tone` 的注释。
+报告版本与受控框架在 content/report_templates.py；生活观察材料在 content/report_guidance.py。
+改动解释内容时递增报告版本，已交付快照不重算。
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
+from app.content import report_guidance as G
 from app.content import report_templates as T
 from app.core.chart_input import chart_longitude
 from app.core.config import get_settings
@@ -24,9 +25,11 @@ from app.core.report_orders import derive_order_id, expires_at_for, sign_token
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import compute_hehun
 from app.engines.bazi_transit import compute_transit
+from app.engines.report_calendar import rolling_months
+from app.engines.report_editor import enrich_natal
 from app.schemas.bazi import BaziChart, BaziNatalRequest
 from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult
-from app.schemas.bazi_transit import BaziTransitRequest, BaziTransitResult
+from app.schemas.bazi_transit import BaziTransitRequest
 from app.schemas.report import (
     ReportDocument,
     ReportEvidenceCard,
@@ -70,6 +73,7 @@ def compose_preview(
         key_points=summary.bullets[:4],
         section_count=len(doc.sections),
         notice=T.PREVIEW_NOTICE,
+        can_generate=get_settings().app_environment != "production",
     )
 
 
@@ -137,7 +141,16 @@ def _compose_r1(request: BaziHehunRequest, reference_date: date | None) -> Repor
         "needs",
         T.REPORT_SECTION_NAMES["r1"]["needs"],
         "chapter",
-        body=[T.R1_NEEDS_OPENING, *needs_items, _action(T.R1_ACTION_FOCUS["needs"], "act")],
+        body=[
+            T.R1_NEEDS_OPENING,
+            *needs_items,
+            *(
+                [G.R1_STAGE_CONTEXT[request.relationship_stage]]
+                if getattr(request, "relationship_stage", "unspecified") in G.R1_STAGE_CONTEXT
+                else []
+            ),
+            _action(T.R1_ACTION_FOCUS["needs"], "act"),
+        ],
         cards=[
             _card(
                 "r1-needs-01",
@@ -152,7 +165,7 @@ def _compose_r1(request: BaziHehunRequest, reference_date: date | None) -> Repor
 
     # 吸引力与互补 ----------------------------------------------------------
     comp_bullets = [
-        f"{view.label} · {cell.name}：{'、'.join(e.element for e in cell.elements)}"
+        f"{view.label} · {cell.name}（{'、'.join(e.element for e in cell.elements)}）：{G.R1_COMPLEMENT_EXPLANATION[cell.name]}"
         for view in result.complement.views
         for cell in view.cells
         if cell.elements
@@ -180,9 +193,16 @@ def _compose_r1(request: BaziHehunRequest, reference_date: date | None) -> Repor
 
     # 冲突升级链 ------------------------------------------------------------
     negatives = [f for f in result.fired if f.delta < 0]
-    issues = "、".join(f"{f.label}（{f.reading}）" for f in negatives[:3]) or T.R1_RISK_NONE
-    pattern = _r1_conflict_pattern(male.favorable_elements, female.favorable_elements)
-    trigger_lines = [T.R1_CONFLICT_TRIGGERS[family] for family in _hit_families(result) if family in T.R1_CONFLICT_TRIGGERS]
+    issues = (
+        "、".join(f.label for f in sorted(negatives, key=lambda row: row.delta)[:3])
+        or T.R1_RISK_NONE
+    )
+    pattern = G.R1_PATTERN_BOUNDARY
+    trigger_lines = [
+        T.R1_CONFLICT_TRIGGERS[family]
+        for family in sorted({row.family for row in negatives})
+        if family in T.R1_CONFLICT_TRIGGERS
+    ]
     conflict = _section(
         "conflict",
         T.REPORT_SECTION_NAMES["r1"]["conflict"],
@@ -212,9 +232,10 @@ def _compose_r1(request: BaziHehunRequest, reference_date: date | None) -> Repor
         T.REPORT_SECTION_NAMES["r1"]["scripts"],
         "chapter",
         body=[
-            T.R1_SCRIPT_STEPS["step1"],
-            T.R1_SCRIPT_STEPS["step2"].format(own_need=own_need, partner_need=partner_need),
-            T.R1_SCRIPT_STEPS["step3"].format(signal="一句你们共同认的暗号"),
+            *(
+                line.format(own_need=own_need, partner_need=partner_need)
+                for line in G.R1_REPAIR_SCENARIOS
+            ),
             _action(T.R1_ACTION_FOCUS["scripts"], "act"),
         ],
     )
@@ -268,9 +289,13 @@ def _compose_r1(request: BaziHehunRequest, reference_date: date | None) -> Repor
         body=[T.BOUNDARY_STATEMENTS["r1"]],
     )
 
-    return _document("r1", request, [summary, needs, complement, conflict, scripts, windows, agreement, evidence, boundary],
-                     input_summary=f"乾造 {male.four_pillars}（{male.zodiac}）· 坤造 {female.four_pillars}（{female.zodiac}）",
-                     boundary_text=T.BOUNDARY_STATEMENTS["r1"])
+    return _document(
+        "r1",
+        request,
+        [summary, needs, complement, conflict, scripts, windows, agreement, evidence, boundary],
+        input_summary=f"乾造 {male.four_pillars}（{male.zodiac}）· 坤造 {female.four_pillars}（{female.zodiac}）",
+        boundary_text=T.BOUNDARY_STATEMENTS["r1"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -396,7 +421,7 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
         cards=[
             _card(
                 "r2-stress-01",
-                f"压力反应与最旺五行（{top['element']}）和最缺五行（{low['element']}）相关",
+                f"五行相对高项 {top['element']}、相对低项 {low['element']} 的压力观察假设",
                 f"五行分布：{_wuxing_summary(chart)}",
                 rules_src,
                 "medium",
@@ -480,7 +505,22 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
     return _document(
         "r2",
         request,
-        [summary, profile, dimensions, driver, stress, energy, dayun, relationships, experiments, evidence, boundary],
+        enrich_natal(
+            [
+                summary,
+                profile,
+                dimensions,
+                driver,
+                stress,
+                energy,
+                dayun,
+                relationships,
+                experiments,
+                evidence,
+                boundary,
+            ],
+            chart,
+        ),
         input_summary=f"{chart.four_pillars}（{chart.zodiac}）",
         boundary_text=T.BOUNDARY_STATEMENTS["r2"],
     )
@@ -492,117 +532,106 @@ def _compose_r2(request: BaziNatalRequest, reference_date: date | None) -> Repor
 
 
 def _compose_r3(request: BaziTransitRequest, reference_date: date | None) -> ReportDocument:
-    ref_date = reference_date or date.today()
-    start_year = request.start_year or ref_date.year
-    end_year = request.end_year or start_year + 1
-    focus_year = request.focus_year or start_year
-    result = compute_transit(
+    # Keep the original interval validation; report dates do not silently excuse invalid chart input.
+    ref = reference_date or date.today()
+    compute_transit(
         birth_date=request.birth_date,
         birth_time=request.birth_time,
         calendar=request.calendar,
         longitude=chart_longitude(request.city, request.longitude, request.apply_true_solar_time),
         gender=request.gender,
         apply_true_solar_time=request.apply_true_solar_time,
-        start_year=start_year,
-        end_year=end_year,
-        focus_year=focus_year,
-        reference_date=reference_date,
+        start_year=request.start_year,
+        end_year=request.end_year,
+        focus_year=request.focus_year,
+        reference_date=ref,
         name=request.name,
     )
-    tables = _table_names(result.provenance.tables)
-    rules_src = _pick_table(tables, "transit_rules") or _pick_table(tables, "plain") or tables[0]
-    plain_src = _pick_table(tables, "plain") or rules_src
-
-    best = max(result.years, key=lambda y: y.score.value)
-    worst = min(result.years, key=lambda y: y.score.value)
-    months = _month_tone_brief(result)
-
+    start, end, periods = rolling_months(request, reference_date)
+    month_lines, actions, evidence_cards, high, low = [], [], [], [], []
+    for index, (left, right, pieces) in enumerate(periods):
+        descriptions = []
+        for a, b, term in pieces:
+            tone = _month_tone(term.score.value)
+            monthly = [row for row in term.fired if row.key.startswith("yue.")]
+            selected = sorted(monthly, key=lambda row: abs(row.delta), reverse=True)[:2]
+            reasons = "；".join(f"{row.label}（账本增量 {row.delta:+g}）" for row in selected)
+            if not reasons:
+                reasons = "本段未命中额外流月因子，保留年度账本基准，不另编变化"
+            descriptions.append(
+                f"{a}—{b} · {term.ganzhi}节气月 · {G.R3_TONE_LABELS[tone]}：{reasons}"
+            )
+            evidence_cards.append(
+                _card(
+                    f"r3-month-{index}-{term.index}",
+                    f"{a}—{b} 的传统模型分档为{G.R3_TONE_LABELS[tone]}",
+                    f"{term.ganzhi}，原始交节区间 {term.start_solar}—{term.end_solar}，账本 {term.score.value:g} 分；{reasons}",
+                    "bazi_transit_rules · report_guidance",
+                    "medium",
+                )
+            )
+        dominant = max(pieces, key=lambda piece: (piece[1] - piece[0]).days)[2]
+        tone = _month_tone(dominant.score.value)
+        if tone == "push":
+            high.append(f"{left}—{right}")
+        elif tone in ("wrap", "rest"):
+            low.append(f"{left}—{right}")
+        month_lines.append(f"第{index + 1}个月｜{left}—{right}：" + "。".join(descriptions))
+        monthly = [row for row in dominant.fired if row.key.startswith("yue.")]
+        factor = max(monthly, key=lambda row: abs(row.delta), default=None)
+        focus = G.R3_FACTOR_CONTEXT.get(
+            factor.family if factor else "default", G.R3_FACTOR_CONTEXT["default"]
+        )
+        actions.append(
+            f"{left}—{right}：{T.R3_ACTIONS[tone]} {focus} {G.R3_OBSERVATIONS[index % len(G.R3_OBSERVATIONS)]}"
+        )
     summary = _section(
         "summary",
         T.REPORT_SECTION_NAMES["r3"]["summary"],
         "summary",
         bullets=[
-            f"{T.R3_SUMMARY_LABELS['theme']}：{result.verdict.headline}",
-            f"{T.R3_SUMMARY_LABELS['windows']}：{best.year}（{best.score.value:.0f} 分）",
-            f"{T.R3_SUMMARY_LABELS['low']}：{worst.year}（{worst.score.value:.0f} 分）",
-        ],
-        cards=[
-            _card(
-                "r3-summary-01",
-                result.verdict.headline,
-                f"区间 {result.start_year}–{result.end_year} 逐年账本，档位 {result.verdict.grade}（{result.verdict.stars} 星）",
-                rules_src,
-                "high",
-            )
+            f"报告范围：{start}—{end}，从起始日起连续十二个月，按公历月段阅读",
+            "阅读方式：每个公历月段可能跨交节；分段列出实际节气边界和命中因素，不把整个月当成相同的盘面",
+            f"节奏分布：{len(high)}个月段以推进为主，{len(low)}个月段以收尾或休整为主；分档不是事件概率",
         ],
     )
-
-    months_body = [T.R3_MONTH_OPENING.format(tones="；".join(
-        f"{k}（{'、'.join(v)}）" for k, v in months.items() if v
-    ))]
-    if result.focus_year is not None and result.years:
-        focus = next((y for y in result.years if y.year == result.focus_year), None)
-        if focus is not None and focus.months is not None:
-            months_body.append(T.R3_MONTH_FOOTER)
-        else:
-            months_body.append(T.R3_FOCUS_NONE)
-    else:
-        months_body.append(T.R3_FOCUS_NONE)
     month_section = _section(
         "months",
         T.REPORT_SECTION_NAMES["r3"]["months"],
         "chapter",
-        body=months_body,
-        bullets=[f"{m['month_in_chinese']}月（{m['ganzhi']}）：{T.R3_MONTH_TONES[_month_tone(m['score']['value'])]}"
-                 for m in _focus_months(result)],
-        cards=[
-            _card(
-                "r3-months-01",
-                "逐月节奏由流月账本分数分档",
-                f"{focus_year} 年十二节气流月账本（{len(_focus_months(result))} 个月）",
-                plain_src,
-                "high",
-            )
+        body=[
+            "以下按真实交节区间组合每个公历月段。分数仅用于传统模型分档；同档月份仍可能命中不同因素，不能直接推断事件。"
         ],
+        bullets=month_lines,
+        cards=evidence_cards,
     )
-
-    high = [m["month_in_chinese"] for m in _focus_months(result) if _month_tone(m["score"]["value"]) == "push"]
-    low = [m["month_in_chinese"] for m in _focus_months(result) if _month_tone(m["score"]["value"]) in ("wrap", "rest")]
     windows = _section(
         "windows",
         T.REPORT_SECTION_NAMES["r3"]["windows"],
         "chapter",
         body=[
-            T.R3_WINDOW_HIGH.format(months="、".join(high) or "—"),
-            T.R3_WINDOW_LOW.format(months="、".join(low) or "—"),
+            "推进为主的月段："
+            + ("；".join(high) or "本周期没有达到该模型分界的月段，不强造利好窗口"),
+            "收尾或休整为主的月段：" + ("；".join(low) or "本周期没有落在该模型分界的月段"),
             T.R3_WINDOW_FOOTER,
         ],
     )
-
-    actions = _section(
-        "actions",
-        T.REPORT_SECTION_NAMES["r3"]["actions"],
-        "action",
-        bullets=[
-            T.R3_ACTION_TEMPLATE.format(window=f"{m['month_in_chinese']}月", action=T.R3_ACTIONS[_month_tone(m["score"]["value"])])
-            for m in _focus_months(result)
-        ][:12],
+    action_section = _section(
+        "actions", T.REPORT_SECTION_NAMES["r3"]["actions"], "action", bullets=actions
     )
-
     review = _section(
         "review",
         T.REPORT_SECTION_NAMES["r3"]["review"],
         "chapter",
         body=[T.R3_REVIEW_OPENING],
-        bullets=list(T.R3_REVIEW_ITEMS),
+        bullets=T.R3_REVIEW_ITEMS,
     )
-
     evidence = _section(
         "evidence",
         T.REPORT_SECTION_NAMES["r3"]["evidence"],
         "evidence",
         body=[T.EVIDENCE_SUMMARY_OPENING],
-        bullets=_evidence_summary([summary, month_section, windows]),
+        bullets=_evidence_summary([month_section]),
     )
     boundary = _section(
         "boundary",
@@ -610,12 +639,11 @@ def _compose_r3(request: BaziTransitRequest, reference_date: date | None) -> Rep
         "boundary",
         body=[T.BOUNDARY_STATEMENTS["r3"]],
     )
-
     return _document(
         "r3",
         request,
-        [summary, month_section, windows, actions, review, evidence, boundary],
-        input_summary=f"{result.four_pillars} · 区间 {result.start_year}–{result.end_year}",
+        [summary, month_section, windows, action_section, review, evidence, boundary],
+        input_summary=f"滚动时段 {start}—{end}",
         boundary_text=T.BOUNDARY_STATEMENTS["r3"],
     )
 
@@ -633,7 +661,7 @@ def _document(
     boundary_text: str,
 ) -> ReportDocument:
     settings = get_settings()
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     order_id = derive_order_id(product, request)
     return ReportDocument(
         order_id=order_id,
@@ -650,25 +678,29 @@ def _document(
     )
 
 
-def _section(section_id: str, title: str, kind: str, body=None, bullets=None, cards=None) -> ReportSection:
+def _section(
+    section_id: str, title: str, kind: str, body=None, bullets=None, cards=None
+) -> ReportSection:
     return ReportSection(
         id=section_id,
         title=title,
         kind=kind,
-        body=body or [],
-        bullets=bullets or [],
+        body=[_clean_sentence(line) for line in (body or [])],
+        bullets=[_clean_sentence(line) for line in (bullets or [])],
         evidence_cards=cards or [],
     )
 
 
-def _card(claim_id: str, claim: str, chart_fact: str, source: str, confidence: str) -> ReportEvidenceCard:
+def _card(
+    claim_id: str, claim: str, chart_fact: str, source: str, confidence: str
+) -> ReportEvidenceCard:
     return ReportEvidenceCard(
         claim_id=claim_id,
-        claim=claim,
-        chart_fact=chart_fact,
+        claim=_clean_sentence(claim),
+        chart_fact=_clean_sentence(chart_fact),
         source=source,
-        confidence=confidence,
-        falsifier=T.EVIDENCE_FALSIFIER.format(claim=claim, basis=chart_fact),
+        confidence="medium" if confidence == "high" else confidence,
+        falsifier="请先核对盘面与引用规则。若相应的生活描述不符合经历，不必认领；规则一致不等于现实预测已被验证。",
     )
 
 
@@ -696,9 +728,7 @@ def _r1_complement_brief(result: BaziHehunResult) -> str:
     for view in result.complement.views:
         for cell in view.cells:
             if cell.name in ("补", "阙") and cell.elements:
-                parts.append(
-                    f"{view.label}：{'、'.join(e.element for e in cell.elements)}"
-                )
+                parts.append(f"{view.label}：{'、'.join(e.element for e in cell.elements)}")
                 break
     return "；".join(parts) or T.R1_COMPLEMENT_NONE
 
@@ -711,22 +741,8 @@ def _r1_top_risk(result: BaziHehunResult) -> str:
     return f"{worst.label}（{worst.reading}）"
 
 
-def _hit_families(result: BaziHehunResult) -> set[str]:
-    return {f.family for f in result.fired}
-
-
-def _r1_conflict_pattern(male_fav: list[str], female_fav: list[str]) -> str:
-    """谁先退、谁先追：按两造喜用重叠度映射（喜忌互补越少，立场越容易顶住）。"""
-    overlap = len(set(male_fav) & set(female_fav))
-    if overlap == 0:
-        return T.R1_CONFLICT_PATTERN_HIGH
-    if overlap >= 2:
-        return T.R1_CONFLICT_PATTERN_LOW
-    return T.R1_CONFLICT_PATTERN_MID
-
-
 def _r1_windows(result: BaziHehunResult, ref_year: int) -> list[str]:
-    """未来 12 个月（参考年起两年）的低同步与高同步年份。"""
+    """Annual rows can support yearly context only, never monthly timing claims."""
     window = [r for r in result.axis.rows if ref_year <= r.year <= ref_year + 1]
     if not window:
         return [T.R1_WINDOW_NONE]
@@ -738,11 +754,7 @@ def _r1_windows(result: BaziHehunResult, ref_year: int) -> list[str]:
             years="、".join(f"{r.year}（{r.sync}）" for r in low) or T.R1_WINDOW_NONE
         )
     )
-    lines.append(
-        T.R1_WINDOW_GOOD.format(
-            years="、".join(f"{r.year}" for r in good) or "—"
-        )
-    )
+    lines.append(T.R1_WINDOW_GOOD.format(years="、".join(f"{r.year}" for r in good) or "—"))
     lines.append(T.R1_WINDOW_FOOTER)
     return lines
 
@@ -878,8 +890,6 @@ def _r2_dimensions_section(dims, rules_src: str) -> ReportSection:
             bullets.append(T.R2_DIMENSION_CAUTIONS.format(items="、".join(d.cautions)))
         if not d.strengths and not d.cautions:
             bullets.append(T.R2_DIMENSION_EMPTY_FACTOR)
-        if d.plain:
-            body.append(f"【{d.dimension}】{d.plain}")
     cards = []
     if dims:
         cards.append(
@@ -913,11 +923,7 @@ def _r2_dayun_section(chart: BaziChart, rules_src: str) -> ReportSection:
             "chapter",
             body=[T.R2_DAYUN_NONE],
         )
-    body = [
-        T.R2_DAYUN_OPENING.format(
-            ganzhi=du.ganzhi, start_age=du.start_age, end_age=du.end_age
-        )
-    ]
+    body = [T.R2_DAYUN_OPENING.format(ganzhi=du.ganzhi, start_age=du.start_age, end_age=du.end_age)]
     for r in du.relations:
         body.append(T.R2_DAYUN_RELATION.format(relation=r.kind, reading=r.reading))
     body.append(T.R2_DAYUN_FOOTER)
@@ -968,24 +974,6 @@ def _r2_focus_area(favorable: list[str]) -> str:
     }.get(favorable[0] if favorable else "", "日常生活")
 
 
-def _focus_months(result: BaziTransitResult) -> list[dict]:
-    """聚焦年（focus_year）的十二节气流月；未展开时返回空。"""
-    if result.focus_year is None:
-        return []
-    for year in result.years:
-        if year.year == result.focus_year and year.months is not None:
-            return [m.model_dump() for m in year.months]
-    return []
-
-
-def _month_tone_brief(result: BaziTransitResult) -> dict[str, list[str]]:
-    """逐月节奏按分档归组（推进/谈判/收尾/休整），供摘要与 months 章共用。"""
-    grouped: dict[str, list[str]] = {"push": [], "negotiate": [], "wrap": [], "rest": []}
-    for m in _focus_months(result):
-        grouped[_month_tone(m["score"]["value"])].append(m["month_in_chinese"])
-    return grouped
-
-
 def _evidence_summary(sections: list[ReportSection]) -> list[str]:
     """证据附录的汇总条目：每章首卡一行（结论 → 依据 → 出处）。"""
     lines = []
@@ -993,3 +981,9 @@ def _evidence_summary(sections: list[ReportSection]) -> list[str]:
         for card in section.evidence_cards[:1]:
             lines.append(f"{section.title}：{card.claim}（依据：{card.chart_fact}；{card.source}）")
     return lines
+
+
+def _clean_sentence(text: str) -> str:
+    while "。。" in text:
+        text = text.replace("。。", "。")
+    return text

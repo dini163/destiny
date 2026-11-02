@@ -222,7 +222,7 @@ def _discover_request_models() -> dict[str, type[BaseModel]]:
     """按 `*Request` 后缀收集 schemas 包里的请求模型（含嵌套子模型由 walker 负责）。
 
     "以 `*Request` 结尾"是命名耦合（新增系统若换个后缀就静默不入反射），属 ledger 记账项，
-    本轮不动它的选取口径；件数断言（19 个）写在用它的那个测的函数体里，不写在 helper 里。
+    本轮不动它的选取口径；件数断言（含 report.py 的 ReportTimeRequest / ReportRelationshipRequest）写在用它的那个测的函数体里，不写在 helper 里。
     """
     requests: dict[str, type[BaseModel]] = {}
     for m in pkgutil.iter_modules(_schemas_pkg.__path__):
@@ -314,7 +314,7 @@ def test_string_input_caps_present_in_registry_survive() -> None:
     两个集合的语义差别见 `_bounded_leaves()` 的 docstring。
     """
     requests = _discover_request_models()
-    assert len(requests) == 19, sorted(requests)
+    assert len(requests) == 21, sorted(requests)
     string_caps, dict_entry_caps = _bounded_leaves(requests)
 
     missing = sorted(set(_EXPECTED_BOUNDED) - set(string_caps))

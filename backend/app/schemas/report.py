@@ -1,23 +1,23 @@
-"""付费报告产品线的一进三出：预览、完整文档、无状态订单（v2.1 §3A，snake_case 直出）。
+"""报告产品线：预览、完整文档与人工交付快照（v2.1 §3A，snake_case 直出）。
 
 本文件声明报告层的全部响应契约：`ReportPreview`（免费预览）、`ReportDocument`（完整报告，
-含无状态订单的签名令牌）、`ReportEvidenceCard`（证据卡，PRD §3A.5 的三层内容分层）。
+兼容内测凭据和人工交付标识）、`ReportEvidenceCard`（证据卡，PRD §3A.5 的三层内容分层）。
 
-**订单为什么是无状态的**：后端是零数据库的纯计算 API（AGENTS.md：分层里没有存储层）。
-v1 的「订单 + 签名交付链接」（PRD §3A.7）用签名令牌实现：`order_id` 是输入规范的
-确定性哈希前 16 位，`token` 是服务端对 `product:order_id:created_ts` 的 HMAC 签名，
-`expires_at` 限定有效期。取报告时 API 验签通过后**重新生成**同一份报告 —— 引擎是
-确定性的（AGENTS.md：同一输入同一版本可复现），所以无状态、可撤销、可过期，不需要任何
-存储。付费与免费试用本轮明确不做（用户审批口径），订单状态在 v1 由人工在交付流程维护。
+内测自助响应保留重算凭据兼容旧调用；人工交付使用随机交付标识、随机 bearer 与固定快照。
+计算与履约分开，快照读取不再要求原始输入。
 
 入参不在此重复定义：三个产品各用既有系统的入参（r1=`BaziHehunRequest`、
 r2=`BaziNatalRequest`、r3=`BaziTransitRequest`），报告层不重算历法，也不重定义出生参数
 （AGENTS.md 第 6 条）。产品 → 入参的分发在 `api/v1/report.py` 做。
 """
 
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from app.schemas.bazi_hehun import BaziHehunRequest
+from app.schemas.bazi_transit import BaziTransitRequest
 
 #: 报告产品：r1 双人关系说明书 / r2 本命使用说明书 / r3 未来12个月时间地图。
 ReportProduct = Literal["r1", "r2", "r3"]
@@ -26,7 +26,7 @@ ReportProduct = Literal["r1", "r2", "r3"]
 #: evidence（证据附录）、boundary（边界声明）。序在 `content/report_templates.py` 的名册里。
 SectionKind = Literal["summary", "chapter", "action", "evidence", "boundary"]
 
-#: 证据卡置信度（PRD §3A.5 的三层）：high 盘面事实 / medium 规则解释 / low 综合建议。
+#: 证据类型保留兼容键：high 模型账本 / medium 传统规则解释 / low 综合建议；不是预测置信度。
 EvidenceConfidence = Literal["high", "medium", "low"]
 
 
@@ -43,7 +43,7 @@ class ReportEvidenceCard(BaseModel):
     chart_fact: str = Field(description="盘面依据：可核对的事实（分数/柱/命中规则）。")
     source: str = Field(description="出处：语料表名或模板表名，不写「本系统」一类空出处。")
     confidence: EvidenceConfidence = Field(
-        description="high=盘面事实直接支撑；medium=规则/语料解释；low=综合建议。"
+        description="high=传统模型账本；medium=传统规则解释；low=生活观察建议；不是现实预测置信度。"
     )
     falsifier: str = Field(description="可推翻句：给出可被实际经历检验/推翻的方式。")
 
@@ -84,6 +84,10 @@ class ReportPreview(BaseModel):
     )
     section_count: int = Field(description="完整报告的章节数，让用户知道全文范围。")
     notice: str
+    can_generate: bool = Field(
+        default=True,
+        description="Whether this environment allows internal self-service generation.",
+    )
 
 
 class ReportDocument(BaseModel):
@@ -93,7 +97,7 @@ class ReportDocument(BaseModel):
     `app.core.report_orders` 的验签函数校验后按同一输入重新生成（确定性可复现）。
     """
 
-    order_id: str = Field(description="输入规范哈希前 16 位（十六进制），同一输入恒同。")
+    order_id: str = Field(description="交付标识；内测保留输入指纹兼容，人工交付使用独立随机标识。")
     product: ReportProduct
     title: str
     tagline: str
@@ -102,5 +106,19 @@ class ReportDocument(BaseModel):
     input_summary: str
     sections: list[ReportSection] = Field(description="按模板名册序排布的全部章节。")
     boundary: str = Field(description="边界声明全文，逐字取模板表（同时住在 boundary 章）。")
-    token: str = Field(description="HMAC 签名令牌：`product:order_id:created_ts` 的签名。")
+    token: str = Field(description="内测重算令牌或人工交付的随机 bearer；不得公开转发。")
     expires_at: str = Field(description="链接过期时间（ISO）。")
+
+
+class ReportTimeRequest(BaziTransitRequest):
+    """Report-only rolling start; free transit endpoints retain their annual contract."""
+
+    start_date: date | None = None
+
+
+class ReportRelationshipRequest(BaziHehunRequest):
+    relationship_stage: Literal["unspecified", "dating", "long_term", "repair"] = "unspecified"
+
+
+class DeliveryLookup(BaseModel):
+    token: str = Field(min_length=1, max_length=512)

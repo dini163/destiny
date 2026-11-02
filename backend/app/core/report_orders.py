@@ -1,12 +1,7 @@
 """无状态订单：输入规范哈希 + HMAC 签名链接（v1「订单 + 签名交付链接」的载体）。
 
-后端零数据库（AGENTS.md 分层无存储层），v1 的订单就做成「凭据 + 重算」：
-`order_id` 由输入的规范 JSON 确定性派生（同一输入恒同），`token` 是服务端密钥对
-`product:order_id:created_ts` 的 HMAC 签名，取报告时验签通过即按同一输入重新生成 ——
-引擎是确定性的，所以不需要存储任何订单行。撤销 = 过期时间已过（或密钥轮换后旧签全部失效）。
-
-`token` 自带时间：它编码成 `<b64(created_ts)>.<sig>`，`verify_token` 先从令牌拆出创建时间，
-再重算签名并检查过期 —— 因此取报告只需 `order_id + token` 两个参数，不需要额外状态。
+此模块保留内测重算凭据。正式人工交付在 core/report_store.py 生成独立随机标识与 bearer，
+保存固定版本，支持逐份撤销与清理；输入指纹不充当真实付款订单。
 
 安全说明：`REPORT_SECRET` 只从环境变量读；缺省值是开发用占位，生产环境必须设置，
 否则签名链接对任何知道代码的人可伪造（.env.example 已标注）。
@@ -78,15 +73,17 @@ def verify_token(
     if created_ts is None:
         return False
     expected = _sign_raw(secret, product, order_id, created_ts)
-    if not hmac.compare_digest(expected, sig):
+    if not hmac.compare_digest(expected.encode(), sig.encode()):
         return False
     try:
         created_at = datetime.fromisoformat(created_ts)
     except ValueError:
         return False
+    if created_at.tzinfo is None:
+        return False
     now = datetime.now(timezone.utc)
     expires_at = created_at + timedelta(hours=ttl_hours)
-    return now < expires_at
+    return created_at <= now < expires_at
 
 
 def expires_at_for(created_at: datetime, ttl_hours: int) -> str:

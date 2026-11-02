@@ -66,7 +66,7 @@ class TransitRangeError(DestinyError):
     合婚 spec §9.3）：`transit_range_reversed` / `transit_range_too_wide` /
     `transit_range_unsupported` / `transit_focus_out_of_range` / `liuri_month_unsupported` /
     `liuri_focus_out_of_month` / `liushi_date_unsupported` / `liushi_hour_out_of_day` /
-    `hehun_axis_out_of_range`。
+    `hehun_axis_out_of_range` / `report_month_coverage`。
     它们过不了 pydantic 的字段校验，因为每个字段单独看都合法 —— 坏的是它们之间的关系，
     以及它们与该命盘大运窗口的关系，而窗口是排盘之后才知道的事实。所以这里给 422
     而不是 400：请求成形，只是推不出东西来。
@@ -108,6 +108,23 @@ class GematriaInputError(DestinyError):
 
     code = "gematria_no_latin_letters"
     status_code = 422
+
+
+class ReportAccessError(DestinyError):
+    """403: report_operator_required / report_manual_delivery_required deny unavailable fulfilment rights."""
+
+    status_code = 403
+
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+
+
+class ReportDeliveryError(DestinyError):
+    """404 report_delivery_unavailable: invalid, expired and revoked bearer links share one response."""
+
+    status_code = 404
+    code = "report_delivery_unavailable"
 
 
 def register_error_handlers(app: FastAPI) -> None:
