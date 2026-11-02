@@ -3,12 +3,15 @@
 from fastapi import APIRouter
 
 from app.engines.tarot import draw_spread
+from app.engines.tarot_context import apply_context
 from app.schemas.tarot import TarotSpreadRequest, TarotSpreadResponse
 
 router = APIRouter(prefix="/tarot")
 
 
-@router.post("/spread", response_model=TarotSpreadResponse, summary="Draw and interpret a tarot spread")
+@router.post(
+    "/spread", response_model=TarotSpreadResponse, summary="Draw and interpret a tarot spread"
+)
 async def tarot_spread(request: TarotSpreadRequest) -> TarotSpreadResponse:
     """Draw cards for a chosen spread using a cryptographically secure shuffle.
 
@@ -16,8 +19,9 @@ async def tarot_spread(request: TarotSpreadRequest) -> TarotSpreadResponse:
     (when ``allow_reversed``); the response carries the position meanings and a
     synthesis composed from the real card interpretations.
     """
-    return draw_spread(
+    result = draw_spread(
         spread_id=request.spread_id,
         allow_reversed=request.allow_reversed,
         question=request.question,
     )
+    return apply_context(result, request.reading_topic)

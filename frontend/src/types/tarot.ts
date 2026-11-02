@@ -33,7 +33,10 @@ export interface TarotProvenance {
  * Input for a tarot spread draw. `spread_id` selects a layout: `single`,
  * `three_card`, `celtic_cross`, `relationship`, `career` or `decision`.
  */
+export type ReadingTopic = 'general' | 'relationship' | 'career' | 'decision';
+
 export interface TarotSpreadRequest {
+  reading_topic?: ReadingTopic;
   spread_id: string;
   /** Whether cards may land reversed (default true). */
   allow_reversed?: boolean;
@@ -76,6 +79,7 @@ export interface DrawnCard {
 
 /** Complete tarot spread produced by the backend engine. */
 export interface TarotSpreadResponse {
+  contextual_reading?: string[];
   spread_id: string;
   spread_name: string;
   spread_name_zh: string;

@@ -126,19 +126,10 @@ describe('塔罗中英配对呈现', () => {
     expect(entry.size).toBe(spread.cards.length);
   });
 
-  it('夹具里的五行出处按展示序排列', () => {
-    // 行序=展示序（`components/ui/ProvenancePanel.tsx` 的 `tables.map`），所以钉的是等序列表不是集合；
-    // 后端 golden 钉的是同一份清单的另一头（`backend/tests/golden/test_tarot_golden.py` 那条五行等序钉），
-    // 与 `lenormand`/`qimen`/`ziwei` 三家同形状。第五行 `tarot_polarity` 是 verdict 吉凶倾向表。
-    // 这一条**只钉夹具那五行自己的展示序**（测体读的是 `readFixture('tarot')` 的 JSON，把
-    // `TarotPage.tsx` 改坏不会红在这里）。溯源块已按 2026-10-21 UI 需求从页面移除，
-    // 「前端把这五行递给面板」那半截凭据随之作废，不再在此记挂。
+  it('夹具中的牌义与阅读主题出处按展示序排列', () => {
+    // The live recorder includes the extra table actually read by the topic adapter.
     expect(spread.provenance.tables.map((table) => table.name)).toEqual([
-      'tarot_major',
-      'tarot_minor',
-      'tarot_deck',
-      'tarot_keywords_zh',
-      'tarot_polarity',
+      'tarot_major', 'tarot_minor', 'tarot_deck', 'tarot_keywords_zh', 'tarot_polarity', 'tarot_context',
     ]);
   });
 

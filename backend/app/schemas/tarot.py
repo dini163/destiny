@@ -4,6 +4,8 @@ Field names are snake_case end-to-end (the JSON contract mirrors these models)
 so the frontend can consume responses without a mapping layer.
 """
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 from app.schemas.common import ProvenanceTable, Verdict
@@ -21,7 +23,10 @@ class TarotSpreadRequest(BaseModel):
 
     spread_id: str = Field(description="Spread layout id, e.g. celtic_cross.")
     allow_reversed: bool = Field(default=True, description="Whether cards may land reversed.")
-    question: str | None = Field(default=None, description="Optional question the reading addresses.")
+    question: str | None = Field(
+        default=None, description="Optional question the reading addresses."
+    )
+    reading_topic: Literal["general", "relationship", "career", "decision"] = "general"
 
 
 class TarotProvenance(BaseModel):
@@ -77,6 +82,7 @@ class TarotSpreadResponse(BaseModel):
     drawn_ids: list[str] = Field(description="Card ids in draw order (unique within the spread).")
     allow_reversed: bool = Field(description="Whether reversals were enabled for this draw.")
     synthesis: str = Field(description="A reading that connects the drawn cards and positions.")
+    contextual_reading: list[str] = Field(default_factory=list)
 
     # Derived emphasis
     major_arcana_count: int = Field(description="How many drawn cards are Major Arcana.")
@@ -88,4 +94,6 @@ class TarotSpreadResponse(BaseModel):
     provenance: TarotProvenance
 
     rng: str = Field(default="secrets", description="Randomness source: Python secrets (CSPRNG).")
-    engine: str = Field(default="content-library", description="Interpretations come from the curated deck.")
+    engine: str = Field(
+        default="content-library", description="Interpretations come from the curated deck."
+    )

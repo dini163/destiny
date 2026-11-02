@@ -8,7 +8,7 @@ import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useTarotSpread } from '../hooks/useTarotSpread';
-import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../types/tarot';
+import type { ReadingTopic, DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../types/tarot';
 
 /**
  * Tarot oracle page (塔罗神谕).
@@ -25,6 +25,7 @@ import type { DrawnCard, TarotSpreadRequest, TarotSpreadResponse } from '../type
 export function TarotPage() {
   const [spreadId, setSpreadId] = useState('celtic_cross');
   const [question, setQuestion] = useState('');
+  const [readingTopic, setReadingTopic] = useState<ReadingTopic>('general');
   const [allowReversed, setAllowReversed] = useState(true);
   const [revealed, setRevealed] = useState<ReadonlySet<number>>(() => new Set());
   const [selected, setSelected] = useState<number | null>(null);
@@ -41,6 +42,7 @@ export function TarotPage() {
     const trimmed = question.trim();
     const request: TarotSpreadRequest = {
       spread_id: spreadId,
+      reading_topic: readingTopic,
       allow_reversed: allowReversed,
       question: trimmed === '' ? undefined : trimmed,
     };
@@ -80,6 +82,8 @@ export function TarotPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <SpreadControls
+        readingTopic={readingTopic}
+        onReadingTopicChange={setReadingTopic}
         spreadId={spreadId}
         onSpreadChange={setSpreadId}
         question={question}
@@ -184,6 +188,9 @@ function TarotResults({
         </div>
       </div>
 
+      {spread.contextual_reading?.length ? <ResultCard title="围绕你选择的主题" eyebrow="READING LENS" icon="compass">
+        {spread.contextual_reading.map(line => <p key={line} className="text-base leading-loose text-ink-variant">{line}</p>)}
+      </ResultCard> : null}
       <VerdictCard verdict={spread.verdict} />
 
       <ResultCard title="综合解读" eyebrow="SYNTHESIS" icon="seal" elevated>

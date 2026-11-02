@@ -13,29 +13,29 @@
       "position_label_zh": "过去",
       "position_meaning": "Roots and events already shaping the situation.",
       "position_meaning_zh": "过去位看的是根子，那些已经发生、正在塑造当下局面的事。",
-      "card_id": "wands-07",
-      "name": "Seven of Wands",
-      "name_zh": "权杖七",
-      "arcana": "minor",
-      "number": 7,
-      "suit": "wands",
+      "card_id": "major-00",
+      "name": "The Fool",
+      "name_zh": "愚人",
+      "arcana": "major",
+      "number": 0,
+      "suit": null,
       "rank": null,
-      "element": "fire",
-      "orientation": "upright",
+      "element": null,
+      "orientation": "reversed",
       "keywords": [
-        "challenge",
-        "competition",
-        "perseverance",
-        "defensiveness"
+        "recklessness",
+        "risk-taking",
+        "holding back",
+        "folly"
       ],
       "keywords_zh": [
-        "挑战",
-        "竞争",
-        "坚持到底",
-        "设防心态"
+        "鲁莽",
+        "冒险行事",
+        "缩手缩脚",
+        "糊涂"
       ],
-      "meaning": "From high ground a figure fends off six wands below, holding a hard-won position through determination.",
-      "meaning_zh": "站在高处的人挡住下面六根权杖，靠决心守住一个来之不易的位置。"
+      "meaning": "Reversed, the Fool warns of folly and heedless risk, or of fear that keeps you from taking a necessary leap.",
+      "meaning_zh": "逆位时，愚人说的是糊涂与不顾后果的冒险，也可能是那份让你不敢纵身一跃的害怕。"
     },
     {
       "position_index": 1,
@@ -44,29 +44,29 @@
       "position_label_zh": "现在",
       "position_meaning": "The current dynamics and where you stand now.",
       "position_meaning_zh": "现在位看的是眼下的动势，以及你此刻站的位置。",
-      "card_id": "pentacles-10",
-      "name": "Ten of Pentacles",
-      "name_zh": "星币十",
+      "card_id": "cups-06",
+      "name": "Six of Cups",
+      "name_zh": "圣杯六",
       "arcana": "minor",
-      "number": 10,
-      "suit": "pentacles",
+      "number": 6,
+      "suit": "cups",
       "rank": null,
-      "element": "earth",
-      "orientation": "reversed",
+      "element": "water",
+      "orientation": "upright",
       "keywords": [
-        "the dark side of wealth",
-        "financial failure",
-        "loneliness",
-        "disputes"
+        "revisiting the past",
+        "childhood memories",
+        "innocence",
+        "joy"
       ],
       "keywords_zh": [
-        "财富的阴暗面",
-        "财务失败",
-        "孤独",
-        "争执"
+        "重访旧日",
+        "童年记忆",
+        "纯真",
+        "喜悦"
       ],
-      "meaning": "Reversed, inheritance brings dispute, or material security proves empty and isolating.",
-      "meaning_zh": "逆位时，继承带来争执，或者物质的安稳落到空荡与孤立。"
+      "meaning": "Children exchange cups of flowers in a sunlit home, evoking nostalgia, innocence and simple joy.",
+      "meaning_zh": "孩子们在洒满阳光的家门前交换盛花的杯子，唤起怀旧、纯真与简单的喜乐。"
     },
     {
       "position_index": 2,
@@ -75,49 +75,56 @@
       "position_label_zh": "未来",
       "position_meaning": "The likely direction if things continue as they are.",
       "position_meaning_zh": "未来位看的是照目前的走向继续下去，事情大概会往哪去。",
-      "card_id": "swords-09",
-      "name": "Nine of Swords",
-      "name_zh": "宝剑九",
-      "arcana": "minor",
-      "number": 9,
-      "suit": "swords",
+      "card_id": "major-20",
+      "name": "Judgement",
+      "name_zh": "审判",
+      "arcana": "major",
+      "number": 20,
+      "suit": null,
       "rank": null,
-      "element": "air",
+      "element": null,
       "orientation": "reversed",
       "keywords": [
-        "depression",
-        "nightmares",
-        "intense anxiety",
-        "reaching out"
+        "self-doubt",
+        "inner critic",
+        "ignoring the call",
+        "harsh judgement"
       ],
       "keywords_zh": [
-        "抑郁",
-        "噩梦",
-        "强烈不安",
-        "主动求助"
+        "自我怀疑",
+        "内在批评者",
+        "无视召唤",
+        "严苛评判"
       ],
-      "meaning": "Reversed, the night terrors ease or, at their worst, demand that help be sought.",
-      "meaning_zh": "逆位时，夜里的恐怖减轻，或在最难熬的时候，逼出一次主动求助。"
+      "meaning": "Reversed, a harsh inner critic or self-doubt causes you to ignore the call to renewal.",
+      "meaning_zh": "逆位时，严苛的内在批评者或自我怀疑让你无视那次召唤，错过这轮更新。"
     }
   ],
   "drawn_ids": [
-    "wands-07",
-    "pentacles-10",
-    "swords-09"
+    "major-00",
+    "cups-06",
+    "major-20"
   ],
   "allow_reversed": true,
-  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 权杖七（Seven of Wands），正位，取的是 挑战、竞争、坚持到底。 现在（Present）抽出 星币十（Ten of Pentacles），逆位，取的是 财富的阴暗面、财务失败、孤独。 未来（Future）抽出 宝剑九（Nine of Swords），逆位，取的是 抑郁、噩梦、强烈不安。 一张大牌也没有出现，所以这次讲的是日常的、你能直接上手的现实力量，而不是更大的人生主题。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
-  "major_arcana_count": 0,
+  "synthesis": "本次以 时间之流三张（Three Card）布阵。 过去（Past）抽出 愚人（The Fool），逆位，取的是 鲁莽、冒险行事、缩手缩脚。 现在（Present）抽出 圣杯六（Six of Cups），正位，取的是 重访旧日、童年记忆、纯真。 未来（Future）抽出 审判（Judgement），逆位，取的是 自我怀疑、内在批评者、无视召唤。 3 张牌里有 2 张大牌，那些超出你当下掌控的人生主题与力量正明显起作用。 2 张逆位，指向被阻滞、被内收或被延迟的能量，它们要的是被看清，不是被硬推。",
+  "contextual_reading": [
+    "阅读主题：自我观察。以下提纲基于你选择的主题，不分析自由文字，也不声称知道现实发生了什么。",
+    "过去 · 愚人（鲁莽、冒险行事、缩手缩脚）：这张牌的关键词和你最近哪一件具体事情有关？若没有对应，不必强行套用。",
+    "现在 · 圣杯六（重访旧日、童年记忆、纯真）：这张牌的关键词和你最近哪一件具体事情有关？若没有对应，不必强行套用。",
+    "未来 · 审判（自我怀疑、内在批评者、无视召唤）：这张牌的关键词和你最近哪一件具体事情有关？若没有对应，不必强行套用。",
+    "可以尝试：先挑一张最有共鸣的牌，写下事实和联想，暂不据此作重大决定。"
+  ],
+  "major_arcana_count": 2,
   "reversed_count": 2,
   "verdict": {
-    "grade": "小凶",
-    "stars": 2,
-    "headline": "你这一阵抽出的牌属小凶：积极牌0张、消极牌1张、中性牌2张，另有大牌0张、逆位2张，拖累的一面更多，先看清楚再动。",
+    "grade": "凶",
+    "stars": 1,
+    "headline": "你这一阵抽出的牌属凶：积极牌0张、消极牌2张、中性牌1张，另有大牌2张、逆位2张，先把基本盘稳住，别急着出手。",
     "points": [
       "积极牌 0 张",
-      "消极牌 1 张",
-      "中性牌 2 张",
-      "大牌 0 张",
+      "消极牌 2 张",
+      "中性牌 1 张",
+      "大牌 2 张",
       "逆位 2 张"
     ],
     "advice": "综合建议：你这一阵抽出的牌面已经摆在眼前，负向牌偏多，先把眼前的阻滞看清楚，暂缓推进。"
@@ -152,6 +159,11 @@
         "name": "tarot_polarity",
         "version": "2026.09",
         "source": "伟特体系通行牌义（A. E. Waite《The Pictorial Key to the Tarot》1910：大牌章、权杖/圣杯/宝剑/星币四花色小牌章）· 吉凶倾向为本表自持归类（模型参数，非古籍赋分）"
+      },
+      {
+        "name": "tarot_context",
+        "version": "2026.09",
+        "source": "Destiny 自撰牌义阅读提纲（按用户选择的主题组织，不作事件推断）"
       }
     ]
   },

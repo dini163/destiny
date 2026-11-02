@@ -1,3 +1,4 @@
+import type { ReadingTopic } from '../../types/tarot';
 import type { FormEvent } from 'react';
 
 import { SPREAD_CATALOG } from '../../lib/tarot';
@@ -6,6 +7,8 @@ import { LabeledField } from '../ui/LabeledField';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 interface SpreadControlsProps {
+  readingTopic: ReadingTopic;
+  onReadingTopicChange: (value: ReadingTopic) => void;
   /** Currently chosen spread id. */
   spreadId: string;
   onSpreadChange: (id: string) => void;
@@ -37,6 +40,7 @@ const REVERSAL_OPTIONS: ReadonlyArray<{ value: ReversalMode; label: string }> = 
  * mirrored from the backend library, so counts and names are never invented.
  */
 export function SpreadControls({
+  readingTopic, onReadingTopicChange,
   spreadId,
   onSpreadChange,
   question,
@@ -95,7 +99,7 @@ export function SpreadControls({
                   className={`flex flex-col gap-1 rounded-element border p-2.5 text-left transition ${
                     active
                       ? 'border-gold-strong bg-gold/10'
-                      : 'border-rim bg-[#0e111a] hover:border-rim-strong'
+                      : 'border-rim bg-[var(--field-bg)] hover:border-rim-strong'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -115,13 +119,16 @@ export function SpreadControls({
         </LabeledField>
 
         <div className="flex flex-col gap-4 xl:col-span-4">
+          <LabeledField label="阅读主题"><select className="field" aria-label="阅读主题" value={readingTopic} onChange={event => onReadingTopicChange(event.target.value as ReadingTopic)}>
+            <option value="general">自我观察</option><option value="relationship">关系沟通</option><option value="career">工作与任务</option><option value="decision">选择与取舍</option></select></LabeledField>
           <LabeledField label="求问焦点 / QUESTION" hint={<span className="text-ink-muted">可选</span>}>
-            <div className="flex items-center gap-2 rounded-element border border-rim bg-[#0e111a] px-3 py-2 transition focus-within:border-rim-strong">
+            <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <Icon name="seal" size={16} className="shrink-0 text-ink-muted" />
               <input
                 type="text"
                 value={question}
                 onChange={(event) => onQuestionChange(event.target.value)}
+                title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
                 placeholder="例如：我该如何看待当前事业的转折？"
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 aria-label="求问焦点"
@@ -129,6 +136,7 @@ export function SpreadControls({
             </div>
           </LabeledField>
 
+          <p className="text-xs text-ink-muted">主题决定阅读提纲；问题文字只记录关注点，不用于推断现实事件。</p>
           <LabeledField label="正逆位 / ORIENTATION">
             <SegmentedControl
               ariaLabel="正逆位设置"

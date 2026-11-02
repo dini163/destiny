@@ -359,6 +359,7 @@ def test_provenance_engine_and_note_and_the_two_pinned_labels(client: TestClient
         "tarot_deck",
         "tarot_keywords_zh",
         "tarot_polarity",
+        "tarot_context",
     ]
 
 

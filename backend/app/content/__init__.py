@@ -40,6 +40,7 @@ from app.content.rune_spreads import SPREADS_SOURCE
 from app.content.synastry import SYNASTRY_SOURCE
 from app.content.synastry_plain import SYNASTRY_PLAIN_SOURCE
 from app.content.tarot_deck import TAROT_SOURCE
+from app.content.tarot_context import TOPIC_SOURCE
 from app.content.tarot_keywords_zh import TAROT_KEYWORDS_ZH_SOURCE
 from app.content.tarot_polarity import TAROT_POLARITY_SOURCE
 from app.content.transit_plain import TRANSIT_PLAIN_SOURCE
@@ -334,3 +335,6 @@ ZHOUYI_CONTENT_SOURCES: tuple[tuple[str, str], ...] = (
     ("zhouyi_plain", ZHOUYI_PLAIN_SOURCE),
     ("zhouyi_duanci", ZHOUYI_DUANCI_SOURCE),
 )
+
+# Only the explicit topic-reading adapter consumes this additional table.
+TAROT_CONTEXT_SOURCES: tuple[tuple[str, str], ...] = (("tarot_context", TOPIC_SOURCE),)
