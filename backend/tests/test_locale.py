@@ -767,3 +767,34 @@ def test_numerology_display_names_localize() -> None:
     assert localize("乐观", "zh-Hant") == "樂觀"
     assert localize("心智平面", "zh-Hant") == "心智平面"
     assert localize("实干", "zh-Hant") == "实干"
+
+
+def test_bazi_transit_rule_labels_localize() -> None:
+    # p15：岁运账本规则短名与粒度名在 en 下替换；干留天干之干，冲取六冲之沖。
+    from app.content.bazi_transit_rules import TRANSIT_RULES
+
+    payload = {
+        "birth_date": "1990-06-15", "birth_time": "08:30:00", "city": "成都",
+        "gender": "male", "calendar": "solar", "apply_true_solar_time": True, "target_year": 2026,
+    }
+    labels = {r.label for r in TRANSIT_RULES.values()}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/liuyue", json=payload)
+        e = client.post("/api/v1/bazi/liuyue?locale=en", json=payload)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in labels}
+    assert present, "bazi 岁运应至少落一个规则短名叶值"
+    for token in present:
+        assert token not in el, f"en 未替换岁运规则短名 {token}"
+    # 直接单测：全族取到预期英译；繁体对干/冲/岁取正确字形，无差者透传。
+    assert localize("值太岁", "en") == "Encountering Tai Sui"
+    assert localize("日主临衰病死墓绝", "en") == "Day Master at Decline, Illness, Death, Tomb, Extinction"
+    assert localize("流年", "en") == "Flowing Year"
+    assert localize("大运", "en") == "Major Luck Cycle"
+    assert localize("运干入喜用", "zh-Hant") == "運干入喜用"
+    assert localize("冲太岁", "zh-Hant") == "沖太歲"
+    assert localize("半合忌", "zh-Hant") == "半合忌"
+    assert localize("三会忌", "zh-Hant") == "三會忌"
+    assert localize("大运", "zh-Hant") == "大運"
