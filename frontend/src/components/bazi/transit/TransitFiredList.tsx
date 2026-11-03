@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { formatDelta } from '../../../lib/scoring';
 import type { TransitFired } from '../../../types/baziTransit';
 
@@ -28,9 +29,10 @@ const FAMILY_CAPTION: Record<string, string> = {
  * 月段行的短名自带「（流月）」后缀，与年段行同组并列时可分辨。
  */
 export function TransitFiredList({ rows }: { rows: TransitFired[] }) {
+  const { t } = useI18n();
   if (rows.length === 0) {
     // 如实说明"查过了、没命中"，而不是留白让人以为是渲染坏了。
-    return <p className="text-sm text-ink-muted">此岁未命中岁运规则表中的任何一条，账本只有基准一行。</p>;
+    return <p className="text-sm text-ink-muted">{t('此岁未命中岁运规则表中的任何一条，账本只有基准一行。')}</p>;
   }
 
   const families: string[] = [];
@@ -51,10 +53,11 @@ export function TransitFiredList({ rows }: { rows: TransitFired[] }) {
 
 /** One family: its caption and hit count, then its rows. */
 function FamilyBlock({ family, rows }: { family: string; rows: TransitFired[] }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5">
       <span className="label-caps text-ink-muted">
-        {FAMILY_CAPTION[family] ?? family} · {rows.length}条
+        {t(FAMILY_CAPTION[family] ?? family)} · {t('{{n}}条', { n: rows.length })}
       </span>
       <ul className="flex flex-col gap-1.5">
         {rows.map((row) => (
@@ -62,7 +65,7 @@ function FamilyBlock({ family, rows }: { family: string; rows: TransitFired[] })
             key={row.key}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-1 rounded-element bg-[var(--field-bg)] px-3 py-2 text-xs"
           >
-            <span className="text-ink">{row.label}</span>
+            <span className="text-ink">{t(row.label)}</span>
             <span className={`numeric ${row.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>
               {formatDelta(row.delta)}
             </span>

@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { HOUR_BRANCHES, type TransitHourCell } from '../../../types/baziLiushi';
 import { tierClass } from '../liuri/tier';
 
@@ -31,6 +32,7 @@ export function LiushiQiWaveform({
   peakIndex: number;
 }) {
   const step = WIDTH / 12;
+  const { t } = useI18n();
   const segments = hours.map(
     (cell, index) => `M${index * step},${yOf(cell.value)} L${(index + 1) * step},${yOf(cell.value)}`,
   );
@@ -84,7 +86,7 @@ export function LiushiQiWaveform({
         ))}
       </div>
       <span className="text-[11px] text-ink-muted">
-        虚线 = 本日气数 {Math.round(baseline)}；纵轴只有吉凶度一把尺，阶梯为实测十二点，未插值。
+        {t('虚线 = 本日气数 {{n}}；纵轴只有吉凶度一把尺，阶梯为实测十二点，未插值。', { n: Math.round(baseline) })}
       </span>
     </div>
   );

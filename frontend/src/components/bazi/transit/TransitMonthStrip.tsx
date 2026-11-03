@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../i18n/context';
 import { Icon } from '../../ui/Icon';
 import { ScoreLedger } from '../../ui/ScoreLedger';
 import { TransitFiredList } from './TransitFiredList';
@@ -42,14 +43,15 @@ export function TransitMonthStrip({
 /** One 节气月: caption, date span, ledger and its own fired rows. */
 function MonthCard({ month, href }: { month: TransitMonth; href?: string }) {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-3 rounded-element border border-rim bg-[var(--field-bg)] p-4">
       <div className="flex items-baseline justify-between gap-2">
         <span className="flex items-baseline gap-2">
-          <span className="font-display text-base text-ink">{month.month_in_chinese}月</span>
+          <span className="font-display text-base text-ink">{t('{{m}}月', { m: month.month_in_chinese })}</span>
           <span className="text-sm text-gold-soft">{month.ganzhi}</span>
         </span>
-        <span className="label-caps text-ink-muted">{month.pillar.di_shi}</span>
+        <span className="label-caps text-ink-muted">{t(month.pillar.di_shi)}</span>
       </div>
 
       <p className="numeric text-xs text-ink-muted">
@@ -66,7 +68,7 @@ function MonthCard({ month, href }: { month: TransitMonth; href?: string }) {
           className="label-caps flex items-center gap-1 self-start text-ink-muted hover:text-gold-soft"
         >
           <Icon name="chevronDown" size={12} className={open ? 'rotate-180' : undefined} />
-          {open ? '收起本月命中' : `展开本月命中 ${month.fired.length} 行`}
+          {open ? t('收起本月命中') : t('展开本月命中 {{n}} 行', { n: month.fired.length })}
         </button>
 
         {href ? (
@@ -75,7 +77,7 @@ function MonthCard({ month, href }: { month: TransitMonth; href?: string }) {
             className="label-caps flex items-center gap-1 self-start text-ink-muted hover:text-gold-soft"
           >
             <Icon name="calendar" size={12} />
-            看本段逐日
+            {t('看本段逐日')}
           </Link>
         ) : null}
       </div>

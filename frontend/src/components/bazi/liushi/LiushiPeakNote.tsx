@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { tierClass } from '../liuri/tier';
 import type { TransitHourCell } from '../../../types/baziLiushi';
 
@@ -11,6 +12,7 @@ import type { TransitHourCell } from '../../../types/baziLiushi';
  * 存在，否则读者会以为空列表 = 页面漏了。
  */
 export function LiushiPeakNote({ cell, dayValue }: { cell: TransitHourCell; dayValue: number }) {
+  const { t } = useI18n();
   const gap = Math.round((cell.value - dayValue) * 10) / 10;
   return (
     <div className="flex flex-col gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-4 py-3">
@@ -20,22 +22,22 @@ export function LiushiPeakNote({ cell, dayValue }: { cell: TransitHourCell; dayV
           {cell.start_clock}–{cell.end_clock}
         </span>
         <span className={`numeric text-sm ${tierClass(cell.tier)}`}>
-          {cell.value} 分 · {cell.tier}
+          {t('{{v}} 分 · {{tier}}', { v: cell.value, tier: t(cell.tier) })}
         </span>
         <span className="numeric text-xs text-ink-variant">
-          较本日 {gap >= 0 ? `+${gap}` : gap} 分
+          {t('较本日 {{gap}} 分', { gap: gap >= 0 ? `+${gap}` : `${gap}` })}
         </span>
       </span>
-      <span className="text-xs text-ink-muted">日主临时支·{cell.qi_strength}</span>
+      <span className="text-xs text-ink-muted">{t('日主临时支·{{s}}', { s: t(cell.qi_strength) })}</span>
       {cell.hour_hits.length === 0 ? (
         <p className="text-sm leading-relaxed text-ink-variant">
-          时段本身没有加账 —— 这一格的分值来自日头那三段（流年、流月、流日）。
+          {t('时段本身没有加账 —— 这一格的分值来自日头那三段（流年、流月、流日）。')}
         </p>
       ) : (
         <ul className="flex flex-col gap-1">
           {cell.hour_hits.map((hit) => (
             <li key={hit.key} className="flex items-baseline justify-between gap-3 text-sm">
-              <span className="text-ink-variant">{hit.label}</span>
+              <span className="text-ink-variant">{t(hit.label)}</span>
               <span
                 className={`numeric ${hit.delta >= 0 ? 'text-wuxing-wood' : 'text-wuxing-fire'}`}
               >

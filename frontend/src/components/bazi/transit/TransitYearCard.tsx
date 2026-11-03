@@ -1,6 +1,7 @@
 import { PillarCard } from '../PillarCard';
 import { RelationChips } from '../RelationChips';
 import { ShenShaList } from '../ShenShaList';
+import { useI18n } from '../../../i18n/context';
 import { ResultCard } from '../../ui/ResultCard';
 import { ScoreLedger } from '../../ui/ScoreLedger';
 import { SourceNote } from '../../ui/SourceNote';
@@ -26,15 +27,16 @@ export function TransitYearCard({
   year: TransitYear;
   hrefFor?: (month: TransitMonth) => string;
 }) {
+  const { t } = useI18n();
   return (
     <ResultCard
-      eyebrow={`${year.year} 流年 · 虚岁 ${year.age}`}
-      title={`${year.pillar.ganzhi}年`}
+      eyebrow={t('{{year}} 流年 · 虚岁 {{age}}', { year: year.year, age: year.age })}
+      title={t('{{gz}}年', { gz: year.pillar.ganzhi })}
       icon="timeline"
       elevated
       actions={
         <span className="label-caps text-ink-muted">
-          {year.dayun_ganzhi ? `大运 ${year.dayun_ganzhi}` : '未起运'}
+          {year.dayun_ganzhi ? t('大运 {{gz}}', { gz: year.dayun_ganzhi }) : t('未起运')}
         </span>
       }
     >
@@ -49,14 +51,14 @@ export function TransitYearCard({
       <div className="gold-rule" />
 
       <div className="flex flex-col gap-3">
-        <span className="label-caps text-ink-muted">命中详单</span>
+        <span className="label-caps text-ink-muted">{t('命中详单')}</span>
         <TransitFiredList rows={year.fired} />
       </div>
 
       <div className="flex flex-col gap-3">
-        <span className="label-caps text-ink-muted">流年之干论十神</span>
+        <span className="label-caps text-ink-muted">{t('流年之干论十神')}</span>
         <div className="flex flex-col gap-1.5 rounded-element bg-[var(--field-bg)] px-3 py-2.5">
-          <span className="font-display text-base text-ink">{year.ten_god.god}</span>
+          <span className="font-display text-base text-ink">{t(year.ten_god.god)}</span>
           <p className="text-sm leading-relaxed text-ink-variant">{year.ten_god.meaning}</p>
           <span className="self-end">
             <SourceNote source={year.ten_god.source} />
@@ -66,21 +68,21 @@ export function TransitYearCard({
 
       {year.relations.length > 0 || year.branch_groups.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <span className="label-caps text-ink-muted">岁运与原局的刑冲合害</span>
+          <span className="label-caps text-ink-muted">{t('岁运与原局的刑冲合害')}</span>
           <RelationChips relations={year.relations} groups={year.branch_groups} />
         </div>
       ) : null}
 
       {year.shensha.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <span className="label-caps text-ink-muted">岁运落点神煞</span>
+          <span className="label-caps text-ink-muted">{t('岁运落点神煞')}</span>
           <ShenShaList entries={year.shensha} />
         </div>
       ) : null}
 
       {year.months ? (
         <div className="flex flex-col gap-3">
-          <span className="label-caps text-ink-muted">十二节气月</span>
+          <span className="label-caps text-ink-muted">{t('十二节气月')}</span>
           <TransitMonthStrip months={year.months} hrefFor={hrefFor} />
         </div>
       ) : null}

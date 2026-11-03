@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../i18n/context';
 import { yiPreview } from '../liuri/LiuriDayCell';
 import type { ShiftDirection } from '../liuri/LiuriSegmentHeader';
 import { TransitFiredList } from '../transit/TransitFiredList';
@@ -22,10 +23,11 @@ const DAY_SHIFT_ACTIONS: ReadonlyArray<{ direction: ShiftDirection; label: strin
 
 /** 一条事实：标签 + 值。缺值即整条不渲染，不留 `undefined` 在页面上。 */
 function Fact({ label, value }: { label: string; value: string | number | null | undefined }) {
+  const { t } = useI18n();
   if (value === null || value === undefined || value === '') return null;
   return (
     <span className="flex items-baseline gap-1 text-xs">
-      <span className="label-caps text-ink-muted">{label}</span>
+      <span className="label-caps text-ink-muted">{t(label)}</span>
       <span className="numeric text-ink">{value}</span>
     </span>
   );
@@ -55,10 +57,15 @@ export function LiushiDayHeader({
   onShift: (direction: ShiftDirection) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
   const yi = yiPreview(result.day_almanac.yi);
   return (
     <ResultCard
-      title={`${result.year_ganzhi}年 ${result.month_ganzhi}月 · ${result.day_ganzhi}日`}
+      title={t('{{year}}年 {{month}}月 · {{day}}日', {
+        year: result.year_ganzhi,
+        month: result.month_ganzhi,
+        day: result.day_ganzhi,
+      })}
       icon="sun"
       actions={
         <span className="flex items-center gap-2">
@@ -67,7 +74,7 @@ export function LiushiDayHeader({
               to={liuriHref}
               className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
             >
-              回流日矩阵
+              {t('回流日矩阵')}
             </Link>
           ) : null}
           {DAY_SHIFT_ACTIONS.map((action) => (
@@ -78,7 +85,7 @@ export function LiushiDayHeader({
               disabled={busy}
               className="rounded-element border border-rim px-2.5 py-1 text-xs text-ink-variant transition hover:border-rim-strong disabled:opacity-50"
             >
-              {action.label}
+              {t(action.label)}
             </button>
           ))}
         </span>
@@ -89,16 +96,16 @@ export function LiushiDayHeader({
         <Fact label="星期" value={WEEKDAY_HEAD[result.weekday]} />
         <Fact label="农历" value={result.lunar_day} />
         <Fact label="节气月段" value={`${result.month_start_solar} ~ ${result.month_end_solar}`} />
-        <Fact label="大运" value={result.dayun_ganzhi ?? '未起运'} />
+        <Fact label="大运" value={result.dayun_ganzhi ?? t('未起运')} />
         <Fact label="虚岁" value={result.year_age} />
-        <Fact label="本日气数" value={`${result.day_score.value} · ${result.day_score.tier}`} />
+        <Fact label="本日气数" value={t('{{v}} · {{tier}}', { v: result.day_score.value, tier: t(result.day_score.tier) })} />
       </div>
 
       <p className="text-xs leading-relaxed text-ink-muted">
-        本日历注：宜 {yi.join('、')}
-        {result.day_almanac.yi.length > yi.length ? ` 等 ${result.day_almanac.yi.length} 条` : ''}；忌{' '}
-        {result.day_almanac.ji.length === 0 ? '—' : result.day_almanac.ji.join('、')}。历注取自外部历法库，
-        是「日」粒度内容，不参与上面任何一分账，也不下挂到时辰。
+        {t('本日历注：宜')} {yi.map((entry) => t(entry)).join(t('、'))}
+        {result.day_almanac.yi.length > yi.length ? ` ${t('等 {{n}} 条', { n: result.day_almanac.yi.length })}` : ''}；{t('忌')}
+        {' '}
+        {result.day_almanac.ji.length === 0 ? '—' : result.day_almanac.ji.map((entry) => t(entry)).join(t('、'))}。{t('历注取自外部历法库，是「日」粒度内容，不参与上面任何一分账，也不下挂到时辰。')}
       </p>
 
       <div className="gold-rule" />
@@ -108,7 +115,7 @@ export function LiushiDayHeader({
         onClick={() => setOpen((next) => !next)}
         className="self-start label-caps text-ink-muted transition hover:text-ink"
       >
-        {open ? '收起本日命中' : `展开本日命中（${result.day_fired.length} 条）`}
+        {open ? t('收起本日命中') : t('展开本日命中（{{n}} 条）', { n: result.day_fired.length })}
       </button>
       {open ? <TransitFiredList rows={result.day_fired} /> : null}
     </ResultCard>

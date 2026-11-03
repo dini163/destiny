@@ -1,4 +1,5 @@
 import { SourceNote } from '../ui/SourceNote';
+import { useI18n } from '../../i18n/context';
 import { pillarLabel } from '../../lib/pillars';
 import type { GeJu } from '../../types/bazi';
 
@@ -8,6 +9,7 @@ import type { GeJu } from '../../types/bazi';
  * component joins nothing and adds nothing.
  */
 export function GeJuCard({ geju }: { geju: GeJu }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -19,12 +21,12 @@ export function GeJuCard({ geju }: { geju: GeJu }) {
               : 'label-caps rounded-element bg-wuxing-fire/15 px-2 py-0.5 text-wuxing-fire'
           }
         >
-          {geju.is_success ? '成格' : '不成格'}
+          {geju.is_success ? t('成格') : t('不成格')}
         </span>
       </div>
 
       <p className="text-xs text-ink-muted" title={`from_pillar=${geju.from_pillar}`}>
-        起于{pillarLabel(geju.from_pillar)}柱 · 取十神{geju.ten_god}
+        {t('起于{{label}}柱 · 取十神{{god}}', { label: t(pillarLabel(geju.from_pillar)), god: t(geju.ten_god) })}
       </p>
 
       <ul className="flex flex-col gap-2">
