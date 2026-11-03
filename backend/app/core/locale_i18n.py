@@ -73,6 +73,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         # 周易小节标题
         "本卦总论": "本卦總論",
         "变卦去向": "變卦去向",
+        # 黄道十二星座（sign_zh 叶值）：仅登记繁简字形有差者，同形回落源文。
+        "狮子": "獅子",
+        "处女": "處女",
+        "天蝎": "天蠍",
+        "双鱼": "雙魚",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -131,6 +136,19 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         # 周易小节标题
         "本卦总论": "Primary Hexagram Overview",
         "变卦去向": "Changed Hexagram Direction",
+        # 黄道十二星座（sign_zh 叶值，与 `engines/western.SIGNS_ZH` 同源十二名）。
+        "白羊": "Aries",
+        "金牛": "Taurus",
+        "双子": "Gemini",
+        "巨蟹": "Cancer",
+        "狮子": "Leo",
+        "处女": "Virgo",
+        "天秤": "Libra",
+        "天蝎": "Scorpio",
+        "射手": "Sagittarius",
+        "摩羯": "Capricorn",
+        "水瓶": "Aquarius",
+        "双鱼": "Pisces",
     },
 }
 

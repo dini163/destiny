@@ -21,6 +21,14 @@ _ZIWEI = {
     "apply_true_solar_time": True,
 }
 
+_WESTERN_NATAL = {
+    "birth_date": "1990-06-15",
+    "birth_time": "08:30:00",
+    "latitude": 51.4769,
+    "longitude": -0.0005,
+    "utc_offset_hours": 0.0,
+}
+
 
 def _walk_strings(value: object) -> list[str]:
     out: list[str] = []
@@ -76,3 +84,25 @@ def test_default_path_is_byte_identical_and_active_locales_swap_labels() -> None
     with TestClient(app) as client:
         unknown = client.post("/api/v1/ziwei/chart?locale=fr", json=_ZIWEI)
     assert unknown.content == default.content
+
+
+def test_western_sign_names_localize_only_when_requested() -> None:
+    # p15 星座专名表：默认 zh-Hans 逐字节透传，`?locale=en` 才把 sign_zh 叶值换掉。
+    from app.engines.western import SIGNS_ZH
+
+    with TestClient(app) as client:
+        default = client.post("/api/v1/western/natal", json=_WESTERN_NATAL)
+        en = client.post("/api/v1/western/natal?locale=en", json=_WESTERN_NATAL)
+        hant = client.post("/api/v1/western/natal?locale=zh-Hant", json=_WESTERN_NATAL)
+
+    assert default.status_code == en.status_code == hant.status_code == 200
+    d_leaves = _walk_strings(default.json())
+    en_leaves = _walk_strings(en.json())
+
+    # 响应确实携带至少一个星座名叶值（真响应，不 mock）。
+    present_signs = [s for s in d_leaves if s in SIGNS_ZH]
+    assert present_signs, "western 本命盘应至少落一个星座名叶值"
+    for sign in present_signs:
+        assert sign not in en_leaves, f"en 未替换星座名 {sign}"
+    # 默认 zh-Hans 路径保留源文，星座专名表不越界。
+    assert any(s in SIGNS_ZH for s in d_leaves)
