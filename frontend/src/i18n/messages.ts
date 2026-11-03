@@ -477,6 +477,43 @@ const zhHant: MessageDict = {
   '大限：': '大限：',
   岁起运: '歲起運',
   '历法：': '曆法：',
+
+  // NorseRunes
+  '正在铸石…': '正在鑄石…',
+  '{{count}} 枚石碑': '{{count}} 枚石碑',
+  导出符印命谱: '導出符印命譜',
+
+  // Report page
+  '关系阶段（可选）': '關係階段（可選）',
+  暂不提供: '暫不提供',
+  相识或交往: '相識或交往',
+  长期相处: '長期相處',
+  修复分歧: '修復分歧',
+  '只用于组织沟通建议，不改变盘面计算。':
+    '僅用於組織溝通建議，不改變盤面計算。',
+  报告起始日: '報告起始日',
+  '不选则从今天开始，连续十二个月。': '不選則從今天起，連續十二個月。',
+  返回发现: '返回發現',
+  '真实计算样例 · 非个人测评': '真實計算樣例 · 非個人測評',
+  私密报告交付: '私密報告交付',
+  报告预览: '報告預覽',
+  '正在准备报告…': '正在準備報告…',
+
+  // Profiles page
+  '把常用之人的生辰与出生地存成本地档案：八字、紫微、西洋占星等任一测算页点「选择档案」即可一键填充，测算后也可把当前输入一键存入。':
+    '把常用之人的生辰與出生地存為本機檔案：八字、紫微、西洋占星等任一測算頁點「選擇檔案」即可一鍵填充，測算後亦可把當前輸入一鍵存入。',
+  '档案只写在你这台设备的浏览器里，不上传服务器，不随账号漫游，可随时编辑或删除。':
+    '檔案只寫在你這台裝置的瀏覽器裡，不上傳伺服器，不隨帳號漫遊，可隨時編輯或刪除。',
+  '{{count}} 份档案 · 本机存储': '{{count}} 份檔案 · 本機儲存',
+  还没有档案: '還沒有檔案',
+  '点击「新建档案」录入第一位家人或朋友，之后在任何测算页都能从「选择档案」一键带入其生辰。':
+    '點擊「新建檔案」錄入第一位家人或朋友，之後在任何測算頁都能從「選擇檔案」一鍵帶入其生辰。',
+  新建第一份档案: '新建第一份檔案',
+  未填性别: '未填性別',
+  '更新于 {{date}}': '更新於 {{date}}',
+  编辑: '編輯',
+  确认删除: '確認刪除',
+  删除: '刪除',
 };
 
 const en: MessageDict = {
@@ -937,6 +974,43 @@ const en: MessageDict = {
   '大限：': 'Major limit:',
   岁起运: ' yrs to first limit',
   '历法：': 'Calendar:',
+
+  // NorseRunes
+  '正在铸石…': 'Casting the stones…',
+  '{{count}} 枚石碑': '{{count}} stones',
+  导出符印命谱: 'Export bindrune',
+
+  // Report page
+  '关系阶段（可选）': 'Relationship stage (optional)',
+  暂不提供: 'Not provided',
+  相识或交往: 'Acquaintance or dating',
+  长期相处: 'Long-term together',
+  修复分歧: 'Repairing rifts',
+  '只用于组织沟通建议，不改变盘面计算。':
+    'Used only to organise communication advice; chart calculations are unchanged.',
+  报告起始日: 'Report start date',
+  '不选则从今天开始，连续十二个月。': 'Defaults to today, covering the next twelve months.',
+  返回发现: 'Back to Discover',
+  '真实计算样例 · 非个人测评': 'Real computation sample · not a personal reading',
+  私密报告交付: 'Private report delivery',
+  报告预览: 'Report preview',
+  '正在准备报告…': 'Preparing the report…',
+
+  // Profiles page
+  '把常用之人的生辰与出生地存成本地档案：八字、紫微、西洋占星等任一测算页点「选择档案」即可一键填充，测算后也可把当前输入一键存入。':
+    'Save the birth data of the people you care about: on any divination page (BaZi, Zi Wei, Western natal, and so on) hit “Pick profile” to fill the console in one tap, or store the current inputs after casting.',
+  '档案只写在你这台设备的浏览器里，不上传服务器，不随账号漫游，可随时编辑或删除。':
+    'Profiles live only in this device\u2019s browser — no upload, no cross-account sync, editable or deletable at any time.',
+  '{{count}} 份档案 · 本机存储': '{{count}} profiles · stored locally',
+  还没有档案: 'No profiles yet',
+  '点击「新建档案」录入第一位家人或朋友，之后在任何测算页都能从「选择档案」一键带入其生辰。':
+    'Click “New profile” to add a family member or friend; from then on any divination page can fill in their birth data via “Pick profile”.',
+  新建第一份档案: 'Create your first profile',
+  未填性别: 'Gender not set',
+  '更新于 {{date}}': 'Updated {{date}}',
+  编辑: 'Edit',
+  确认删除: 'Confirm delete',
+  删除: 'Delete',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

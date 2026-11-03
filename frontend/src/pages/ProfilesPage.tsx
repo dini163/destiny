@@ -2,15 +2,18 @@ import { useState } from 'react';
 
 import { useProfiles } from '../hooks/useProfiles';
 import type { PersonProfile } from '../lib/profiles';
+import { useI18n } from '../i18n/context';
 import { ProfileEditor } from '../components/profiles/ProfileEditor';
 import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
 
+type Translate = ReturnType<typeof useI18n>['t'];
+
 /** Compact birth-data line for a profile card. */
-function birthLine(profile: PersonProfile): string {
+function birthLine(profile: PersonProfile, t: Translate): string {
   const parts: string[] = [];
   if (profile.birth_date) {
-    parts.push(`${profile.calendar === 'lunar' ? '农历' : '公历'} ${profile.birth_date} ${profile.birth_time ?? ''}`);
+    parts.push(`${profile.calendar === 'lunar' ? t('农历') : t('公历')} ${profile.birth_date} ${profile.birth_time ?? ''}`);
   }
   if (profile.city) {
     parts.push(profile.city);
@@ -18,7 +21,7 @@ function birthLine(profile: PersonProfile): string {
       parts.push(`${profile.latitude.toFixed(2)}°N/${profile.longitude.toFixed(2)}°E`);
     }
   }
-  return parts.length > 0 ? parts.join(' · ') : '未填生辰';
+  return parts.length > 0 ? parts.join(' · ') : t('未填生辰');
 }
 
 /**
@@ -29,6 +32,7 @@ function birthLine(profile: PersonProfile): string {
  * the privacy seals in the footer state exactly this.
  */
 export function ProfilesPage() {
+  const { t } = useI18n();
   const { profiles, upsert, remove } = useProfiles();
   const [editing, setEditing] = useState<PersonProfile | null | undefined>(undefined);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -42,16 +46,17 @@ export function ProfilesPage() {
       >
         <div className="flex flex-col gap-3">
           <p className="max-w-3xl text-sm leading-relaxed text-ink-muted">
-            把常用之人的生辰与出生地存成本地档案：八字、紫微、西洋占星等任一测算页点「选择档案」即可一键填充，测算后也可把当前输入一键存入。
-            档案只写在你这台设备的浏览器里，不上传服务器，不随账号漫游，可随时编辑或删除。
+            {t('把常用之人的生辰与出生地存成本地档案：八字、紫微、西洋占星等任一测算页点「选择档案」即可一键填充，测算后也可把当前输入一键存入。')}
+            {' '}
+            {t('档案只写在你这台设备的浏览器里，不上传服务器，不随账号漫游，可随时编辑或删除。')}
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <button type="button" className="btn-primary" onClick={() => setEditing(null)}>
               <Icon name="sparkle" size={18} />
-              新建档案
+              {t('新建档案')}
             </button>
             <span className="label-caps text-ink-muted">
-              {profiles.length} 份档案 · 本机存储
+              {t('{{count}} 份档案 · 本机存储', { count: profiles.length })}
             </span>
           </div>
         </div>
@@ -63,14 +68,14 @@ export function ProfilesPage() {
             <Icon name="vault" size={28} />
           </span>
           <div className="flex flex-col gap-1">
-            <h2 className="font-display text-lg text-ink">还没有档案</h2>
+            <h2 className="font-display text-lg text-ink">{t('还没有档案')}</h2>
             <p className="max-w-md text-sm leading-relaxed text-ink-muted">
-              点击「新建档案」录入第一位家人或朋友，之后在任何测算页都能从「选择档案」一键带入其生辰。
+              {t('点击「新建档案」录入第一位家人或朋友，之后在任何测算页都能从「选择档案」一键带入其生辰。')}
             </p>
           </div>
           <button type="button" className="btn-primary" onClick={() => setEditing(null)}>
             <Icon name="sparkle" size={18} />
-            新建第一份档案
+            {t('新建第一份档案')}
           </button>
         </div>
       ) : (
@@ -88,17 +93,17 @@ export function ProfilesPage() {
                   ) : null}
                 </div>
                 <span className="label-caps shrink-0 rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                  {profile.gender ? (profile.gender === 'male' ? '男' : '女') : '未填性别'}
+                  {profile.gender ? (profile.gender === 'male' ? t('男') : t('女')) : t('未填性别')}
                 </span>
               </div>
 
               <p className="min-h-[2.5rem] text-sm leading-relaxed text-ink-muted">
-                {birthLine(profile)}
+                {birthLine(profile, t)}
               </p>
 
               <div className="mt-auto flex items-center justify-between gap-2 border-t border-rim/60 pt-3">
                 <span className="label-caps text-ink-muted">
-                  更新于 {profile.updated_at.slice(0, 10)}
+                  {t('更新于 {{date}}', { date: profile.updated_at.slice(0, 10) })}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
@@ -106,7 +111,7 @@ export function ProfilesPage() {
                     className="btn-ghost rounded-element px-2.5 py-1.5 text-sm"
                     onClick={() => setEditing(profile)}
                   >
-                    编辑
+                    {t('编辑')}
                   </button>
                   {confirmingId === profile.id ? (
                     <button
@@ -117,7 +122,7 @@ export function ProfilesPage() {
                         setConfirmingId(null);
                       }}
                     >
-                      确认删除
+                      {t('确认删除')}
                     </button>
                   ) : (
                     <button
@@ -125,7 +130,7 @@ export function ProfilesPage() {
                       className="btn-ghost rounded-element px-2.5 py-1.5 text-sm text-ink-muted transition hover:text-ink"
                       onClick={() => setConfirmingId(profile.id)}
                     >
-                      删除
+                      {t('删除')}
                     </button>
                   )}
                 </div>

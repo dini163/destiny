@@ -9,11 +9,13 @@ import { ReportNotice } from '../components/report/ReportNotice';
 import { ReportHeader } from '../components/report/ReportHeader';
 import { ReportPreviewGate } from '../components/report/ReportPreviewGate';
 import { useReportReading } from '../hooks/useReportReading';
+import { useI18n } from '../i18n/context';
 import { isReportProduct } from '../lib/reportReading';
 import type { ReportProduct } from '../types/report';
 import { ROUTES } from '../nav';
 
 export function ReportPage() {
+  const { t } = useI18n();
   const { product } = useParams();
   const location = useLocation();
   const [query, setQuery] = useSearchParams();
@@ -27,7 +29,7 @@ export function ReportPage() {
         !location.hash.includes('delivery=') &&
         query.get('sample') !== '1' && (
           <label className="report-start-date">
-            关系阶段（可选）
+            {t('关系阶段（可选）')}
             <select
               value={stage ?? 'unspecified'}
               onChange={(event) => {
@@ -36,19 +38,19 @@ export function ReportPage() {
                 setQuery(next);
               }}
             >
-              <option value="unspecified">暂不提供</option>
-              <option value="dating">相识或交往</option>
-              <option value="long_term">长期相处</option>
-              <option value="repair">修复分歧</option>
+              <option value="unspecified">{t('暂不提供')}</option>
+              <option value="dating">{t('相识或交往')}</option>
+              <option value="long_term">{t('长期相处')}</option>
+              <option value="repair">{t('修复分歧')}</option>
             </select>
-            <span>只用于组织沟通建议，不改变盘面计算。</span>
+            <span>{t('只用于组织沟通建议，不改变盘面计算。')}</span>
           </label>
         )}
       {product === 'r3' &&
         !location.hash.includes('delivery=') &&
         query.get('sample') !== '1' && (
           <label className="report-start-date">
-            报告起始日
+            {t('报告起始日')}
             <input
               type="date"
               value={startDate ?? ''}
@@ -59,7 +61,7 @@ export function ReportPage() {
                 setQuery(next);
               }}
             />
-            <span>不选则从今天开始，连续十二个月。</span>
+            <span>{t('不选则从今天开始，连续十二个月。')}</span>
           </label>
         )}
       <ReportSession
@@ -87,6 +89,7 @@ function ReportSession({
   startDate?: string;
   stage?: string;
 }) {
+  const { t } = useI18n();
   const report = useReportReading(product, sample, fragment, startDate, stage);
   const doc =
     report.document ?? report.deliveredDocument ?? report.sampleDocument;
@@ -100,13 +103,13 @@ function ReportSession({
   return (
     <div className="report-page">
       <div className="report-top">
-        <Link to={ROUTES.overview}>← 返回发现</Link>
+        <Link to={ROUTES.overview}>← {t('返回发现')}</Link>
         <span>
           {sample
-            ? '真实计算样例 · 非个人测评'
+            ? t('真实计算样例 · 非个人测评')
             : report.delivered
-              ? '私密报告交付'
-              : '报告预览'}
+              ? t('私密报告交付')
+              : t('报告预览')}
         </span>
       </div>
       {error && (
@@ -118,7 +121,7 @@ function ReportSession({
         report.isFetchingDelivery ||
         report.isFetchingSample) && (
         <p className="page-loading" role="status">
-          正在准备报告…
+          {t('正在准备报告…')}
         </p>
       )}
       {doc ? (

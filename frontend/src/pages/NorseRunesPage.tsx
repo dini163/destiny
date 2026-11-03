@@ -9,6 +9,7 @@ import { Icon } from '../components/ui/Icon';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useRunes } from '../hooks/useRunes';
+import { useI18n } from '../i18n/context';
 import { downloadRuneTranscript } from '../lib/runeExport';
 import type { RuneCastResponse } from '../types/runes';
 
@@ -31,6 +32,7 @@ import type { RuneCastResponse } from '../types/runes';
  */
 export function NorseRunesPage() {
   const runes = useRunes();
+  const { t } = useI18n();
 
   return (
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
@@ -44,7 +46,7 @@ export function NorseRunesPage() {
       ) : null}
 
       {runes.isPending && !runes.data ? (
-        <p className="label-caps text-ink-muted">正在铸石…</p>
+        <p className="label-caps text-ink-muted">{t('正在铸石…')}</p>
       ) : null}
 
       {runes.data ? <RuneResults cast={runes.data} /> : null}
@@ -54,6 +56,7 @@ export function NorseRunesPage() {
 
 /** 一次铸石的全部结果，按「碑阵 → 直读 → 阴影参照 → 全典」的阅读次序排。出处块已按 2026-10-21 UI 需求移除。 */
 function RuneResults({ cast }: { cast: RuneCastResponse }) {
+  const { t } = useI18n();
   return (
     <>
       <ResultCard
@@ -63,14 +66,16 @@ function RuneResults({ cast }: { cast: RuneCastResponse }) {
         elevated
         actions={
           <>
-            <span className="label-caps text-ink-muted">{cast.stones.length} 枚石碑</span>
+            <span className="label-caps text-ink-muted">
+              {t('{{count}} 枚石碑', { count: cast.stones.length })}
+            </span>
             <button
               type="button"
               onClick={() => downloadRuneTranscript(cast)}
               className="btn-ghost rounded-element px-3 py-1.5 text-xs"
             >
               <Icon name="seal" size={14} />
-              导出符印命谱
+              {t('导出符印命谱')}
             </button>
           </>
         }
