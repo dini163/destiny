@@ -195,3 +195,26 @@ def test_najia_six_spirits_and_six_relatives_localize() -> None:
     assert any(s in liuqin for s in present), "应含六亲叶值"
     for token in set(present):
         assert token not in el, f"en 未替换六神/六亲叶值 {token}"
+
+
+def test_ziwei_palace_names_localize_only_when_requested() -> None:
+    # p15-d：紫微十二宫宫名叶值（PALACE_NAMES）只在请求时替换，默认透传。
+    from app.content.ziwei import PALACE_NAMES
+
+    palaces = set(PALACE_NAMES)
+    with TestClient(app) as client:
+        d = client.post("/api/v1/ziwei/chart", json=_ZIWEI)
+        e = client.post("/api/v1/ziwei/chart?locale=en", json=_ZIWEI)
+        h = client.post("/api/v1/ziwei/chart?locale=zh-Hant", json=_ZIWEI)
+    assert d.status_code == e.status_code == h.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = [s for s in dl if s in palaces]
+    assert present, "ziwei 应至少落一个宫名叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换宫名 {token}"
+    # 繁简有差的宫名（命宫/财帛…）在 zh-Hant 下也要被换掉。
+    hl = _walk_strings(h.json())
+    for token in [s for s in set(present) if s in LABELS["zh-Hant"]]:
+        assert token not in hl, f"zh-Hant 未替换宫名 {token}"

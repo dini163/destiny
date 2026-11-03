@@ -93,6 +93,12 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "勾陈": "勾陳",
         "子孙": "子孫",
         "妻财": "妻財",
+        # 紫微十二宫（ziwei palace name 叶值）：仅登记字形有差者。
+        "命宫": "命宮",
+        "财帛": "財帛",
+        "迁移": "遷移",
+        "仆役": "僕役",
+        "官禄": "官祿",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -208,6 +214,18 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "子孙": "Offspring",
         "妻财": "Wealth",
         "官鬼": "Officers",
+        # 紫微十二宫（palace name 叶值，与 `content/ziwei.PALACE_NAMES` 同源）；
+        # 兄弟/父母与六亲同词同译，不重复登记。宫位网格以裸名作标，语境已供“宫”义。
+        "命宫": "Life",
+        "夫妻": "Spouse",
+        "子女": "Children",
+        "财帛": "Wealth",
+        "疾厄": "Health",
+        "迁移": "Travel",
+        "仆役": "Servants",
+        "官禄": "Career",
+        "田宅": "Property",
+        "福德": "Blessing",
     },
 }
 
