@@ -550,6 +550,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "春分": "Spring Equinox", "清明": "Clear and Bright", "白露": "White Dew", "秋分": "Autumn Equinox",
         "立冬": "Start of Winter", "立夏": "Start of Summer", "立春": "Start of Spring", "立秋": "Start of Autumn",
         "芒种": "Grain in Ear", "谷雨": "Grain Rain", "雨水": "Rain Water", "霜降": "Frost's Descent",
+        # 月令旺相休囚死（`content/bazi_wangshuai.WANG_SHUAI_VALUE` keys）＋奇门三元（`content/qimen.YUAN_NAMES`）：均繁简同形，仅登 en（死复用十二长生 Death）。
+        "旺": "Prosperous", "相": "Viable", "休": "Resting", "囚": "Imprisoned", "上元": "Upper Yuan", "中元": "Middle Yuan", "下元": "Lower Yuan",
     },
 }
 

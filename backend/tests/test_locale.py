@@ -682,3 +682,48 @@ def test_solar_terms_localize() -> None:
     assert localize("惊蛰", "zh-Hant") == "驚蟄"
     assert localize("芒种", "zh-Hant") == "芒種"
     assert localize("处暑", "zh-Hant") == "處暑"
+
+
+def test_wangshuai_grades_and_sanyuan_localize() -> None:
+    # p15：月令旺相休囚死（梅花落叶）与奇门三元在 en 下替换；均繁简同形，zh-Hant 透传。
+    import app.content.qimen as Q
+    from app.content.bazi_wangshuai import WANG_SHUAI_VALUE
+
+    meihua_cast = {
+        "method": "time",
+        "birth_date": "1990-06-15",
+        "birth_time": "08:30:00",
+    }
+    ws = set(WANG_SHUAI_VALUE)
+    yuan = set(Q.YUAN_NAMES)
+    assert ws == {"旺", "相", "休", "囚", "死"}
+    with TestClient(app) as client:
+        md = client.post("/api/v1/meihua/cast", json=meihua_cast)
+        me = client.post("/api/v1/meihua/cast?locale=en", json=meihua_cast)
+        mh = client.post("/api/v1/meihua/cast?locale=zh-Hant", json=meihua_cast)
+        qd = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        qe = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+    assert md.status_code == me.status_code == mh.status_code == 200
+    assert qd.status_code == qe.status_code == 200
+    mdl = _walk_strings(md.json())
+    mel = _walk_strings(me.json())
+    mhl = _walk_strings(mh.json())
+    present = {s for s in mdl if s in ws}
+    assert present, "meihua 应至少落一个旺相休囚死叶值"
+    for token in present:
+        assert token not in mel, f"en 未替换旺衰 {token}"
+        assert token in mhl, f"zh-Hant 不应改动旺衰 {token}"
+    qdl = _walk_strings(qd.json())
+    qel = _walk_strings(qe.json())
+    qpresent = {s for s in qdl if s in yuan}
+    assert qpresent, "qimen 应至少落一个三元叶值"
+    for token in qpresent:
+        assert token not in qel, f"en 未替换三元 {token}"
+    # 直接单测：全族取到预期英译；死复用十二长生 Death；繁简同形透传。
+    assert localize("旺", "en") == "Prosperous"
+    assert localize("囚", "en") == "Imprisoned"
+    assert localize("死", "en") == "Death"
+    assert localize("上元", "en") == "Upper Yuan"
+    assert localize("下元", "en") == "Lower Yuan"
+    assert localize("旺", "zh-Hant") == "旺"
+    assert localize("中元", "zh-Hant") == "中元"
