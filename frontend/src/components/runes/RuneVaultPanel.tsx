@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { ResultCard } from '../ui/ResultCard';
 import { Icon } from '../ui/Icon';
+import { useI18n } from '../../i18n/context';
 import { downloadRuneTranscript } from '../../lib/runeExport';
 import { loadVault, persistVault, removeCast, saveCast } from '../../lib/runeVault';
 import type { SavedRuneCast } from '../../lib/runeVault';
@@ -19,6 +20,7 @@ interface RuneVaultPanelProps {
  * 石阵回看 —— 回看就是重新掷符或导出命谱，面板只承担「存得住、找得到、删得掉」。
  */
 export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
+  const { t } = useI18n();
   const [entries, setEntries] = useState<SavedRuneCast[]>(() => loadVault());
   const [justSaved, setJustSaved] = useState(false);
 
@@ -41,14 +43,14 @@ export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={handleSave} className="btn-primary shrink-0">
           <Icon name="vault" size={18} />
-          {justSaved ? '已存入秘匣' : '存入本份铸石'}
+          {justSaved ? t('已存入秘匣') : t('存入本份铸石')}
         </button>
-        <span className="label-caps text-ink-muted">本机保存 · 共 {entries.length} 份</span>
+        <span className="label-caps text-ink-muted">{t('本机保存 · 共 {{n}} 份', { n: entries.length })}</span>
       </div>
 
       {entries.length === 0 ? (
         <p className="rounded-element border border-dashed border-rim-soft p-4 text-sm text-ink-muted">
-          秘匣是空的。掷出一份铸石后按「存入本份铸石」，它就只留在这台设备的浏览器里。
+          {t('秘匣是空的。掷出一份铸石后按「存入本份铸石」，它就只留在这台设备的浏览器里。')}
         </p>
       ) : (
         <ul className="flex flex-col gap-2.5">
@@ -61,11 +63,11 @@ export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
                 <span className="font-display text-sm text-ink">
                   {entry.cast.spread_name_zh}
                   <span className="numeric label-caps ml-2 text-ink-muted">
-                    {entry.cast.stones.length} 枚 · {entry.cast.verdict.grade}
+                    {t('{{n}} 枚', { n: entry.cast.stones.length })} · {entry.cast.verdict.grade}
                   </span>
                 </span>
                 <span className="truncate text-xs text-ink-muted">
-                  {entry.cast.question ?? '未附所问'} · 存于{' '}
+                  {entry.cast.question ?? t('未附所问')} · {t('存于')}{' '}
                   {new Date(entry.saved_at).toLocaleString('zh-CN')}
                 </span>
               </div>
@@ -76,12 +78,12 @@ export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
                   className="btn-ghost rounded-element px-2.5 py-1 text-xs"
                 >
                   <Icon name="seal" size={13} />
-                  导出
+                  {t('导出')}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleRemove(entry.id)}
-                  aria-label="删除这份存档"
+                  aria-label={t('删除这份存档')}
                   className="flex h-7 w-7 items-center justify-center rounded-element border border-rim text-ink-muted transition-colors hover:border-wuxing-fire hover:text-wuxing-fire"
                 >
                   <Icon name="close" size={14} />

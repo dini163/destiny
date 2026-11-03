@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ResultCard } from '../ui/ResultCard';
 import { SourceNote } from '../ui/SourceNote';
 import { codexMatches, flattenCodex, isBlankStone } from '../../lib/runes';
+import { useI18n } from '../../i18n/context';
 import type { AettGroup, CodexRune, RuneCodex } from '../../types/runes';
 
 interface FutharkCodexProps {
@@ -26,13 +27,14 @@ function CodexCell({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const { t } = useI18n();
   const blank = isBlankStone(rune);
   return (
     <button
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      aria-label={`${rune.name} · ${rune.name_zh} · 序位 ${rune.order}`}
+      aria-label={`${rune.name} · ${rune.name_zh} · ${t('序位 {{n}}', { n: rune.order })}`}
       className={`flex flex-col items-center gap-1 rounded-element border p-2 transition-colors ${
         selected
           ? 'border-gold/60 bg-gold/10'
@@ -59,6 +61,7 @@ function CodexCell({
 
 /** 选中那一枚的两面释义与码位锚点。 */
 function CodexDetail({ rune }: { rune: CodexRune }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-4 rounded-element border border-rim bg-surface p-4">
       <div className="flex flex-wrap items-center gap-2.5">
@@ -72,7 +75,7 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
         </span>
         {rune.is_wyrd ? (
           <span className="label-caps rounded-element border border-arcane/40 bg-arcane/10 px-1.5 py-0.5 text-[#c7cbff]">
-            空白石 · 现代增补
+            {t('空白石 · 现代增补')}
           </span>
         ) : null}
       </div>
@@ -80,14 +83,14 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
       {/* 宽表纪律：外层横向滚动、表自身给足最小宽度，窄屏读到的是一行完整的锚点而不是一列挤扁的字。 */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[40rem] text-xs">
-          <caption className="sr-only">所选符文的码位、音译与名义</caption>
+          <caption className="sr-only">{t('所选符文的码位、音译与名义')}</caption>
           <thead>
             <tr className="text-left text-ink-muted">
-              <th scope="col" className="font-normal">序位</th>
-              <th scope="col" className="font-normal">音译</th>
-              <th scope="col" className="font-normal">音值</th>
-              <th scope="col" className="font-normal">码位</th>
-              <th scope="col" className="font-normal">Unicode 官方名</th>
+              <th scope="col" className="font-normal">{t('序位')}</th>
+              <th scope="col" className="font-normal">{t('音译')}</th>
+              <th scope="col" className="font-normal">{t('音值')}</th>
+              <th scope="col" className="font-normal">{t('码位')}</th>
+              <th scope="col" className="font-normal">{t('Unicode 官方名')}</th>
             </tr>
           </thead>
           <tbody>
@@ -107,18 +110,18 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
       </div>
 
       <p className="text-sm leading-relaxed text-ink-variant">
-        <span className="label-caps mr-1.5 text-gold-soft">名义</span>
+        <span className="label-caps mr-1.5 text-gold-soft">{t('名义')}</span>
         {rune.name_meaning}
         {rune.name_meaning_uncertain ? (
           <span className="label-caps ml-2 rounded-element border border-rim bg-[var(--field-bg)] px-1.5 py-0.5 text-ink-muted">
-            名义不确定
+            {t('名义不确定')}
           </span>
         ) : null}
       </p>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex flex-col gap-2">
-          <span className="label-caps text-[#2dd4bf]">正位</span>
+          <span className="label-caps text-[#2dd4bf]">{t('正位')}</span>
           <div className="flex flex-wrap gap-1.5">
             {rune.upright_keywords.map((keyword) => (
               <span
@@ -133,10 +136,10 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="label-caps text-[#f43f5e]">逆位</span>
+          <span className="label-caps text-[#f43f5e]">{t('逆位')}</span>
           {rune.reversed_meaning === null || rune.reversed_keywords === null ? (
             <p className="text-sm leading-relaxed text-ink-muted">
-              此符对称，无逆位 —— 字形转 180° 后与原形重合，故语料不给它编一段逆位释义。
+              {t('此符对称，无逆位 —— 字形转 180° 后与原形重合，故语料不给它编一段逆位释义。')}
             </p>
           ) : (
             <>
@@ -180,6 +183,7 @@ function CodexDetail({ rune }: { rune: CodexRune }) {
  * 因为在框里补了一个字就把详情抽走，是在替他决定他看完了。
  */
 export function FutharkCodex({ codex }: FutharkCodexProps) {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
@@ -202,21 +206,21 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
       icon="search"
       actions={
         <span className="numeric label-caps text-ink-muted">
-          {hitCount} / {codex.total} 条命中
+          {t('{{hit}} / {{total}} 条命中', { hit: hitCount, total: codex.total })}
         </span>
       }
     >
       <input
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="按名、音译或词义检索，如 fehu、þ、赠予"
+        placeholder={t('按名、音译或词义检索，如 fehu、þ、赠予')}
         className="field w-full"
-        aria-label="检索全典：按名、音译或词义过滤"
+        aria-label={t('检索全典：按名、音译或词义过滤')}
       />
 
       {hitCount === 0 ? (
         <p className="rounded-element border border-rim bg-[var(--field-bg)] p-4 text-sm text-ink-muted">
-          没有对得上的条目。清空检索框可以看整部典。
+          {t('没有对得上的条目。清空检索框可以看整部典。')}
         </p>
       ) : (
         <div className="flex flex-col gap-5">
@@ -255,7 +259,7 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
               <header className="flex flex-wrap items-center gap-2">
                 <h3 className="font-display text-base text-ink">{codex.wyrd.name_zh}</h3>
                 <span className="label-caps rounded-element border border-arcane/40 bg-arcane/10 px-1.5 py-0.5 text-[#c7cbff]">
-                  现代增补 · 不入三组
+                  {t('现代增补 · 不入三组')}
                 </span>
               </header>
               <div className="grid grid-cols-4 gap-2 sm:max-w-[12rem]">
@@ -271,7 +275,7 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
       )}
 
       {selected === null ? (
-        <p className="label-caps text-ink-muted">选一枚看它的两面释义与码位锚点</p>
+        <p className="label-caps text-ink-muted">{t('选一枚看它的两面释义与码位锚点')}</p>
       ) : (
         <CodexDetail rune={selected} />
       )}

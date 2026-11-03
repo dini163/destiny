@@ -1,4 +1,5 @@
 import { ResultCard } from '../ui/ResultCard';
+import { useI18n } from '../../i18n/context';
 import type { AettCount } from '../../types/runes';
 
 interface RuneSynthesisProps {
@@ -27,6 +28,7 @@ interface RuneSynthesisProps {
  * 都不出（决策 7）。
  */
 export function RuneSynthesis({ synthesis, aettBalance }: RuneSynthesisProps) {
+  const { t } = useI18n();
   return (
     <ResultCard title="综合直读" icon="compass">
       <p className="rounded-element border border-rim bg-[var(--field-bg)] p-4 text-sm leading-loose text-ink-variant">
@@ -35,8 +37,8 @@ export function RuneSynthesis({ synthesis, aettBalance }: RuneSynthesisProps) {
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="label-caps text-gold-soft">AETTIR 组别配比</h3>
-          <span className="label-caps text-ink-muted">计数，不是评分</span>
+          <h3 className="label-caps text-gold-soft">{t('AETTIR 组别配比')}</h3>
+          <span className="label-caps text-ink-muted">{t('计数，不是评分')}</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -49,16 +51,14 @@ export function RuneSynthesis({ synthesis, aettBalance }: RuneSynthesisProps) {
               <span className="label-caps text-ink-muted">{row.name}</span>
               <span className="numeric mt-1 text-2xl leading-none text-gold-bright">
                 {row.count}
-                <span className="ml-1 text-xs text-ink-muted">枚</span>
+                <span className="ml-1 text-xs text-ink-muted">{t('枚')}</span>
               </span>
             </div>
           ))}
         </div>
 
         <p className="text-xs leading-relaxed text-ink-muted">
-          四行恒在。某一组这次一枚都没落到时，那个 0 是真实值，照样列出来 —— 少一行会让
-          「没落到」与「引擎忘了算这一组」在页面上长得一样。第四行「不入三组」是空白符的
-          去处：它不算三组里任何一组，可开着开关时它确实可能被抽到，那枚数总得有地方落。
+          {t('四行恒在。某一组这次一枚都没落到时，那个 0 是真实值，照样列出来 —— 少一行会让「没落到」与「引擎忘了算这一组」在页面上长得一样。第四行「不入三组」是空白符的去处：它不算三组里任何一组，可开着开关时它确实可能被抽到，那枚数总得有地方落。')}
         </p>
       </div>
     </ResultCard>

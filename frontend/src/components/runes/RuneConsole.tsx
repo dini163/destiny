@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
 import { SegmentedControl } from '../ui/SegmentedControl';
+import { useI18n } from '../../i18n/context';
 import type { RuneCastRequest, RuneSpreadId } from '../../types/runes';
 
 /** 表单状态。与 `RuneCastRequest` 同义，只是各字段的形状跟着控件走。 */
@@ -64,6 +65,7 @@ interface RuneConsoleProps {
  * 控制台只负责发起铸石，不承担存档与组合。
  */
 export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
+  const { t } = useI18n();
   const [state, setState] = useState<ConsoleState>(EMPTY);
 
   function patch(next: Partial<ConsoleState>): void {
@@ -85,7 +87,7 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                北欧卢恩神谕
+                {t('北欧卢恩神谕')}
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
                 ELDER FUTHARK 24 + WYRD
@@ -97,14 +99,13 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              抽石结果由权威算法真实生成、不可复现；释义全部取自策展语料库。本页不吃出生时间与地点：没有历法、没有星历，
-              因此也不出综合评分、不出任何百分比 —— 没有可以推出那类数字的输入。
+              {t('抽石结果由权威算法真实生成、不可复现；释义全部取自策展语料库。本页不吃出生时间与地点：没有历法、没有星历，因此也不出综合评分、不出任何百分比 —— 没有可以推出那类数字的输入。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '铸石中…' : '重新掷符 CAST'}
+          {pending ? t('铸石中…') : t('重新掷符 CAST')}
         </button>
       </div>
 
@@ -113,7 +114,7 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
           label="牌阵（按抽几枚）"
           hint={
             <span className="label-caps text-ink-muted">
-              牌阵名与位次释义随响应给出
+              {t('牌阵名与位次释义随响应给出')}
             </span>
           }
         >
@@ -141,9 +142,9 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
             value={state.question}
             onChange={(event) => patch({ question: event.target.value })}
             maxLength={QUESTION_MAX}
-            placeholder="如：这次换工作该不该走"
+            placeholder={t('如：这次换工作该不该走')}
             className="field w-full"
-            aria-label="求测事项，仅用于回显与领起直读"
+            aria-label={t('求测事项，仅用于回显与领起直读')}
           />
         </LabeledField>
       </div>
@@ -157,10 +158,9 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
             className="mt-0.5 h-4 w-4 accent-[#d4af37]"
           />
           <span className="flex flex-col gap-0.5">
-            <span>空白符（Wyrd）入牌组</span>
+            <span>{t('空白符（Wyrd）入牌组')}</span>
             <span className="text-xs leading-relaxed text-ink-muted">
-              它是现代增补的第 25 枚，不见于任何古铭文，故默认关闭。开启后它可能被抽到，
-              但不计入三组任何一组；全典里它恒单独成条并另有出处。
+              {t('它是现代增补的第 25 枚，不见于任何古铭文，故默认关闭。开启后它可能被抽到，但不计入三组任何一组；全典里它恒单独成条并另有出处。')}
             </span>
           </span>
         </label>
@@ -173,17 +173,16 @@ export function RuneConsole({ pending, onSubmit }: RuneConsoleProps) {
             className="mt-0.5 h-4 w-4 accent-[#d4af37]"
           />
           <span className="flex flex-col gap-0.5">
-            <span>允许逆位（merkstave）</span>
+            <span>{t('允许逆位（merkstave）')}</span>
             <span className="text-xs leading-relaxed text-ink-muted">
-              字形旋转 180° 后与原形重合的那几枚没有逆位读法，无论这里怎么设都恒正位，
-              碑上也不给它们印朝向角标。判据全文在掷符后随碑阵印出。
+              {t('字形旋转 180° 后与原形重合的那几枚没有逆位读法，无论这里怎么设都恒正位，碑上也不给它们印朝向角标。判据全文在掷符后随碑阵印出。')}
             </span>
           </span>
         </label>
       </div>
 
       <p className="label-caps text-ink-muted">
-        改动牌阵或两个开关后须再按一次 CAST：每一次铸石都是一次新的抽取，不会照着上一份结果改。
+        {t('改动牌阵或两个开关后须再按一次 CAST：每一次铸石都是一次新的抽取，不会照着上一份结果改。')}
       </p>
     </form>
   );

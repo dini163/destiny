@@ -1,4 +1,5 @@
 import { RuneStone } from './RuneStone';
+import { useI18n } from '../../i18n/context';
 import type { DrawnRune, RuneSpreadId } from '../../types/runes';
 
 interface RuneStoneGridProps {
@@ -46,6 +47,7 @@ function crossCells(stones: DrawnRune[]): Record<string, string> | null {
  * 转了 180° 的那几块与没转的那几块，读者当场就能对着核。
  */
 export function RuneStoneGrid({ spreadId, stones, reversibleNote }: RuneStoneGridProps) {
+  const { t } = useI18n();
   const cells = spreadId === 'five' ? crossCells(stones) : null;
 
   const layout =
@@ -95,7 +97,7 @@ export function RuneStoneGrid({ spreadId, stones, reversibleNote }: RuneStoneGri
       </div>
 
       <p className="relative mt-4 rounded-element border border-rim bg-[var(--field-bg)] p-3 text-xs leading-relaxed text-ink-muted">
-        <span className="label-caps mr-1.5 text-gold-soft">逆位判据</span>
+        <span className="label-caps mr-1.5 text-gold-soft">{t('逆位判据')}</span>
         {reversibleNote}
       </p>
     </div>

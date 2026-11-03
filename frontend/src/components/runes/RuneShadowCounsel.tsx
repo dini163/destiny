@@ -1,5 +1,6 @@
 import { ResultCard } from '../ui/ResultCard';
 import { orientationMeta } from '../../lib/runes';
+import { useI18n } from '../../i18n/context';
 import type { ShadowNote } from '../../types/runes';
 
 interface RuneShadowCounselProps {
@@ -26,13 +27,13 @@ interface RuneShadowCounselProps {
  * 少了它，一段反面参照就会被读成对本次结果的第二次断言。
  */
 export function RuneShadowCounsel({ notes }: RuneShadowCounselProps) {
+  const { t } = useI18n();
   if (notes === null || notes.length === 0) return null;
 
   return (
     <ResultCard title="阴影参照" icon="alert">
       <p className="text-xs leading-relaxed text-ink-muted">
-        只列本次抽到的可逆符，逐条标明它是参照还是本次结果。八枚对称符与空白符没有另一面，
-        故不在这里 —— 判据全文在碑阵底下。
+        {t('只列本次抽到的可逆符，逐条标明它是参照还是本次结果。八枚对称符与空白符没有另一面，故不在这里 —— 判据全文在碑阵底下。')}
       </p>
 
       <ul className="flex flex-col gap-3">
@@ -58,7 +59,7 @@ export function RuneShadowCounsel({ notes }: RuneShadowCounselProps) {
                   className="label-caps rounded-element px-1.5 py-0.5 font-semibold"
                   style={{ color: orientation.color, backgroundColor: `${orientation.color}1f` }}
                 >
-                  本次{orientation.label}
+                  {t('本次{{o}}', { o: orientation.label })}
                 </span>
               </div>
 

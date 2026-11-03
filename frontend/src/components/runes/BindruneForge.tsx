@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { ResultCard } from '../ui/ResultCard';
 import { Icon } from '../ui/Icon';
+import { useI18n } from '../../i18n/context';
 import { flattenCodex, isBlankStone } from '../../lib/runes';
 import type { CodexRune, RuneCodex } from '../../types/runes';
 
@@ -21,6 +22,7 @@ const MAX_SELECTED = 5;
  * 名义与正位关键词，供读者自行手刻或取用 —— 不给一个"已经熔合成一枚"的假结果。
  */
 export function BindruneForge({ codex }: BindruneForgeProps) {
+  const { t } = useI18n();
   const all = useMemo(() => flattenCodex(codex).filter((rune) => !isBlankStone(rune)), [codex]);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
@@ -49,8 +51,7 @@ export function BindruneForge({ codex }: BindruneForgeProps) {
   return (
     <ResultCard title="Bindrune 组合符" icon="compass">
       <p className="text-sm leading-relaxed text-ink-muted">
-        从全典挑 1–{MAX_SELECTED} 枚符文，并置成一条组合符。这里只做字形并置，不自动熔刻笔画；
-        传统叠笔需手工刻写。
+        {t('从全典挑 1–{{max}} 枚符文，并置成一条组合符。这里只做字形并置，不自动熔刻笔画；传统叠笔需手工刻写。', { max: MAX_SELECTED })}
       </p>
 
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
@@ -80,7 +81,7 @@ export function BindruneForge({ codex }: BindruneForgeProps) {
 
       {selected.length === 0 ? (
         <p className="label-caps rounded-element border border-dashed border-rim-soft p-4 text-ink-muted">
-          点选上方符文后，这里会出现组合符号带。
+          {t('点选上方符文后，这里会出现组合符号带。')}
         </p>
       ) : (
         <div className="flex flex-col gap-4 rounded-element border border-gold/25 bg-[#0c0e14] p-4">
@@ -100,7 +101,7 @@ export function BindruneForge({ codex }: BindruneForgeProps) {
               className="btn-ghost shrink-0 rounded-element px-3 py-1.5 text-xs"
             >
               <Icon name="check" size={14} />
-              {copied ? '已复制' : '复制组合'}
+              {copied ? t('已复制') : t('复制组合')}
             </button>
           </div>
 

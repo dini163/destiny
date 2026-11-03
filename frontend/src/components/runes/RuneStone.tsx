@@ -1,5 +1,6 @@
 import { SourceNote } from '../ui/SourceNote';
 import { isBlankStone, orientationMeta, shouldRotate } from '../../lib/runes';
+import { useI18n } from '../../i18n/context';
 import type { DrawnRune } from '../../types/runes';
 
 interface RuneStoneProps {
@@ -38,6 +39,7 @@ interface RuneStoneProps {
  * 与 `orientationMeta` 不复用塔罗那一份是同一条理由。
  */
 export function RuneStone({ stone }: RuneStoneProps) {
+  const { t } = useI18n();
   const blank = isBlankStone(stone);
   const rotate = shouldRotate(stone);
   const orientation = orientationMeta(stone.orientation);
@@ -73,7 +75,7 @@ export function RuneStone({ stone }: RuneStoneProps) {
           {blank ? (
             <span className="flex h-24 w-24 items-center justify-center rounded-full border border-dashed border-rim-strong">
               <span className="label-caps px-2 text-center text-[10px] leading-tight text-ink-muted">
-                无刻痕
+                {t('无刻痕')}
               </span>
             </span>
           ) : (
@@ -89,12 +91,12 @@ export function RuneStone({ stone }: RuneStoneProps) {
           )}
 
           <span className="numeric mt-2 text-[11px] tracking-[0.16em] text-ink-muted">
-            {blank ? 'WYRD · 现代增补' : `${stone.name.toUpperCase()} · ${orientation.label}`}
+            {blank ? t('WYRD · 现代增补') : `${stone.name.toUpperCase()} · ${orientation.label}`}
           </span>
 
           <div className="absolute inset-x-3 bottom-2 flex items-center justify-between gap-2">
             <span className="label-caps truncate text-[10px] text-ink-muted">
-              {stone.aett_zh ?? '不入三组'}
+              {stone.aett_zh ?? t('不入三组')}
             </span>
             <span className="numeric shrink-0 text-[10px] text-ink-muted">
               #{String(stone.order).padStart(2, '0')} · {stone.name_zh}
@@ -113,12 +115,12 @@ export function RuneStone({ stone }: RuneStoneProps) {
             )}
             {stone.name} · {stone.name_zh}
             <span className="numeric ml-1.5 text-xs font-normal tracking-widest text-ink-muted">
-              {stone.transliteration === '' ? '无音译' : stone.transliteration}
+              {stone.transliteration === '' ? t('无音译') : stone.transliteration}
             </span>
           </h3>
           {stone.is_wyrd ? (
             <span className="label-caps rounded-element border border-arcane/40 bg-arcane/10 px-1.5 py-0.5 text-[#c7cbff]">
-              空白石 · 现代增补
+              {t('空白石 · 现代增补')}
             </span>
           ) : stone.reversible ? (
             <span
@@ -129,17 +131,17 @@ export function RuneStone({ stone }: RuneStoneProps) {
             </span>
           ) : (
             <span className="label-caps rounded-element border border-rim bg-surface px-1.5 py-0.5 text-ink-muted">
-              此符对称，无逆位
+              {t('此符对称，无逆位')}
             </span>
           )}
         </div>
 
         <p className="text-xs leading-relaxed text-ink-variant">
-          <span className="label-caps mr-1.5 text-ink-muted">名义</span>
+          <span className="label-caps mr-1.5 text-ink-muted">{t('名义')}</span>
           {stone.name_meaning}
           {stone.name_meaning_uncertain ? (
             <span className="label-caps ml-1.5 rounded-element border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-gold-soft">
-              名义不确定
+              {t('名义不确定')}
             </span>
           ) : null}
         </p>
@@ -160,7 +162,7 @@ export function RuneStone({ stone }: RuneStoneProps) {
         <p className="text-sm leading-relaxed text-ink">{stone.meaning}</p>
 
         <p className="rounded-element border border-rim bg-[var(--field-bg)] p-2.5 text-xs leading-relaxed text-ink-muted">
-          <span className="label-caps mr-1.5 text-gold-soft">位次</span>
+          <span className="label-caps mr-1.5 text-gold-soft">{t('位次')}</span>
           {stone.position_meaning}
         </p>
       </div>
