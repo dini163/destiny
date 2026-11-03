@@ -268,6 +268,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "盗贼暧昧·欺瞒暗昧": "盜賊曖昧·欺瞞暗昧",
         "沉静厚载·守藏屯兵": "沉靜厚載·守藏屯兵",
         "扬动高远·出行扩张": "揚動高遠·出行擴張",
+        # 十二生肖（.zodiac，lunar-python 立春生肖）：仅龙/马/鸡/猪字形有差，余同形回落源文。
+        "龙": "龍", "马": "馬", "鸡": "雞", "猪": "豬",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -731,6 +733,10 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "盗贼暧昧·欺瞒暗昧": "Thieves and Ambiguity · Deceit and Darkness",
         "沉静厚载·守藏屯兵": "Quiet Depth that Bears All · Guarding and Mustering",
         "扬动高远·出行扩张": "Soaring High and Far · Travel and Expansion",
+        # 十二生肖（.zodiac）英译（p15 有界专名族；狗复用 lenormand Dog）。
+        "鼠": "Rat", "牛": "Ox", "虎": "Tiger", "兔": "Rabbit",
+        "龙": "Dragon", "马": "Horse", "羊": "Goat", "猴": "Monkey",
+        "鸡": "Rooster", "猪": "Pig",
     },
 }
 

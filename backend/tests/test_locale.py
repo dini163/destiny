@@ -936,3 +936,40 @@ def test_star_door_god_nature_localize() -> None:
     assert localize("财库·稳重保守", "zh-Hant") == "財庫·穩重保守"
     assert localize("福禄·温和享受", "zh-Hant") == "福禄·温和享受"
     assert localize("和合婚姻·交易中介", "zh-Hant") == "和合婚姻·交易中介"
+
+
+def test_zodiac_animals_localize() -> None:
+    # p15：十二生肖（.zodiac，lunar-python 立春生肖）en 全替换；仅龙/马/鸡/猪
+    # 字形有差者 zh-Hant 转形，其余繁简同形透传。蛇/狗 复用卡牌既有英译。
+    zodiac = {"鼠", "牛", "虎", "兔", "龙", "蛇", "马", "羊", "猴", "鸡", "狗", "猪"}
+    payload = {
+        "birth_date": "1990-06-15", "birth_time": "08:30:00", "city": "成都",
+        "gender": "male", "calendar": "solar", "apply_true_solar_time": True,
+    }
+    with TestClient(app) as client:
+        zd = client.post("/api/v1/bazi/natal", json=payload)
+        ze = client.post("/api/v1/bazi/natal?locale=en", json=payload)
+        zh = client.post("/api/v1/bazi/natal?locale=zh-Hant", json=payload)
+    assert zd.status_code == ze.status_code == zh.status_code == 200
+    present = {s for s in _walk_strings(zd.json()) if s in zodiac}
+    assert present, "八字本命盘应落一个生肖叶值"
+    en_leaves = _walk_strings(ze.json())
+    for token in present:
+        assert token not in en_leaves, f"en 未替换生肖 {token}"
+    zh_leaves = _walk_strings(zh.json())
+    for token in present:
+        expected = localize(token, "zh-Hant")
+        assert expected in zh_leaves, f"zh-Hant 未落地 {token}->{expected}"
+    # 直接单测：全族英译；字形有差者转形，同形者透传。
+    assert localize("马", "en") == "Horse"
+    assert localize("龙", "en") == "Dragon"
+    assert localize("鼠", "en") == "Rat"
+    assert localize("猪", "en") == "Pig"
+    assert localize("马", "zh-Hant") == "馬"
+    assert localize("龙", "zh-Hant") == "龍"
+    assert localize("鸡", "zh-Hant") == "雞"
+    assert localize("猪", "zh-Hant") == "豬"
+    assert localize("鼠", "zh-Hant") == "鼠"
+    assert localize("牛", "zh-Hant") == "牛"
+    assert localize("蛇", "en") == "Snake"
+    assert localize("狗", "en") == "Dog"
