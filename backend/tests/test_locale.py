@@ -49,6 +49,10 @@ _QIMEN_CAST = {"cast_time": "2024-05-15T10:30:00"}
 
 _RUNES_CAST = {"spread_id": "three"}
 
+_TAROT_SPREAD = {"spread_id": "celtic_cross"}
+
+_LENORMAND_TABLEAU = {"spread_id": "grand_tableau"}
+
 
 def _walk_strings(value: object) -> list[str]:
     out: list[str] = []
@@ -297,3 +301,34 @@ def test_name_endpoint_is_exempt_from_localization() -> None:
     assert d.status_code == 200
     assert d.content == e.content == h.content, "name 路径应逐字节透传，不参与本地化"
     assert "金" in _walk_strings(d.json())  # 人名字符确实以叶值形式出现
+
+
+def test_tarot_and_lenormand_card_names_localize() -> None:
+    # p15-h：塔罗与雷诺曼牌名（name_zh 叶值）在 en 下换为牌组英文名，默认透传。
+    from app.content.lenormand import CARDS as LENO
+    from app.content.tarot_deck import DECK as TAROT
+
+    with TestClient(app) as client:
+        td = client.post("/api/v1/tarot/spread", json=_TAROT_SPREAD)
+        te = client.post("/api/v1/tarot/spread?locale=en", json=_TAROT_SPREAD)
+        ld = client.post("/api/v1/lenormand/draw", json=_LENORMAND_TABLEAU)
+        le = client.post("/api/v1/lenormand/draw?locale=en", json=_LENORMAND_TABLEAU)
+    assert td.status_code == te.status_code == 200
+    assert ld.status_code == le.status_code == 200
+
+    tarot_zh = {c.name_zh for c in TAROT}
+    leno_zh = {c.name_zh for c in LENO}
+
+    tdl = _walk_strings(td.json())
+    tel = _walk_strings(te.json())
+    tpresent = {s for s in tdl if s in tarot_zh}
+    assert tpresent, "tarot 应至少落一个牌名叶值"
+    for token in tpresent:
+        assert token not in tel, f"en 未替换塔罗牌名 {token}"
+
+    ldl = _walk_strings(ld.json())
+    lel = _walk_strings(le.json())
+    lpresent = {s for s in ldl if s in leno_zh}
+    assert len(lpresent) >= 30, f"grand_tableau 应落满雷诺曼牌名，实得 {len(lpresent)}"
+    for token in lpresent:
+        assert token not in lel, f"en 未替换雷诺曼牌名 {token}"
