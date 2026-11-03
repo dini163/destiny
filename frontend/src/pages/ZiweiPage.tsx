@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { ZiweiChartGrid } from '../components/ziwei/ZiweiChartGrid';
 import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
@@ -27,6 +28,7 @@ import type { ZiweiChart, ZiweiRequest } from '../types/ziwei';
  * calendar toggle matters here more than for 八字.
  */
 export function ZiweiPage() {
+  const { t } = useI18n();
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
   const [name, setName] = useState('');
@@ -85,7 +87,7 @@ export function ZiweiPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             maxLength={40}
-            placeholder="如：示例命主"
+            placeholder={t('如：示例命主')}
             className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
           />
         </LabeledField>
@@ -96,7 +98,7 @@ export function ZiweiPage() {
             onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
             className="h-4 w-4 accent-[#d4af37]"
           />
-          真太阳时校正（推荐）
+          {t('真太阳时校正（推荐）')}
         </label>
       </InputBar>
 
@@ -108,7 +110,7 @@ export function ZiweiPage() {
       ) : null}
 
       {ziwei.isPending && !ziwei.data ? (
-        <p className="label-caps text-ink-muted">正在安星排盘，布列十二宫垣…</p>
+        <p className="label-caps text-ink-muted">{t('正在安星排盘，布列十二宫垣…')}</p>
       ) : null}
 
       {ziwei.data ? <ZiweiResults chart={ziwei.data} /> : null}
@@ -145,23 +147,27 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
 
 /** Headline strip: 命宫 / 五行局 / 命主身主 / 紫微天府落宫 plus the birth facts. */
 function ChartSummary({ chart }: { chart: ZiweiChart }) {
+  const { t } = useI18n();
   const tst =
     chart.tst_applied && chart.true_solar_time
-      ? `真太阳时 ${chart.true_solar_time}（校正 ${chart.tst_offset_minutes?.toFixed(1) ?? '0'} 分）`
-      : '未校正（标准时直排）';
+      ? t('真太阳时 {{tst}}（校正 {{offset}} 分）', {
+          tst: chart.true_solar_time,
+          offset: chart.tst_offset_minutes?.toFixed(1) ?? '0',
+        })
+      : t('未校正（标准时直排）');
 
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           {chart.name ? <span className="text-sm text-ink-variant">{chart.name}</span> : null}
-          <span className="label-caps">紫微斗数命盘 · ZI WEI DOU SHU</span>
+          <span className="label-caps">{t('紫微斗数命盘 · ZI WEI DOU SHU')}</span>
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="font-display text-3xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-4xl">
               {chart.wuxing_ju}
             </span>
             <span className="font-display text-xl text-ink">
-              命宫 {chart.ming_gong_ganzhi} · {chart.ming_gong_nayin}
+              {t('命宫')} {chart.ming_gong_ganzhi} · {chart.ming_gong_nayin}
             </span>
           </div>
         </div>
@@ -169,8 +175,8 @@ function ChartSummary({ chart }: { chart: ZiweiChart }) {
           <Chip label="造向" value={genderLabel(chart.gender)} />
           <Chip label="命主" value={chart.ming_zhu} />
           <Chip label="身主" value={chart.shen_zhu} />
-          <Chip label="紫微" value={`${chart.ziwei_zhi}宫`} />
-          <Chip label="天府" value={`${chart.tianfu_zhi}宫`} />
+          <Chip label="紫微" value={`${chart.ziwei_zhi}${t('宫')}`} />
+          <Chip label="天府" value={`${chart.tianfu_zhi}${t('宫')}`} />
         </div>
       </div>
 
@@ -178,29 +184,29 @@ function ChartSummary({ chart }: { chart: ZiweiChart }) {
 
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-variant">
         <span>
-          农历：<span className="text-ink">{chart.lunar_date}</span>
-          {chart.lunar_leap ? <span className="text-gold-soft">（闰）</span> : null}
+          {t('农历：')}<span className="text-ink">{chart.lunar_date}</span>
+          {chart.lunar_leap ? <span className="text-gold-soft">{t('（闰）')}</span> : null}
           <span className="numeric text-ink-muted">
             {' '}
-            · {chart.lunar_month}月{chart.lunar_day}日 · {chart.time_zhi}时
+            · {chart.lunar_month}{t('月')}{chart.lunar_day}{t('日')} · {chart.time_zhi}{t('时')}
           </span>
         </span>
         <span>
-          身宫：<span className="text-ink">{chart.shen_gong_name}（{chart.shen_gong_zhi}）</span>
+          {t('身宫：')}<span className="text-ink">{chart.shen_gong_name}（{chart.shen_gong_zhi}）</span>
         </span>
         <span>
-          大限：<span className="text-ink">{chart.dayun_direction}</span>
-          <span className="numeric text-ink-muted"> · {chart.dayun_start_age}岁起运</span>
+          {t('大限：')}<span className="text-ink">{chart.dayun_direction}</span>
+          <span className="numeric text-ink-muted"> · {chart.dayun_start_age}{t('岁起运')}</span>
         </span>
         <span>
-          标准时：<span className="numeric text-ink">{chart.standard_datetime}</span>
+          {t('标准时：')}<span className="numeric text-ink">{chart.standard_datetime}</span>
         </span>
         <span className="text-gold-soft">{tst}</span>
         <span>
-          经度：<span className="numeric text-ink">{chart.longitude.toFixed(2)}°</span>
+          {t('经度：')}<span className="numeric text-ink">{chart.longitude.toFixed(2)}°</span>
         </span>
         <span>
-          历法：<span className="text-ink">{calendarLabel(chart.calendar)}</span>
+          {t('历法：')}<span className="text-ink">{calendarLabel(chart.calendar)}</span>
         </span>
       </div>
     </div>
@@ -209,9 +215,10 @@ function ChartSummary({ chart }: { chart: ZiweiChart }) {
 
 /** A compact label/value chip used in the summary header. */
 function Chip({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <span className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1 text-xs">
-      <span className="label-caps">{label}</span>
+      <span className="label-caps">{t(label)}</span>
       <span className="text-ink">{value}</span>
     </span>
   );

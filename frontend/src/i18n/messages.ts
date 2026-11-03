@@ -439,6 +439,44 @@ const zhHant: MessageDict = {
   动爻: '動爻',
   无: '無',
   动: '動',
+
+  // --- Phase 2.4 · Qimen / Ziwei page chrome ---
+  // Qimen
+  '正在起局，布地盘、转九星八门八神…': '正在起局，布地盤、轉九星八門八神…',
+  全局白话: '全局白話',
+  洛书九宫盘: '洛書九宮盤',
+  九宫白话: '九宮白話',
+  '定局 · JU DETERMINATION': '定局 · JU DETERMINATION',
+  值符: '值符',
+  值使: '值使',
+  落: '落',
+  宫: '宮',
+  年柱: '年柱',
+  月柱: '月柱',
+  时柱: '時柱',
+  时辰旬首: '時辰旬首',
+  '{{xs}}（遁{{yi}}）': '{{xs}}（遁{{yi}}）',
+  旬空: '旬空',
+  驿马: '驛馬',
+  用事时刻: '用事時刻',
+  占问事项: '占問事項',
+
+  // Ziwei
+  '正在安星排盘，布列十二宫垣…': '正在安星排盤，布列十二宮垣…',
+  全盘白话: '全盘白話',
+  十二宫命盘: '十二宮命盤',
+  十二宫白话: '十二宮白話',
+  '紫微斗数命盘 · ZI WEI DOU SHU': '紫微斗數命盤 · ZI WEI DOU SHU',
+  造向: '造向',
+  命主: '命主',
+  身主: '身主',
+  紫微: '紫微',
+  天府: '天府',
+  '（闰）': '（閏）',
+  '身宫：': '身宮：',
+  '大限：': '大限：',
+  岁起运: '歲起運',
+  '历法：': '曆法：',
 };
 
 const en: MessageDict = {
@@ -861,6 +899,44 @@ const en: MessageDict = {
   动爻: 'Moving lines',
   无: 'None',
   动: ' moving',
+
+  // --- Phase 2.4 · Qimen / Ziwei page chrome ---
+  // Qimen
+  '正在起局，布地盘、转九星八门八神…': 'Setting the board — arranging the earth plate, rotating the nine stars, eight doors, eight spirits…',
+  全局白话: 'Board Overview',
+  洛书九宫盘: 'Luoshu Nine-Palace Board',
+  九宫白话: 'Nine Palaces in Plain Words',
+  '定局 · JU DETERMINATION': 'Ju determination',
+  值符: 'Duty Star',
+  值使: 'Duty Door',
+  落: ' lands in ',
+  宫: ' palace',
+  年柱: 'Year pillar',
+  月柱: 'Month pillar',
+  时柱: 'Hour pillar',
+  时辰旬首: 'Xun head of the hour',
+  '{{xs}}（遁{{yi}}）': '{{xs}} (Dun {{yi}})',
+  旬空: 'Xun void',
+  驿马: 'Post horse',
+  用事时刻: 'Matter time',
+  占问事项: 'The matter asked',
+
+  // Ziwei
+  '正在安星排盘，布列十二宫垣…': 'Seating the stars and arranging the twelve palaces…',
+  全盘白话: 'Whole-Chart Plain Read',
+  十二宫命盘: 'Twelve-Palace Natal Board',
+  十二宫白话: 'Twelve Palaces in Plain Words',
+  '紫微斗数命盘 · ZI WEI DOU SHU': 'Zi Wei Dou Shu natal board',
+  造向: 'Direction',
+  命主: 'Life lord',
+  身主: 'Body lord',
+  紫微: 'Zi Wei',
+  天府: 'Tian Fu',
+  '（闰）': '(leap)',
+  '身宫：': 'Body palace:',
+  '大限：': 'Major limit:',
+  岁起运: ' yrs to first limit',
+  '历法：': 'Calendar:',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

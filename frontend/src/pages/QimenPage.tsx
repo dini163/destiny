@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { QimenBoard } from '../components/qimen/QimenBoard';
 import { QimenControls } from '../components/qimen/QimenControls';
 import { Icon } from '../components/ui/Icon';
@@ -18,6 +19,7 @@ import type { QimenChart, QimenRequest } from '../types/qimen';
  * defaults to now, so 起局 with no input casts the present moment.
  */
 export function QimenPage() {
+  const { t } = useI18n();
   const [question, setQuestion] = useState('');
   const [castTime, setCastTime] = useState('');
   const qimen = useQimen();
@@ -50,7 +52,7 @@ export function QimenPage() {
       ) : null}
 
       {qimen.isPending && !qimen.data ? (
-        <p className="label-caps text-ink-muted">正在起局，布地盘、转九星八门八神…</p>
+        <p className="label-caps text-ink-muted">{t('正在起局，布地盘、转九星八门八神…')}</p>
       ) : null}
 
       {qimen.data ? <QimenResults chart={qimen.data} /> : null}
@@ -104,11 +106,12 @@ function QimenResults({ chart }: { chart: QimenChart }) {
 
 /** The 定局 headline plus the real 四柱 / 值符值使 / 空马 metadata. */
 function JuSummary({ chart }: { chart: QimenChart }) {
+  const { t } = useI18n();
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">定局 · JU DETERMINATION</span>
+          <span className="label-caps">{t('定局 · JU DETERMINATION')}</span>
           <div className="flex flex-wrap items-baseline gap-3">
             <span className="font-display text-3xl font-semibold text-gold-bright text-glow-gold sm:text-4xl">
               {chart.ju_name}
@@ -120,10 +123,10 @@ function JuSummary({ chart }: { chart: QimenChart }) {
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="label-caps rounded-element bg-astral/15 px-2 py-1 text-astral">
-            值符 {chart.zhifu_star} 落{chart.zhifu_palace}宫
+            {t('值符')} {chart.zhifu_star} {t('落')}{chart.zhifu_palace}{t('宫')}
           </span>
           <span className="label-caps rounded-element bg-gold/15 px-2 py-1 text-gold">
-            值使 {chart.zhishi_door} 落{chart.zhishi_palace}宫
+            {t('值使')} {chart.zhishi_door} {t('落')}{chart.zhishi_palace}{t('宫')}
           </span>
         </div>
       </div>
@@ -135,7 +138,7 @@ function JuSummary({ chart }: { chart: QimenChart }) {
         <Meta label="月柱" value={chart.month_ganzhi} />
         <Meta label="日柱" value={chart.day_ganzhi} />
         <Meta label="时柱" value={chart.time_ganzhi} />
-        <Meta label="时辰旬首" value={`${chart.xunshou}（遁${chart.xunshou_yi}）`} />
+        <Meta label="时辰旬首" value={t('{{xs}}（遁{{yi}}）', { xs: chart.xunshou, yi: chart.xunshou_yi })} />
         <Meta label="旬空" value={chart.kongwang} />
         <Meta label="驿马" value={chart.yima} />
         <Meta label="用事时刻" value={chart.cast_time} />
@@ -143,7 +146,7 @@ function JuSummary({ chart }: { chart: QimenChart }) {
 
       {chart.question ? (
         <p className="text-sm leading-relaxed text-ink-variant">
-          <span className="label-caps mr-2 align-middle">占问事项</span>
+          <span className="label-caps mr-2 align-middle">{t('占问事项')}</span>
           {chart.question}
         </p>
       ) : null}
@@ -153,9 +156,10 @@ function JuSummary({ chart }: { chart: QimenChart }) {
 
 /** A single caption + value pair in the summary strip. */
 function Meta({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="label-caps">{label}</dt>
+      <dt className="label-caps">{t(label)}</dt>
       <dd className="font-display text-sm text-ink-variant">{value}</dd>
     </div>
   );
