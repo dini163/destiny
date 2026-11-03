@@ -57,7 +57,7 @@ export function AspectMatrix({ planets, aspects }: AspectMatrixProps) {
             </div>
             <div className="shrink-0 text-right">
               <span className="numeric block text-xs" style={{ color: style.color }}>
-                {style.label} {aspect.angle}°
+                {t(style.label)} {aspect.angle}°
               </span>
               <span className="numeric text-[11px] text-ink-muted">{t('容许度')} {formatOrb(aspect.orb)}</span>
             </div>

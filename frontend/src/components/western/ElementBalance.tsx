@@ -79,7 +79,7 @@ function BalanceBar({
     <div className="flex flex-col gap-1 rounded-element border border-rim-soft bg-surface p-2.5">
       <div className="flex items-center justify-between gap-2">
         <span className="label-caps" style={{ color }}>
-          {label}
+          {t(label)}
         </span>
         <span className="numeric text-xs text-ink">
           {t('{{count}} 星 · {{percent}}%', { count, percent })}
@@ -88,7 +88,7 @@ function BalanceBar({
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
         <div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
       </div>
-      {footnote ? <span className="text-[11px] text-ink-muted">{footnote}</span> : null}
+      {footnote ? <span className="text-[11px] text-ink-muted">{t(footnote)}</span> : null}
     </div>
   );
 }

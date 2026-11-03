@@ -1327,6 +1327,15 @@ const zhHant: MessageDict = {
   '不可达': '不可達',
   '后端计算 API': '後端計算 API',
   '本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。': '本頁授時用於了解當前標準時與視太陽時差異。實際排盤按所填出生時間和地點獨立校正；這裡的當前授時不會改變你的命盤。',
+  // Lib display labels: astro element/modality + vedic span (Phase 2.11 / p7 batch 3g-d)
+  '风象 Air': '風象 Air',
+  '基本宫 Cardinal': '基本宮 Cardinal',
+  '固定宫 Fixed': '固定宮 Fixed',
+  '变动宫 Mutable': '變動宮 Mutable',
+  '白羊 · 狮子 · 射手': '白羊 · 獅子 · 射手',
+  '金牛 · 处女 · 摩羯': '金牛 · 處女 · 摩羯',
+  '巨蟹 · 天蝎 · 双鱼': '巨蟹 · 天蠍 · 雙魚',
+  '{{v}} 个月': '{{v}} 個月',
 };
 
 const en: MessageDict = {
@@ -2862,6 +2871,20 @@ const en: MessageDict = {
   '不可达': 'Unreachable',
   '后端计算 API': 'Backend compute API',
   '本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。': 'The time shown on this page helps you understand the difference between the current standard time and apparent solar time. The actual chart is corrected independently by the birth time and place you enter; this live reading does not change your natal chart.',
+  // Lib display labels: astro element/modality + vedic span (Phase 2.11 / p7 batch 3g-d)
+  '火象 Fire': 'Fire',
+  '土象 Earth': 'Earth',
+  '风象 Air': 'Air',
+  '水象 Water': 'Water',
+  '基本宫 Cardinal': 'Cardinal',
+  '固定宫 Fixed': 'Fixed',
+  '变动宫 Mutable': 'Mutable',
+  '白羊 · 狮子 · 射手': 'Aries · Leo · Sagittarius',
+  '金牛 · 处女 · 摩羯': 'Taurus · Virgo · Capricorn',
+  '双子 · 天秤 · 水瓶': 'Gemini · Libra · Aquarius',
+  '巨蟹 · 天蝎 · 双鱼': 'Cancer · Scorpio · Pisces',
+  '{{v}} 年': '{{v}} yr',
+  '{{v}} 个月': '{{v}} mo',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

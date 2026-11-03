@@ -31,7 +31,7 @@ export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
         </span>
         <span className="text-ink-muted">
           {t('出生余额')}{' '}
-          <span className="numeric text-gold-soft">{formatSpan(vimshottari.balance_at_birth_years)}</span>
+          <span className="numeric text-gold-soft">{formatSpan(vimshottari.balance_at_birth_years, t)}</span>
         </span>
         {current ? (
           <span className="text-ink-muted">
@@ -62,7 +62,7 @@ export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
                 <span className={`font-display ${md.is_current ? 'text-gold-bright' : 'text-ink'}`}>
                   {md.lord_zh}{t('大运')}
                 </span>
-                <span className="numeric text-xs text-ink-muted">{formatSpan(md.years)}</span>
+                <span className="numeric text-xs text-ink-muted">{formatSpan(md.years, t)}</span>
                 {md.is_current ? (
                   <span className="label-caps rounded bg-gold/20 px-1.5 text-[9px] text-gold-bright">{t('现行')}</span>
                 ) : null}
@@ -76,7 +76,7 @@ export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
                 {md.antardashas.map((ad) => (
                   <span
                     key={`${md.lord}-${ad.lord}-${ad.start_date}`}
-                    title={`${ad.lord_zh} · ${formatSpan(ad.years)} · ${ad.start_date} → ${ad.end_date}`}
+                    title={`${ad.lord_zh} · ${formatSpan(ad.years, t)} · ${ad.start_date} → ${ad.end_date}`}
                     className={`flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] ${
                       ad.is_current
                         ? 'border-gold/50 bg-gold/15 text-gold-bright'
@@ -85,7 +85,7 @@ export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
                   >
                     <span style={{ color: grahaColor(ad.lord) }}>{ad.glyph}</span>
                     {ad.lord_zh}
-                    <span className="numeric text-ink-muted">{formatSpan(ad.years)}</span>
+                    <span className="numeric text-ink-muted">{formatSpan(ad.years, t)}</span>
                   </span>
                 ))}
               </div>

@@ -123,11 +123,15 @@ export function rashiByIndex(chart: VedicChart, signIndex: number) {
   return chart.rashis.find((rashi) => rashi.sign_index === signIndex);
 }
 
-/** Format a dasha span as e.g. `16.0 年`, or `8 个月` when under a year. */
-export function formatSpan(years: number): string {
+/** Format a dasha span as e.g. `16.0 年`, or `8 个月` when under a year.
+ * `t` is the active locale's translate fn so the year/month units stay localized. */
+export function formatSpan(
+  years: number,
+  t: (key: string, params?: Record<string, string | number>) => string,
+): string {
   if (years < 1) {
     const months = Math.round(years * 12);
-    return `${Math.max(months, 1)} 个月`;
+    return t('{{v}} 个月', { v: Math.max(months, 1) });
   }
-  return `${years.toFixed(1)} 年`;
+  return t('{{v}} 年', { v: years.toFixed(1) });
 }
