@@ -3,6 +3,7 @@ import { wuxingText } from '../../lib/wuxing';
 import { lineValueMeta, liushenColor } from '../../lib/zhouyi';
 import { Icon } from '../ui/Icon';
 import { LineBar } from '../ui/LineBar';
+import { useI18n } from '../../i18n/context';
 
 interface HexagramStackProps {
   /** 本卦 — the primary hexagram (identity for the column header). */
@@ -34,6 +35,7 @@ const TOP_DOWN = [6, 5, 4, 3, 2, 1] as const;
  * annotations are omitted because the engine does not compute them (no-mock rule).
  */
 export function HexagramStack({ ben, bian, lines }: HexagramStackProps) {
+  const { t } = useI18n();
   const byPosition = new Map(lines.map((line) => [line.position, line]));
   const movingCount = lines.filter((line) => line.moving).length;
 
@@ -44,13 +46,13 @@ export function HexagramStack({ ben, bian, lines }: HexagramStackProps) {
       <div className="overflow-x-auto">
         <div className="flex min-w-[620px] flex-col gap-1">
           <div className={`${MATRIX_GRID} px-2 pb-0.5`}>
-            <span className="label-caps">六神</span>
-            <span className="label-caps">爻题</span>
-            <span className="label-caps">纳甲</span>
-            <span className="label-caps">六亲</span>
-            <span className="label-caps text-center">本卦</span>
-            <span className="label-caps text-center">世应</span>
-            <span className="label-caps text-center">{bian ? '变卦' : '无变'}</span>
+            <span className="label-caps">{t('六神')}</span>
+            <span className="label-caps">{t('爻题')}</span>
+            <span className="label-caps">{t('纳甲')}</span>
+            <span className="label-caps">{t('六亲')}</span>
+            <span className="label-caps text-center">{t('本卦')}</span>
+            <span className="label-caps text-center">{t('世应')}</span>
+            <span className="label-caps text-center">{bian ? t('变卦') : t('无变')}</span>
           </div>
 
           {TOP_DOWN.map((position) => {
@@ -144,17 +146,18 @@ function TransformStrip({
   bian: HexagramInfo | null;
   movingCount: number;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-element border border-rim-soft bg-surface px-3 py-2.5">
       <HexLabel hexagram={ben} caption="本卦" strong />
       <div className="flex items-center gap-1.5">
         <Icon name="arrowRight" size={18} className="text-gold" />
-        <span className="label-caps whitespace-nowrap">{movingCount} 爻动</span>
+        <span className="label-caps whitespace-nowrap">{t('{{n}} 爻动', { n: movingCount })}</span>
       </div>
       {bian ? (
         <HexLabel hexagram={bian} caption="变卦" />
       ) : (
-        <span className="font-display text-sm text-ink-muted">六爻安静 · 无变卦</span>
+        <span className="font-display text-sm text-ink-muted">{t('六爻安静 · 无变卦')}</span>
       )}
     </div>
   );
@@ -170,6 +173,7 @@ function HexLabel({
   caption: string;
   strong?: boolean;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center gap-2.5">
       <span
@@ -178,11 +182,11 @@ function HexLabel({
         {hexagram.symbol}
       </span>
       <div className="flex flex-col">
-        <span className="label-caps">{caption}</span>
+        <span className="label-caps">{t(caption)}</span>
         <span className={`font-display text-base ${strong ? 'font-semibold text-ink' : 'text-ink-variant'}`}>
           {hexagram.full_name_zh}
         </span>
-        <span className="numeric text-[11px] text-ink-muted">第 {hexagram.number} 卦</span>
+        <span className="numeric text-[11px] text-ink-muted">{t('第 {{n}} 卦', { n: hexagram.number })}</span>
       </div>
     </div>
   );
@@ -190,23 +194,24 @@ function HexLabel({
 
 /** Marker + colour key so the matrix reads without guesswork. */
 function Legend() {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-element border border-rim-soft bg-surface px-3 py-2 text-[11px] text-ink-muted">
       <span className="flex items-center gap-1.5">
-        <span className="font-numeric font-bold text-gold-bright">○</span> 老阳动爻（九）
+        <span className="font-numeric font-bold text-gold-bright">○</span> {t('老阳动爻（九）')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="font-numeric font-bold text-gold-bright">×</span> 老阴动爻（六）
+        <span className="font-numeric font-bold text-gold-bright">×</span> {t('老阴动爻（六）')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="h-2 w-6 rounded-full bg-ink-muted" /> 本卦静爻
+        <span className="h-2 w-6 rounded-full bg-ink-muted" /> {t('本卦静爻')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="h-2 w-6 rounded-full bg-gold-soft" /> 变卦动化
+        <span className="h-2 w-6 rounded-full bg-gold-soft" /> {t('变卦动化')}
       </span>
       <span className="flex items-center gap-1.5">
         <span className="rounded bg-gold/20 px-1 font-bold text-gold-bright">世</span>
-        <span className="rounded bg-astral/20 px-1 font-bold text-astral">应</span> 世应爻
+        <span className="rounded bg-astral/20 px-1 font-bold text-astral">应</span> {t('世应爻')}
       </span>
     </div>
   );

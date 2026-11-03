@@ -1,5 +1,6 @@
 import type { ZhouyiLine } from '../../types/zhouyi';
 import { lineValueMeta, positionLabel } from '../../lib/zhouyi';
+import { useI18n } from '../../i18n/context';
 
 interface CastLedgerProps {
   /** The six dressed lines, bottom-to-top (throw order equals position order). */
@@ -17,6 +18,7 @@ interface CastLedgerProps {
  * the manual editor in the console is where the caller's own coins are shown.
  */
 export function CastLedger({ lines }: CastLedgerProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5">
       {lines.map((line) => {
@@ -26,7 +28,7 @@ export function CastLedger({ lines }: CastLedgerProps) {
             key={line.position}
             className="flex items-center gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)]/60 px-2.5 py-1.5"
           >
-            <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">第{line.position}掷</span>
+            <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">{t('第 {{n}} 掷', { n: line.position })}</span>
             <span className="w-9 shrink-0 font-display text-xs text-ink-variant">
               {positionLabel(line.position)}
             </span>
@@ -46,13 +48,13 @@ export function CastLedger({ lines }: CastLedgerProps) {
                 meta.moving ? 'bg-wuxing-fire/20 text-wuxing-fire' : 'bg-surface text-ink-muted'
               }`}
             >
-              {meta.moving ? '动爻' : '静爻'}
+              {meta.moving ? t('动爻') : t('静爻')}
             </span>
           </div>
         );
       })}
       <p className="mt-1 text-[11px] leading-snug text-ink-muted">
-        数值 6/7/8/9 定老少阴阳：六老阴、七少阳、八少阴、九老阳；老阴老阳为动爻，动则变卦生。
+        {t('数值 6/7/8/9 定老少阴阳：六老阴、七少阳、八少阴、九老阳；老阴老阳为动爻，动则变卦生。')}
       </p>
     </div>
   );

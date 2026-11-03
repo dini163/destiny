@@ -2,6 +2,7 @@ import type { MeihuaCast, TiYongParty } from '../../types/meihua';
 import { relationChip } from '../../lib/meihua';
 import { wuxingChip, wuxingText } from '../../lib/wuxing';
 import { PlainProse } from '../ui/PlainProse';
+import { useI18n } from '../../i18n/context';
 
 interface TiYongPanelProps {
   /** The complete cast — supplies 体卦 / 用卦, the 生克 verdict and the 卦气 context. */
@@ -26,16 +27,17 @@ const ROLE_META: Record<string, { title: string; gloss: string }> = {
  * 技术判语（`tiyong.text`）降为小字脚注。面板自己一个字都不写，两段的字都来自引擎。
  */
 export function TiYongPanel({ cast }: TiYongPanelProps) {
+  const { t } = useI18n();
   const { ti, yong, tiyong, wangshuai } = cast;
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2 text-xs">
-        <span className="label-caps text-ink-muted">卦气 · 月令</span>
+        <span className="label-caps text-ink-muted">{t('卦气 · 月令')}</span>
         <span className="font-display text-ink-variant">
-          {wangshuai.season_zh}（{wangshuai.month_zhi}月）
+          {wangshuai.season_zh}{t('（{{m}}月）', { m: wangshuai.month_zhi })}
         </span>
-        <span className="text-ink-muted">当令</span>
+        <span className="text-ink-muted">{t('当令')}</span>
         <span className={`font-display ${wuxingText(wangshuai.commanding_element)}`}>
           {wangshuai.commanding_element}
         </span>
@@ -48,10 +50,10 @@ export function TiYongPanel({ cast }: TiYongPanelProps) {
 
       <div className="flex flex-col gap-2 rounded-card border border-rim-strong bg-surface/70 p-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="label-caps text-ink-muted">体用生克 · VERDICT</span>
+          <span className="label-caps text-ink-muted">{t('体用生克 · VERDICT')}</span>
           <span className="font-display text-lg font-semibold text-ink">{tiyong.relation_zh}</span>
           <span className={`rounded-element px-2 py-0.5 text-xs font-semibold ${relationChip(tiyong.verdict)}`}>
-            {tiyong.verdict}
+            {t(tiyong.verdict)}
           </span>
         </div>
         <PlainProse text={cast.plain_summary} className="rounded-element border border-rim-soft bg-[var(--field-bg)] p-3" />
@@ -63,6 +65,7 @@ export function TiYongPanel({ cast }: TiYongPanelProps) {
 
 /** One 体 / 用 card: role, trigram identity, 五行, 万物类象 and 旺衰. */
 function PartyCard({ party, accent }: { party: TiYongParty; accent?: boolean }) {
+  const { t } = useI18n();
   const meta = ROLE_META[party.role] ?? { title: party.role, gloss: '' };
   const { trigram } = party;
 
@@ -75,9 +78,9 @@ function PartyCard({ party, accent }: { party: TiYongParty; accent?: boolean }) 
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col">
           <span className={`font-display text-base font-semibold ${accent ? 'text-gold-bright' : 'text-ink'}`}>
-            {meta.title}
+            {t(meta.title)}
           </span>
-          <span className="text-[11px] leading-snug text-ink-muted">{meta.gloss}</span>
+          <span className="text-[11px] leading-snug text-ink-muted">{meta.gloss ? t(meta.gloss) : ''}</span>
         </div>
         <span className={`rounded-element px-2 py-0.5 text-[11px] ${wuxingChip(trigram.element)}`}>
           {trigram.element}
@@ -89,9 +92,9 @@ function PartyCard({ party, accent }: { party: TiYongParty; accent?: boolean }) 
         <div className="flex flex-col">
           <span className="font-display text-lg text-ink">
             {trigram.name_zh}
-            <span className="ml-1 text-sm text-ink-muted">为{trigram.nature_zh}</span>
+            <span className="ml-1 text-sm text-ink-muted">{t('为 {{nature}}', { nature: trigram.nature_zh })}</span>
           </span>
-          <span className="numeric text-[11px] text-ink-muted">{trigram.position === 'lower' ? '内卦' : '外卦'}</span>
+          <span className="numeric text-[11px] text-ink-muted">{trigram.position === 'lower' ? t('内卦') : t('外卦')}</span>
         </div>
       </div>
 
@@ -100,7 +103,7 @@ function PartyCard({ party, accent }: { party: TiYongParty; accent?: boolean }) 
       <div className="gold-rule" />
 
       <div className="flex items-baseline gap-2">
-        <span className="label-caps text-ink-muted">旺衰</span>
+        <span className="label-caps text-ink-muted">{t('旺衰')}</span>
         <span className={`font-display text-sm font-semibold ${wuxingText(trigram.element)}`}>{party.wangshuai}</span>
       </div>
       <p className="text-[11px] leading-relaxed text-ink-muted">{party.wangshuai_text}</p>

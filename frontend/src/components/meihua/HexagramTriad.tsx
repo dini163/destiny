@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { MeihuaCast, MeihuaHexagram, MeihuaTrigram } from '../../types/meihua';
 import { wuxingText } from '../../lib/wuxing';
 import { HexagramGlyph } from '../ui/HexagramGlyph';
+import { useI18n } from '../../i18n/context';
 
 interface HexagramTriadProps {
   /** The complete cast — supplies 本/互/变卦, the moving line and the 体用 roles. */
@@ -71,11 +72,12 @@ interface TriadCardProps {
 
 /** One hexagram column: caption, figure, name, trigram natures and optional roles. */
 function TriadCard({ eyebrow, caption, hexagram, moving, barClass, nameClass, roles }: TriadCardProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-3 rounded-card border border-rim bg-surface/60 p-4">
       <div className="flex flex-col gap-0.5">
-        <span className="label-caps">{eyebrow}</span>
-        <span className="text-[11px] leading-snug text-ink-muted">{caption}</span>
+        <span className="label-caps">{t(eyebrow)}</span>
+        <span className="text-[11px] leading-snug text-ink-muted">{t(caption)}</span>
       </div>
 
       <div className="flex items-start gap-3">
@@ -85,11 +87,12 @@ function TriadCard({ eyebrow, caption, hexagram, moving, barClass, nameClass, ro
             <span className="font-display text-2xl leading-none text-gold">{hexagram.symbol}</span>
             <span className={`font-display text-base font-semibold ${nameClass}`}>{hexagram.full_name_zh}</span>
           </div>
-          <span className="numeric text-[11px] text-ink-muted">第 {hexagram.number} 卦</span>
+          <span className="numeric text-[11px] text-ink-muted">{t('第 {{n}} 卦', { n: hexagram.number })}</span>
           <span className="text-[11px] leading-snug text-ink-variant">
-            {hexagram.lower.name_zh}
-            {hexagram.lower.nature_zh}下 · {hexagram.upper.name_zh}
-            {hexagram.upper.nature_zh}上
+            {t('{{lo}}下 · {{up}}上', {
+              lo: `${hexagram.lower.name_zh}${hexagram.lower.nature_zh}`,
+              up: `${hexagram.upper.name_zh}${hexagram.upper.nature_zh}`,
+            })}
           </span>
         </div>
       </div>
@@ -101,6 +104,7 @@ function TriadCard({ eyebrow, caption, hexagram, moving, barClass, nameClass, ro
 
 /** A compact 体 / 用 chip naming the trigram, its position and its 五行. */
 function RoleChip({ role, trigram, accent }: { role: string; trigram: MeihuaTrigram; accent?: boolean }) {
+  const { t } = useI18n();
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-element px-2 py-0.5 text-[11px] ${
@@ -108,7 +112,7 @@ function RoleChip({ role, trigram, accent }: { role: string; trigram: MeihuaTrig
       }`}
     >
       <span className="font-semibold">{role}</span>
-      <span className="text-ink-muted">{POSITION_ZH[trigram.position] ?? ''}</span>
+      <span className="text-ink-muted">{POSITION_ZH[trigram.position] ? t(POSITION_ZH[trigram.position]) : ''}</span>
       <span className="font-display">
         {trigram.symbol}
         {trigram.name_zh}

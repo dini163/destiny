@@ -1,6 +1,7 @@
 import type { MeihuaCast } from '../../types/meihua';
 import { deltaText, scoreBarClass, verdictText } from '../../lib/meihua';
 import { formatStepDelta } from '../../lib/scoring';
+import { useI18n } from '../../i18n/context';
 
 interface MeihuaScoreLedgerProps {
   /** The complete cast — supplies the 吉凶指数, its factor ledger and the 综合断语. */
@@ -16,6 +17,7 @@ interface MeihuaScoreLedgerProps {
  * all labels, details and deltas are the backend's own.
  */
 export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
+  const { t } = useI18n();
   const { score, score_factors, summary } = cast;
   const band = cast.verdict.grade;
 
@@ -24,13 +26,13 @@ export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
       <div className="flex flex-col gap-2">
         <div className="flex items-end justify-between gap-3">
           <div className="flex flex-col">
-            <span className="label-caps">吉凶指数 · FORTUNE INDEX</span>
+            <span className="label-caps">{t('吉凶指数 · FORTUNE INDEX')}</span>
             <div className="flex items-baseline gap-2">
               <span className="numeric text-4xl font-bold leading-none text-gold-bright">{score}</span>
               <span className="numeric text-sm text-ink-muted">/ 100</span>
             </div>
           </div>
-          <span className={`font-display text-xl font-semibold ${verdictText(band)}`}>{band}</span>
+          <span className={`font-display text-xl font-semibold ${verdictText(band)}`}>{t(band)}</span>
         </div>
 
         <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--field-bg)] ring-1 ring-inset ring-rim">
@@ -58,7 +60,7 @@ export function MeihuaScoreLedger({ cast }: MeihuaScoreLedgerProps) {
       <div className="gold-rule" />
 
       <p className="font-display text-sm leading-relaxed text-ink-variant">
-        <span className="label-caps mr-2 align-middle">综合断语</span>
+        <span className="label-caps mr-2 align-middle">{t('综合断语')}</span>
         {summary}
       </p>
     </div>

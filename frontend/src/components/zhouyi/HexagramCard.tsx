@@ -4,6 +4,7 @@ import type { HexagramInfo } from '../../types/zhouyi';
 import { wuxingChip } from '../../lib/wuxing';
 import { HexagramGlyph } from '../ui/HexagramGlyph';
 import { PlainProse } from '../ui/PlainProse';
+import { useI18n } from '../../i18n/context';
 
 interface HexagramCardProps {
   /** The hexagram to describe (变卦 or 互卦). */
@@ -28,6 +29,7 @@ interface HexagramCardProps {
  * is invented.
  */
 export function HexagramCard({ hexagram, moving, note }: HexagramCardProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3.5">
@@ -50,29 +52,30 @@ export function HexagramCard({ hexagram, moving, note }: HexagramCardProps) {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <Chip>第 {hexagram.number} 卦</Chip>
+        <Chip>{t('第 {{n}} 卦', { n: hexagram.number })}</Chip>
         <Chip>
           {hexagram.palace_name_zh} · {hexagram.generation}
         </Chip>
         <span
           className={`inline-flex items-center rounded-element px-2 py-0.5 text-[11px] ${wuxingChip(hexagram.palace_element)}`}
         >
-          宫属{hexagram.palace_element}
+          {t('宫属 {{el}}', { el: hexagram.palace_element })}
         </span>
         <Chip>
-          世{hexagram.shi} · 应{hexagram.ying}
+          {t('世{{shi}} · 应{{ying}}', { shi: hexagram.shi, ying: hexagram.ying })}
         </Chip>
         <Chip>
-          下{hexagram.lower_name_zh}
-          {hexagram.lower_nature_zh} · 上{hexagram.upper_name_zh}
-          {hexagram.upper_nature_zh}
+          {t('下{{lo}} · 上{{up}}', {
+            lo: `${hexagram.lower_name_zh}${hexagram.lower_nature_zh}`,
+            up: `${hexagram.upper_name_zh}${hexagram.upper_nature_zh}`,
+          })}
         </Chip>
       </div>
 
       <div className="gold-rule" />
 
       <div className="flex flex-col gap-1">
-        <span className="label-caps">卦辞</span>
+        <span className="label-caps">{t('卦辞')}</span>
         <PlainProse text={hexagram.plain_gua_ci} />
         <p className="font-display text-sm leading-relaxed text-ink-muted">{hexagram.gua_ci}</p>
       </div>

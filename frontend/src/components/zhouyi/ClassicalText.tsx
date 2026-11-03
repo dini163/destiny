@@ -1,5 +1,6 @@
 import type { HexagramInfo, ZhouyiLine } from '../../types/zhouyi';
 import { PlainProse } from '../ui/PlainProse';
+import { useI18n } from '../../i18n/context';
 
 interface ClassicalTextProps {
   /** 本卦 — supplies the 卦辞 and 用九/用六. */
@@ -20,11 +21,12 @@ interface ClassicalTextProps {
  * below it as the footnote.
  */
 export function ClassicalText({ ben, lines }: ClassicalTextProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-5">
       <section className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
-          <span className="label-caps">卦辞 · JUDGMENT</span>
+          <span className="label-caps">{t('卦辞 · JUDGMENT')}</span>
           <span className="gold-rule flex-1" />
         </div>
         <PlainProse text={ben.plain_gua_ci} />
@@ -40,9 +42,9 @@ export function ClassicalText({ ben, lines }: ClassicalTextProps) {
 
       <section className="flex flex-col gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="label-caps">爻辞 · LINE STATEMENTS</span>
+          <span className="label-caps">{t('爻辞 · LINE STATEMENTS')}</span>
           <span className="gold-rule flex-1" />
-          <span className="shrink-0 text-[11px] text-ink-muted">动爻高亮</span>
+          <span className="shrink-0 text-[11px] text-ink-muted">{t('动爻高亮')}</span>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -66,7 +68,7 @@ export function ClassicalText({ ben, lines }: ClassicalTextProps) {
                 </span>
                 {line.moving ? (
                   <span className="rounded bg-wuxing-fire/20 px-1.5 py-0.5 text-[10px] font-bold text-wuxing-fire">
-                    动爻
+                    {t('动爻')}
                   </span>
                 ) : null}
               </div>

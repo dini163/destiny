@@ -7,6 +7,7 @@ import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
 import { ChineseDateTimeField } from '../ui/DateTimeFieldCombined';
 import { SegmentedControl } from '../ui/SegmentedControl';
+import { useI18n } from '../../i18n/context';
 
 interface CastControlsProps {
   /** Chosen casting method. */
@@ -50,6 +51,7 @@ export function CastControls({
   pending,
   onSubmit,
 }: CastControlsProps) {
+  const { t } = useI18n();
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending) {
@@ -69,19 +71,19 @@ export function CastControls({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">周易六爻神机</h1>
+              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{t('周易六爻神机')}</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                纳甲六爻 · 真随机
+                {t('纳甲六爻 · 真随机')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              铜钱六掷起卦，定本卦、变卦、互卦，配世应、六亲、六神与纳甲干支，并附《周易》通行本卦辞、爻辞原文。三法皆由后端真实推演，绝无虚构。
+              {t('铜钱六掷起卦，定本卦、变卦、互卦，配世应、六亲、六神与纳甲干支，并附《周易》通行本卦辞、爻辞原文。三法皆由后端真实推演，绝无虚构。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending}>
           <Icon name="compass" size={18} />
-          {pending ? '起卦推演中…' : '起卦 · 排盘'}
+          {pending ? t('起卦推演中…') : t('起卦 · 排盘')}
         </button>
       </div>
 
@@ -93,7 +95,7 @@ export function CastControls({
             value={method}
             onChange={onMethodChange}
           />
-          <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{activeMethod?.hint}</p>
+          <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{activeMethod ? t(activeMethod.hint) : null}</p>
         </LabeledField>
 
         <div className="flex flex-col gap-4 xl:col-span-5">
@@ -104,13 +106,13 @@ export function CastControls({
                 type="text"
                 value={question}
                 onChange={(event) => onQuestionChange(event.target.value)}
-                title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
-                placeholder="例如：本月求谋可否得成？"
+                title={t('问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。')}
+                placeholder={t('例如：本月求谋可否得成？')}
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-                aria-label="所占之事"
+                aria-label={t('所占之事')}
               />
             </div>
-          <p className="text-xs leading-relaxed text-ink-muted">问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{t('问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。')}</p>
           </LabeledField>
 
           <LabeledField label="起卦时刻 / CAST TIME" hint={<span className="text-ink-muted">留空取当前</span>}>
@@ -126,9 +128,9 @@ export function CastControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          铜钱摇卦与梅花时间由权威算法真实推算，每次起卦独立不可复现。
+          {t('铜钱摇卦与梅花时间由权威算法真实推算，每次起卦独立不可复现。')}
         </span>
-        <span>纳甲、六亲、六神、世应与卦爻辞均取自策展经典数据，未作运行时虚构。</span>
+        <span>{t('纳甲、六亲、六神、世应与卦爻辞均取自策展经典数据，未作运行时虚构。')}</span>
       </div>
     </form>
   );
@@ -147,6 +149,7 @@ function CoinThrowEditor({
   coins: CoinFace[][];
   onChange: (coins: CoinFace[][]) => void;
 }) {
+  const { t } = useI18n();
   function toggleCoin(throwIndex: number, coinIndex: number): void {
     const next = coins.map((throwCoins) => throwCoins.slice());
     next[throwIndex][coinIndex] = next[throwIndex][coinIndex] === 3 ? 2 : 3;
@@ -156,8 +159,8 @@ function CoinThrowEditor({
   return (
     <div className="flex flex-col gap-2 rounded-element border border-rim-soft bg-surface p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="label-caps">手动铜钱六掷 · MANUAL COINS</span>
-        <span className="text-[11px] text-ink-muted">点选铜钱：字=2（阴）· 背=3（阳）</span>
+        <span className="label-caps">{t('手动铜钱六掷 · MANUAL COINS')}</span>
+        <span className="text-[11px] text-ink-muted">{t('点选铜钱：字=2（阴）· 背=3（阳）')}</span>
       </div>
       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
         {coins.map((throwCoins, throwIndex) => {
@@ -168,7 +171,7 @@ function CoinThrowEditor({
               key={throwIndex}
               className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)]/60 px-2.5 py-2"
             >
-              <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">第{throwIndex + 1}掷</span>
+              <span className="numeric w-11 shrink-0 text-[11px] text-ink-muted">{t('第 {{n}} 掷', { n: throwIndex + 1 })}</span>
               <div className="flex items-center gap-1">
                 {throwCoins.map((face, coinIndex) => (
                   <button
@@ -176,7 +179,7 @@ function CoinThrowEditor({
                     type="button"
                     onClick={() => toggleCoin(throwIndex, coinIndex)}
                     aria-pressed={face === 3}
-                    aria-label={`第${throwIndex + 1}掷第${coinIndex + 1}枚：${coinLabel(face)}`}
+                    aria-label={t('第{{m}}掷第{{c}}枚：{{label}}', { m: throwIndex + 1, c: coinIndex + 1, label: coinLabel(face) })}
                     className={
                       face === 3
                         ? 'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-gold-bright to-gold text-xs font-bold text-[var(--on-gold)] transition'
