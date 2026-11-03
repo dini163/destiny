@@ -89,7 +89,7 @@ export function natalLongitudeByName(natal: WesternChart): Map<string, number> {
   return map;
 }
 
-/** Format decimal years as e.g. `26.73 岁`, for the progression headline. */
+/** Render decimal years to 2dp (unit is localised by the caller, e.g. `t('{{y}} 岁', …)`). */
 export function formatAgeYears(years: number): string {
-  return `${years.toFixed(2)} 岁`;
+  return years.toFixed(2);
 }

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../i18n/context';
 import { PillarCard } from '../PillarCard';
 import { RelationChips } from '../RelationChips';
 import { ShenShaList } from '../ShenShaList';
@@ -22,9 +23,10 @@ import type { TransitDayDetail } from '../../../types/baziLiuri';
  * 历注与四书语料视觉上分开：它来自外部历法库，不参与上面那本账的任何一分。
  */
 export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; href?: string }) {
+  const { t } = useI18n();
   return (
     <ResultCard
-      title={`${detail.ganzhi}日`}
+      title={t('{{ganzhi}}日', { ganzhi: detail.ganzhi })}
       icon="sun"
       actions={
         <span className="flex items-baseline gap-3">
@@ -35,7 +37,7 @@ export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; hre
               to={href}
               className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
             >
-              看这一刻的十二时辰
+              {t('看这一刻的十二时辰')}
             </Link>
           ) : null}
         </span>
@@ -54,12 +56,12 @@ export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; hre
       <div className="gold-rule" />
 
       <div className="flex flex-col gap-3">
-        <span className="label-caps text-ink-muted">命中详单</span>
+        <span className="label-caps text-ink-muted">{t('命中详单')}</span>
         <TransitFiredList rows={detail.fired} />
       </div>
 
       <div className="flex flex-col gap-3">
-        <span className="label-caps text-ink-muted">流日之干论十神</span>
+        <span className="label-caps text-ink-muted">{t('流日之干论十神')}</span>
         <div className="flex flex-col gap-1.5 rounded-element bg-[var(--field-bg)] px-3 py-2.5">
           <span className="font-display text-base text-ink">{detail.ten_god.god}</span>
           <p className="text-sm leading-relaxed text-ink-variant">{detail.ten_god.meaning}</p>
@@ -71,23 +73,23 @@ export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; hre
 
       {detail.relations.length > 0 || detail.branch_groups.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <span className="label-caps text-ink-muted">岁运与原局的刑冲合害</span>
+          <span className="label-caps text-ink-muted">{t('岁运与原局的刑冲合害')}</span>
           <RelationChips relations={detail.relations} groups={detail.branch_groups} />
         </div>
       ) : null}
 
       {detail.shensha.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <span className="label-caps text-ink-muted">岁运落点神煞</span>
+          <span className="label-caps text-ink-muted">{t('岁运落点神煞')}</span>
           <ShenShaList entries={detail.shensha} />
         </div>
       ) : null}
 
       <div className="flex flex-col gap-3">
-        <span className="label-caps text-ink-muted">通书历注（全量）</span>
+        <span className="label-caps text-ink-muted">{t('通书历注（全量）')}</span>
         <div className="flex flex-col gap-2 rounded-element bg-[var(--field-bg)] px-3 py-2.5">
-          <AlmanacLine prefix="宜" items={detail.almanac.yi} />
-          <AlmanacLine prefix="忌" items={detail.almanac.ji} />
+          <AlmanacLine prefix={t('宜')} items={detail.almanac.yi} />
+          <AlmanacLine prefix={t('忌')} items={detail.almanac.ji} />
         </div>
         <SourceNote source="通书宜忌（外部历法数据，非本仓古籍语料，不参与本页任何计分）" />
       </div>

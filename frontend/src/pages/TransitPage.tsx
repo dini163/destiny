@@ -261,7 +261,7 @@ function SummaryStrip({ chart }: { chart: TransitChart }) {
           {t('当地生时：')}<span className="numeric text-ink">{natal.local_datetime}</span>
         </span>
         <span>
-          {t('周岁：')}<span className="numeric text-gold-soft">{formatAgeYears(chart.progression.age_years)}</span>
+          {t('周岁：')}<span className="numeric text-gold-soft">{t('{{y}} 岁', { y: formatAgeYears(chart.progression.age_years) })}</span>
         </span>
         <span>
           {t('太阳弧：')}<span className="numeric text-gold-soft">{chart.solar_arc.arc_text}</span>
@@ -286,7 +286,7 @@ function ProgressionCard({ progression }: { progression: ProgressionBlock }) {
             <span className="font-display text-base text-gold-bright">{progression.moon_sign_zh}</span>
             <span className="text-ink-muted">{t('落本命第 {{n}} 宫', { n: progression.moon_natal_house })}</span>
           </span>
-          <span className="numeric text-xs text-ink-muted">{formatAgeYears(progression.age_years)} · {t('一日当一年')}</span>
+          <span className="numeric text-xs text-ink-muted">{t('{{y}} 岁', { y: formatAgeYears(progression.age_years) })} · {t('一日当一年')}</span>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {progression.angles.map((angle) => (

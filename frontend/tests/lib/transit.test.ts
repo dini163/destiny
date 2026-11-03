@@ -68,9 +68,9 @@ describe('行运三层的取法（Task 8B 判据 4）', () => {
 });
 
 describe('行运页眉的两个标量口径（Task 8B 判据 4）', () => {
-  it('周岁按页面口径印成两位小数：26.7329 → 26.73 岁', () => {
+  it('周岁按页面口径印成两位小数：26.7329 → 26.73（单位由页面本地化）', () => {
     expect(transit.progression.age_years).toBe(26.7329);
-    expect(formatAgeYears(transit.progression.age_years)).toBe('26.73 岁');
+    expect(formatAgeYears(transit.progression.age_years)).toBe('26.73');
   });
 
   it('次限日期与 age_years 是同一次推进：ΔJD 等于周岁数，且该 JD 落在那个日历日', () => {

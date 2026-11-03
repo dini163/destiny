@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { GENDER_LABEL, GENDER_SHORT } from '../../../lib/gender';
 import { pillarColumnLabel } from '../../../lib/pillars';
 import type { HehunCell } from '../../../types/baziHehun';
@@ -17,6 +18,7 @@ const POSITIONS = ['year', 'month', 'day', 'hour'] as const;
  * 字是从哪一格来的。
  */
 export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
+  const { t } = useI18n();
   const cellFor = (male: string, female: string): HehunCell | undefined =>
     cells.find((cell) => cell.male_position === male && cell.female_position === female);
 
@@ -24,16 +26,16 @@ export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[46rem] border-separate border-spacing-1 text-xs">
         <caption className="sr-only">
-          {GENDER_LABEL.male}四柱对{GENDER_LABEL.female}四柱的跨造关系矩阵
+          {t('{{male}}四柱对{{female}}四柱的跨造关系矩阵', { male: t(GENDER_LABEL.male), female: t(GENDER_LABEL.female) })}
         </caption>
         <thead>
           <tr>
             <th scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">
-              {GENDER_SHORT.male} ＼ {GENDER_SHORT.female}
+              {t(GENDER_SHORT.male)} ＼ {t(GENDER_SHORT.female)}
             </th>
             {POSITIONS.map((position) => (
               <th key={position} scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">
-                {pillarColumnLabel(position)}
+                {t(pillarColumnLabel(position))}
               </th>
             ))}
           </tr>
@@ -42,8 +44,8 @@ export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
           {POSITIONS.map((male) => (
             <tr key={male}>
               <th scope="row" className="label-caps whitespace-nowrap p-2 text-left font-normal text-gold">
-                {pillarColumnLabel(male)}
-                {male === 'day' ? <span className="ml-1 text-ink-muted">· 婚姻宫在日柱一格</span> : null}
+                {t(pillarColumnLabel(male))}
+                {male === 'day' ? <span className="ml-1 text-ink-muted">{t('· 婚姻宫在日柱一格')}</span> : null}
               </th>
               {POSITIONS.map((female) => {
                 const cell = cellFor(male, female);
@@ -57,12 +59,12 @@ export function HehunPairMatrix({ cells }: { cells: HehunCell[] }) {
                     } ${palace ? 'outline outline-1 outline-rim-strong' : ''}`}
                   >
                     {hits.length === 0 ? (
-                      <span className="text-ink-muted">无</span>
+                      <span className="text-ink-muted">{t('无')}</span>
                     ) : (
                       <ul className="flex flex-col gap-1">
                         {hits.map((hit, index) => (
                           <li key={`${hit.rule}#${index}`} className="flex flex-wrap items-baseline gap-x-1.5">
-                            <span className="text-ink">{hit.kind}</span>
+                            <span className="text-ink">{t(hit.kind)}</span>
                             <span className="numeric text-ink-muted">
                               {hit.male_character} × {hit.female_character}
                             </span>

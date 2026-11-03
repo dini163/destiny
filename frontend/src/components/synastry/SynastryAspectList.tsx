@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import { aspectStyle } from '../../lib/astro';
 import { natureStyle } from '../../lib/transit';
@@ -31,6 +32,7 @@ interface SynastryAspectListProps {
  * so does that sentence — the page composes none of its own wording.
  */
 export function SynastryAspectList({ aspects }: SynastryAspectListProps) {
+  const { t } = useI18n();
   const [filter, setFilter] = useState<Filter>('counted');
   const shown = filter === 'counted' ? aspects.filter((aspect) => aspect.counted) : aspects;
 
@@ -44,12 +46,12 @@ export function SynastryAspectList({ aspects }: SynastryAspectListProps) {
           onChange={setFilter}
         />
         <span className="label-caps text-ink-muted">
-          {shown.length} / {aspects.length} 条 · 按容许度排序
+          {t('{{a}} / {{b}} 条 · 按容许度排序', { a: shown.length, b: aspects.length })}
         </span>
       </div>
 
       {shown.length === 0 ? (
-        <p className="text-sm text-ink-muted">当前经典容许度内，未检出人对人的主要相位。</p>
+        <p className="text-sm text-ink-muted">{t('当前经典容许度内，未检出人对人的主要相位。')}</p>
       ) : (
         <ul className="flex flex-col gap-1.5">
           {shown.map((aspect, index) => {
@@ -63,7 +65,7 @@ export function SynastryAspectList({ aspects }: SynastryAspectListProps) {
                 }`}
               >
                 <span className="flex w-[6.5rem] shrink-0 items-center gap-1.5">
-                  <span className="label-caps shrink-0 rounded bg-gold/15 px-1 text-gold-soft">甲</span>
+                  <span className="label-caps shrink-0 rounded bg-gold/15 px-1 text-gold-soft">{t('甲')}</span>
                   <span className="text-base leading-none" style={{ color: nat.color }}>
                     {aspect.point_a_glyph}
                   </span>
@@ -74,25 +76,25 @@ export function SynastryAspectList({ aspects }: SynastryAspectListProps) {
                   style={{ borderColor: `${asp.color}66`, color: asp.color }}
                 >
                   <span className="text-sm leading-none">{aspect.glyph}</span>
-                  <span className="text-xs">{asp.label}</span>
+                  <span className="text-xs">{t(asp.label)}</span>
                 </span>
                 <span className="shrink-0 text-ink-muted" aria-hidden="true">
                   →
                 </span>
                 <span className="flex w-[6.5rem] shrink-0 items-center gap-1.5">
-                  <span className="label-caps shrink-0 rounded bg-gold/15 px-1 text-gold-soft">乙</span>
+                  <span className="label-caps shrink-0 rounded bg-gold/15 px-1 text-gold-soft">{t('乙')}</span>
                   <span className="truncate text-sm text-ink-variant">{aspect.point_b_zh}</span>
                 </span>
                 <span className="ml-auto flex shrink-0 items-center gap-2">
-                  <span className="numeric text-xs text-ink-muted">容 {aspect.orb.toFixed(2)}°</span>
+                  <span className="numeric text-xs text-ink-muted">{t('容 {{orb}}°', { orb: aspect.orb.toFixed(2) })}</span>
                   {aspect.core_bond ? (
-                    <span className="rounded-full bg-gold/15 px-2 py-0.5 text-xs text-gold">核心</span>
+                    <span className="rounded-full bg-gold/15 px-2 py-0.5 text-xs text-gold">{t('核心')}</span>
                   ) : null}
                   <span
                     className="rounded-full px-2 py-0.5 text-xs"
                     style={{ backgroundColor: `${nat.color}22`, color: nat.color }}
                   >
-                    {nat.label}
+                    {t(nat.label)}
                   </span>
                 </span>
                 <p className="w-full text-xs leading-relaxed text-ink-variant">{aspect.plain}</p>

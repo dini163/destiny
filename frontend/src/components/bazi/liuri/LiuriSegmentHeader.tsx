@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../i18n/context';
 import { Icon } from '../../ui/Icon';
 import { ResultCard } from '../../ui/ResultCard';
 import { TransitFiredList } from '../transit/TransitFiredList';
@@ -40,10 +41,11 @@ export function LiuriSegmentHeader({
   transitHref?: string;
   onShift: (direction: ShiftDirection) => void;
 }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   return (
     <ResultCard
-      title={`${result.year_ganzhi}年 ${result.month_ganzhi}月`}
+      title={`${t('{{year}}年', { year: result.year_ganzhi })} ${t('{{month}}月', { month: result.month_ganzhi })}`}
       icon="calendar"
       actions={
         <span className="flex items-center gap-2">
@@ -52,7 +54,7 @@ export function LiuriSegmentHeader({
               to={transitHref}
               className="label-caps rounded-element border border-rim px-2 py-1 text-gold-soft transition hover:border-rim-strong"
             >
-              回岁运流年
+              {t('回岁运流年')}
             </Link>
           ) : null}
           {SHIFT_ACTIONS.map((action) => (
@@ -63,29 +65,29 @@ export function LiuriSegmentHeader({
               onClick={() => onShift(action.direction)}
               className="label-caps rounded-element border border-rim px-3 py-1.5 transition hover:border-rim-strong hover:text-gold-soft disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {action.label}
+              {t(action.label)}
             </button>
           ))}
         </span>
       }
     >
       <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2 text-xs">
-        <Fact label="月名" value={`${result.month_in_chinese}月`} />
+        <Fact label="月名" value={`${t('{{m}}月', { m: result.month_in_chinese })}`} />
         <Fact label="起讫" value={`${result.month_start_solar} ~ ${result.month_end_solar}`} />
-        <Fact label="流年" value={`${result.year} 年 · 虚岁 ${result.year_age}`} />
+        <Fact label="流年" value={t('{{year}} 年 · 虚岁 {{age}}', { year: result.year, age: result.year_age })} />
         <Fact
           label="大运"
           value={
             result.dayun_ganzhi
-              ? `第 ${result.dayun_index} 运 ${result.dayun_ganzhi}`
-              : `第 ${result.dayun_index} 段（未起运）`
+              ? t('第 {{n}} 运 {{gz}}', { n: result.dayun_index, gz: result.dayun_ganzhi })
+              : t('第 {{n}} 段（未起运）', { n: result.dayun_index })
           }
         />
         <Fact
           label="段基准"
-          value={`${result.month_score.value.toFixed(1)} ${result.month_score.tier}`}
+          value={`${result.month_score.value.toFixed(1)} ${t(result.month_score.tier)}`}
         />
-        <Fact label="逐日" value={`${result.days.length} 格`} />
+        <Fact label="逐日" value={t('{{n}} 格', { n: result.days.length })} />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -96,7 +98,7 @@ export function LiuriSegmentHeader({
           className="label-caps flex items-center gap-1 self-start text-ink-muted hover:text-gold-soft"
         >
           <Icon name="chevronDown" size={12} className={open ? 'rotate-180' : undefined} />
-          {open ? '收起本段命中' : `展开本段命中 ${result.month_fired.length} 行`}
+          {open ? t('收起本段命中') : t('展开本段命中 {{n}} 行', { n: result.month_fired.length })}
         </button>
         {open ? <TransitFiredList rows={result.month_fired} /> : null}
       </div>
@@ -106,9 +108,10 @@ export function LiuriSegmentHeader({
 
 /** One caption/value pair in the segment line. */
 function Fact({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <span className="flex items-baseline gap-1.5">
-      <span className="label-caps text-ink-muted">{label}</span>
+      <span className="label-caps text-ink-muted">{t(label)}</span>
       <span className="numeric text-ink">{value}</span>
     </span>
   );

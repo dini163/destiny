@@ -1,4 +1,5 @@
 import type { TransitDayCell } from '../../../types/baziLiuri';
+import { useI18n } from '../../../i18n/context';
 import { tierClass } from './tier';
 
 /** 「馀事勿取」在库给的 `yi` 里时，它是"今日诸事不宜"的唯一信号 —— 排第一且永不被截掉。 */
@@ -30,6 +31,7 @@ export function LiuriDayCell({
   isFocused: boolean;
   onSelect: (solarDate: string) => void;
 }) {
+  const { t } = useI18n();
   const yi = yiPreview(cell.almanac.yi);
   const ji = cell.almanac.ji.slice(0, PREVIEW_COUNT);
   return (
@@ -51,16 +53,16 @@ export function LiuriDayCell({
       </span>
       <span className="flex items-baseline justify-between gap-1">
         <span className="text-xs text-ink-variant">{cell.lunar_day}</span>
-        {isToday ? <span className="label-caps text-gold">今日</span> : null}
+        {isToday ? <span className="label-caps text-gold">{t('今日')}</span> : null}
       </span>
       <span className="flex items-baseline gap-1.5">
         <span className={`numeric text-lg ${tierClass(cell.tier)}`}>
           {Math.round(cell.value)}
         </span>
-        <span className={`label-caps ${tierClass(cell.tier)}`}>{cell.tier}</span>
+        <span className={`label-caps ${tierClass(cell.tier)}`}>{t(cell.tier)}</span>
       </span>
-      <YiJiLine prefix="宜" items={yi} total={cell.almanac.yi.length} />
-      <YiJiLine prefix="忌" items={ji} total={cell.almanac.ji.length} />
+      <YiJiLine prefix={t('宜')} items={yi} total={cell.almanac.yi.length} />
+      <YiJiLine prefix={t('忌')} items={ji} total={cell.almanac.ji.length} />
     </button>
   );
 }

@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import type { TransitYear } from '../../../types/baziTransit';
 
 interface TransitYearTableProps {
@@ -16,6 +17,7 @@ interface TransitYearTableProps {
  * 里出现过的族，顺序即首次命中顺序，与展开后的断语清单同序。
  */
 export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTableProps) {
+  const { t } = useI18n();
   return (
     <ul className="flex flex-col gap-2">
       {years.map((year) => (
@@ -32,7 +34,7 @@ export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTable
           >
             <span className="flex w-14 shrink-0 flex-col">
               <span className="numeric text-base text-ink">{year.year}</span>
-              <span className="label-caps text-ink-muted">虚{year.age}</span>
+              <span className="label-caps text-ink-muted">{t('虚{{age}}', { age: year.age })}</span>
             </span>
 
             <span className="flex w-24 shrink-0 flex-col">
@@ -42,10 +44,10 @@ export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTable
 
             <span className="flex min-w-[9rem] flex-1 flex-col gap-1">
               <span className="flex items-baseline justify-between gap-2">
-                <span className="label-caps text-ink-muted">{year.dayun_ganzhi ?? '未起运'}</span>
+                <span className="label-caps text-ink-muted">{year.dayun_ganzhi ? t(year.dayun_ganzhi) : t('未起运')}</span>
                 <span className="flex items-baseline gap-2">
                   <span className="numeric text-sm text-gold-bright">{year.score.value.toFixed(1)}</span>
-                  <span className="label-caps text-ink">{year.score.tier}</span>
+                  <span className="label-caps text-ink">{t(year.score.tier)}</span>
                 </span>
               </span>
               <ScoreBar value={year.score.value} />
@@ -57,7 +59,7 @@ export function TransitYearTable({ years, focusYear, onFocus }: TransitYearTable
                   key={family}
                   className="label-caps normal-case rounded-element border border-rim-strong px-1.5 py-0.5 text-ink-muted"
                 >
-                  {family}
+                  {t(family)}
                 </span>
               ))}
             </span>

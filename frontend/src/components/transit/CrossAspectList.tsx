@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { aspectStyle } from '../../lib/astro';
 import { natureStyle } from '../../lib/transit';
 import type { CrossAspect } from '../../types/transit';
@@ -17,10 +18,11 @@ interface CrossAspectListProps {
  * and orb come straight from the geometric detection (PRD no-mock rule).
  */
 export function CrossAspectList({ aspects, emptyHint }: CrossAspectListProps) {
+  const { t } = useI18n();
   if (aspects.length === 0) {
     return (
       <p className="text-sm text-ink-muted">
-        {emptyHint ?? '当前经典容许度内，未检出移动层星体对本命所成之主要相位。'}
+        {t(emptyHint ?? '当前经典容许度内，未检出移动层星体对本命所成之主要相位。')}
       </p>
     );
   }
@@ -45,19 +47,19 @@ export function CrossAspectList({ aspects, emptyHint }: CrossAspectListProps) {
               style={{ borderColor: `${asp.color}66`, color: asp.color }}
             >
               <span className="text-sm leading-none">{aspect.glyph}</span>
-              <span className="text-xs">{asp.label}</span>
+              <span className="text-xs">{t(asp.label)}</span>
             </span>
             <span className="shrink-0 text-ink-muted" aria-hidden="true">
               →
             </span>
-            <span className="w-[5.5rem] shrink-0 truncate text-sm text-ink-variant">本命{aspect.natal_zh}</span>
+            <span className="w-[5.5rem] shrink-0 truncate text-sm text-ink-variant">{t('本命{{zh}}', { zh: aspect.natal_zh })}</span>
             <span className="ml-auto flex shrink-0 items-center gap-2">
-              <span className="numeric text-xs text-ink-muted">容 {aspect.orb.toFixed(2)}°</span>
+              <span className="numeric text-xs text-ink-muted">{t('容 {{orb}}°', { orb: aspect.orb.toFixed(2) })}</span>
               <span
                 className="rounded-full px-2 py-0.5 text-xs"
                 style={{ backgroundColor: `${nat.color}22`, color: nat.color }}
               >
-                {nat.label}
+                {t(nat.label)}
               </span>
             </span>
           </li>
