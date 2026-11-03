@@ -3,6 +3,7 @@ import { RouteError } from './components/ui/RouteError';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { AppShell } from './components/layout/AppShell';
+import { useI18n } from './i18n/context';
 import { ROUTES } from './nav';
 const BaziLiushiPage = lazy(() =>
   import('./pages/BaziLiushiPage').then((module) => ({
@@ -126,11 +127,15 @@ const segment = (absolutePath: string): string =>
  * than a drill-down under a single chart, so it does ship in `SECONDARY_NAV`
  * (spec 决策 10) and `以此造合婚` is only one optional entry point into it.
  */
-const loading = (
-  <p className="page-loading" role="status">
-    正在打开页面…
-  </p>
-);
+const LoadingFallback = () => {
+  const { t } = useI18n();
+  return (
+    <p className="page-loading" role="status">
+      {t('正在打开页面…')}
+    </p>
+  );
+};
+const loading = <LoadingFallback />;
 const deferred = (element: ReactNode) => (
   <Suspense fallback={loading}>{element}</Suspense>
 );

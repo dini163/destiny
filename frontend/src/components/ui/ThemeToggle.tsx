@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { readTheme, saveTheme } from '../../lib/theme';
+import { useI18n } from '../../i18n/context';
 import { Icon } from './Icon';
 export function ThemeToggle() {
+  const { t } = useI18n();
   const [theme, setTheme] = useState(readTheme);
-  const label = theme === 'paper' ? '切换为曜石深色' : '切换为暖纸白';
+  const label = theme === 'paper' ? t('切换为曜石深色') : t('切换为暖纸白');
   return (
     <button
       type="button"

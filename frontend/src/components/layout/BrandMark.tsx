@@ -3,8 +3,14 @@
  *
  * Purely presentational (no routing) so it can sit inside the header link or the
  * footer seal. The star geometry matches `public/favicon.svg` for one identity.
+ * The tagline below the wordmark is translated via `useI18n()` because it reads
+ * as brand copy rather than an icon, and overseas users benefit from an English
+ * variant on every page.
  */
+import { useI18n } from '../../i18n/context';
+
 export function BrandMark({ compact = false }: { compact?: boolean }) {
+  const { t } = useI18n();
   return (
     <span className="brand-lockup flex items-center gap-3 text-gold">
       <svg viewBox="0 0 64 64" className="h-8 w-8 shrink-0" role="img" aria-label="Destiny">
@@ -29,7 +35,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
           <span className="font-display text-lg font-semibold tracking-[0.18em] text-gold">
             DESTINY
           </span>
-          <span className="label-caps mt-1.5">观己 · 知时 · 懂相处</span>
+          <span className="label-caps mt-1.5">{t('观己 · 知时 · 懂相处')}</span>
         </span>
       )}
     </span>

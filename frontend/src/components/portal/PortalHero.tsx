@@ -1,36 +1,38 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '../../i18n/context';
 import { ROUTES } from '../../nav';
 export function PortalHero() {
+  const { t } = useI18n();
   return (
     <section className="discovery-hero">
       <div>
         <h1>
-          把古老的智慧，
+          {t('把古老的智慧，')}
           <br />
-          读成自己的答案。
+          {t('读成自己的答案。')}
         </h1>
         <p className="hero-description">
-          从了解自己，到读懂一段关系。
+          {t('从了解自己，到读懂一段关系。')}
           <br />
-          把复杂的排盘，整理成你看得懂、用得上的生活观察。
+          {t('把复杂的排盘，整理成你看得懂、用得上的生活观察。')}
         </p>
         <div className="hero-actions">
           <a className="discovery-primary" href="#questions">
-            从你关心的问题开始 <span aria-hidden="true">↗</span>
+            {t('从你关心的问题开始')} <span aria-hidden="true">↗</span>
           </a>
           <Link className="quiet-link" to="/report/r2?sample=1">
-            先读一份真实样例 <span aria-hidden="true">→</span>
+            {t('先读一份真实样例')} <span aria-hidden="true">→</span>
           </Link>
         </div>
         <p className="trust-line">
-          有据可查的排盘 <span>·</span> 读得懂的解读 <span>·</span>{' '}
-          留给自己的选择
+          {t('有据可查的排盘')} <span>·</span> {t('读得懂的解读')} <span>·</span>{' '}
+          {t('留给自己的选择')}
         </p>
       </div>
       <div
         className="observatory-art"
         role="img"
-        aria-label="天体轨道装饰，不代表实际星体位置"
+        aria-label={t('天体轨道装饰，不代表实际星体位置')}
       >
         <span className="art-caption">THE ART OF UNDERSTANDING YOURSELF</span>
         <svg viewBox="0 0 500 500" fill="none" aria-hidden="true">
@@ -65,14 +67,14 @@ export function PortalHero() {
           </text>
         </svg>
         <p>
-          每一份排盘，
+          {t('每一份排盘')}，
           <br />
-          都是一次重新认识自己的起点。
+          {t('都是一次重新认识自己的起点')}。
         </p>
         <Link
           className="art-link"
           to={ROUTES.baziNatal}
-          aria-label="开始八字排盘"
+          aria-label={t('开始八字排盘')}
         >
           ↗
         </Link>

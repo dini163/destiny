@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useI18n } from '../../i18n/context';
 import { ROUTES } from '../../nav';
 import { Icon, type IconName } from '../ui/Icon';
+// Titles/labels/bodies here are source keys; each is wrapped in `t()` at
+// render time so en/zh-Hant dictionaries can override without touching data.
 const QUESTIONS: {
   title: string;
   label: string;
@@ -31,13 +34,14 @@ const QUESTIONS: {
   },
 ];
 export function QuestionEntries() {
+  const { t } = useI18n();
   return (
     <section id="questions" className="question-section">
       <div className="discovery-heading">
         <div>
-          <h2>此刻，你更想了解什么？</h2>
+          <h2>{t('此刻，你更想了解什么？')}</h2>
         </div>
-        <p>不必先懂术语，从一个真实的关心开始。</p>
+        <p>{t('不必先懂术语，从一个真实的关心开始。')}</p>
       </div>
       <div className="question-grid">
         {QUESTIONS.map((item, index) => (
@@ -46,11 +50,11 @@ export function QuestionEntries() {
               <span>0{index + 1}</span>
               <Icon name={item.icon} size={39} />
             </div>
-            <span className="question-kicker">{item.label}</span>
-            <h3>{item.title}</h3>
-            <p>{item.body}</p>
+            <span className="question-kicker">{t(item.label)}</span>
+            <h3>{t(item.title)}</h3>
+            <p>{t(item.body)}</p>
             <div className="question-card-bottom">
-              <span>开始探索</span>
+              <span>{t('开始探索')}</span>
               <span aria-hidden="true">↗</span>
             </div>
           </Link>

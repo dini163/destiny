@@ -6,8 +6,13 @@ import './styles/tokens.css';
 import './styles/experience.css';
 import './styles/report.css';
 import { applyTheme, readTheme } from './lib/theme';
+import { applyLocale, detectLocale } from './lib/locale';
 
+// Reflect stored/detected settings on <html> before the first paint, so a
+// fresh visit renders in the right theme and lang without a flash from the
+// defaults; LocaleProvider will re-apply after mount as the state owner.
 applyTheme(readTheme());
+applyLocale(detectLocale());
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

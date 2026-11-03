@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 
 import type { PortalSystem } from '../../lib/portal';
+import { useI18n } from '../../i18n/context';
 import { Icon } from '../ui/Icon';
 
 interface SystemCardProps {
@@ -15,9 +16,12 @@ interface SystemCardProps {
  *
  * A live system renders as a `<Link>` to its real route with a call to action; an
  * unbuilt system renders as an inert panel. The blurb and highlight tags are
- * curated descriptions of the discipline — never a fabricated result.
+ * curated descriptions of the discipline — never a fabricated result. Every
+ * source-Chinese field goes through `t()` so the en/zh-Hant dictionaries can
+ * override per-locale without duplicating the catalogue data.
  */
 export function SystemCard({ system, index = 0 }: SystemCardProps) {
+  const { t } = useI18n();
   const live = system.route !== null;
   const enterStyle = { '--card-delay': `${Math.min(index, 12) * 45}ms` } as CSSProperties;
 
@@ -38,11 +42,11 @@ export function SystemCard({ system, index = 0 }: SystemCardProps) {
           <h3
             className={`whitespace-nowrap font-display text-lg font-semibold ${live ? 'text-ink group-hover:text-gold-bright' : 'text-ink-variant'}`}
           >
-            {system.nameZh}
+            {t(system.nameZh)}
           </h3>
           <span className="label-caps">{system.nameEn}</span>
         </div>
-        <p className="line-clamp-2 text-xs leading-relaxed text-ink-muted">{system.blurb}</p>
+        <p className="line-clamp-2 text-xs leading-relaxed text-ink-muted">{t(system.blurb)}</p>
       </div>
 
       <div className="flex items-center justify-between gap-2 border-t border-rim-soft pt-3">
@@ -52,13 +56,13 @@ export function SystemCard({ system, index = 0 }: SystemCardProps) {
               key={tag}
               className="numeric rounded-element bg-surface px-1.5 py-0.5 text-[11px] text-ink-variant"
             >
-              {tag}
+              {t(tag)}
             </span>
           ))}
         </div>
         {live ? (
           <span className="label-caps flex shrink-0 items-center gap-1 text-gold">
-            {system.cta}
+            {t(system.cta)}
             <Icon name="arrowRight" size={14} />
           </span>
         ) : null}

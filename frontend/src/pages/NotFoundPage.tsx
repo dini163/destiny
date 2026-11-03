@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 
 import { PagePlaceholder } from '../components/layout/PagePlaceholder';
+import { useI18n } from '../i18n/context';
 import { ROUTES } from '../nav';
 
 /** Catch-all route for unknown paths — offers a way back to the portal. */
 export function NotFoundPage() {
+  const { t } = useI18n();
   return (
     <PagePlaceholder
       title="迷失星域"
@@ -12,7 +14,7 @@ export function NotFoundPage() {
       status="ERROR 404"
       action={
         <Link to={ROUTES.overview} className="btn-primary">
-          返回测算大厅
+          {t('返回测算大厅')}
         </Link>
       }
     />

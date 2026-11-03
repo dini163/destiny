@@ -1,6 +1,7 @@
 import { Icon } from '../ui/Icon';
 import { BrandMark } from './BrandMark';
 import { LocalDataControls } from '../ui/LocalDataControls';
+import { useI18n } from '../../i18n/context';
 
 /** PRD §4.3 — the site-wide compliance disclaimer, reproduced verbatim. */
 const DISCLAIMER =
@@ -36,23 +37,24 @@ const SEALS: Seal[] = [
  * provenance seals and the identity bar. Shared verbatim across every route.
  */
 export function SiteFooter() {
+  const { t } = useI18n();
   return (
     <footer className="site-footer border-t border-rim bg-void/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1536px] flex-col gap-gutter px-gutter py-margin">
         <div className="panel flex flex-col gap-4 p-5 md:flex-row md:items-center md:gap-6">
           <div className="flex shrink-0 items-center gap-2 text-gold">
             <Icon name="seal" size={20} />
-            <span className="font-display text-base text-gold-soft">合规免责声明</span>
+            <span className="font-display text-base text-gold-soft">{t('合规免责声明')}</span>
           </div>
-          <p className="text-sm leading-relaxed text-ink-variant">{DISCLAIMER}</p>
+          <p className="text-sm leading-relaxed text-ink-variant">{t(DISCLAIMER)}</p>
         </div>
 
-        <details className="footer-details"><summary>了解排盘依据与隐私保存</summary><div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
+        <details className="footer-details"><summary>{t('了解排盘依据与隐私保存')}</summary><div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
           {SEALS.map((seal) => (
             <div key={seal.title} className="flex flex-col gap-2">
               <span className="label-caps text-gold">{seal.caption}</span>
-              <span className="font-display text-base text-ink">{seal.title}</span>
-              <p className="text-sm leading-relaxed text-ink-muted">{seal.body}</p>
+              <span className="font-display text-base text-ink">{t(seal.title)}</span>
+              <p className="text-sm leading-relaxed text-ink-muted">{t(seal.body)}</p>
             </div>
           ))}
         </div>
