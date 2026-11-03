@@ -526,3 +526,29 @@ def test_bazi_auxiliary_display_names_localize() -> None:
     assert localize("七杀格", "en") == "Qisha Structure"
     assert localize("事业", "zh-Hant") == "事業"
     assert localize("建禄格", "zh-Hant") == "建祿格"
+
+
+def test_bazi_nayin_and_shensha_localize() -> None:
+    # p15：六十甲子纳音与神煞在 en 下替换（真端点取到哪个换哪个），默认透传。
+    from app.content.bazi_nayin import NAYIN_MEANING
+    from app.content.bazi_shensha import SHENSHA_RULES
+
+    tokens = {c.nayin for c in NAYIN_MEANING.values()} | (
+        set(SHENSHA_RULES) - {"十二长生"}
+    )
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in tokens}
+    assert present, "bazi 命局应至少落一个纳音/神煞叶值"
+    for token in present:
+        assert token not in el, f"en 未替换纳音/神煞 {token}"
+    # 直接单测：钗钏金（易错字）的 en 与繁体、神煞的 en 与繁体均取到预期译文。
+    assert localize("钗钏金", "en") == "Hairpin Metal"
+    assert localize("钗钏金", "zh-Hant") == "釵釧金"
+    assert localize("天乙贵人", "en") == "Celestial Noble"
+    assert localize("天乙贵人", "zh-Hant") == "天乙貴人"
+    assert localize("空亡", "en") == "Void"

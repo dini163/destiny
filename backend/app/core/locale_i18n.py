@@ -178,6 +178,13 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "时柱": "時柱", "本气": "本氣", "中气": "中氣", "余气": "餘氣", "身强": "身強",
         "长生": "長生", "冠带": "冠帶", "临官": "臨官", "绝": "絕", "养": "養",
         "七杀格": "七殺格", "伤官格": "傷官格", "正财格": "正財格", "偏财格": "偏財格", "建禄格": "建祿格",
+        # 神煞/纳音繁体（与上同源）：仅登记字形有差者。
+        "天乙贵人": "天乙貴人", "文昌贵人": "文昌貴人", "太极贵人": "太極貴人",
+        "天德贵人": "天德貴人", "月德贵人": "月德貴人", "建禄": "建祿",
+        "金舆": "金輿", "驿马": "驛馬", "华盖": "華蓋", "将星": "將星",
+        "炉中火": "爐中火", "剑锋金": "劍鋒金", "山头火": "山頭火", "城头土": "城頭土",
+        "涧下水": "澗下水", "白蜡金": "白蠟金", "杨柳木": "楊柳木", "霹雳火": "霹靂火",
+        "长流水": "長流水", "覆灯火": "覆燈火", "大驿土": "大驛土", "钗钏金": "釵釧金",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -482,6 +489,24 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "食神格": "Shishen Structure", "伤官格": "Shangguan Structure",
         "正财格": "Zhengcai Structure", "偏财格": "Piancai Structure",
         "建禄格": "Jianlu Structure", "月刃格": "Yueren Structure",
+        # 八字神煞（`content/bazi_shensha.SHENSHA_RULES` 叶值）：取意译，贵人一律 Noble。
+        "天乙贵人": "Celestial Noble", "文昌贵人": "Literary Noble", "太极贵人": "Taiji Noble",
+        "天德贵人": "Heavenly Virtue Noble", "月德贵人": "Lunar Virtue Noble",
+        "建禄": "Established Prosperity", "羊刃": "Ram Blade", "金舆": "Golden Carriage",
+        "咸池": "Xianchi Pool", "驿马": "Travel Horse", "华盖": "Imperial Canopy",
+        "将星": "General Star", "劫煞": "Calamity Star", "亡神": "Hidden Foe",
+        "魁罡": "Kuigang", "空亡": "Void",
+        # 六十甲子纳音（`content/bazi_nayin` 30 组名）：五行后缀按元素意译。
+        "海中金": "Gold in the Sea", "炉中火": "Fire in the Furnace", "大林木": "Forest Wood",
+        "路旁土": "Roadside Earth", "剑锋金": "Sword-Edge Metal", "山头火": "Mountaintop Fire",
+        "涧下水": "Valley Stream Water", "城头土": "City Wall Earth", "白蜡金": "White Wax Metal",
+        "杨柳木": "Willow Wood", "泉中水": "Spring Water", "屋上土": "Rooftop Earth",
+        "霹雳火": "Thunderbolt Fire", "松柏木": "Pine and Cypress Wood", "长流水": "Flowing Water",
+        "沙中金": "Gold in the Sand", "山下火": "Fire Below the Mountain", "平地木": "Plain Wood",
+        "壁上土": "Wall Earth", "金箔金": "Gold Foil Metal", "覆灯火": "Lantern Fire",
+        "天河水": "Heavenly River Water", "大驿土": "Post-Station Earth", "钗钏金": "Hairpin Metal",
+        "桑柘木": "Mulberry Wood", "大溪水": "Great Stream Water", "沙中土": "Sand Earth",
+        "天上火": "Heavenly Fire", "石榴木": "Pomegranate Wood", "大海水": "Great Sea Water",
     },
 }
 
