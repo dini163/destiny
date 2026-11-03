@@ -497,3 +497,32 @@ def test_bazi_ten_god_names_localize() -> None:
         assert token not in el, f"en 未替换十神 {token}"
     for token in [s for s in present if s in LABELS["zh-Hant"]]:
         assert token not in hl, f"zh-Hant 未替换十神 {token}"
+
+
+def test_bazi_auxiliary_display_names_localize() -> None:
+    # p15：八字辅助专名（维度/柱位/藏干层/旺衰带/十二长生/格局）在 en 下替换，默认透传。
+    from app.content.bazi_changsheng import CHANG_SHENG_ORDER
+    from app.content.bazi_dimensions import DIMENSION_ORDER
+    from app.content.bazi_geju import GEJU_RULES
+
+    tokens = (
+        set(DIMENSION_ORDER)
+        | {"年柱", "月柱", "日柱", "时柱", "本气", "中气", "余气", "身强", "中和", "身弱"}
+        | set(CHANG_SHENG_ORDER)
+        | set(GEJU_RULES)
+    )
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in tokens}
+    assert present, "bazi 命局应至少落一个辅助专名叶值"
+    for token in present:
+        assert token not in el, f"en 未替换辅助专名 {token}"
+    # 直接单测：十二长生与格局根干取到预期译文。
+    assert localize("长生", "en") == "Growth"
+    assert localize("七杀格", "en") == "Qisha Structure"
+    assert localize("事业", "zh-Hant") == "事業"
+    assert localize("建禄格", "zh-Hant") == "建祿格"

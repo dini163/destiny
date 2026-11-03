@@ -173,6 +173,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "化禄": "化祿", "化权": "化權",
         # 八字十神繁体（与上 en 十神同源）：仅登记字形有差者。
         "劫财": "劫財", "伤官": "傷官", "偏财": "偏財", "正财": "正財", "七杀": "七殺",
+        # 八字辅助专名繁体（与上 en 同源）：仅登记字形有差者，同形回落源文。
+        "事业": "事業", "财运": "財運", "学业": "學業", "人际": "人際",
+        "时柱": "時柱", "本气": "本氣", "中气": "中氣", "余气": "餘氣", "身强": "身強",
+        "长生": "長生", "冠带": "冠帶", "临官": "臨官", "绝": "絕", "养": "養",
+        "七杀格": "七殺格", "伤官格": "傷官格", "正财格": "正財格", "偏财格": "偏財格", "建禄格": "建祿格",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -461,6 +466,22 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "比肩": "Bijian", "劫财": "Jiecai", "食神": "Shishen", "伤官": "Shangguan",
         "偏财": "Piancai", "正财": "Zhengcai", "正官": "Zhengguan", "偏印": "Pianyin",
         "正印": "Zhengyin", "日主": "Day Master",
+        # 八字辅助专名（bazi/natal 叶值）：维度类别、柱位、藏干层次、旺衰带。
+        "事业": "Career", "财运": "Wealth", "婚姻": "Marriage",
+        "健康": "Health", "学业": "Studies", "人际": "Relationships",
+        "年柱": "Year Pillar", "月柱": "Month Pillar", "日柱": "Day Pillar", "时柱": "Hour Pillar",
+        "本气": "Primary Qi", "中气": "Middle Qi", "余气": "Residual Qi",
+        "身强": "Strong", "中和": "Balanced", "身弱": "Weak",
+        # 十二长生（`content/bazi_changsheng.CHANG_SHENG_ORDER`）：五行寄生十二宫阶段名。
+        "长生": "Growth", "沐浴": "Bathing", "冠带": "Capping", "临官": "Officing",
+        "帝旺": "Peak", "衰": "Decline", "病": "Illness", "死": "Death",
+        "墓": "Tomb", "绝": "Extinction", "胎": "Conception", "养": "Nurturing",
+        # 八字格局（`content/bazi_geju.GEJU_RULES`）：十神拼音根 + Structure，与上十神同口径。
+        "正官格": "Zhengguan Structure", "七杀格": "Qisha Structure",
+        "正印格": "Zhengyin Structure", "偏印格": "Pianyin Structure",
+        "食神格": "Shishen Structure", "伤官格": "Shangguan Structure",
+        "正财格": "Zhengcai Structure", "偏财格": "Piancai Structure",
+        "建禄格": "Jianlu Structure", "月刃格": "Yueren Structure",
     },
 }
 
