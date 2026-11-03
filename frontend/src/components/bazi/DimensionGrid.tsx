@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { PlainProse } from '../ui/PlainProse';
 import { ScoreLedger } from '../ui/ScoreLedger';
 import { SourceNote } from '../ui/SourceNote';
@@ -28,9 +29,10 @@ export function DimensionGrid({ reading }: { reading: BaziInterpretation }) {
 }
 
 function DimensionCard({ dimension }: { dimension: DimensionReading }) {
+  const { t } = useI18n();
   return (
     <article className="flex flex-col gap-3 rounded-card border border-rim bg-surface p-4">
-      <h3 className="font-display text-lg font-bold text-gold-bright">{dimension.dimension}</h3>
+      <h3 className="font-display text-lg font-bold text-gold-bright">{t(dimension.dimension)}</h3>
       <ScoreLedger score={dimension.score} label="维度得分" />
       {dimension.strengths.length > 0 ? (
         <LineList tone="strengths" items={dimension.strengths} />
@@ -49,12 +51,13 @@ function DimensionCard({ dimension }: { dimension: DimensionReading }) {
 
 /** strengths 用中性列、cautions 用火色列：吉凶着色与神煞表同一套语汇。 */
 function LineList({ tone, items }: { tone: 'strengths' | 'cautions'; items: string[] }) {
+  const { t } = useI18n();
   const accent = tone === 'strengths' ? 'text-wuxing-wood' : 'text-wuxing-fire';
   return (
     <ul className="flex flex-col gap-1 text-xs">
       {items.map((item) => (
         <li key={`${tone}-${item}`} className="flex gap-1.5">
-          <span className={accent}>{tone === 'strengths' ? '利' : '忌'}</span>
+          <span className={accent}>{tone === 'strengths' ? t('利') : t('忌')}</span>
           <span className="text-ink-variant">{item}</span>
         </li>
       ))}

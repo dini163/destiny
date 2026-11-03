@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import { SourceNote } from '../ui/SourceNote';
 import { Icon } from '../ui/Icon';
 import { pillarColumnLabel } from '../../lib/pillars';
@@ -33,8 +34,9 @@ export function RelationChips({
   relations: RelationPair[];
   groups: BranchGroup[];
 }) {
+  const { t } = useI18n();
   if (relations.length === 0 && groups.length === 0) {
-    return <p className="text-sm text-ink-muted">本命四柱之间未构成刑冲合害破或合会局。</p>;
+    return <p className="text-sm text-ink-muted">{t('本命四柱之间未构成刑冲合害破或合会局。')}</p>;
   }
   return (
     <div className="flex flex-col gap-4">
@@ -59,12 +61,13 @@ function PairBlock({ relations }: { relations: RelationPair[] }) {
 
 /** One kind: a header chip plus its pillar pairs, collapsed past three. */
 function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const shown = open || rows.length <= 3 ? rows : rows.slice(0, 3);
   return (
     <div className="flex flex-col gap-1.5">
       <span className="label-caps text-ink-muted">
-        {kind} · {rows.length}组
+        {t(kind)} · {t('{{count}}组', { count: rows.length })}
       </span>
       <ul className="flex flex-col gap-1.5">
         {shown.map((row, index) => (
@@ -74,13 +77,13 @@ function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
           >
             <span className="flex items-center gap-1.5 text-ink">
               <span>{row.character_a}</span>
-              <span className="text-ink-muted">{pillarColumnLabel(row.pillar_a)}</span>
+              <span className="text-ink-muted">{t(pillarColumnLabel(row.pillar_a))}</span>
               <Icon name="arrowRight" size={12} className="text-gold-muted" />
               <span>{row.character_b}</span>
-              <span className="text-ink-muted">{pillarColumnLabel(row.pillar_b)}</span>
-              <span className="label-caps text-ink-muted">{row.strength}</span>
+              <span className="text-ink-muted">{t(pillarColumnLabel(row.pillar_b))}</span>
+              <span className="label-caps text-ink-muted">{t(row.strength)}</span>
               {row.transforming_element ? (
-                <span className="label-caps text-gold-soft">化气{row.transforming_element}</span>
+                <span className="label-caps text-gold-soft">{t('化气{{element}}', { element: row.transforming_element })}</span>
               ) : null}
             </span>
             <span className="w-full text-ink-variant sm:w-auto sm:max-w-md">{row.reading}</span>
@@ -98,7 +101,7 @@ function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
           className="label-caps flex items-center gap-1 self-start text-ink-muted hover:text-gold-soft"
         >
           <Icon name="chevronDown" size={12} className={open ? 'rotate-180' : undefined} />
-          {open ? '收起其余' : `展开其余 ${rows.length - 3} 组`}
+          {open ? t('收起其余') : t('展开其余 {{count}} 组', { count: rows.length - 3 })}
         </button>
       ) : null}
     </div>
@@ -107,9 +110,10 @@ function KindRows({ kind, rows }: { kind: string; rows: RelationPair[] }) {
 
 /** 三合/半合/三会 read as members of a frame, not as pairs. */
 function GroupBlock({ groups }: { groups: BranchGroup[] }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="label-caps text-ink-muted">合会局</span>
+      <span className="label-caps text-ink-muted">{t('合会局')}</span>
       <ul className="flex flex-col gap-1.5">
         {groups.map((group, index) => (
           <li
@@ -117,8 +121,8 @@ function GroupBlock({ groups }: { groups: BranchGroup[] }) {
             className={`flex flex-wrap items-center justify-between gap-2 rounded-element border bg-[var(--field-bg)] px-3 py-2 text-xs ${GROUP_CLASS[group.kind]}`}
           >
             <span className="flex items-center gap-1.5 text-ink">
-              <span className="label-caps text-gold-soft">{group.kind}</span>
-              <span>{group.element}</span>
+              <span className="label-caps text-gold-soft">{t(group.kind)}</span>
+              <span>{t(group.element)}</span>
               {group.members.map((member) => (
                 <span
                   key={`${member.pillar}-${member.branch}`}
@@ -129,7 +133,7 @@ function GroupBlock({ groups }: { groups: BranchGroup[] }) {
                 </span>
               ))}
               <span className="label-caps text-ink-muted">
-                {group.is_complete ? '三字全' : '三字不全'}
+                {group.is_complete ? t('三字全') : t('三字不全')}
               </span>
             </span>
             <span className="w-full text-ink-variant sm:w-auto sm:max-w-md">{group.reading}</span>

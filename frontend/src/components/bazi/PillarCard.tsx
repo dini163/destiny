@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { wuxingBg, wuxingText } from '../../lib/wuxing';
 import type { BaziPillar, HiddenStemWeight } from '../../types/bazi';
 
@@ -28,6 +29,7 @@ interface PillarCardProps {
  * master (命主日元).
  */
 export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
+  const { t } = useI18n();
   const isDay = pillar.position === 'day';
   // 岁运合成柱（transit_year / transit_month）不在四宫之内，标题只留柱名。
   const palace: string | undefined = PALACE_CAPTION[pillar.position];
@@ -48,11 +50,11 @@ export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
 
       <div className="flex items-center justify-between gap-2">
         <span className={`label-caps ${isDay ? 'text-gold' : ''}`}>
-          {palace ? `${pillar.label} · ${palace}` : pillar.label}
+          {palace ? `${t(pillar.label)} · ${t(palace)}` : t(pillar.label)}
         </span>
         {isDay ? (
           <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[var(--on-gold)]">
-            命主日元
+            {t('命主日元')}
           </span>
         ) : null}
       </div>
@@ -68,24 +70,24 @@ export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
       </div>
 
       <div className="flex flex-col gap-1 rounded-element bg-[var(--field-bg)] p-2.5">
-        <span className="label-caps">地支藏干</span>
+        <span className="label-caps">{t('地支藏干')}</span>
         {ledger.length > 0
           ? ledger.map((row) => (
               <div key={row.stem} className="flex items-center justify-between text-xs">
                 <span className={wuxingText(elementOf(row.stem))}>
-                  {row.stem} <span className="text-ink-muted">{row.role}</span>
+                  {t(row.stem)} <span className="text-ink-muted">{t(row.role)}</span>
                 </span>
                 <span className="numeric text-ink-muted">
-                  {row.ten_god} · {row.weight.toFixed(2)}
+                  {t(row.ten_god)} · {row.weight.toFixed(2)}
                 </span>
               </div>
             ))
           : pillar.hidden_stems.map((stem, index) => (
               <div key={`${stem}-${index}`} className="flex items-center justify-between text-xs">
-                <span className={wuxingText(pillar.hidden_stem_elements[index] ?? '')}>{stem}</span>
+                <span className={wuxingText(pillar.hidden_stem_elements[index] ?? '')}>{t(stem)}</span>
                 <span className="text-ink-muted">
-                  {pillar.hidden_stem_elements[index]}
-                  {pillar.shishen_zhi[index] ? ` · ${pillar.shishen_zhi[index]}` : ''}
+                  {t(pillar.hidden_stem_elements[index])}
+                  {pillar.shishen_zhi[index] ? ` · ${t(pillar.shishen_zhi[index])}` : ''}
                 </span>
               </div>
             ))}
@@ -113,11 +115,12 @@ function CharacterRow({
   shishen?: string;
   emphasize?: boolean;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center gap-2">
       {shishen ? (
         <span className="label-caps rounded-element bg-surface px-1.5 py-0.5 text-ink-muted">
-          {shishen}
+          {t(shishen)}
         </span>
       ) : null}
       <span
@@ -127,17 +130,18 @@ function CharacterRow({
       >
         {char}
       </span>
-      <span className={`h-2 w-2 rounded-full ${wuxingBg(element)}`} title={`五行：${element}`} />
+      <span className={`h-2 w-2 rounded-full ${wuxingBg(element)}`} title={t('五行：{{element}}', { element: t(element) })} />
     </div>
   );
 }
 
 /** A caption/value line in the pillar's property list. */
 function MetaRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-ink-muted">{label}</dt>
-      <dd className={accent ? 'text-gold-soft' : 'text-ink-variant'}>{value || '—'}</dd>
+      <dt className="text-ink-muted">{t(label)}</dt>
+      <dd className={accent ? 'text-gold-soft' : 'text-ink-variant'}>{t(value) || '—'}</dd>
     </div>
   );
 }

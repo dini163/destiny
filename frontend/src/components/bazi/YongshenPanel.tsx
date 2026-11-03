@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { SourceNote } from '../ui/SourceNote';
 import { wuxingChip } from '../../lib/wuxing';
 import type { Yongshen, YongshenConflict, YongshenMethod } from '../../types/bazi';
@@ -26,18 +27,19 @@ export function YongshenPanel({ yongshen }: { yongshen: Yongshen }) {
 
 /** The merged verdict as a row of five-element chips. */
 function ElementLine({ label, elements }: { label: string; elements: string[] }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center justify-between gap-2 rounded-element bg-[var(--field-bg)] px-3 py-2">
-      <span className="label-caps">{label}</span>
+      <span className="label-caps">{t(label)}</span>
       <span className="flex flex-wrap items-center justify-end gap-1.5">
         {elements.length > 0 ? (
           elements.map((element) => (
             <span key={element} className={`rounded-element px-2 py-0.5 text-xs ${wuxingChip(element)}`}>
-              {element}
+              {t(element)}
             </span>
           ))
         ) : (
-          <span className="text-xs text-ink-muted">三法互斥后无取用（见下）</span>
+          <span className="text-xs text-ink-muted">{t('三法互斥后无取用（见下）')}</span>
         )}
       </span>
     </div>
@@ -46,6 +48,7 @@ function ElementLine({ label, elements }: { label: string; elements: string[] })
 
 /** One method: name, the rule branch it took, what it chose, and the source. */
 function MethodLine({ method }: { method: YongshenMethod }) {
+  const { t } = useI18n();
   const silent = method.chosen_elements.length === 0;
   return (
     <li className="flex flex-col gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] p-3">
@@ -55,17 +58,17 @@ function MethodLine({ method }: { method: YongshenMethod }) {
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs">
         {silent ? (
-          <span className="text-ink-muted">未取用</span>
+          <span className="text-ink-muted">{t('未取用')}</span>
         ) : (
           method.chosen_elements.map((element) => (
             <span key={element} className={`rounded-element px-2 py-0.5 ${wuxingChip(element)}`}>
-              {element}
+              {t(element)}
             </span>
           ))
         )}
         {method.already_present ? (
           <span className="label-caps rounded-element border border-rim-strong px-1.5 py-0.5 text-ink-muted">
-            命局已备
+            {t('命局已备')}
           </span>
         ) : null}
       </div>
@@ -78,16 +81,17 @@ function MethodLine({ method }: { method: YongshenMethod }) {
 
 /** Two methods disagreeing: shown as the engine's own sentence, side by side. */
 function ConflictNote({ conflict }: { conflict: YongshenConflict }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="label-caps text-wuxing-fire">取用冲突</span>
+        <span className="label-caps text-wuxing-fire">{t('取用冲突')}</span>
         <span className={`rounded-element px-2 py-0.5 text-xs ${wuxingChip(conflict.element)}`}>
-          {conflict.element}
+          {t(conflict.element)}
         </span>
         {/* "相左"是引擎 reason 里的原词；suppressed_by 记的是持异议的那一法（恒为扶抑）。 */}
         <span className="text-xs text-ink-muted" title="suppressed_by">
-          与 {conflict.suppressed_by} 相左
+          {t('与 {{method}} 相左', { method: conflict.suppressed_by })}
         </span>
       </div>
       <p className="text-sm leading-relaxed text-ink-variant">{conflict.reason}</p>

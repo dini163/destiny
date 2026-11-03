@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import { ScoreLedger } from '../ui/ScoreLedger';
 import type { DayMasterAnalysis } from '../../types/bazi';
 
@@ -26,6 +27,7 @@ interface StrengthDialProps {
  * them together with the three methods that produced them (Task 15 注 2).
  */
 export function StrengthDial({ analysis }: StrengthDialProps) {
+  const { t } = useI18n();
   const score = analysis.strength;
   const offset = RING_CIRCUMFERENCE * (1 - Math.min(1, Math.max(0, score.value / 100)));
 
@@ -67,10 +69,10 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
         <dl className="flex flex-1 flex-col gap-1.5 text-sm">
           <StatRow label="日元">
             <span className="text-gold">
-              {analysis.day_master}（{analysis.day_master_element}）
+              {analysis.day_master}（{t(analysis.day_master_element)}）
             </span>
           </StatRow>
-          <StatRow label="定格">{LEVEL_LABEL[analysis.level] ?? analysis.level}</StatRow>
+          <StatRow label="定格">{t(LEVEL_LABEL[analysis.level] ?? analysis.level)}</StatRow>
         </dl>
       </div>
 
@@ -85,9 +87,10 @@ export function StrengthDial({ analysis }: StrengthDialProps) {
 
 /** A caption/value line in the dial's statistics column. */
 function StatRow({ label, children }: { label: string; children: ReactNode }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-center justify-between gap-2">
-      <dt className="text-ink-muted">{label}</dt>
+      <dt className="text-ink-muted">{t(label)}</dt>
       <dd className="text-ink">{children}</dd>
     </div>
   );

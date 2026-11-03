@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { wuxingBg, wuxingLabelEn, wuxingText } from '../../lib/wuxing';
 import type { WuxingScore } from '../../types/bazi';
 
@@ -16,6 +17,7 @@ interface WuxingBarsProps {
  * value comes straight from the engine — sorted heaviest-first purely for legibility.
  */
 export function WuxingBars({ scores, missing }: WuxingBarsProps) {
+  const { t } = useI18n();
   const total = scores.reduce((sum, item) => sum + item.score, 0);
   const ordered = [...scores].sort((a, b) => b.score - a.score);
 
@@ -31,14 +33,14 @@ export function WuxingBars({ scores, missing }: WuxingBarsProps) {
                 <span className="ml-1 text-xs text-ink-muted">{wuxingLabelEn(item.element)}</span>
               </span>
               <span className="numeric text-xs text-ink-muted">
-                {item.count} 见 · {percent}%
+                {t('{{count}} 见', { count: item.count })} · {percent}%
               </span>
             </div>
             <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--field-bg)]">
               <div
                 className={`h-full rounded-full ${wuxingBg(item.element)}`}
                 style={{ width: `${percent}%` }}
-                title={`加权分 ${item.score.toFixed(2)}`}
+                title={t('加权分 {{score}}', { score: item.score.toFixed(2) })}
               />
             </div>
           </div>
@@ -47,7 +49,7 @@ export function WuxingBars({ scores, missing }: WuxingBarsProps) {
 
       <p className="mt-1 flex items-center gap-2 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2 text-xs text-ink-variant">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-        {missing.length > 0 ? `五行缺：${missing.join('、')}` : '五行俱全，无明显偏枯。'}
+        {missing.length > 0 ? t('五行缺：{{missing}}', { missing: missing.map((m) => t(m)).join('、') }) : t('五行俱全，无明显偏枯。')}
       </p>
     </div>
   );

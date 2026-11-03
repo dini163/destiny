@@ -1,8 +1,10 @@
 import type { TenGodReading } from '../../types/bazi';
+import { useI18n } from '../../i18n/context';
 import { pillarSlotLabel } from '../../lib/pillars';
 
 /** 十神清点：命局出现的每个十神一条，落点与释义都来自后端。 */
 export function TenGodList({ readings }: { readings: TenGodReading[] }) {
+  const { t } = useI18n();
   if (readings.length === 0) return null;
   return (
     <ul className="flex flex-wrap gap-2">
@@ -12,9 +14,9 @@ export function TenGodList({ readings }: { readings: TenGodReading[] }) {
           className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 text-xs"
           title={`${reading.meaning}｜${reading.source}`}
         >
-          <span className="text-ink">{reading.ten_god}</span>
+          <span className="text-ink">{t(reading.ten_god)}</span>
           <span className="numeric text-gold-soft">{reading.count}</span>
-          <span className="text-ink-muted">{reading.positions.map(pillarSlotLabel).join('、')}</span>
+          <span className="text-ink-muted">{reading.positions.map((p) => t(pillarSlotLabel(p))).join('、')}</span>
         </li>
       ))}
     </ul>

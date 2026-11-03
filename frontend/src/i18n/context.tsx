@@ -41,21 +41,26 @@ interface I18nValue {
 
 const I18nContext = createContext<I18nValue | null>(null);
 
+/** Substitute `{{name}}` placeholders from `vars` (empty string when absent). */
+function interpolate(raw: string, vars?: Vars): string {
+  if (!vars) return raw;
+  return raw.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
+    Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : '',
+  );
+}
+
 const FALLBACK: I18nValue = {
   locale: DEFAULT_LOCALE,
   setLocale: () => undefined,
-  t: (key) => key,
+  // Identity for the string itself, but placeholders are still filled — a
+  // parameterised key (e.g. `{{label}}的赋分账本`) has no user-facing meaning
+  // left unsubstituted, and zh-Hans carries no dict so this is its render path.
+  t: (key, vars) => interpolate(key, vars),
 };
 
 function buildTranslator(locale: AppLocale): (key: string, vars?: Vars) => string {
   const dict = MESSAGES[locale];
-  return (key, vars) => {
-    const raw = dict?.[key] ?? key;
-    if (!vars) return raw;
-    return raw.replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
-      Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : '',
-    );
-  };
+  return (key, vars) => interpolate(dict?.[key] ?? key, vars);
 }
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
