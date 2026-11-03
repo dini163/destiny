@@ -1,5 +1,6 @@
 import type { DrawnCard } from '../../types/lenormand';
 import { polarityAccent, polarityChip } from '../../lib/lenormand';
+import { useI18n } from '../../i18n/context';
 
 interface LenormandCardProps {
   /** The drawn card occupying this position. */
@@ -21,6 +22,7 @@ interface LenormandCardProps {
  * essence/keywords); no artwork is fetched or fabricated. The 指示牌 gets a gold ring.
  */
 export function LenormandCard({ card, compact, selected, onSelect }: LenormandCardProps) {
+  const { t } = useI18n();
   const accent = polarityAccent(card.polarity);
   const ring = card.is_significator || selected;
 
@@ -29,7 +31,7 @@ export function LenormandCard({ card, compact, selected, onSelect }: LenormandCa
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
-      aria-label={`第 ${card.position_index + 1} 位 · ${card.position_label_zh} · ${card.number} ${card.name_zh} ${card.polarity_label}`}
+      aria-label={`${t('第 {{n}} 位', { n: card.position_index + 1 })} · ${card.position_label_zh} · ${card.number} ${card.name_zh} ${card.polarity_label}`}
       className="group flex shrink-0 flex-col items-center gap-1 focus:outline-none"
     >
       <div
@@ -77,7 +79,7 @@ export function LenormandCard({ card, compact, selected, onSelect }: LenormandCa
 
         {card.is_significator ? (
           <span className="absolute -top-1.5 -right-1.5 rounded-full bg-gold px-1 text-[8px] font-bold leading-tight text-void">
-            指示
+            {t('指示')}
           </span>
         ) : null}
       </div>

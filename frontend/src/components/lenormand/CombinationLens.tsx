@@ -1,4 +1,5 @@
 import { PlainProse } from '../ui/PlainProse';
+import { useI18n } from '../../i18n/context';
 import type { CardRef, LenormandReading, SignificatorInfo } from '../../types/lenormand';
 
 /**
@@ -11,6 +12,7 @@ import type { CardRef, LenormandReading, SignificatorInfo } from '../../types/le
  * card comes straight from the response; nothing is invented here.
  */
 export function CombinationLens({ reading }: { reading: LenormandReading }) {
+  const { t } = useI18n();
   const { combinations, significator, positive_count, neutral_count, negative_count } = reading;
 
   return (
@@ -20,7 +22,7 @@ export function CombinationLens({ reading }: { reading: LenormandReading }) {
           一行都不折——`PlainProse` 的 `whitespace-pre-line` 就是「不折」的机器保证。
           这里不引 T9 的 `PlainSectionList`：那是「一格一段」的列表件，整阵只有一段。 */}
       <div className="flex flex-col gap-2">
-        <span className="label-caps">整阵白话 · IN PLAIN WORDS</span>
+        <span className="label-caps">{t('整阵白话 · IN PLAIN WORDS')}</span>
         <PlainProse text={reading.plain_summary} />
       </div>
 
@@ -29,9 +31,9 @@ export function CombinationLens({ reading }: { reading: LenormandReading }) {
       {significator ? <SignificatorPanel significator={significator} /> : null}
 
       <div className="flex flex-col gap-2">
-        <span className="label-caps">组合直读 · COMBINATIONS</span>
+        <span className="label-caps">{t('组合直读 · COMBINATIONS')}</span>
         {combinations.length === 0 ? (
-          <p className="text-sm text-ink-muted">此牌阵只有一张牌，暂无组合可读。</p>
+          <p className="text-sm text-ink-muted">{t('此牌阵只有一张牌，暂无组合可读。')}</p>
         ) : (
           <ul className="flex flex-col gap-1.5">
             {combinations.map((combo, index) => (
@@ -58,6 +60,7 @@ export function CombinationLens({ reading }: { reading: LenormandReading }) {
 
 /** A stacked bar of the 积极 / 中性 / 消极 card counts. */
 function PolarityBar({ positive, neutral, negative }: { positive: number; neutral: number; negative: number }) {
+  const { t } = useI18n();
   const total = Math.max(positive + neutral + negative, 1);
   const segments = [
     { label: '积极', count: positive, className: 'bg-gold-bright' },
@@ -67,9 +70,9 @@ function PolarityBar({ positive, neutral, negative }: { positive: number; neutra
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="label-caps">吉凶极性 · POLARITY</span>
+        <span className="label-caps">{t('吉凶极性 · POLARITY')}</span>
         <span className="numeric text-xs text-ink-muted">
-          积极 {positive} · 中性 {neutral} · 消极 {negative}
+          {t('积极 {{p}} · 中性 {{n}} · 消极 {{neg}}', { p: positive, n: neutral, neg: negative })}
         </span>
       </div>
       <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-raised">
@@ -89,16 +92,17 @@ function PolarityBar({ positive, neutral, negative }: { positive: number; neutra
 
 /** Where the 指示牌 landed and the cards along its row and column. */
 function SignificatorPanel({ significator }: { significator: SignificatorInfo }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2 rounded-element border border-gold/25 bg-gold/5 px-3 py-2.5">
       <span className="label-caps text-gold">
-        指示牌 · {significator.name_zh}（第 {significator.row + 1} 行第 {significator.col + 1} 列）
+        {t('指示牌 · {{name}}（第 {{r}} 行第 {{c}} 列）', { name: significator.name_zh, r: significator.row + 1, c: significator.col + 1 })}
       </span>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <DirectionRow label="身后 · 过去" refs={significator.behind} />
-        <DirectionRow label="眼前 · 未来" refs={significator.ahead} />
-        <DirectionRow label="其上 · 显意识" refs={significator.above} />
-        <DirectionRow label="其下 · 潜意识" refs={significator.below} />
+        <DirectionRow label={t('身后 · 过去')} refs={significator.behind} />
+        <DirectionRow label={t('眼前 · 未来')} refs={significator.ahead} />
+        <DirectionRow label={t('其上 · 显意识')} refs={significator.above} />
+        <DirectionRow label={t('其下 · 潜意识')} refs={significator.below} />
       </div>
     </div>
   );
@@ -106,11 +110,12 @@ function SignificatorPanel({ significator }: { significator: SignificatorInfo })
 
 /** One direction's card list beside the significator. */
 function DirectionRow({ label, refs }: { label: string; refs: CardRef[] }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-0.5">
       <span className="label-caps text-ink-muted">{label}</span>
       <span className={`text-xs leading-relaxed ${refs.length ? 'text-ink-variant' : 'text-ink-muted'}`}>
-        {refs.length ? refs.map((ref) => `${ref.number} ${ref.name_zh}`).join(' · ') : '（无）'}
+        {refs.length ? refs.map((ref) => `${ref.number} ${ref.name_zh}`).join(' · ') : t('（无）')}
       </span>
     </div>
   );

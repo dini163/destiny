@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import type { SignificatorChoice } from '../../types/lenormand';
 import { SIGNIFICATOR_OPTIONS, SPREAD_OPTIONS } from '../../lib/lenormand';
 import { Icon } from '../ui/Icon';
+import { useI18n } from '../../i18n/context';
 import { LabeledField } from '../ui/LabeledField';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
@@ -43,6 +44,7 @@ export function LenormandControls({
   pending,
   onSubmit,
 }: LenormandControlsProps) {
+  const { t } = useI18n();
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending) {
@@ -62,19 +64,19 @@ export function LenormandControls({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">雷诺曼神谕</h1>
+              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{t('雷诺曼神谕')}</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                lenormand · 36 张组合直读
+                {t('lenormand · 36 张组合直读')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              欧式三十六张生活微观象征牌，一律正位、以组合直读见长：前牌为主、后牌为饰，两两相叠成句。可选指示牌定位问卜者，大桌全景尽铺三十六张作命运俯瞰。
+              {t('欧式三十六张生活微观象征牌，一律正位、以组合直读见长：前牌为主、后牌为饰，两两相叠成句。可选指示牌定位问卜者，大桌全景尽铺三十六张作命运俯瞰。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '洗牌抽牌中…' : '洗牌 · 抽牌'}
+          {pending ? t('洗牌抽牌中…') : t('洗牌 · 抽牌')}
         </button>
       </div>
 
@@ -87,13 +89,13 @@ export function LenormandControls({
             onChange={onSpreadChange}
           />
           <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">
-            <span className="numeric mr-1 text-gold-soft">{activeSpread?.size ?? 0} 张</span>
-            {activeSpread?.hint}
+            <span className="numeric mr-1 text-gold-soft">{t('{{n}} 张', { n: activeSpread?.size ?? 0 })}</span>
+            {activeSpread ? t(activeSpread.hint) : null}
           </p>
         </LabeledField>
 
         <div className="flex flex-col gap-4 xl:col-span-5">
-          <LabeledField label="指示牌 / SIGNIFICATOR" hint={<span className="text-ink-muted">大桌尤重</span>}>
+          <LabeledField label="指示牌 / SIGNIFICATOR" hint={<span className="text-ink-muted">{t('大桌尤重')}</span>}>
             <SegmentedControl
               ariaLabel="指示牌"
               options={SIGNIFICATOR_SEGMENTS}
@@ -109,13 +111,13 @@ export function LenormandControls({
                 type="text"
                 value={question}
                 onChange={(event) => onQuestionChange(event.target.value)}
-                title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
-                placeholder="例如：这段合作关系前景如何？"
+                title={t('问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。')}
+                placeholder={t('例如：这段合作关系前景如何？')}
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-                aria-label="所问之事"
+                aria-label={t('所问之事')}
               />
             </div>
-          <p className="text-xs leading-relaxed text-ink-muted">问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{t('问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。')}</p>
           </LabeledField>
         </div>
       </div>
@@ -123,7 +125,7 @@ export function LenormandControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          抽牌由权威算法真实洗牌、无重复发牌；牌义与组合直读取自策展 36 张牌库，未作运行时虚构。
+          {t('抽牌由权威算法真实洗牌、无重复发牌；牌义与组合直读取自策展 36 张牌库，未作运行时虚构。')}
         </span>
       </div>
     </form>
