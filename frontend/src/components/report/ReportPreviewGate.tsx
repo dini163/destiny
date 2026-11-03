@@ -1,4 +1,5 @@
 import { Icon } from '../ui/Icon';
+import { useI18n } from '../../i18n/context';
 import type { ReportPreview } from '../../types/report';
 
 /**
@@ -14,6 +15,7 @@ export function ReportPreviewGate({
   isGenerating: boolean;
   onGenerate: () => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start gap-2 rounded-card border border-gold/25 bg-[var(--field-bg)] px-4 py-3">
@@ -24,7 +26,7 @@ export function ReportPreviewGate({
       </div>
 
       <section className="flex flex-col gap-2 rounded-card border border-gold/15 bg-gradient-to-b from-surface to-[var(--field-bg)] p-4 sm:p-5">
-        <h2 className="label-caps text-gold">关键结论</h2>
+        <h2 className="label-caps text-gold">{t('关键结论')}</h2>
         <ul className="flex flex-col gap-2">
           {preview.key_points.map((point) => {
             const split = point.indexOf('：');
@@ -50,7 +52,7 @@ export function ReportPreviewGate({
           })}
         </ul>
         <p className="text-xs text-ink-variant">
-          完整报告共 {preview.section_count} 章。
+          {t('完整报告共 {{n}} 章。', { n: preview.section_count })}
         </p>
       </section>
 
@@ -61,11 +63,11 @@ export function ReportPreviewGate({
           disabled={isGenerating}
           className="rounded-card border border-gold/40 bg-gold/15 px-5 py-3 font-display text-sm font-semibold text-gold-bright transition-colors hover:bg-gold/25 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isGenerating ? '正在生成…' : '内测生成完整报告'}
+          {isGenerating ? t('正在生成…') : t('内测生成完整报告')}
         </button>
       ) : (
         <p className="text-base leading-loose text-ink-variant">
-          完整报告由交付人员确认后提供。收到私密链接后，可直接打开阅读。
+          {t('完整报告由交付人员确认后提供。收到私密链接后，可直接打开阅读。')}
         </p>
       )}
     </div>
