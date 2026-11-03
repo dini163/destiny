@@ -44,6 +44,10 @@
   --stardust-cool: 46 74 66;
   --stardust-core: 107 84 38;
   --starfield-opacity: 0.75;
+  /* Foreground for text/marks sitting on a solid gold or gold-gradient fill. On
+     obsidian the gold is light so the ink is dark; on paper gold flips to a dark
+     bronze, so the same marks need a light foreground to stay >=4.5:1. */
+  --on-gold: #faf6ec;
   color-scheme: light;
 }
 :root[data-theme='obsidian'] {
@@ -90,6 +94,7 @@
   --stardust-cool: 226 226 235;
   --stardust-core: 255 248 226;
   --starfield-opacity: 0.55;
+  --on-gold: #3c2f00;
   color-scheme: dark;
 }
 :root {
@@ -143,7 +148,9 @@ summary {
 button:focus-visible,
 a:focus-visible,
 summary:focus-visible,
-input:focus-visible {
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 5px;
 }
@@ -1454,6 +1461,11 @@ body {
 .data-controls {
   font-size: 13px;
 }
+.data-controls > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
 .data-controls button {
   min-height: 44px;
 }
@@ -1535,7 +1547,7 @@ body {
     font-size: 16px;
   }
   .brand-lockup .label-caps {
-    font-size: 8px;
+    font-size: 10px;
   }
   .discovery-page {
     margin-inline: 22px;

@@ -46,7 +46,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={
               active
-                ? 'whitespace-nowrap rounded-[3px] bg-gradient-to-b from-gold-bright to-gold px-3 py-1.5 text-sm font-semibold text-[#3c2f00] transition'
+                ? 'whitespace-nowrap rounded-[3px] bg-gradient-to-b from-gold-bright to-gold px-3 py-1.5 text-sm font-semibold text-[var(--on-gold)] transition'
                 : 'whitespace-nowrap rounded-[3px] px-3 py-1.5 text-sm text-ink-muted transition hover:text-ink'
             }
           >

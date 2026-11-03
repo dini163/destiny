@@ -179,7 +179,7 @@ function CoinThrowEditor({
                     aria-label={`第${throwIndex + 1}掷第${coinIndex + 1}枚：${coinLabel(face)}`}
                     className={
                       face === 3
-                        ? 'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-gold-bright to-gold text-xs font-bold text-[#3c2f00] transition'
+                        ? 'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-b from-gold-bright to-gold text-xs font-bold text-[var(--on-gold)] transition'
                         : 'flex h-7 w-7 items-center justify-center rounded-full border border-rim-strong bg-surface text-xs text-ink-muted transition hover:text-ink'
                     }
                   >

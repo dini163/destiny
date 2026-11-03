@@ -72,7 +72,7 @@ export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
                   </span>
                 </div>
                 {pinnacle.is_current ? (
-                  <span className="label-caps shrink-0 rounded-element bg-gold px-1.5 py-0.5 font-semibold text-[#3c2f00]">
+                  <span className="label-caps shrink-0 rounded-element bg-gold px-1.5 py-0.5 font-semibold text-[var(--on-gold)]">
                     当前激活
                   </span>
                 ) : null}

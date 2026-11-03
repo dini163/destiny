@@ -89,7 +89,7 @@ function DayunCard({ step }: { step: DayunStep }) {
           {step.start_age}–{step.end_age}岁
         </span>
         {step.is_current ? (
-          <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[#3c2f00]">当下</span>
+          <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[var(--on-gold)]">当下</span>
         ) : null}
       </div>
       <div className="flex items-baseline gap-2">

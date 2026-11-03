@@ -69,6 +69,22 @@ export function SiteHeader() {
           </button>
         </div>
         <nav aria-label="全体系导航">
+          {/* On mobile the primary bar is hidden; the catalogue dialog is the only
+              nav, so surface the two desktop-only destinations here or they become
+              unreachable. */}
+          <section>
+            <h3>快捷入口</h3>
+            <div className="catalogue-grid">
+              <Link to={`${ROUTES.overview}#questions`}>
+                从问题开始
+                <span aria-hidden="true">↗</span>
+              </Link>
+              <Link to="/report/r2?sample=1">
+                报告样例
+                <span aria-hidden="true">↗</span>
+              </Link>
+            </div>
+          </section>
           {SECONDARY_NAV.map((group) => (
             <section key={group.title}>
               <h3>{group.title}</h3>

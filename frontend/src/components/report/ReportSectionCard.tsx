@@ -76,7 +76,7 @@ export function ReportSectionCard({ section, index }: { section: ReportSection; 
       aria-labelledby={`report-${id}`}
     >
       <div className="flex items-baseline gap-2.5">
-        <span className="numeric text-sm text-gold/70">{String(index + 1).padStart(2, '0')}</span>
+        <span className="numeric text-sm text-gold">{String(index + 1).padStart(2, '0')}</span>
         <h2 id={`report-${id}`} className="font-display text-lg font-semibold tracking-wide text-ink">
           {title}
         </h2>

@@ -51,7 +51,7 @@ export function PillarCard({ pillar, hidden_stem_rows }: PillarCardProps) {
           {palace ? `${pillar.label} · ${palace}` : pillar.label}
         </span>
         {isDay ? (
-          <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[#3c2f00]">
+          <span className="label-caps rounded-element bg-gold px-1.5 py-0.5 text-[var(--on-gold)]">
             命主日元
           </span>
         ) : null}
