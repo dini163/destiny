@@ -78,6 +78,16 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "处女": "處女",
         "天蝎": "天蠍",
         "双鱼": "雙魚",
+        # 八卦卦名 / 卦象（zhouyi lower_name_zh、upper_name_zh、*_nature_zh 叶值）：仅登记字形有差者。
+        "兑": "兌",
+        "离": "離",
+        "泽": "澤",
+        "风": "風",
+        # 吠陀九曜（VedicPlanet.name_zh 叶值）：仅登记字形有差者。
+        "太阳": "太陽",
+        "太阴": "太陰",
+        "罗睺": "羅睺",
+        "计都": "計都",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -149,6 +159,37 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "摩羯": "Capricorn",
         "水瓶": "Aquarius",
         "双鱼": "Pisces",
+        # 八卦卦名（name_zh 叶值）取邵雍先天罗马音；卦象（nature_zh）取义译。
+        "乾": "Qian",
+        "兑": "Dui",
+        "离": "Li",
+        "震": "Zhen",
+        "巽": "Xun",
+        "坎": "Kan",
+        "艮": "Gen",
+        "坤": "Kun",
+        "天": "Heaven",
+        "泽": "Lake",
+        "雷": "Thunder",
+        "山": "Mountain",
+        "地": "Earth",
+        "风": "Wind",
+        # 五行（element 叶值）；火/水与卦象同词同译，共用下面两个键。
+        "木": "Wood",
+        "火": "Fire",
+        "土": "Earth",
+        "金": "Metal",
+        "水": "Water",
+        # 吠陀九曜（VedicPlanet.name_zh 叶值，与 `content/vedic.GRAHAS` 同源）。
+        "太阳": "Sun",
+        "太阴": "Moon",
+        "火星": "Mars",
+        "水星": "Mercury",
+        "木星": "Jupiter",
+        "金星": "Venus",
+        "土星": "Saturn",
+        "罗睺": "Rahu",
+        "计都": "Ketu",
     },
 }
 

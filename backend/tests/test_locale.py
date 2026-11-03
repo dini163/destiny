@@ -29,6 +29,22 @@ _WESTERN_NATAL = {
     "utc_offset_hours": 0.0,
 }
 
+_VEDIC_NATAL = {
+    "birth_date": "2000-01-01",
+    "birth_time": "12:00",
+    "latitude": 51.4769,
+    "longitude": -0.0005,
+    "utc_offset_hours": 0,
+    "target_date": "2026-09-25",
+    "gender": "male",
+}
+
+_ZHOUYI_CAST = {
+    "method": "time",
+    "birth_date": "1990-06-15",
+    "birth_time": "08:30:00",
+}
+
 
 def _walk_strings(value: object) -> list[str]:
     out: list[str] = []
@@ -106,3 +122,47 @@ def test_western_sign_names_localize_only_when_requested() -> None:
         assert sign not in en_leaves, f"en 未替换星座名 {sign}"
     # 默认 zh-Hans 路径保留源文，星座专名表不越界。
     assert any(s in SIGNS_ZH for s in d_leaves)
+
+
+def test_graha_and_trigram_display_names_localize_only_when_requested() -> None:
+    # p15-a 专名表：吠陀九曜（name_zh）与八卦卦名/卦象/五行叶值，
+    # 默认 zh-Hans 逐字节透传，`?locale=en` / `?locale=zh-Hant` 才把叶子换掉。
+    from app.content.vedic import GRAHAS
+    from app.content.wuxing import ELEMENT_ORDER
+    from app.content.zhouyi_trigrams import TRIGRAMS
+
+    graha_zh = {g.name_zh for g in GRAHAS}
+    element_zh = set(ELEMENT_ORDER)
+    trigram_names = {t.name_zh for t in TRIGRAMS}
+    trigram_natures = {t.nature_zh for t in TRIGRAMS}
+    atomic = trigram_names | element_zh
+
+    with TestClient(app) as client:
+        v_def = client.post("/api/v1/vedic/natal", json=_VEDIC_NATAL)
+        v_en = client.post("/api/v1/vedic/natal?locale=en", json=_VEDIC_NATAL)
+        v_hant = client.post("/api/v1/vedic/natal?locale=zh-Hant", json=_VEDIC_NATAL)
+        z_def = client.post("/api/v1/zhouyi/cast", json=_ZHOUYI_CAST)
+        z_en = client.post("/api/v1/zhouyi/cast?locale=en", json=_ZHOUYI_CAST)
+
+    assert v_def.status_code == v_en.status_code == v_hant.status_code == 200
+    assert z_def.status_code == z_en.status_code == 200
+
+    # 吠陀：九曜名作为叶值落盘，en 下被换掉。
+    vd = _walk_strings(v_def.json())
+    ve = _walk_strings(v_en.json())
+    present_grahas = [s for s in vd if s in graha_zh]
+    assert present_grahas, "vedic 本命盘应至少落一个九曜名叶值"
+    for graha in present_grahas:
+        assert graha not in ve, f"en 未替换九曜名 {graha}"
+
+    # 周易：卦名/五行/卦象原子叶值在 en 下被换掉，默认保留源文。
+    zd = _walk_strings(z_def.json())
+    ze = _walk_strings(z_en.json())
+    present_atomic = [s for s in zd if s in atomic]
+    assert present_atomic, "zhouyi 响应应至少落一个卦名/五行叶值"
+    for token in set(present_atomic):
+        assert token not in ze, f"en 未替换原子专名 {token}"
+    # 纯卦象叶值（不在五行集里的 nature_zh）同样要在 en 下被换掉。
+    pure_natures = trigram_natures - element_zh
+    for token in [s for s in zd if s in pure_natures]:
+        assert token not in ze, f"en 未替换卦象叶值 {token}"
