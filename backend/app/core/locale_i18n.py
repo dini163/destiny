@@ -424,6 +424,18 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         # （如 辛 即天干）都是共形常用词，全局单表无法按系统区分，故不入表（回落源文）。
         "慈悲之柱": "Pillar of Mercy", "严厉之柱": "Pillar of Severity",
         "中柱·平衡": "Pillar of Equilibrium", "知识（隐藏）": "Daath (Hidden)",
+        # 二十七星宿（vedic nakshatra name_zh 叶值，与 `content/vedic.NAKSHATRAS` 同源）：
+        # en 取同一表自带梵文拉丁转写（name_en）。星宿名系音译，无权威繁体，不入 zh-Hant（同符文裁定）。
+        "阿湿毗尼": "Ashwini", "婆罗尼": "Bharani", "基栗底伽": "Krittika", "楼喜尼": "Rohini",
+        "弥利迦奢罗": "Mrigashira", "阿陀罗": "Ardra", "布纳瓦苏": "Punarvasu", "布沙": "Pushya",
+        "阿湿利沙": "Ashlesha", "摩伽": "Magha", "前发座": "Purva Phalguni", "后发座": "Uttara Phalguni",
+        "哈斯塔": "Hasta", "质多罗": "Chitra", "室伐底": "Swati", "毗舍佉": "Vishakha",
+        "阿努罗陀": "Anuradha", "耆宿": "Jyeshtha", "牟拉": "Mula", "前阿沙荼": "Purva Ashadha",
+        "后阿沙荼": "Uttara Ashadha", "室罗伐那": "Shravana", "陀尼沙": "Dhanishta", "百药": "Shatabhisha",
+        "前婆罗钵提": "Purva Bhadrapada", "后婆罗钵提": "Uttara Bhadrapada", "梨婆底": "Revati",
+        # 三颗外行星（western/transit/synastry 行星中文名叶值，与 `engines/western.PLANETS` 同源）：
+        # 日/月/水/金/火/木/土已由九曜入表，此处只补三颗天王/海王/冥王（繁体同形，不登 zh-Hant）。
+        "天王星": "Uranus", "海王星": "Neptune", "冥王星": "Pluto",
     },
 }
 

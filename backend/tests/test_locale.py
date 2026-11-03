@@ -416,3 +416,32 @@ def test_card_and_hexagram_traditional_forms_localize() -> None:
     for rune in ("费胡", "阿尔吉兹", "空白符"):
         assert rune not in LABELS["zh-Hant"], f"卢恩音译名不应入繁体表：{rune}"
         assert localize_str(rune, "zh-Hant") == rune
+
+
+def test_nakshatras_and_outer_planets_localize() -> None:
+    # p15：吠陀二十七星宿名与三颗外行星中文名在 en 下换为拉丁/英文，默认透传。
+    from app.content.vedic import NAKSHATRAS
+
+    nak_zh = {n.name_zh for n in NAKSHATRAS}
+    planets = {"天王星", "海王星", "冥王星"}
+    with TestClient(app) as client:
+        v_def = client.post("/api/v1/vedic/natal", json=_VEDIC_NATAL)
+        v_en = client.post("/api/v1/vedic/natal?locale=en", json=_VEDIC_NATAL)
+        w_def = client.post("/api/v1/western/natal", json=_WESTERN_NATAL)
+        w_en = client.post("/api/v1/western/natal?locale=en", json=_WESTERN_NATAL)
+    assert v_def.status_code == v_en.status_code == 200
+    assert w_def.status_code == w_en.status_code == 200
+
+    vd = _walk_strings(v_def.json())
+    ve = _walk_strings(v_en.json())
+    present_nak = {s for s in vd if s in nak_zh}
+    assert present_nak, "vedic 本命盘应至少落一个星宿名叶值"
+    for token in present_nak:
+        assert token not in ve, f"en 未替换星宿名 {token}"
+
+    wd = _walk_strings(w_def.json())
+    we = _walk_strings(w_en.json())
+    present_planets = {s for s in wd if s in planets}
+    assert present_planets == planets, f"western 应落三颗外行星，实得 {present_planets}"
+    for token in present_planets:
+        assert token not in we, f"en 未替换行星名 {token}"
