@@ -15,6 +15,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useVedic } from '../hooks/useVedic';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { useI18n } from '../i18n/context';
 import { CHART_STYLES } from '../lib/vedic';
 import type { ChartStyle } from '../lib/vedic';
 import type { VedicChart, VedicNatalRequest } from '../types/vedic';
@@ -35,6 +36,7 @@ function todayISO(): string {
  * runtime (PRD no-mock rule).
  */
 export function VedicPage() {
+  const { t } = useI18n();
   const [utcOffset, setUtcOffset] = useState('');
   const [targetDate, setTargetDate] = useState<string>(todayISO);
   const profile = useProfileFill();
@@ -79,10 +81,10 @@ export function VedicPage() {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-gold" />
-              恒星黄道 = 回归黄道 − 岁差（Ayanamsa）
+              {t('恒星黄道 = 回归黄道 − 岁差（Ayanamsa）')}
             </span>
-            <span>整宫制自上升点起算第一宫；月宿决定 Vimshottari 起运。</span>
-            <span className="text-gold-soft">目标日期用于标记现行大运。</span>
+            <span>{t('整宫制自上升点起算第一宫；月宿决定 Vimshottari 起运。')}</span>
+            <span className="text-gold-soft">{t('目标日期用于标记现行大运。')}</span>
           </div>
         }
       >
@@ -92,10 +94,10 @@ export function VedicPage() {
             onChange={setTargetDate}
             minYear={1900}
             maxYear={new Date().getFullYear() + 30}
-            ariaLabel="目标"
+            ariaLabel={t('目标')}
           />
         </LabeledField>
-        <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">小时</span>}>
+        <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">{t('小时')}</span>}>
           <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
             <input
@@ -105,9 +107,9 @@ export function VedicPage() {
               step={0.5}
               value={utcOffset}
               onChange={(event) => setUtcOffset(event.target.value)}
-              placeholder="自动（按经度）"
+              placeholder={t('自动（按经度）')}
               className="numeric w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-              aria-label="UTC 时区偏移（小时）"
+              aria-label={t('UTC 时区偏移（小时）')}
             />
           </div>
         </LabeledField>
@@ -121,7 +123,7 @@ export function VedicPage() {
       ) : null}
 
       {vedic.isPending && !vedic.data ? (
-        <p className="label-caps text-ink-muted">正在依拉希里岁差推排恒星盘、星宿与 Vimshottari 大运…</p>
+        <p className="label-caps text-ink-muted">{t('正在依拉希里岁差推排恒星盘、星宿与 Vimshottari 大运…')}</p>
       ) : null}
 
       {vedic.data ? <VedicResults chart={vedic.data} /> : null}
@@ -133,6 +135,7 @@ export function VedicPage() {
 
 /** The full composition: headline trinity, the chart-style switch, tables and dasha. */
 function VedicResults({ chart }: { chart: VedicChart }) {
+  const { t } = useI18n();
   const [style, setStyle] = useState<ChartStyle>('south');
 
   return (
@@ -143,7 +146,7 @@ function VedicResults({ chart }: { chart: VedicChart }) {
 
       <div className="panel-raised flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1.5">
-          <span className="label-caps">排盘制式 / CHART STYLE</span>
+          <span className="label-caps">{t('排盘制式 / CHART STYLE')}</span>
           <SegmentedControl<ChartStyle>
             ariaLabel="排盘制式"
             options={CHART_STYLES.map((s) => ({ value: s.value, label: s.label }))}
@@ -153,8 +156,8 @@ function VedicResults({ chart }: { chart: VedicChart }) {
         </div>
         <p className="max-w-md text-sm leading-relaxed text-ink-muted">
           {style === 'south'
-            ? '南印盘：十二星座固定落位，自白羊起顺时针排列，宫位随上升点推移。'
-            : '北印盘：十二宫固定落位，第一宫恒居顶部中央，星座编号随上升点轮转。'}
+            ? t('南印盘：十二星座固定落位，自白羊起顺时针排列，宫位随上升点推移。')
+            : t('北印盘：十二宫固定落位，第一宫恒居顶部中央，星座编号随上升点轮转。')}
         </p>
       </div>
 
@@ -165,7 +168,7 @@ function VedicResults({ chart }: { chart: VedicChart }) {
           icon="compass"
           actions={
             <span className="label-caps text-gold-soft">
-              上升 {chart.lagna_sign_zh} · 整宫制
+              {t('上升 {{sign}} · 整宫制', { sign: chart.lagna_sign_zh })}
             </span>
           }
           elevated
@@ -177,7 +180,7 @@ function VedicResults({ chart }: { chart: VedicChart }) {
           className="xl:col-span-7"
           title="九曜星历表"
           icon="gauge"
-          actions={<span className="label-caps text-ink-muted">恒星黄道 · 含星宿</span>}
+          actions={<span className="label-caps text-ink-muted">{t('恒星黄道 · 含星宿')}</span>}
           elevated
         >
           <GrahaTable chart={chart} />
@@ -189,7 +192,7 @@ function VedicResults({ chart }: { chart: VedicChart }) {
         icon="timeline"
         actions={
           <span className="label-caps text-ink-muted">
-            自月宿 {chart.vimshottari.birth_nakshatra_zh} 起算
+            {t('自月宿 {{nak}} 起算', { nak: chart.vimshottari.birth_nakshatra_zh })}
           </span>
         }
         elevated
@@ -200,7 +203,7 @@ function VedicResults({ chart }: { chart: VedicChart }) {
       <ResultCard
         title="白话详解"
         icon="sparkle"
-        actions={<span className="label-caps text-ink-muted">四段 · 逐条转述已算出的落座、落宫、宿与主事星</span>}
+        actions={<span className="label-caps text-ink-muted">{t('四段 · 逐条转述已算出的落座、落宫、宿与主事星')}</span>}
         elevated
       >
         <PlainSectionList sections={chart.plain} />
@@ -211,13 +214,14 @@ function VedicResults({ chart }: { chart: VedicChart }) {
 
 /** Headline strip: the Lagna, the Moon's sign/nakshatra, ayanamsa and current dasha. */
 function SummaryStrip({ chart }: { chart: VedicChart }) {
+  const { t } = useI18n();
   const current = chart.vimshottari.current;
   return (
     <div className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-col gap-1">
-        <span className="label-caps">吠陀本命 · SIDEREAL NATAL</span>
+        <span className="label-caps">{t('吠陀本命 · SIDEREAL NATAL')}</span>
         <span className="font-display text-2xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-3xl">
-          上升 {chart.lagna_sign_glyph} {chart.lagna_sign_zh}
+          {t('上升')} {chart.lagna_sign_glyph} {chart.lagna_sign_zh}
           <span className="numeric ml-2 text-base font-normal text-ink-variant">
             {chart.lagna_degree_text}
           </span>
@@ -226,26 +230,26 @@ function SummaryStrip({ chart }: { chart: VedicChart }) {
       <div className="gold-rule" />
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-variant">
         <span>
-          月亮：<span className="text-ink">{chart.moon_sign_zh}</span> ·{' '}
+          {t('月亮：')}<span className="text-ink">{chart.moon_sign_zh}</span> ·{' '}
           <span className="text-ink">{chart.moon_nakshatra_zh}</span>
-          <span className="numeric text-ink-muted"> 第{chart.moon_pada}足</span>
+          <span className="numeric text-ink-muted"> {t('第{{n}}足', { n: chart.moon_pada })}</span>
         </span>
         <span>
-          月宿主星：<span className="text-ink">{chart.moon_nakshatra_lord_zh}</span>
+          {t('月宿主星：')}<span className="text-ink">{chart.moon_nakshatra_lord_zh}</span>
         </span>
         <span>
-          当地生时：<span className="numeric text-ink">{chart.local_datetime}</span>
+          {t('当地生时：')}<span className="numeric text-ink">{chart.local_datetime}</span>
         </span>
         <span>
-          岁差：<span className="numeric text-gold-soft">{chart.ayanamsa.toFixed(4)}°</span>
+          {t('岁差：')}<span className="numeric text-gold-soft">{chart.ayanamsa.toFixed(4)}°</span>
           <span className="text-ink-muted"> {chart.ayanamsa_name}</span>
         </span>
         {current ? (
           <span>
-            现行大运：<span className="text-gold-bright">{current.mahadasha_lord_zh}</span>
+            {t('现行大运：')}<span className="text-gold-bright">{current.mahadasha_lord_zh}</span>
             {current.antardasha_lord_zh ? (
               <>
-                {' '}· 小运 <span className="text-gold-soft">{current.antardasha_lord_zh}</span>
+                {' '}· {t('小运')} <span className="text-gold-soft">{current.antardasha_lord_zh}</span>
               </>
             ) : null}
           </span>

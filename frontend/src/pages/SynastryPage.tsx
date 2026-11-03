@@ -15,6 +15,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useSynastry } from '../hooks/useSynastry';
 import { useProfiles } from '../hooks/useProfiles';
+import { useI18n } from '../i18n/context';
 import type { PersonProfile, ProfileDraft } from '../lib/profiles';
 import { aspectStyle } from '../lib/astro';
 import type { SynastryChart, SynastryRequest } from '../types/synastry';
@@ -38,6 +39,7 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
  * 累加，账本逐条可核（PRD 无 mock 铁律）。页面上唯一的意志是两造生辰、定位与共用分宫制。
  */
 export function SynastryPage() {
+  const { t } = useI18n();
   const [sideAPreset, setSideAPreset] = useState<SideState | null>(null);
   const [sideBPreset, setSideBPreset] = useState<SideState | null>(null);
   /** 存入档案弹层的预填值（当前一侧输入快照，无 id = 新建）。 */
@@ -117,7 +119,7 @@ export function SynastryPage() {
       ) : null}
 
       {synastry.isPending && !synastry.data ? (
-        <p className="label-caps text-ink-muted">正在依瑞士星历比对两张本命盘、合成中点组合盘…</p>
+        <p className="label-caps text-ink-muted">{t('正在依瑞士星历比对两张本命盘、合成中点组合盘…')}</p>
       ) : null}
 
       {synastry.data ? <SynastryResults chart={synastry.data} /> : null}
@@ -127,6 +129,7 @@ export function SynastryPage() {
 
 /** The full two-person composition rendered once a real result is available. */
 function SynastryResults({ chart }: { chart: SynastryChart }) {
+  const { t } = useI18n();
   const { composite } = chart;
   return (
     <>
@@ -139,7 +142,10 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
         icon="gauge"
         actions={
           <span className="label-caps text-ink-muted">
-            {chart.synastry_aspects.filter((a) => a.counted).length} 条计入 · 账本 {chart.score.factors.length} 行
+            {t('{{counted}} 条计入 · 账本 {{rows}} 行', {
+              counted: chart.synastry_aspects.filter((a) => a.counted).length,
+              rows: chart.score.factors.length,
+            })}
           </span>
         }
         elevated
@@ -158,7 +164,7 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
           <ResultCard
             title="合盘双轮盘"
             icon="compass"
-            actions={<span className="label-caps text-gold-soft">内{chart.person_a_name} · 外{chart.person_b_name}</span>}
+            actions={<span className="label-caps text-gold-soft">{t('内{{a}} · 外{{b}}', { a: chart.person_a_name, b: chart.person_b_name })}</span>}
             elevated
           >
             <div className="relative mx-auto aspect-square w-full max-w-[620px]">
@@ -176,7 +182,7 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
           <ResultCard
             title="人对人相位"
             icon="sparkle"
-            actions={<span className="label-caps text-ink-muted">共 {chart.synastry_aspects.length} 对</span>}
+            actions={<span className="label-caps text-ink-muted">{t('共 {{count}} 对', { count: chart.synastry_aspects.length })}</span>}
             elevated
           >
             <SynastryAspectList aspects={chart.synastry_aspects} />
@@ -187,14 +193,14 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
           <ResultCard
             title="组合中点盘"
             icon="sun"
-            actions={<span className="label-caps text-ink-muted">{composite.method} · 短弧中点</span>}
+            actions={<span className="label-caps text-ink-muted">{composite.method} · {t('短弧中点')}</span>}
             elevated
           >
             <div className="flex flex-col gap-3">
               <p className="text-sm text-ink-variant">
-                组合日
-                <span className="font-display text-gold-bright"> {composite.sun_sign_zh} </span>· 组合月
-                <span className="font-display text-gold-bright"> {composite.moon_sign_zh} </span>· 组合升
+                {t('组合日')}
+                <span className="font-display text-gold-bright"> {composite.sun_sign_zh} </span>· {t('组合月')}
+                <span className="font-display text-gold-bright"> {composite.moon_sign_zh} </span>· {t('组合升')}
                 <span className="font-display text-gold-bright"> {composite.ascendant_sign_zh}</span>
               </p>
               <div className="relative mx-auto aspect-square w-full max-w-[420px]">
@@ -226,13 +232,14 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
 
 /** Headline strip: both natals' trinity plus the composite trinity. */
 function SummaryStrip({ chart }: { chart: SynastryChart }) {
+  const { t } = useI18n();
   const a = chart.person_a;
   const b = chart.person_b;
   const c = chart.composite;
   return (
     <div className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-col gap-1">
-        <span className="label-caps">西洋合盘 · SYNASTRY &amp; COMPOSITE</span>
+        <span className="label-caps">{t('西洋合盘 · SYNASTRY & COMPOSITE')}</span>
         <span className="font-display text-2xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-3xl">
           {chart.person_a_name} × {chart.person_b_name}
         </span>
@@ -261,31 +268,33 @@ function TrinityCell({
   asc: string;
   when?: string;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5 rounded-element border border-rim-soft bg-surface px-4 py-3">
-      <span className="label-caps text-ink-muted">{caption}</span>
+      <span className="label-caps text-ink-muted">{t(caption)}</span>
       <span className="font-display text-lg text-ink">
-        日{sun} · 月{moon} · 升{asc}
+        {t('日{{sun}} · 月{{moon}} · 升{{asc}}', { sun, moon, asc })}
       </span>
-      {when ? <span className="numeric text-xs text-ink-muted">当地生时 {when}</span> : null}
+      {when ? <span className="numeric text-xs text-ink-muted">{t('当地生时 {{when}}', { when })}</span> : null}
     </div>
   );
 }
 
 /** Legend: what the two rings mean plus the aspect chord colours. */
 function WheelLegend() {
+  const { t } = useI18n();
   return (
     <div className="mt-4 flex flex-col gap-2 border-t border-rim-soft pt-3">
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-ink-variant">
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-full border-2 border-gold" />
-          外圈：乙方（带金环）
+          {t('外圈：乙方（带金环）')}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-full border-2 border-ink-muted" />
-          内圈：甲方
+          {t('内圈：甲方')}
         </span>
-        <span className="text-ink-muted">连线为计入相契度的人对人相位（核心轴更粗）</span>
+        <span className="text-ink-muted">{t('连线为计入相契度的人对人相位（核心轴更粗）')}</span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
         {ASPECT_LEGEND.map((item) => {
@@ -293,7 +302,7 @@ function WheelLegend() {
           return (
             <span key={item.type} className="flex items-center gap-1.5 text-xs text-ink-variant">
               <span className="h-0.5 w-4 rounded-full" style={{ backgroundColor: style.color }} />
-              {style.label} {item.angle}
+              {t(style.label)} {item.angle}
             </span>
           );
         })}

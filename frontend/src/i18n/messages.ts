@@ -640,6 +640,73 @@ const zhHant: MessageDict = {
   拱相: '拱相',
   冲相: '冲相',
   相位: '相位',
+
+  // Vedic page (Phase 2.8)
+  '吠陀占星 · 乔蒂什': '吠陀占星 · 喬蒂什',
+  '以拉希里（Lahiri / Chitrapaksha）岁差校正的恒星黄道排盘：九曜（Navagraha，含罗睺计都）、自上升起算的整宫制、二十七星宿（Nakshatra），并依月宿推排一百二十年的 Vimshottari 大运时间轴。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。':
+    '以拉希里（Lahiri / Chitrapaksha）歲差校正的恆星黃道排盤：九曜（Navagraha，含羅睺計都）、自上升起算的整宮制、二十七星宿（Nakshatra），並依月宿推排一百二十年的 Vimshottari 大運時間軸。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。',
+  '恒星排盘中…': '恆星排盤中…',
+  即刻排定星盘: '即刻排定星盤',
+  '恒星黄道 = 回归黄道 − 岁差（Ayanamsa）': '恆星黃道 = 回歸黃道 − 歲差（Ayanamsa）',
+  '整宫制自上升点起算第一宫；月宿决定 Vimshottari 起运。':
+    '整宮制自上升點起算第一宮；月宿決定 Vimshottari 起運。',
+  '目标日期用于标记现行大运。': '目標日期用於標記現行大運。',
+  目标: '目標',
+  '目标日期 / TARGET DATE': '目標日期 / TARGET DATE',
+  '正在依拉希里岁差推排恒星盘、星宿与 Vimshottari 大运…':
+    '正在依拉希里歲差推排恆星盤、星宿與 Vimshottari 大運…',
+  '排盘制式 / CHART STYLE': '排盤制式 / CHART STYLE',
+  排盘制式: '排盤制式',
+  '南印盘 South Indian': '南印盤 South Indian',
+  '北印盘 North Indian': '北印盤 North Indian',
+  '南印盘：十二星座固定落位，自白羊起顺时针排列，宫位随上升点推移。':
+    '南印盤：十二星座固定落位，自白羊起順時針排列，宮位隨上升點推移。',
+  '北印盘：十二宫固定落位，第一宫恒居顶部中央，星座编号随上升点轮转。':
+    '北印盤：十二宮固定落位，第一宮恆居頂部中央，星座編號隨上升點輪轉。',
+  南印本命盘: '南印本命盤',
+  北印本命盘: '北印本命盤',
+  '上升 {{sign}} · 整宫制': '上升 {{sign}} · 整宮制',
+  上升: '上升',
+  九曜星历表: '九曜星曆表',
+  '恒星黄道 · 含星宿': '恆星黃道 · 含星宿',
+  'Vimshottari 大运时间轴': 'Vimshottari 大運時間軸',
+  '自月宿 {{nak}} 起算': '自月宿 {{nak}} 起算',
+  '四段 · 逐条转述已算出的落座、落宫、宿与主事星':
+    '四段 · 逐條轉述已算出的落座、落宮、宿與主事星',
+  '吠陀本命 · SIDEREAL NATAL': '吠陀本命 · SIDEREAL NATAL',
+  '月亮：': '月亮：',
+  '第{{n}}足': '第{{n}}足',
+  '月宿主星：': '月宿主星：',
+  '当地生时：': '當地生時：',
+  '岁差：': '歲差：',
+  '现行大运：': '現行大運：',
+  小运: '小運',
+
+  // Synastry page (Phase 2.8)
+  '甲方 · 选档案': '甲方 · 選檔案',
+  '乙方 · 选档案': '乙方 · 選檔案',
+  '正在依瑞士星历比对两张本命盘、合成中点组合盘…':
+    '正在依瑞士星曆比對兩張本命盤、合成中點組合盤…',
+  相契度总分: '相契度總分',
+  '{{counted}} 条计入 · 账本 {{rows}} 行': '{{counted}} 條計入 · 賬本 {{rows}} 行',
+  合盘双轮盘: '合盤雙輪盤',
+  '内{{a}} · 外{{b}}': '內{{a}} · 外{{b}}',
+  人对人相位: '人對人相位',
+  '共 {{count}} 对': '共 {{count}} 對',
+  组合中点盘: '組合中點盤',
+  短弧中点: '短弧中點',
+  组合日: '組合日',
+  组合月: '組合月',
+  组合升: '組合升',
+  组合盘元素与形态: '組合盤元素與形態',
+  组合盘十二宫头: '組合盤十二宮頭',
+  '西洋合盘 · SYNASTRY & COMPOSITE': '西洋合盤 · SYNASTRY & COMPOSITE',
+  '组合盘 Composite': '組合盤 Composite',
+  '当地生时 {{when}}': '當地生時 {{when}}',
+  '外圈：乙方（带金环）': '外圈：乙方（帶金環）',
+  '内圈：甲方': '內圈：甲方',
+  '连线为计入相契度的人对人相位（核心轴更粗）':
+    '連線為計入相契度的人對人相位（核心軸更粗）',
 };
 
 const en: MessageDict = {
@@ -1266,6 +1333,74 @@ const en: MessageDict = {
   拱相: 'Trine',
   冲相: 'Opposition',
   相位: 'Aspect',
+
+  // Vedic page (Phase 2.8)
+  '吠陀占星 · 乔蒂什': 'Vedic Astrology · Jyotish',
+  恒星黄道: 'Sidereal Zodiac',
+  '以拉希里（Lahiri / Chitrapaksha）岁差校正的恒星黄道排盘：九曜（Navagraha，含罗睺计都）、自上升起算的整宫制、二十七星宿（Nakshatra），并依月宿推排一百二十年的 Vimshottari 大运时间轴。示例：2000-01-01 12:00 · 格林尼治 (51.4769, -0.0005) · UTC 0。':
+    'A sidereal chart corrected by the Lahiri (Chitrapaksha) ayanamsa: the nine grahas (Navagraha, including Rahu and Ketu), whole-sign houses counted from the Ascendant, the 27 nakshatras, and a 120-year Vimshottari dasha timeline keyed to the natal Moon\'s nakshatra. Example: 2000-01-01 12:00 · Greenwich (51.4769, -0.0005) · UTC 0.',
+  '恒星排盘中…': 'Casting the sidereal chart…',
+  即刻排定星盘: 'Cast the Chart',
+  '恒星黄道 = 回归黄道 − 岁差（Ayanamsa）': 'Sidereal zodiac = Tropical zodiac − precession (Ayanamsa)',
+  '整宫制自上升点起算第一宫；月宿决定 Vimshottari 起运。':
+    'Whole-sign houses begin at the Ascendant; the natal Moon\'s nakshatra sets the Vimshottari start.',
+  '目标日期用于标记现行大运。': 'The target date marks the dasha running now.',
+  目标: 'Target',
+  '目标日期 / TARGET DATE': 'TARGET DATE',
+  '正在依拉希里岁差推排恒星盘、星宿与 Vimshottari 大运…':
+    'Computing the sidereal chart, nakshatras and Vimshottari dashas under the Lahiri ayanamsa…',
+  '排盘制式 / CHART STYLE': 'CHART STYLE',
+  排盘制式: 'Chart style',
+  '南印盘 South Indian': 'South Indian',
+  '北印盘 North Indian': 'North Indian',
+  '南印盘：十二星座固定落位，自白羊起顺时针排列，宫位随上升点推移。':
+    'South Indian chart: the twelve signs hold fixed cells, running clockwise from Aries; houses shift with the Ascendant.',
+  '北印盘：十二宫固定落位，第一宫恒居顶部中央，星座编号随上升点轮转。':
+    'North Indian chart: the twelve houses hold fixed cells, house 1 always at top centre; sign numbers rotate with the Ascendant.',
+  南印本命盘: 'South Indian Natal Chart',
+  北印本命盘: 'North Indian Natal Chart',
+  '上升 {{sign}} · 整宫制': 'Ascendant {{sign}} · Whole Sign',
+  上升: 'Rising',
+  九曜星历表: 'Nine-Graha Ephemeris',
+  '恒星黄道 · 含星宿': 'Sidereal zodiac · with nakshatras',
+  'Vimshottari 大运时间轴': 'Vimshottari Dasha Timeline',
+  '自月宿 {{nak}} 起算': 'From the natal nakshatra {{nak}}',
+  '四段 · 逐条转述已算出的落座、落宫、宿与主事星':
+    'Four sections · each computed sign, house, nakshatra and lord restated line by line',
+  '吠陀本命 · SIDEREAL NATAL': 'SIDEREAL NATAL',
+  '月亮：': 'Moon:',
+  '第{{n}}足': 'Pada {{n}}',
+  '月宿主星：': 'Moon\'s nakshatra lord:',
+  '当地生时：': 'Local birth time:',
+  '岁差：': 'Ayanamsa:',
+  '现行大运：': 'Current dasha:',
+  小运: 'Antardasha',
+
+  // Synastry page (Phase 2.8)
+  '甲方 · 选档案': 'Person A · choose profile',
+  '乙方 · 选档案': 'Person B · choose profile',
+  '正在依瑞士星历比对两张本命盘、合成中点组合盘…':
+    'Comparing both natal charts and composing the midpoint chart with the Swiss Ephemeris…',
+  相契度总分: 'Compatibility Score',
+  '{{counted}} 条计入 · 账本 {{rows}} 行': '{{counted}} counted · {{rows}} ledger rows',
+  合盘双轮盘: 'Synastry Double Wheel',
+  '内{{a}} · 外{{b}}': 'Inner {{a}} · Outer {{b}}',
+  人对人相位: 'Person-to-Person Aspects',
+  '共 {{count}} 对': '{{count}} pairs',
+  组合中点盘: 'Composite Midpoint Chart',
+  短弧中点: 'shortest-arc midpoint',
+  组合日: 'Composite Sun',
+  组合月: 'Composite Moon',
+  组合升: 'Composite Ascendant',
+  组合盘元素与形态: 'Composite Elements & Modalities',
+  组合盘十二宫头: 'Composite House Cups',
+  '西洋合盘 · SYNASTRY & COMPOSITE': 'SYNASTRY & COMPOSITE',
+  '组合盘 Composite': 'Composite',
+  '当地生时 {{when}}': 'Local birth time {{when}}',
+  '外圈：乙方（带金环）': 'Outer ring: Person B (gold rim)',
+  '内圈：甲方': 'Inner ring: Person A',
+  '连线为计入相契度的人对人相位（核心轴更粗）':
+    'Chords are the person-to-person aspects counted in the score (core axes drawn thicker)',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {
