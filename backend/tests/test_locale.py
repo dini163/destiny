@@ -397,3 +397,22 @@ def test_kabbalah_pillars_and_daath_localize() -> None:
     hl = _walk_strings(h.json())
     for token in [s for s in present if s in LABELS["zh-Hant"]]:
         assert token not in hl, f"zh-Hant 未替换卡巴拉专名 {token}"
+
+
+def test_card_and_hexagram_traditional_forms_localize() -> None:
+    # p15：塔罗/雷诺曼牌名与六十四卦名的繁体叶子（zh-Hant）——繁简有差者被传统化。
+    # 音译专名（卢恩符文）无权威繁体，回落源简体（同 en-only 裁定）。
+    from app.core.locale_i18n import localize_str
+
+    hant = {
+        "魔术师": "魔術師", "战车": "戰車", "正义": "正義", "宝剑国王": "寶劍国王",
+        "星币侍从": "星幣侍從", "骑士": "騎士", "云": "雲",
+        "乾为天": "乾為天", "山地剥": "山地剝", "火水未济": "火水未濟", "本宫": "本宮",
+    }
+    for source, trad in hant.items():
+        assert LABELS["zh-Hant"][source] == trad, f"zh-Hant 表里 {source} 应为 {trad}"
+        assert localize_str(source, "zh-Hant") == trad
+    # 音译符文名不入繁体表——回落源简体，不被机械传统化。
+    for rune in ("费胡", "阿尔吉兹", "空白符"):
+        assert rune not in LABELS["zh-Hant"], f"卢恩音译名不应入繁体表：{rune}"
+        assert localize_str(rune, "zh-Hant") == rune
