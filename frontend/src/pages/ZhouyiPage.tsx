@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { CastControls } from '../components/zhouyi/CastControls';
 import { CastLedger } from '../components/zhouyi/CastLedger';
 import { ClassicalText } from '../components/zhouyi/ClassicalText';
@@ -28,6 +29,7 @@ import type { CastMethod, ZhouyiCast, ZhouyiCastRequest } from '../types/zhouyi'
  * so per-line retelling stays in place and the overview is not buried inside one line.
  */
 export function ZhouyiPage() {
+  const { t } = useI18n();
   const [method, setMethod] = useState<CastMethod>('three_coin');
   const [question, setQuestion] = useState('');
   const [castTime, setCastTime] = useState('');
@@ -68,7 +70,7 @@ export function ZhouyiPage() {
       ) : null}
 
       {zhouyi.isPending && !zhouyi.data ? (
-        <p className="label-caps text-ink-muted">正在起卦排盘，推演纳甲六亲…</p>
+        <p className="label-caps text-ink-muted">{t('正在起卦排盘，推演纳甲六亲…')}</p>
       ) : null}
 
       {zhouyi.data ? <ZhouyiResults cast={zhouyi.data} /> : null}
@@ -87,6 +89,7 @@ function normalizeCastTime(value: string): string | undefined {
 
 /** The full reading composition, rendered once a real cast is available. */
 function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
+  const { t } = useI18n();
   const { ben, bian, hu, lines, moving_positions } = cast;
 
   return (
@@ -115,15 +118,15 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
       <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
         <ResultCard title="变卦" icon="arrowRight">
           {bian ? (
-            <HexagramCard hexagram={bian} moving={moving_positions} note="本卦动爻阴阳互变得变卦，示事之趋向。" />
+            <HexagramCard hexagram={bian} moving={moving_positions} note={t('本卦动爻阴阳互变得变卦，示事之趋向。')} />
           ) : (
             <p className="text-sm leading-relaxed text-ink-muted">
-              六爻安静，本卦无动爻，故无变卦。占断以本卦卦辞与世应为主。
+              {t('六爻安静，本卦无动爻，故无变卦。占断以本卦卦辞与世应为主。')}
             </p>
           )}
         </ResultCard>
         <ResultCard title="互卦" icon="vault">
-          <HexagramCard hexagram={hu} note="取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。" />
+          <HexagramCard hexagram={hu} note={t('取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。')} />
         </ResultCard>
       </div>
 
@@ -136,13 +139,14 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
 
 /** The ben → bian headline plus the real cast metadata. */
 function CastSummary({ cast }: { cast: ZhouyiCast }) {
+  const { t } = useI18n();
   const { ben, bian, method, cast_time, day_ganzhi, question, moving_positions } = cast;
 
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">本卦 → 变卦 · PRIMARY TO CHANGED</span>
+          <span className="label-caps">{t('本卦 → 变卦 · PRIMARY TO CHANGED')}</span>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-display text-3xl leading-none text-gold">{ben.symbol}</span>
             <span className="font-display text-2xl font-semibold text-gold-bright text-glow-gold sm:text-3xl">
@@ -157,7 +161,7 @@ function CastSummary({ cast }: { cast: ZhouyiCast }) {
                 </span>
               </>
             ) : (
-              <span className="font-display text-xl text-ink-muted">六爻安静 · 无变卦</span>
+              <span className="font-display text-xl text-ink-muted">{t('六爻安静 · 无变卦')}</span>
             )}
           </div>
         </div>
@@ -166,7 +170,7 @@ function CastSummary({ cast }: { cast: ZhouyiCast }) {
             {methodLabel(method)}
           </span>
           <span className="label-caps rounded-element bg-wuxing-fire/15 px-2 py-1 text-wuxing-fire">
-            {moving_positions.length} 爻动
+            {t('{{count}} 爻动', { count: moving_positions.length })}
           </span>
         </div>
       </div>
@@ -179,13 +183,13 @@ function CastSummary({ cast }: { cast: ZhouyiCast }) {
         <Meta label="本卦宫" value={`${ben.palace_name_zh} · ${ben.generation}`} />
         <Meta
           label="动爻"
-          value={moving_positions.length > 0 ? moving_positions.map(positionLabel).join('、') : '无'}
+          value={moving_positions.length > 0 ? moving_positions.map(positionLabel).join('、') : t('无')}
         />
       </dl>
 
       {question ? (
         <p className="text-sm leading-relaxed text-ink-variant">
-          <span className="label-caps mr-2 align-middle">所占之事</span>
+          <span className="label-caps mr-2 align-middle">{t('所占之事')}</span>
           {question}
         </p>
       ) : null}
@@ -195,9 +199,10 @@ function CastSummary({ cast }: { cast: ZhouyiCast }) {
 
 /** A single caption + value pair in the summary strip. */
 function Meta({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="label-caps">{label}</dt>
+      <dt className="label-caps">{t(label)}</dt>
       <dd className="font-display text-sm text-ink-variant">{value}</dd>
     </div>
   );

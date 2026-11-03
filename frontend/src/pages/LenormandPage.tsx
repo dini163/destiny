@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { CombinationLens } from '../components/lenormand/CombinationLens';
 import { LenormandBoard } from '../components/lenormand/LenormandBoard';
 import { LenormandCard } from '../components/lenormand/LenormandCard';
@@ -20,6 +21,7 @@ import type { DrawnCard, LenormandReading, LenormandRequest, SignificatorChoice 
  * upright (Lenormand never reverses) and clickable to inspect their full meaning.
  */
 export function LenormandPage() {
+  const { t } = useI18n();
   const [spread, setSpread] = useState('three_card');
   const [significator, setSignificator] = useState<SignificatorChoice>('none');
   const [question, setQuestion] = useState('');
@@ -58,7 +60,7 @@ export function LenormandPage() {
       ) : null}
 
       {lenormand.isPending && !lenormand.data ? (
-        <p className="label-caps text-ink-muted">正在洗牌抽牌，铺陈牌阵…</p>
+        <p className="label-caps text-ink-muted">{t('正在洗牌抽牌，铺陈牌阵…')}</p>
       ) : null}
 
       {lenormand.data ? (
@@ -78,6 +80,7 @@ function LenormandResults({
   selected: number | null;
   onSelect: (index: number | null) => void;
 }) {
+  const { t } = useI18n();
   const cards = reading.cards;
   const sigIndex = cards.findIndex((card) => card.is_significator);
   const activeIndex = selected ?? (sigIndex >= 0 ? sigIndex : 0);
@@ -87,7 +90,7 @@ function LenormandResults({
     <>
       <ResultCard
         title="牌阵布局"
-        eyebrow={`${reading.spread_name_en} · ${cards.length} 张`}
+        eyebrow={`${reading.spread_name_en} · ${cards.length} ${t('张')}`}
         icon="vault"
         elevated
         actions={
@@ -98,7 +101,7 @@ function LenormandResults({
       >
         {reading.question ? (
           <p className="text-sm leading-relaxed text-ink-variant">
-            <span className="label-caps mr-2 align-middle">所问之事</span>
+            <span className="label-caps mr-2 align-middle">{t('所问之事')}</span>
             {reading.question}
           </p>
         ) : null}
@@ -122,7 +125,7 @@ function LenormandResults({
             {activeCard ? (
               <CardInspector card={activeCard} onDeselect={() => onSelect(null)} />
             ) : (
-              <p className="text-sm text-ink-muted">点击牌阵中任意一张牌，查看其完整牌义。</p>
+              <p className="text-sm text-ink-muted">{t('点击牌阵中任意一张牌，查看其完整牌义。')}</p>
             )}
           </ResultCard>
         </div>
@@ -139,13 +142,14 @@ function LenormandResults({
 
 /** The full detail of the selected card, all fields straight from the response. */
 function CardInspector({ card, onDeselect }: { card: DrawnCard; onDeselect: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
         <LenormandCard card={card} selected onSelect={onDeselect} />
         <div className="flex flex-col gap-1">
           <span className="label-caps text-gold-soft">
-            第 {card.position_index + 1} 位 · {card.position_label_zh}
+            {t('第 {{n}} 位 ·', { n: card.position_index + 1 })} {card.position_label_zh}
           </span>
           <span className="font-display text-xl font-semibold text-ink">
             {String(card.number).padStart(2, '0')} {card.name_zh}
@@ -170,13 +174,13 @@ function CardInspector({ card, onDeselect }: { card: DrawnCard; onDeselect: () =
       </div>
 
       <div className="flex flex-col gap-1.5 rounded-element border border-rim-soft bg-surface/50 px-3 py-2.5">
-        <span className="label-caps text-ink-muted">核心牌义</span>
+        <span className="label-caps text-ink-muted">{t('核心牌义')}</span>
         <p className="font-display text-sm leading-relaxed text-ink-variant">{card.meaning}</p>
       </div>
 
       <p className="text-xs leading-relaxed text-ink-muted">
-        名词核心：<span className="text-gold-soft">{card.essence}</span>
-        ；作后牌修饰前牌时：<span className="text-gold-soft">{card.as_modifier}</span>。
+        {t('名词核心：')}<span className="text-gold-soft">{card.essence}</span>
+        {t('；作后牌修饰前牌时：')}<span className="text-gold-soft">{card.as_modifier}</span>。
       </p>
     </div>
   );

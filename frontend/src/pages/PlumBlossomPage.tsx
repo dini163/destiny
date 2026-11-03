@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { HexagramTriad } from '../components/meihua/HexagramTriad';
 import { MeihuaControls } from '../components/meihua/MeihuaControls';
 import { MeihuaScoreLedger } from '../components/meihua/MeihuaScoreLedger';
@@ -24,6 +25,7 @@ const EMPTY_NUMBERS = ['', '', ''];
  * auditable, exactly as 邵康节's method prescribes.
  */
 export function PlumBlossomPage() {
+  const { t } = useI18n();
   const [method, setMethod] = useState<MeihuaMethod>('time');
   const [numbers, setNumbers] = useState<string[]>(() => EMPTY_NUMBERS.slice());
   const [question, setQuestion] = useState('');
@@ -64,7 +66,7 @@ export function PlumBlossomPage() {
       ) : null}
 
       {meihua.isPending && !meihua.data ? (
-        <p className="label-caps text-ink-muted">正在起卦，推演体用互变…</p>
+        <p className="label-caps text-ink-muted">{t('正在起卦，推演体用互变…')}</p>
       ) : null}
 
       {meihua.data ? <MeihuaResults cast={meihua.data} /> : null}
@@ -132,13 +134,14 @@ function MeihuaResults({ cast }: { cast: MeihuaCast }) {
 
 /** The ben → bian headline plus the real cast metadata and 起卦 arithmetic. */
 function CastSummary({ cast }: { cast: MeihuaCast }) {
+  const { t } = useI18n();
   const { ben, bian, method, cast_time, question, moving_position, derivation, wangshuai } = cast;
 
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">本卦 → 变卦 · PRIMARY TO CHANGED</span>
+          <span className="label-caps">{t('本卦 → 变卦 · PRIMARY TO CHANGED')}</span>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-display text-3xl leading-none text-gold">{ben.symbol}</span>
             <span className="font-display text-2xl font-semibold text-gold-bright text-glow-gold sm:text-3xl">
@@ -154,7 +157,7 @@ function CastSummary({ cast }: { cast: MeihuaCast }) {
             {meihuaMethodLabel(method)}
           </span>
           <span className="label-caps rounded-element bg-astral/15 px-2 py-1 text-astral">
-            {movingPositionLabel(moving_position)}动
+            {movingPositionLabel(moving_position)}{t('动')}
           </span>
         </div>
       </div>
@@ -163,20 +166,20 @@ function CastSummary({ cast }: { cast: MeihuaCast }) {
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Meta label="起卦时刻" value={cast_time} />
-        <Meta label="月令卦气" value={`${wangshuai.season_zh} · ${wangshuai.commanding_element}当令`} />
+        <Meta label="月令卦气" value={`${wangshuai.season_zh} · ${wangshuai.commanding_element}${t('当令')}`} />
         <Meta label="体卦" value={`${cast.ti.trigram.name_zh}${cast.ti.trigram.element}`} />
         <Meta label="用卦" value={`${cast.yong.trigram.name_zh}${cast.yong.trigram.element}`} />
       </dl>
 
       <div className="flex flex-col gap-1 rounded-element border border-rim-soft bg-[var(--field-bg)] px-3 py-2">
-        <span className="label-caps text-ink-muted">起卦推演 · DERIVATION</span>
+        <span className="label-caps text-ink-muted">{t('起卦推演 · DERIVATION')}</span>
         <p className="numeric text-xs leading-relaxed text-ink-variant">{derivation.formula}</p>
         <p className="text-[11px] leading-relaxed text-ink-muted">{derivation.inputs}</p>
       </div>
 
       {question ? (
         <p className="text-sm leading-relaxed text-ink-variant">
-          <span className="label-caps mr-2 align-middle">所占之事</span>
+          <span className="label-caps mr-2 align-middle">{t('所占之事')}</span>
           {question}
         </p>
       ) : null}
@@ -186,9 +189,10 @@ function CastSummary({ cast }: { cast: MeihuaCast }) {
 
 /** A single caption + value pair in the summary strip. */
 function Meta({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="label-caps">{label}</dt>
+      <dt className="label-caps">{t(label)}</dt>
       <dd className="font-display text-sm text-ink-variant">{value}</dd>
     </div>
   );
@@ -196,9 +200,10 @@ function Meta({ label, value }: { label: string; value: string }) {
 
 /** One 互卦 / 变卦 tendency paragraph from the engine. */
 function AnalysisBlock({ label, text }: { label: string; text: string }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5 rounded-element border border-rim-soft bg-surface/50 px-3 py-2.5">
-      <span className="label-caps text-ink-muted">{label}</span>
+      <span className="label-caps text-ink-muted">{t(label)}</span>
       <p className="font-display text-sm leading-relaxed text-ink-variant">{text}</p>
     </div>
   );

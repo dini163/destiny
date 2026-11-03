@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useI18n } from '../i18n/context';
 import { CardInspector } from '../components/tarot/CardInspector';
 import { SpreadBoard } from '../components/tarot/SpreadBoard';
 import { SpreadControls } from '../components/tarot/SpreadControls';
@@ -23,6 +24,7 @@ import type { ReadingTopic, DrawnCard, TarotSpreadRequest, TarotSpreadResponse }
  * (PRD no-mock rule).
  */
 export function TarotPage() {
+  const { t } = useI18n();
   const [spreadId, setSpreadId] = useState('celtic_cross');
   const [question, setQuestion] = useState('');
   const [readingTopic, setReadingTopic] = useState<ReadingTopic>('general');
@@ -102,7 +104,7 @@ export function TarotPage() {
       ) : null}
 
       {tarot.isPending && !tarot.data ? (
-        <p className="label-caps text-ink-muted">正在洗牌布阵…</p>
+        <p className="label-caps text-ink-muted">{t('正在洗牌布阵…')}</p>
       ) : null}
 
       {tarot.data ? (
@@ -140,6 +142,7 @@ function TarotResults({
   onCardSelect,
   onRevealAll,
 }: TarotResultsProps) {
+  const { t } = useI18n();
   return (
     <>
       <SpreadSummary spread={spread} />
@@ -158,7 +161,7 @@ function TarotResults({
                 className="btn-ghost px-3 py-1.5 text-xs disabled:cursor-default disabled:opacity-40"
               >
                 <Icon name="sparkle" size={14} />
-                {allRevealed ? '已全部翻开' : '翻开全部'}
+                {allRevealed ? t('已全部翻开') : t('翻开全部')}
               </button>
             }
           >
@@ -169,7 +172,7 @@ function TarotResults({
               onCardSelect={onCardSelect}
             />
             <p className="mt-1 text-center text-xs text-ink-muted">
-              点选任意牌张即可翻开并展开详解；逆位牌以颠倒方向呈现。
+              {t('点选任意牌张即可翻开并展开详解；逆位牌以颠倒方向呈现。')}
             </p>
           </ResultCard>
         </div>

@@ -374,6 +374,71 @@ const zhHant: MessageDict = {
   '经度：': '經度：',
   '真太阳时 {{tst}}（校正 {{offset}} 分）': '真太陽時 {{tst}}（校正 {{offset}} 分）',
   '未校正（标准时直排）': '未校正（標準時直排）',
+
+  // --- Phase 2.3 · Tarot / Lenormand / PlumBlossom / Zhouyi page chrome ---
+  // Tarot
+  '正在洗牌布阵…': '正在洗牌布陣…',
+  已全部翻开: '已全部翻開',
+  翻开全部: '翻開全部',
+  '点选任意牌张即可翻开并展开详解；逆位牌以颠倒方向呈现。':
+    '點選任意牌張即可翻開並展開詳解；逆位牌以顛倒方向呈現。',
+  牌阵盘面: '牌陣盤面',
+  牌义详解: '牌義詳解',
+  围绕你选择的主题: '圍繞你選擇的主題',
+  综合解读: '綜合解讀',
+
+  // Lenormand
+  '正在洗牌抽牌，铺陈牌阵…': '正在洗牌抽牌，鋪陳牌陣…',
+  '第 {{n}} 位 ·': '第 {{n}} 位 ·',
+  张: '張',
+  所问之事: '所問之事',
+  '点击牌阵中任意一张牌，查看其完整牌义。':
+    '點擊牌陣中任意一張牌，檢視其完整牌義。',
+  核心牌义: '核心牌義',
+  '名词核心：': '名詞核心：',
+  '；作后牌修饰前牌时：': '；作後牌修飾前牌時：',
+  牌阵布局: '牌陣布局',
+  组合直读透镜: '組合直讀透鏡',
+  综合判读: '綜合判讀',
+
+  // PlumBlossom
+  '正在起卦，推演体用互变…': '正在起卦，推演體用互變…',
+  '本卦 → 变卦 · PRIMARY TO CHANGED': '本卦 → 變卦 · PRIMARY TO CHANGED',
+  '起卦推演 · DERIVATION': '起卦推演 · DERIVATION',
+  所占之事: '所占之事',
+  起卦时刻: '起卦時刻',
+  月令卦气: '月令卦氣',
+  当令: '當令',
+  体卦: '體卦',
+  用卦: '用卦',
+  '互卦 · 事之中段': '互卦 · 事之中段',
+  '变卦 · 事之归宿': '變卦 · 事之歸宿',
+  卦象三盘: '卦象三盤',
+  体用生克: '體用生剋',
+  吉凶指数: '吉凶指數',
+  互变推演: '互變推演',
+
+  // Zhouyi
+  '正在起卦排盘，推演纳甲六亲…': '正在起卦排盤，推演納甲六親…',
+  整卦白话: '整卦白話',
+  纳甲六亲盘: '納甲六親盤',
+  起卦记录: '起卦記錄',
+  变卦: '變卦',
+  '本卦动爻阴阳互变得变卦，示事之趋向。':
+    '本卦動爻陰陽互變得變卦，示事之趨向。',
+  '六爻安静，本卦无动爻，故无变卦。占断以本卦卦辞与世应为主。':
+    '六爻安靜，本卦無動爻，故無變卦。占斷以本卦卦辭與世應為主。',
+  互卦: '互卦',
+  '取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。':
+    '取本卦二三四爻為下卦、三四五爻為上卦，得互卦，示事之中段。',
+  卦爻辞: '卦爻辭',
+  '六爻安静 · 无变卦': '六爻安靜 · 無變卦',
+  '{{count}} 爻动': '{{count}} 爻動',
+  日柱: '日柱',
+  本卦宫: '本卦宮',
+  动爻: '動爻',
+  无: '無',
+  动: '動',
 };
 
 const en: MessageDict = {
@@ -731,6 +796,71 @@ const en: MessageDict = {
   '经度：': 'Longitude:',
   '真太阳时 {{tst}}（校正 {{offset}} 分）': 'True solar time {{tst}} (offset {{offset}} min)',
   '未校正（标准时直排）': 'Uncorrected (standard time)',
+
+  // --- Phase 2.3 · Tarot / Lenormand / PlumBlossom / Zhouyi page chrome ---
+  // Tarot
+  '正在洗牌布阵…': 'Shuffling and laying out the spread…',
+  已全部翻开: 'All revealed',
+  翻开全部: 'Reveal all',
+  '点选任意牌张即可翻开并展开详解；逆位牌以颠倒方向呈现。':
+    'Click any card to flip it face-up and open its full reading; reversed cards render upside-down.',
+  牌阵盘面: 'Spread Board',
+  牌义详解: 'Card Meanings',
+  围绕你选择的主题: 'On Your Chosen Topic',
+  综合解读: 'Integrated Reading',
+
+  // Lenormand
+  '正在洗牌抽牌，铺陈牌阵…': 'Shuffling and drawing cards, laying out the spread…',
+  '第 {{n}} 位 ·': 'Position {{n}} ·',
+  张: 'cards',
+  所问之事: 'The question',
+  '点击牌阵中任意一张牌，查看其完整牌义。':
+    'Click any card in the spread to see its full meaning.',
+  核心牌义: 'Core meaning',
+  '名词核心：': 'Noun core:',
+  '；作后牌修饰前牌时：': '; as a following card it modifies the previous one:',
+  牌阵布局: 'Spread Layout',
+  组合直读透镜: 'Pair-Reading Lens',
+  综合判读: 'Synthesis',
+
+  // PlumBlossom
+  '正在起卦，推演体用互变…': 'Casting the hexagram and deriving ti/yong/hu/bian…',
+  '本卦 → 变卦 · PRIMARY TO CHANGED': 'Primary → Changed hexagram',
+  '起卦推演 · DERIVATION': 'Cast derivation',
+  所占之事: 'The question',
+  起卦时刻: 'Cast time',
+  月令卦气: 'Seasonal qi',
+  当令: 'in command',
+  体卦: 'Ti (Body) hexagram',
+  用卦: 'Yong (Function) hexagram',
+  '互卦 · 事之中段': 'Hu hexagram · middle of the matter',
+  '变卦 · 事之归宿': 'Changed hexagram · where the matter settles',
+  卦象三盘: 'Three-hexagram boards',
+  体用生克: 'Ti-Yong Generation/Restraint',
+  吉凶指数: 'Fortune Index',
+  互变推演: 'Hu & Bian Derivation',
+
+  // Zhouyi
+  '正在起卦排盘，推演纳甲六亲…': 'Casting and arranging najia & six relations…',
+  整卦白话: 'Whole-hexagram Plain Read',
+  纳甲六亲盘: 'Najia & Six-Relations Board',
+  起卦记录: 'Cast Ledger',
+  变卦: 'Changed Hexagram',
+  '本卦动爻阴阳互变得变卦，示事之趋向。':
+    'Yin/yang inversion of the moving lines in the primary hexagram yields the changed hexagram — where the matter leans.',
+  '六爻安静，本卦无动爻，故无变卦。占断以本卦卦辞与世应为主。':
+    'All six lines are still — no moving line, so no changed hexagram. Base the read on the primary hexagram\'s statement and shi/ying.',
+  互卦: 'Mutual Hexagram',
+  '取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。':
+    'Take lines 2-3-4 as the lower trigram and 3-4-5 as the upper — this yields the hu hexagram, the middle of the matter.',
+  卦爻辞: 'Hexagram & Line Statements',
+  '六爻安静 · 无变卦': 'All lines still · no changed hexagram',
+  '{{count}} 爻动': '{{count}} moving lines',
+  日柱: 'Day pillar',
+  本卦宫: 'Primary palace',
+  动爻: 'Moving lines',
+  无: 'None',
+  动: ' moving',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {
