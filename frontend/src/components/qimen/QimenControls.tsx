@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
 import { ChineseDateTimeField } from '../ui/DateTimeFieldCombined';
+import { useI18n } from '../../i18n/context';
 
 interface QimenControlsProps {
   /** Optional divination question (占问事项, free text). */
@@ -33,6 +34,7 @@ export function QimenControls({
   pending,
   onSubmit,
 }: QimenControlsProps) {
+  const { t } = useI18n();
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending) {
@@ -50,40 +52,40 @@ export function QimenControls({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">奇门遁甲</h1>
+              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{t('奇门遁甲')}</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                qimen-luoshu · 时家转盘
+                {t('qimen-luoshu · 时家转盘')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              帝王之术，以用事时辰定阴阳遁与局数，布三奇六仪地盘，转天盘九星、人盘八门、神盘八神入洛书九宫，定值符值使，察旬空驿马，谋定决策之时空场。起局纯为确定性推算，同时必得同盘。
+              {t('帝王之术，以用事时辰定阴阳遁与局数，布三奇六仪地盘，转天盘九星、人盘八门、神盘八神入洛书九宫，定值符值使，察旬空驿马，谋定决策之时空场。起局纯为确定性推算，同时必得同盘。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending}>
           <Icon name="gauge" size={18} />
-          {pending ? '起局排盘中…' : '起局 · 排九宫'}
+          {pending ? t('起局排盘中…') : t('起局 · 排九宫')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <LabeledField label="占问事项 / QUESTION" hint={<span className="text-ink-muted">可选</span>}>
+        <LabeledField label="占问事项 / QUESTION" hint={<span className="text-ink-muted">{t('可选')}</span>}>
           <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <Icon name="seal" size={16} className="shrink-0 text-ink-muted" />
             <input
               type="text"
               value={question}
               onChange={(event) => onQuestionChange(event.target.value)}
-              title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
-                placeholder="例如：此行洽谈可否成事？"
+              title={t('问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。')}
+                placeholder={t('例如：此行洽谈可否成事？')}
               className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-              aria-label="占问事项"
+              aria-label={t('占问事项')}
             />
           </div>
-        <p className="text-xs leading-relaxed text-ink-muted">问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。</p>
+        <p className="text-xs leading-relaxed text-ink-muted">{t('问题文字只用于记录关注点；解读来自盘面规则，请结合真实情境核对。')}</p>
           </LabeledField>
 
-        <LabeledField label="用事时刻 / CAST TIME" hint={<span className="text-ink-muted">留空取当前</span>}>
+        <LabeledField label="用事时刻 / CAST TIME" hint={<span className="text-ink-muted">{t('留空取当前')}</span>}>
           <ChineseDateTimeField value={castTime} onChange={onCastTimeChange} ariaLabel="用事" />
         </LabeledField>
       </div>
@@ -91,7 +93,7 @@ export function QimenControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          年月日时干支与节气由权威历法真实推算；九星八门八神、局数歌诀取自策展奇门数据，未作运行时虚构。时辰径取钟点，未校正真太阳时。
+          {t('年月日时干支与节气由权威历法真实推算；九星八门八神、局数歌诀取自策展奇门数据，未作运行时虚构。时辰径取钟点，未校正真太阳时。')}
         </span>
       </div>
     </form>

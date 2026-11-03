@@ -1,5 +1,6 @@
 import type { QimenChart, QimenPalace } from '../../types/qimen';
 import { elementDot, elementText, ganText, luckText, palacePlacement } from '../../lib/qimen';
+import { useI18n } from '../../i18n/context';
 
 /**
  * The 洛书九宫 board — a 3×3 grid laid 南上北下, each cell carrying the four plates
@@ -22,6 +23,7 @@ export function QimenBoard({ chart }: { chart: QimenChart }) {
 
 /** One 洛书宫 cell, positioned on the grid by its 0-based row/col. */
 function PalaceCell({ palace }: { palace: QimenPalace }) {
+  const { t } = useI18n();
   const style = palacePlacement(palace.row, palace.col);
 
   if (palace.is_center) {
@@ -30,14 +32,14 @@ function PalaceCell({ palace }: { palace: QimenPalace }) {
         style={style}
         className="flex min-h-[132px] flex-col items-center justify-center gap-1.5 rounded-card border border-rim-soft bg-[#0d1017] p-2 text-center sm:min-h-[168px] sm:p-3"
       >
-        <span className="label-caps text-ink-muted">中五宫 · 土</span>
+        <span className="label-caps text-ink-muted">{t('中五宫 · 土')}</span>
         <span className={`font-display text-3xl leading-none sm:text-4xl ${ganText(palace.dipan_gan)}`}>
           {palace.dipan_gan}
         </span>
         <span className="text-[10px] leading-snug text-ink-muted sm:text-[11px]">
-          天禽星与中宫地盘干
+          {t('天禽星与中宫地盘干')}
           <br />
-          寄坤二宫
+          {t('寄坤二宫')}
         </span>
       </div>
     );
@@ -133,28 +135,29 @@ function PalaceCell({ palace }: { palace: QimenPalace }) {
 
 /** Colour / mark key so the board reads without guesswork. */
 function BoardLegend() {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-element border border-rim-soft bg-surface px-3 py-2 text-[11px] text-ink-muted">
       <span className="flex items-center gap-1.5">
-        <span className="font-display text-sm text-gold-bright">乙丙丁</span>三奇（金）
+        <span className="font-display text-sm text-gold-bright">乙丙丁</span>{t('三奇（金）')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="font-display text-sm text-ink-variant">戊己庚辛壬癸</span>六仪
+        <span className="font-display text-sm text-ink-variant">戊己庚辛壬癸</span>{t('六仪')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-gold/20 px-1 text-gold-bright">符</span>值符星落宫
+        <span className="rounded bg-gold/20 px-1 text-gold-bright">符</span>{t('值符星落宫')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-astral/20 px-1 text-astral">使</span>值使门落宫
+        <span className="rounded bg-astral/20 px-1 text-astral">使</span>{t('值使门落宫')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-surface-raised px-1">空</span>旬空
+        <span className="rounded bg-surface-raised px-1">空</span>{t('旬空')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="rounded bg-wuxing-wood/20 px-1 text-wuxing-wood">马</span>驿马
+        <span className="rounded bg-wuxing-wood/20 px-1 text-wuxing-wood">马</span>{t('驿马')}
       </span>
       <span className="flex items-center gap-1.5">
-        上为天盘干、下为地盘干，色点标五行
+        {t('上为天盘干、下为地盘干，色点标五行')}
       </span>
     </div>
   );

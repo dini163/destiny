@@ -8,6 +8,7 @@ import {
   sihuaShort,
   starKindClass,
 } from '../../lib/ziwei';
+import { useI18n } from '../../i18n/context';
 
 interface ZiweiChartGridProps {
   /** The complete chart — twelve palaces plus the summary facts for the centre. */
@@ -40,6 +41,7 @@ export function ZiweiChartGrid({ chart }: ZiweiChartGridProps) {
 
 /** One 地支 palace cell: name + 大限 + 干支 header over its seated stars. */
 function PalaceCell({ palace, style }: { palace: Palace; style: CSSProperties }) {
+  const { t } = useI18n();
   return (
     <div
       style={style}
@@ -70,13 +72,13 @@ function PalaceCell({ palace, style }: { palace: Palace; style: CSSProperties })
           <StarChip key={star.name} star={star} />
         ))}
         {palace.stars.length === 0 ? (
-          <span className="text-[11px] text-ink-muted">（无主星·借对宫）</span>
+          <span className="text-[11px] text-ink-muted">{t('（无主星·借对宫）')}</span>
         ) : null}
       </div>
 
       <div className="flex items-baseline justify-between gap-1 border-t border-rim-soft pt-1">
         <span className="font-display text-xs text-gold-soft">{palace.ganzhi}</span>
-        <span className="text-[10px] text-ink-muted">{palace.zhi}宫</span>
+        <span className="text-[10px] text-ink-muted">{palace.zhi}{t('宫')}</span>
       </div>
     </div>
   );
@@ -100,25 +102,26 @@ function StarChip({ star }: { star: StarPlacement }) {
 
 /** The centre 2×2 summary block of the 命盘. */
 function ChartCenter({ chart }: { chart: ZiweiChart }) {
+  const { t } = useI18n();
   const { sihua } = chart;
   return (
     <div
       style={CENTER_STYLE}
       className="flex flex-col items-center justify-center gap-2 rounded-card border border-rim-strong bg-[var(--field-bg)] p-3 text-center"
     >
-      <span className="label-caps text-gold">紫微斗数命盘</span>
+      <span className="label-caps text-gold">{t('紫微斗数命盘')}</span>
       <div className="flex flex-col gap-0.5">
         <span className="font-display text-lg font-semibold text-gold-bright">{chart.wuxing_ju}</span>
         <span className="text-[11px] text-ink-muted">
-          命宫 {chart.ming_gong_ganzhi} · {chart.ming_gong_nayin}
+          {t('命宫 {{gz}} · {{ny}}', { gz: chart.ming_gong_ganzhi, ny: chart.ming_gong_nayin })}
         </span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-[11px] text-ink-variant">
         <span>
-          命主 <span className="text-gold-soft">{chart.ming_zhu}</span>
+          {t('命主')} <span className="text-gold-soft">{chart.ming_zhu}</span>
         </span>
         <span>
-          身主 <span className="text-gold-soft">{chart.shen_zhu}</span>
+          {t('身主')} <span className="text-gold-soft">{chart.shen_zhu}</span>
         </span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-1">
@@ -128,7 +131,7 @@ function ChartCenter({ chart }: { chart: ZiweiChart }) {
         <SiHuaBadge label="忌" star={sihua.ji} sihua="化忌" />
       </div>
       <span className="numeric text-[10px] text-ink-muted">
-        {chart.lunar_year_ganzhi}年 · {chart.dayun_direction} · {chart.dayun_start_age}岁起运
+        {t('{{gz}}年 · {{dir}} · {{age}}岁起运', { gz: chart.lunar_year_ganzhi, dir: chart.dayun_direction, age: chart.dayun_start_age })}
       </span>
     </div>
   );
