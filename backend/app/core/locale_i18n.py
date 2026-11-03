@@ -88,6 +88,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "太阴": "太陰",
         "罗睺": "羅睺",
         "计都": "計都",
+        # 六神 / 六亲（zhouyi liushen、liuqin 叶值）：仅登记字形有差者。
+        "青龙": "青龍",
+        "勾陈": "勾陳",
+        "子孙": "子孫",
+        "妻财": "妻財",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -190,6 +195,19 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "土星": "Saturn",
         "罗睺": "Rahu",
         "计都": "Ketu",
+        # 六神（liushen 叶值，与 `content/zhouyi_najia.LIUSHEN_ORDER` 同源）。
+        "青龙": "Azure Dragon",
+        "朱雀": "Vermilion Bird",
+        "勾陈": "Hook Serpent",
+        "螣蛇": "Flying Serpent",
+        "白虎": "White Tiger",
+        "玄武": "Black Tortoise",
+        # 六亲（liuqin 叶值；紫微十二宫中的父母/兄弟同词同义，共用）。
+        "父母": "Parents",
+        "兄弟": "Siblings",
+        "子孙": "Offspring",
+        "妻财": "Wealth",
+        "官鬼": "Officers",
     },
 }
 

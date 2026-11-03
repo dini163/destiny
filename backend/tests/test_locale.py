@@ -166,3 +166,32 @@ def test_graha_and_trigram_display_names_localize_only_when_requested() -> None:
     pure_natures = trigram_natures - element_zh
     for token in [s for s in zd if s in pure_natures]:
         assert token not in ze, f"en 未替换卦象叶值 {token}"
+
+
+def test_najia_six_spirits_and_six_relatives_localize() -> None:
+    # p15-c：纳甲六神（liushen）与六亲（liuqin）叶值只在请求时替换，默认透传。
+    from app.content.zhouyi_najia import LIUSHEN_ORDER
+    from app.engines.zhouyi import (
+        _LIUQIN_BROTHER,
+        _LIUQIN_OFFICER,
+        _LIUQIN_OFFSPRING,
+        _LIUQIN_PARENT,
+        _LIUQIN_WEALTH,
+    )
+
+    liushen = set(LIUSHEN_ORDER)
+    liuqin = {_LIUQIN_PARENT, _LIUQIN_BROTHER, _LIUQIN_OFFSPRING, _LIUQIN_WEALTH, _LIUQIN_OFFICER}
+
+    with TestClient(app) as client:
+        d = client.post("/api/v1/zhouyi/cast", json=_ZHOUYI_CAST)
+        e = client.post("/api/v1/zhouyi/cast?locale=en", json=_ZHOUYI_CAST)
+    assert d.status_code == e.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = [s for s in dl if s in liushen | liuqin]
+    assert present, "zhouyi 应至少落一个六神/六亲叶值"
+    assert any(s in liushen for s in present), "应含六神叶值"
+    assert any(s in liuqin for s in present), "应含六亲叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换六神/六亲叶值 {token}"
