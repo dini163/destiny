@@ -47,6 +47,8 @@ _ZHOUYI_CAST = {
 
 _QIMEN_CAST = {"cast_time": "2024-05-15T10:30:00"}
 
+_RUNES_CAST = {"spread_id": "three"}
+
 
 def _walk_strings(value: object) -> list[str]:
     out: list[str] = []
@@ -262,3 +264,22 @@ def test_qimen_stars_doors_directions_localize() -> None:
     # 八门含“门”字形差，zh-Hant 下也要被换掉。
     for token in [s for s in set(present) if s in LABELS["zh-Hant"]]:
         assert token not in hl, f"zh-Hant 未替换星/门叶值 {token}"
+
+
+def test_rune_names_localize_only_when_requested() -> None:
+    # p15-g：卢恩符文名（name_zh 叶值）在 en 下换为牌组拉丁名，默认透传。
+    # 抽牌随机，故只断言“落盘的符文名均被替换”，不假定具体牌。
+    from app.content.rune_futhark import DECK_25
+
+    rune_zh = {r.name_zh for r in DECK_25}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/runes/cast", json=_RUNES_CAST)
+        e = client.post("/api/v1/runes/cast?locale=en", json=_RUNES_CAST)
+    assert d.status_code == e.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = [s for s in dl if s in rune_zh]
+    assert present, "runes 落宫应至少一个符文名叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换符文名 {token}"

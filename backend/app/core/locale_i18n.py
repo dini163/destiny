@@ -259,6 +259,15 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "中": "Center", "中宫": "Center Palace",
         # 奇门吉凶档（luck 叶值；吉/凶沿用结论档位）。
         "中平": "Balanced",
+        # 卢恩符文名（rune name_zh 叶值，与 `content/rune_futhark.DECK_25` 同源）：
+        # 系音译专名，无权威繁体写法，zh-Hant 回落源简体；en 取牌组自带的拉丁名。
+        "费胡": "Fehu", "乌鲁兹": "Uruz", "图里萨兹": "Thurisaz", "安苏兹": "Ansuz",
+        "莱多": "Raido", "肯纳兹": "Kenaz", "盖博": "Gebo", "温乔": "Wunjo",
+        "哈加拉兹": "Hagalaz", "瑙提兹": "Nauthiz", "伊萨": "Isa", "杰拉": "Jera",
+        "艾赫瓦兹": "Eihwaz", "佩尔索": "Perthro", "阿尔吉兹": "Algiz", "索维洛": "Sowilo",
+        "提瓦兹": "Tiwaz", "贝尔卡纳": "Berkana", "埃瓦兹": "Ehwaz", "曼纳兹": "Mannaz",
+        "拉古兹": "Laguz", "英瓦兹": "Ingwaz", "达加兹": "Dagaz", "欧瑟拉": "Othala",
+        "空白符": "Wyrd",
     },
 }
 
