@@ -361,7 +361,19 @@ const zhHant: MessageDict = {
   命宫: '命宮',
   胎元: '胎元',
   参照日: '參照日',
-  农历用: '農曆',
+
+  // ReportEntryBar internals (parameterised; pages pass source `productName` verbatim)
+  '本盘已排定，可进一步生成《{{productName}}》——按问题组织的深度解读报告。':
+    '本盤已排定，可進一步生成《{{productName}}》——按問題組織的深度解讀報告。',
+  生成报告: '生成報告',
+
+  // BaziNatal · ChartSummary inline heading + colon labels + tst variants
+  '四柱命造 · FOUR PILLARS': '四柱命造 · FOUR PILLARS',
+  '农历：': '農曆：',
+  '标准时：': '標準時：',
+  '经度：': '經度：',
+  '真太阳时 {{tst}}（校正 {{offset}} 分）': '真太陽時 {{tst}}（校正 {{offset}} 分）',
+  '未校正（标准时直排）': '未校正（標準時直排）',
 };
 
 const en: MessageDict = {
@@ -706,6 +718,19 @@ const en: MessageDict = {
   命宫: 'Life Palace',
   胎元: 'Conception Pillar',
   参照日: 'Reference date',
+
+  // ReportEntryBar internals
+  '本盘已排定，可进一步生成《{{productName}}》——按问题组织的深度解读报告。':
+    'This chart is cast — generate the “{{productName}}” for a question-organised in-depth read.',
+  生成报告: 'Generate the report',
+
+  // BaziNatal · ChartSummary heading + colon labels + tst variants
+  '四柱命造 · FOUR PILLARS': 'FOUR PILLARS',
+  '农历：': 'Lunar:',
+  '标准时：': 'Standard:',
+  '经度：': 'Longitude:',
+  '真太阳时 {{tst}}（校正 {{offset}} 分）': 'True solar time {{tst}} (offset {{offset}} min)',
+  '未校正（标准时直排）': 'Uncorrected (standard time)',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

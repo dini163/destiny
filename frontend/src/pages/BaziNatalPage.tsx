@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../i18n/context';
 import { DayunTimeline } from '../components/bazi/DayunTimeline';
 import { DimensionGrid } from '../components/bazi/DimensionGrid';
 import { GeJuCard } from '../components/bazi/GeJuCard';
@@ -45,6 +46,7 @@ import type { Gender } from '../types/common';
  * 2026-10-21 UI requirement (the backend `provenance` payload stays untouched).
  */
 export function BaziNatalPage() {
+  const { t } = useI18n();
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
   const [name, setName] = useState('');
@@ -118,7 +120,7 @@ export function BaziNatalPage() {
             value={name}
             onChange={(event) => setName(event.target.value)}
             maxLength={40}
-            placeholder="如：示例命主"
+            placeholder={t('如：示例命主')}
             className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
           />
         </LabeledField>
@@ -129,7 +131,7 @@ export function BaziNatalPage() {
             onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
             className="h-4 w-4 accent-[#d4af37]"
           />
-          真太阳时校正（推荐）
+          {t('真太阳时校正（推荐）')}
         </label>
       </InputBar>
 
@@ -141,7 +143,7 @@ export function BaziNatalPage() {
       ) : null}
 
       {bazi.isPending && !bazi.data ? (
-        <p className="label-caps text-ink-muted">正在依据真太阳时排定四柱…</p>
+        <p className="label-caps text-ink-muted">{t('正在依据真太阳时排定四柱…')}</p>
       ) : null}
 
       {bazi.data ? (
@@ -182,6 +184,7 @@ function sectionsFor(
   chart: BaziChart,
   transitHref: string | null,
   hehunHref: string | null,
+  translate: (key: string) => string,
 ): SectionSpec[] {
   const ledger = chart.hidden_stem_ledger ?? [];
   const relations = chart.relations ?? [];
@@ -281,13 +284,13 @@ function sectionsFor(
           {transitHref ? (
             <Link to={transitHref} className="btn-ghost self-start">
               <Icon name="timeline" size={16} />
-              推演此造岁运流年
+              {translate('推演此造岁运流年')}
             </Link>
           ) : null}
           {hehunHref ? (
             <Link to={hehunHref} className="btn-ghost self-start">
               <Icon name="compass" size={16} />
-              以此造合婚
+              {translate('以此造合婚')}
             </Link>
           ) : null}
           {chart.dayun_current ? <CurrentDayun detail={chart.dayun_current} /> : null}
@@ -318,14 +321,15 @@ function BaziResults({
   transitHref: string | null;
   hehunHref: string | null;
 }) {
-  const sections = sectionsFor(chart, transitHref, hehunHref);
+  const { t } = useI18n();
+  const sections = sectionsFor(chart, transitHref, hehunHref, t);
 
   return (
     <>
       <ChartSummary chart={chart} />
 
       <nav
-        aria-label="命盘分区"
+        aria-label={t('命盘分区')}
         className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-rim bg-void/85 py-2 backdrop-blur"
       >
         {sections.map((section) => (
@@ -334,7 +338,7 @@ function BaziResults({
             href={`#${section.id}`}
             className="label-caps text-ink-muted hover:text-gold-soft"
           >
-            {section.label}
+            {t(section.label)}
           </a>
         ))}
       </nav>
@@ -358,18 +362,19 @@ function BaziResults({
 
 /** 当前大运与命局的伏吟/反吟（`dayun_current`，只有关系，不含神煞）。 */
 function CurrentDayun({ detail }: { detail: DayunDetail }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2 rounded-element border border-rim bg-[var(--field-bg)] p-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="label-caps text-gold-soft">当前大运 · {detail.ganzhi}</span>
+        <span className="label-caps text-gold-soft">{t('当前大运 ·')} {detail.ganzhi}</span>
         <span className="numeric text-xs text-ink-muted">
-          {detail.start_age}—{detail.end_age} 岁
+          {detail.start_age}—{detail.end_age} {t('岁')}
         </span>
       </div>
       {detail.relations.length > 0 ? (
         <RelationChips relations={detail.relations} groups={[]} />
       ) : (
-        <p className="text-xs text-ink-muted">此运与四柱之间未构成伏吟或反吟。</p>
+        <p className="text-xs text-ink-muted">{t('此运与四柱之间未构成伏吟或反吟。')}</p>
       )}
     </div>
   );
@@ -377,17 +382,21 @@ function CurrentDayun({ detail }: { detail: DayunDetail }) {
 
 /** Headline strip: the four pillars plus the chart's key natal attributes. */
 function ChartSummary({ chart }: { chart: BaziChart }) {
+  const { t } = useI18n();
   const tst =
     chart.tst_applied && chart.true_solar_time
-      ? `真太阳时 ${chart.true_solar_time}（校正 ${chart.tst_offset_minutes?.toFixed(1) ?? '0'} 分）`
-      : '未校正（标准时直排）';
+      ? t('真太阳时 {{tst}}（校正 {{offset}} 分）', {
+          tst: chart.true_solar_time,
+          offset: chart.tst_offset_minutes?.toFixed(1) ?? '0',
+        })
+      : t('未校正（标准时直排）');
 
   return (
     <div className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           {chart.name ? <span className="text-sm text-ink-variant">{chart.name}</span> : null}
-          <span className="label-caps">四柱命造 · FOUR PILLARS</span>
+          <span className="label-caps">{t('四柱命造 · FOUR PILLARS')}</span>
           <span className="font-display text-3xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-4xl">
             {chart.four_pillars}
           </span>
@@ -405,14 +414,14 @@ function ChartSummary({ chart }: { chart: BaziChart }) {
       <div className="gold-rule" />
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-variant">
         <span>
-          农历：<span className="text-ink">{chart.lunar_date}</span>
+          {t('农历：')}<span className="text-ink">{chart.lunar_date}</span>
         </span>
         <span>
-          标准时：<span className="numeric text-ink">{chart.standard_datetime}</span>
+          {t('标准时：')}<span className="numeric text-ink">{chart.standard_datetime}</span>
         </span>
         <span className="text-gold-soft">{tst}</span>
         <span>
-          经度：<span className="numeric text-ink">{chart.longitude.toFixed(2)}°</span>
+          {t('经度：')}<span className="numeric text-ink">{chart.longitude.toFixed(2)}°</span>
         </span>
       </div>
     </div>
@@ -421,9 +430,10 @@ function ChartSummary({ chart }: { chart: BaziChart }) {
 
 /** A compact label/value chip used in the summary header. */
 function Chip({ label, value }: { label: string; value: string }) {
+  const { t } = useI18n();
   return (
     <span className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1 text-xs">
-      <span className="label-caps">{label}</span>
+      <span className="label-caps">{t(label)}</span>
       <span className="text-ink">{value}</span>
     </span>
   );
