@@ -654,3 +654,31 @@ def test_zhouyi_yao_position_names_localize() -> None:
     assert localize("九五", "en") == "Fifth Line (Yang)"
     assert localize("上九", "en") == "Top Line (Yang)"
     assert localize("九二", "zh-Hant") == "九二"
+
+
+def test_solar_terms_localize() -> None:
+    # p15：二十四节气叶值在 en 下替换；字形有差者（惊/蛰/种/满/处）zh-Hant 转形，余透传。
+    import app.content.qimen as Q
+
+    terms = set(Q.YANG_JU) | set(Q.YIN_JU)
+    assert len(terms) == 24
+    with TestClient(app) as client:
+        d = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        e = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+        h = client.post("/api/v1/qimen/chart?locale=zh-Hant", json=_QIMEN_CAST)
+    assert d.status_code == e.status_code == h.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = {s for s in dl if s in terms}
+    assert present, "qimen 应至少落一个节气叶值"
+    for token in present:
+        assert token not in el, f"en 未替换节气 {token}"
+    # 直接单测：全族取到预期英译；繁简同形者 zh-Hant 透传，字形有差者转形。
+    assert localize("立春", "en") == "Start of Spring"
+    assert localize("惊蛰", "en") == "Awakening of Insects"
+    assert localize("大寒", "en") == "Major Cold"
+    assert localize("立春", "zh-Hant") == "立春"
+    assert localize("惊蛰", "zh-Hant") == "驚蟄"
+    assert localize("芒种", "zh-Hant") == "芒種"
+    assert localize("处暑", "zh-Hant") == "處暑"

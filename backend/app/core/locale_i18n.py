@@ -190,6 +190,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "恃势之刑": "恃勢之刑", "无恩之刑": "無恩之刑", "无礼之刑": "無禮之刑",
         # 八字结构化标签繁体（与上同源）：仅登记字形有差者。
         "通关": "通關", "调候": "調候", "紧临": "緊臨", "远位": "遠位", "滞": "滯", "基准分": "基準分",
+        # 二十四节气繁体（与上同源）：仅登记字形有差者（惊/蛰/种/满/处转形）。
+        "处暑": "處暑", "小满": "小滿", "惊蛰": "驚蟄", "芒种": "芒種",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -541,6 +543,13 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "六二": "Second Line (Yin)", "九三": "Third Line (Yang)", "六三": "Third Line (Yin)",
         "九四": "Fourth Line (Yang)", "六四": "Fourth Line (Yin)", "九五": "Fifth Line (Yang)",
         "六五": "Fifth Line (Yin)", "上九": "Top Line (Yang)", "上六": "Top Line (Yin)",
+        # 二十四节气（`content/qimen.YANG_JU`+`YIN_JU` keys）：历法权威词，跨奇门/岁运/节气月出现。
+        "冬至": "Winter Solstice", "处暑": "End of Heat", "夏至": "Summer Solstice", "大寒": "Major Cold",
+        "大暑": "Major Heat", "大雪": "Major Snow", "寒露": "Cold Dew", "小寒": "Minor Cold",
+        "小暑": "Minor Heat", "小满": "Grain Full", "小雪": "Minor Snow", "惊蛰": "Awakening of Insects",
+        "春分": "Spring Equinox", "清明": "Clear and Bright", "白露": "White Dew", "秋分": "Autumn Equinox",
+        "立冬": "Start of Winter", "立夏": "Start of Summer", "立春": "Start of Spring", "立秋": "Start of Autumn",
+        "芒种": "Grain in Ear", "谷雨": "Grain Rain", "雨水": "Rain Water", "霜降": "Frost's Descent",
     },
 }
 
