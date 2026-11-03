@@ -170,7 +170,7 @@ export function InputBar({
               存入档案
             </button>
           ) : null}
-          <button type="submit" className="btn-primary shrink-0" disabled={!ready || pending}>
+          <button type="submit" className="btn-primary hidden shrink-0 sm:flex" disabled={!ready || pending}>
             <Icon name="sparkle" size={18} />
             {submitLabel}
           </button>
@@ -223,6 +223,12 @@ export function InputBar({
             : '填写出生日期、时间并完成定位后即可排盘。'}
         </p>
       ) : null}
+
+      {/* The header action row stacks above the fields on small screens, so repeat the primary submit at the end of the form; a mobile user finishes the last field and submits without scrolling back up. */}
+      <button type="submit" className="btn-primary mt-1 w-full sm:hidden" disabled={!ready || pending}>
+        <Icon name="sparkle" size={18} />
+        {submitLabel}
+      </button>
     </form>
   );
 }
