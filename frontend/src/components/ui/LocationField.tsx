@@ -81,7 +81,8 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <div ref={boxRef} className="relative">
-        <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
+        {/* A <label> makes the entire 44px row — icon and trailing affordance included — a single tap target that focuses the input; a bare input would only be tappable across its ~20px text line. */}
+        <label className="flex min-h-11 items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 transition focus-within:border-rim-strong">
           <Icon name="pin" size={16} className="shrink-0 text-gold" />
           <input
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
@@ -107,7 +108,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
           ) : (
             <Icon name="search" size={16} className="shrink-0 text-ink-muted" />
           )}
-        </div>
+        </label>
 
         {searching && results.length > 0 ? (
           <ul className="absolute z-20 mt-1 max-h-56 w-full overflow-auto rounded-element border border-rim bg-surface-raised/95 py-1 shadow-xl backdrop-blur-xl">
@@ -148,7 +149,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 transition focus-within:border-rim-strong">
+        <label className="flex min-h-11 items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 transition focus-within:border-rim-strong">
           <span className="label-caps shrink-0">纬度</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
@@ -163,7 +164,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
             aria-label="纬度"
           />
         </label>
-        <label className="flex items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 py-1.5 transition focus-within:border-rim-strong">
+        <label className="flex min-h-11 items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 transition focus-within:border-rim-strong">
           <span className="label-caps shrink-0">经度</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
