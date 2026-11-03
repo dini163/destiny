@@ -332,3 +332,43 @@ def test_tarot_and_lenormand_card_names_localize() -> None:
     assert len(lpresent) >= 30, f"grand_tableau 应落满雷诺曼牌名，实得 {len(lpresent)}"
     for token in lpresent:
         assert token not in lel, f"en 未替换雷诺曼牌名 {token}"
+
+
+def test_hexagram_names_palace_and_generation_localize() -> None:
+    # p15-i：六十四卦全名/短名、八宫宫名、八宫世次叶值在 en 下换为专名英译，默认透传。
+    # 用固定手动起卦，卦象/宫/世次叶值稳定落盘（不依赖随机）。
+    from app.content.zhouyi_hexagrams import GENERATION_NAMES, HEXAGRAMS, PALACES
+    from app.content.zhouyi_trigrams import TRIGRAM_BY_KEY
+
+    full_names = {h.full_name_zh for h in HEXAGRAMS}
+    short_names = {h.name_zh for h in HEXAGRAMS}
+    palace_names = {f"{TRIGRAM_BY_KEY[pkey].name_zh}宫" for pkey, _ in PALACES}
+    generations = set(GENERATION_NAMES)
+    atomic = full_names | palace_names | generations
+
+    payload = {
+        "method": "manual",
+        "manual_coins": [[3, 3, 2], [2, 2, 2], [3, 2, 3], [3, 3, 3], [2, 3, 2], [2, 2, 3]],
+        "cast_time": "2024-05-15T10:30:00",
+    }
+    with TestClient(app) as client:
+        d = client.post("/api/v1/zhouyi/cast", json=payload)
+        e = client.post("/api/v1/zhouyi/cast?locale=en", json=payload)
+    assert d.status_code == e.status_code == 200
+
+    body = d.json()
+    dl = _walk_strings(body)
+    el = _walk_strings(e.json())
+    # 本卦必带全名、宫名、世次三者，逐一断言在 en 下被换掉。
+    ben = body["ben"]
+    assert ben["full_name_zh"] in full_names
+    assert ben["palace_name_zh"] in palace_names
+    assert ben["generation"] in generations
+    present = [s for s in dl if s in atomic]
+    assert present, "zhouyi 应至少落一个卦名/宫名/世次叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换卦象专名 {token}"
+    # 短名（非八卦卦名的单/双字）也应被换掉；卦名乾坤等已入上表，同词同译。
+    non_trigram_shorts = {s for s in dl if s in short_names and s in LABELS["en"]}
+    for token in non_trigram_shorts:
+        assert token not in el, f"en 未替换卦短名 {token}"
