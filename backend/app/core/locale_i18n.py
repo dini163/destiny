@@ -188,6 +188,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         # 干支关系枚举繁体（与上同源）：仅登记字形有差者（六冲取沖，会/势/无/礼转形）。
         "三会": "三會", "地支六冲": "地支六沖", "天干相冲": "天干相沖",
         "恃势之刑": "恃勢之刑", "无恩之刑": "無恩之刑", "无礼之刑": "無禮之刑",
+        # 八字结构化标签繁体（与上同源）：仅登记字形有差者。
+        "通关": "通關", "调候": "調候", "紧临": "緊臨", "远位": "遠位", "滞": "滯", "基准分": "基準分",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -532,6 +534,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "地支六合": "Six Branch Combinations", "地支六害": "Six Branch Harms", "地支六破": "Six Branch Breaks",
         "天干五合": "Five Stem Combines", "天干相冲": "Stem Clashes", "恃势之刑": "Punishment by Power",
         "无恩之刑": "Ungrateful Punishment", "无礼之刑": "Discourteous Punishment", "自刑": "Self Punishment",
+        # 八字结构化标签：用神三法（bazi_yongshen）、柱距力量档（bazi_rules STRENGTH_BY_DISTANCE）、岁运档位（顺/滞，平 已在结论档）、评分基准行。
+        "扶抑": "Support-Suppress", "通关": "Mediation", "调候": "Climate Adjustment", "紧临": "Adjacent", "隔位": "Separated", "远位": "Distant", "顺": "Favorable", "滞": "Stagnant", "基准分": "Baseline Score",
     },
 }
 

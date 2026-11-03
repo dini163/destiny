@@ -601,3 +601,31 @@ def test_bazi_relation_enum_localize() -> None:
     assert localize("无恩之刑", "zh-Hant") == "無恩之刑"
     # 繁简同形的枚举回落源文。
     assert localize("三合", "zh-Hant") == "三合"
+
+
+def test_bazi_structured_labels_localize() -> None:
+    # p15：用神三法/柱距档/岁运档/基准行等结构化标签在 en・zh-Hant 下替换。
+    from app.engines.bazi_rules import FARTHEST, STRENGTH_BY_DISTANCE
+
+    tokens = (
+        {"扶抑", "通关", "调候", "顺", "滞", "基准分"}
+        | set(STRENGTH_BY_DISTANCE.values())
+        | {FARTHEST}
+    )
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in tokens}
+    assert present, "bazi 命局应至少落一个结构化标签叶值"
+    for token in present:
+        assert token not in el, f"en 未替换结构化标签 {token}"
+    # 直接单测：三法与档位、繁体转形取到预期译文。
+    assert localize("通关", "en") == "Mediation"
+    assert localize("紧临", "en") == "Adjacent"
+    assert localize("顺", "en") == "Favorable"
+    assert localize("通关", "zh-Hant") == "通關"
+    assert localize("滞", "zh-Hant") == "滯"
+    assert localize("基准分", "zh-Hant") == "基準分"
