@@ -1,5 +1,6 @@
 import type { DrawnCard } from '../../types/tarot';
 import { cardAccent, cardCornerLabel, orientationMeta } from '../../lib/tarot';
+import { useI18n } from '../../i18n/context';
 import { CardArt } from './CardArt';
 
 interface TarotCardProps {
@@ -29,6 +30,7 @@ interface TarotCardProps {
  * competes with the inner flip transition.
  */
 export function TarotCard({ card, revealed, selected, hint = false, onSelect }: TarotCardProps) {
+  const { t } = useI18n();
   const accent = cardAccent(card);
   const orientation = orientationMeta(card.orientation);
   const reversed = card.orientation === 'reversed';
@@ -38,7 +40,7 @@ export function TarotCard({ card, revealed, selected, hint = false, onSelect }: 
       type="button"
       onClick={onSelect}
       aria-pressed={revealed}
-      aria-label={`第 ${card.position_index + 1} 张 · ${card.position_label_zh}${revealed ? ` · ${card.name_zh} ${orientation.label}` : ' · 未翻开'}`}
+      aria-label={`${t('第 {{n}} 张', { n: card.position_index + 1 })} · ${card.position_label_zh}${revealed ? ` · ${card.name_zh} ${orientation.label}` : ` · ${t('未翻开')}`}`}
       className="group flex w-[128px] shrink-0 flex-col items-center gap-2 focus:outline-none sm:w-[160px]"
     >
       <div className="[perspective:1200px]">

@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { SPREAD_CATALOG } from '../../lib/tarot';
 import { Icon } from '../ui/Icon';
+import { useI18n } from '../../i18n/context';
 import { LabeledField } from '../ui/LabeledField';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
@@ -50,6 +51,7 @@ export function SpreadControls({
   pending,
   onSubmit,
 }: SpreadControlsProps) {
+  const { t } = useI18n();
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending) {
@@ -69,19 +71,19 @@ export function SpreadControls({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">塔罗秘仪神谕</h1>
+              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{t('塔罗秘仪神谕')}</h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                真随机洗牌
+                {t('真随机洗牌')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              78 张伟特系（Rider-Waite）大小阿卡纳，牌义取自主策展牌库。选定牌阵、凝神求问，即可布阵抽牌并逐张翻开。
+              {t('78 张伟特系（Rider-Waite）大小阿卡纳，牌义取自主策展牌库。选定牌阵、凝神求问，即可布阵抽牌并逐张翻开。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '洗牌布阵中…' : '洗牌 · 布阵 · 抽牌'}
+          {pending ? t('洗牌布阵中…') : t('洗牌 · 布阵 · 抽牌')}
         </button>
       </div>
 
@@ -109,7 +111,7 @@ export function SpreadControls({
                       {spread.name_zh}
                     </span>
                     <span className={`numeric shrink-0 text-xs ${active ? 'text-gold' : 'text-ink-muted'}`}>
-                      {spread.size} 张
+                      {t('{{n}} 张', { n: spread.size })}
                     </span>
                   </div>
                 </button>
@@ -119,24 +121,24 @@ export function SpreadControls({
         </LabeledField>
 
         <div className="flex flex-col gap-4 xl:col-span-4">
-          <LabeledField label="阅读主题"><select className="field" aria-label="阅读主题" value={readingTopic} onChange={event => onReadingTopicChange(event.target.value as ReadingTopic)}>
-            <option value="general">自我观察</option><option value="relationship">关系沟通</option><option value="career">工作与任务</option><option value="decision">选择与取舍</option></select></LabeledField>
-          <LabeledField label="求问焦点 / QUESTION" hint={<span className="text-ink-muted">可选</span>}>
+          <LabeledField label="阅读主题"><select className="field" aria-label={t('阅读主题')} value={readingTopic} onChange={event => onReadingTopicChange(event.target.value as ReadingTopic)}>
+            <option value="general">{t('自我观察')}</option><option value="relationship">{t('关系沟通')}</option><option value="career">{t('工作与任务')}</option><option value="decision">{t('选择与取舍')}</option></select></LabeledField>
+          <LabeledField label="求问焦点 / QUESTION" hint={<span className="text-ink-muted">{t('可选')}</span>}>
             <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
               <Icon name="seal" size={16} className="shrink-0 text-ink-muted" />
               <input
                 type="text"
                 value={question}
                 onChange={(event) => onQuestionChange(event.target.value)}
-                title="问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。"
-                placeholder="例如：我该如何看待当前事业的转折？"
+                title={t('问题文字用于记录关注点；系统提供牌义或盘面规则参考，不会理解或验证现实事件。')}
+                placeholder={t('例如：我该如何看待当前事业的转折？')}
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-                aria-label="求问焦点"
+                aria-label={t('求问焦点')}
               />
             </div>
           </LabeledField>
 
-          <p className="text-xs text-ink-muted">主题决定阅读提纲；问题文字只记录关注点，不用于推断现实事件。</p>
+          <p className="text-xs text-ink-muted">{t('主题决定阅读提纲；问题文字只记录关注点，不用于推断现实事件。')}</p>
           <LabeledField label="正逆位 / ORIENTATION">
             <SegmentedControl
               ariaLabel="正逆位设置"
@@ -151,9 +153,9 @@ export function SpreadControls({
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full bg-gold" />
-          洗牌与正逆位由权威算法真实决定，每次抽牌独立且不可复现。
+          {t('洗牌与正逆位由权威算法真实决定，每次抽牌独立且不可复现。')}
         </span>
-        <span>牌名、关键词与牌义取自主策展 78 张牌库，综合解读由引擎的固定句式串起这些字段。</span>
+        <span>{t('牌名、关键词与牌义取自主策展 78 张牌库，综合解读由引擎的固定句式串起这些字段。')}</span>
       </div>
     </form>
   );
