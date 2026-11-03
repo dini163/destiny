@@ -1312,6 +1312,21 @@ const zhHant: MessageDict = {
   '重点': '重點',
   '小行动': '小行動',
   '看依据': '看依據',
+  // Portal DailyTimePanel chrome (Phase 2.11 / p7 batch 3g-c)
+  '今日天文授时 · 真太阳时校准': '今日天文授時 · 真太陽時校準',
+  '北京时间 {{clock}}（流时辰界基准）': '北京時間 {{clock}}（流時辰界基準）',
+  '真太阳时 TST': '真太陽時 TST',
+  '视太阳时（含均时差）': '視太陽時（含均時差）',
+  '均时差 E(t)': '均時差 E(t)',
+  '轨道偏心率 + 赤纬修正': '軌道偏心率 + 赤緯修正',
+  '标准时基准': '標準時基準',
+  '计算引擎': '計算引擎',
+  '分钟': '分鐘',
+  '探测中': '探測中',
+  '在线': '在線',
+  '不可达': '不可達',
+  '后端计算 API': '後端計算 API',
+  '本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。': '本頁授時用於了解當前標準時與視太陽時差異。實際排盤按所填出生時間和地點獨立校正；這裡的當前授時不會改變你的命盤。',
 };
 
 const en: MessageDict = {
@@ -2832,6 +2847,21 @@ const en: MessageDict = {
   '重点': 'Highlights',
   '小行动': 'Action',
   '看依据': 'Evidence',
+  // Portal DailyTimePanel chrome (Phase 2.11 / p7 batch 3g-c)
+  '今日天文授时 · 真太阳时校准': "Today's Astronomical Time · True Solar Time Calibration",
+  '北京时间 {{clock}}（流时辰界基准）': 'Beijing time {{clock}} (daily threshold baseline)',
+  '真太阳时 TST': 'True Solar Time TST',
+  '视太阳时（含均时差）': 'Apparent solar time (incl. equation of time)',
+  '均时差 E(t)': 'Equation of Time E(t)',
+  '轨道偏心率 + 赤纬修正': 'Orbital eccentricity + declination correction',
+  '标准时基准': 'Standard time baseline',
+  '计算引擎': 'Compute engine',
+  '分钟': 'min',
+  '探测中': 'Probing',
+  '在线': 'Online',
+  '不可达': 'Unreachable',
+  '后端计算 API': 'Backend compute API',
+  '本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。': 'The time shown on this page helps you understand the difference between the current standard time and apparent solar time. The actual chart is corrected independently by the birth time and place you enter; this live reading does not change your natal chart.',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

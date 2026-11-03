@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { useApiHealth } from '../../hooks/useApiHealth';
+import { useI18n } from '../../i18n/context';
 import { useNow } from '../../hooks/useNow';
 import { useTrueSolarTime } from '../../hooks/useTrueSolarTime';
 import { beijingTime, localClock } from '../../lib/civilTime';
@@ -17,9 +18,9 @@ import { Icon } from '../ui/Icon';
 const STANDARD_MERIDIAN_LONGITUDE = 120;
 
 /** Format a signed equation-of-time offset in minutes as e.g. `+3.42 分钟`. */
-function formatOffset(minutes: number): string {
+function formatOffset(minutes: number, unit: string): string {
   const sign = minutes >= 0 ? '+' : '−';
-  return `${sign}${Math.abs(minutes).toFixed(2)} 分钟`;
+  return `${sign}${Math.abs(minutes).toFixed(2)} ${unit}`;
 }
 
 /**
@@ -33,6 +34,7 @@ function formatOffset(minutes: number): string {
  * them yet, and the no-mock rule forbids inventing them; the footnote says so plainly.
  */
 export function DailyTimePanel() {
+  const { t } = useI18n();
   const now = useNow(1000);
   const local = localClock(now);
   const beijing = beijingTime(now);
@@ -53,7 +55,7 @@ export function DailyTimePanel() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-70" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-gold-bright" />
           </span>
-          <span className="label-caps text-gold">今日天文授时 · 真太阳时校准</span>
+          <span className="label-caps text-gold">{t('今日天文授时 · 真太阳时校准')}</span>
         </div>
         <Icon name="sun" size={20} className="shrink-0 text-gold" />
       </div>
@@ -64,29 +66,29 @@ export function DailyTimePanel() {
           {local.zoneLabel} · {local.date} · {local.offsetLabel}
         </span>
         {local.sameAsBeijing ? null : (
-          <span className="label-caps text-ink-muted">北京时间 {beijing.clock}（流时辰界基准）</span>
+          <span className="label-caps text-ink-muted">{t('北京时间 {{clock}}（流时辰界基准）', { clock: beijing.clock })}</span>
         )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <Metric
-          label="真太阳时 TST"
+          label={t('真太阳时 TST')}
           value={trueSolarTime.data ? shortTime(trueSolarTime.data.true_solar_time) : '…'}
-          sub="视太阳时（含均时差）"
+          sub={t('视太阳时（含均时差）')}
           accent="text-gold-bright"
         />
         <Metric
-          label="均时差 E(t)"
-          value={trueSolarTime.data ? formatOffset(trueSolarTime.data.offset_minutes) : '…'}
-          sub="轨道偏心率 + 赤纬修正"
+          label={t('均时差 E(t)')}
+          value={trueSolarTime.data ? formatOffset(trueSolarTime.data.offset_minutes, t('分钟')) : '…'}
+          sub={t('轨道偏心率 + 赤纬修正')}
         />
         <Metric
-          label="标准时基准"
+          label={t('标准时基准')}
           value={trueSolarTime.data ? shortTime(trueSolarTime.data.standard_time) : '…'}
           sub={local.meridianLabel}
         />
         <Metric
-          label="计算引擎"
+          label={t('计算引擎')}
           value={
             <span className="flex items-center gap-2">
               <span
@@ -94,17 +96,17 @@ export function DailyTimePanel() {
                   health.isLoading ? 'bg-ink-muted' : healthy ? 'bg-wuxing-wood' : 'bg-wuxing-fire'
                 }`}
               />
-              {health.isLoading ? '探测中' : healthy ? '在线' : '不可达'}
+              {health.isLoading ? t('探测中') : healthy ? t('在线') : t('不可达')}
             </span>
           }
-          sub={health.data?.service ?? '后端计算 API'}
+          sub={health.data?.service ?? t('后端计算 API')}
         />
       </div>
 
       <p className="mt-auto flex items-start gap-2 rounded-element border border-rim-soft bg-surface px-3 py-2 text-[11px] leading-relaxed text-ink-muted">
         <Icon name="sparkle" size={14} className="mt-0.5 shrink-0 text-gold" />
         <span>
-          本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。
+          {t('本页授时用于了解当前标准时与视太阳时差异。实际排盘按所填出生时间和地点独立校正；这里的当前授时不会改变你的命盘。')}
         </span>
       </p>
     </div>
