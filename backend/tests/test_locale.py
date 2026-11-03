@@ -372,3 +372,28 @@ def test_hexagram_names_palace_and_generation_localize() -> None:
     non_trigram_shorts = {s for s in dl if s in short_names and s in LABELS["en"]}
     for token in non_trigram_shorts:
         assert token not in el, f"en 未替换卦短名 {token}"
+
+
+def test_kabbalah_pillars_and_daath_localize() -> None:
+    # p15-h：卡巴拉三柱与隐藏原质 Daath 专名叶值只在请求时替换，默认透传。
+    # 十原质 name_zh（美/智慧…）与字母音译（辛）因与常用词/天干共形，不入全局表，本测不假定。
+    from app.content.kabbalah import DAATH, PILLARS
+
+    keys = {p.name_zh for p in PILLARS.values()} | {DAATH.name_zh}
+    assert PILLARS["mercy"].name_zh == "慈悲之柱"
+    with TestClient(app) as client:
+        d = client.get("/api/v1/kabbalah/tree")
+        e = client.get("/api/v1/kabbalah/tree?locale=en")
+        h = client.get("/api/v1/kabbalah/tree?locale=zh-Hant")
+    assert d.status_code == e.status_code == h.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in keys}
+    assert present == keys, f"tree 应落盘三柱与 Daath 专名，实得 {present}"
+    for token in present:
+        assert token not in el, f"en 未替换卡巴拉专名 {token}"
+    # 字形有差的专名（严厉之柱/知识（隐藏））在 zh-Hant 下也要被换掉。
+    hl = _walk_strings(h.json())
+    for token in [s for s in present if s in LABELS["zh-Hant"]]:
+        assert token not in hl, f"zh-Hant 未替换卡巴拉专名 {token}"

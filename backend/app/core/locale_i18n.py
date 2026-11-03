@@ -112,6 +112,10 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "东南": "東南",
         "东北": "東北",
         "中宫": "中宮",
+        # 卡巴拉三柱 / 隐藏原质 Daath（kabbalah pillar.name_zh、DAATH.name_zh 叶值）：仅登记字形有差者。
+        # 慈悲之柱 / 中柱·平衡 繁简同形，回落源文。
+        "严厉之柱": "嚴厲之柱",
+        "知识（隐藏）": "知識（隱藏）",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -364,6 +368,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "本宫": "Original Palace", "一世": "First Generation", "二世": "Second Generation",
         "三世": "Third Generation", "四世": "Fourth Generation", "五世": "Fifth Generation",
         "游魂": "Wandering Soul", "归魂": "Returning Soul",
+        # 卡巴拉三柱与隐藏原质 Daath（pillar.name_zh / DAATH.name_zh 叶值，与 `content/kabbalah.PILLARS` 同源）：
+        # 只登记不与其它系统共形的专名复合词。十原质 name_zh（美/智慧/胜利…）与希伯来字母音译
+        # （如 辛 即天干）都是共形常用词，全局单表无法按系统区分，故不入表（回落源文）。
+        "慈悲之柱": "Pillar of Mercy", "严厉之柱": "Pillar of Severity",
+        "中柱·平衡": "Pillar of Equilibrium", "知识（隐藏）": "Daath (Hidden)",
     },
 }
 
