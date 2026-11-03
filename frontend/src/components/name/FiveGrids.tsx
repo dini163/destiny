@@ -1,6 +1,7 @@
 import { PlainProse } from '../ui/PlainProse';
 import { SourceNote } from '../ui/SourceNote';
 import { wuxingChip, wuxingLabelEn } from '../../lib/wuxing';
+import { useI18n } from '../../i18n/context';
 import type { NameFortune, NameGrid } from '../../types/name';
 
 /** 吉凶档位的色调：设计稿只有四级，颜色不引入第五级。 */
@@ -21,6 +22,7 @@ const FORTUNE_TONE: Record<NameFortune, string> = {
  * 本件不现编文案——本件只决定顺序，不决定句子。
  */
 export function FiveGrids({ grids }: { grids: NameGrid[] }) {
+  const { t } = useI18n();
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
       {grids.map((grid) => (
@@ -34,7 +36,7 @@ export function FiveGrids({ grids }: { grids: NameGrid[] }) {
               <span
                 className={`label-caps rounded-element border px-1.5 py-0.5 ${FORTUNE_TONE[grid.fortune]}`}
               >
-                {grid.fortune}
+                {t(grid.fortune)}
               </span>
             ) : null}
           </header>
@@ -53,7 +55,7 @@ export function FiveGrids({ grids }: { grids: NameGrid[] }) {
                 <span className="ml-1 opacity-70">{wuxingLabelEn(grid.wuxing)}</span>
               </span>
               {grid.number !== null ? (
-                <span className="numeric text-xs text-ink-muted">数理 {grid.number}</span>
+                <span className="numeric text-xs text-ink-muted">{t('数理 {{n}}', { n: grid.number })}</span>
               ) : null}
             </div>
           ) : null}

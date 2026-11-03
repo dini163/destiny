@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
+import { useI18n } from '../../i18n/context';
 import type { ProfileName } from '../../lib/profiles';
 import type { ApiError } from '../../api/client';
 import type { NameAnalyzeRequest } from '../../types/name';
@@ -37,6 +38,7 @@ interface NameInputFormProps {
  * 字不会被重复追问。
  */
 export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit }: NameInputFormProps) {
+  const { t } = useI18n();
   const [surname, setSurname] = useState('');
   const [given, setGiven] = useState('');
   const [variants, setVariants] = useState<Record<string, string>>({});
@@ -79,15 +81,15 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                姓名参玄研判
+                {t('姓名参玄研判')}
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                康熙 · 五格剖象
+                {t('康熙 · 五格剖象')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              逐字以《康熙字典》部首体系核定笔画（由 Unihan 推导，非手抄），再依天、人、地、外、总五格
-              配八十一数理吉凶与三才生克。一简对多繁不代作主张：需点选正体字。
+              {t('逐字以《康熙字典》部首体系核定笔画（由 Unihan 推导，非手抄），再依天、人、地、外、总五格配八十一数理吉凶与三才生克。')}
+              {t('一简对多繁不代作主张：需点选正体字。')}
             </p>
           </div>
         </div>
@@ -97,16 +99,16 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
               type="button"
               className="btn-ghost shrink-0"
               disabled={!surname.trim() || !given.trim()}
-              title="把当前姓名存入本地档案"
+              title={t('把当前姓名存入本地档案')}
               onClick={() => onSaveProfile({ surname: surname.trim(), given: given.trim() })}
             >
               <Icon name="vault" size={18} />
-              存入档案
+              {t('存入档案')}
             </button>
           ) : null}
           <button type="submit" className="btn-primary shrink-0" disabled={pending}>
             <Icon name="sparkle" size={18} />
-            核定笔画
+            {t('核定笔画')}
           </button>
         </div>
       </div>
@@ -118,8 +120,8 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
               className="w-full bg-transparent font-display text-base text-ink outline-none"
               value={surname}
               onChange={(event) => setSurname(event.target.value)}
-              placeholder="如 陸"
-              aria-label="姓氏"
+              placeholder={t('如 陸')}
+              aria-label={t('姓氏')}
             />
           </div>
         </LabeledField>
@@ -129,8 +131,8 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
               className="w-full bg-transparent font-display text-base text-ink outline-none"
               value={given}
               onChange={(event) => setGiven(event.target.value)}
-              placeholder="如 青玄"
-              aria-label="名字"
+              placeholder={t('如 青玄')}
+              aria-label={t('名字')}
             />
           </div>
         </LabeledField>
@@ -138,7 +140,7 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
 
       {Object.keys(variants).length > 0 ? (
         <p className="label-caps text-ink-muted">
-          已指定正体：
+          {t('已指定正体：')}
           {Object.entries(variants)
             .map(([source, target]) => `${source}→${target}`)
             .join('、')}
@@ -147,14 +149,14 @@ export function NameInputForm({ preset, onSaveProfile, pending, error, onSubmit 
             onClick={() => setVariants({})}
             className="ml-2 hover:text-gold-soft"
           >
-            清除
+            {t('清除')}
           </button>
         </p>
       ) : null}
 
       {choices.length > 0 ? (
         <div className="flex flex-col gap-2 rounded-element border border-gold/40 bg-gold/10 px-4 py-3">
-          <p className="text-sm text-ink">以下字一简对多繁，笔画随正体而变，请指定：</p>
+          <p className="text-sm text-ink">{t('以下字一简对多繁，笔画随正体而变，请指定：')}</p>
           {choices.map((choice) => (
             <div key={choice.char} className="flex flex-wrap items-center gap-2">
               <span className="font-display text-base text-gold-bright">{choice.char}</span>

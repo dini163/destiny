@@ -1,4 +1,5 @@
 import { SourceNote } from '../ui/SourceNote';
+import { useI18n } from '../../i18n/context';
 import type { NameChar } from '../../types/name';
 
 interface CharProvenanceTableProps {
@@ -12,10 +13,11 @@ interface CharProvenanceTableProps {
  * 不补一个看起来像值的数字（决策八）。
  */
 export function CharProvenanceTable({ chars }: CharProvenanceTableProps) {
+  const { t } = useI18n();
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs">
-        <caption className="sr-only">逐字康熙笔画核定</caption>
+        <caption className="sr-only">{t('逐字康熙笔画核定')}</caption>
         <thead>
           <tr className="text-left text-ink-muted">
             {['字', '正体', '部首', '算式', '康熙笔画', '拼音声调', '出处'].map((head) => (
@@ -24,7 +26,7 @@ export function CharProvenanceTable({ chars }: CharProvenanceTableProps) {
                 scope="col"
                 className="whitespace-nowrap px-2 py-1.5 font-normal first:pl-0 last:pr-0"
               >
-                {head}
+                {t(head)}
               </th>
             ))}
           </tr>
@@ -37,7 +39,7 @@ export function CharProvenanceTable({ chars }: CharProvenanceTableProps) {
               </td>
               <td className="px-2 py-2 text-ink-variant">{item.resolved}</td>
               <td className="px-2 py-2 text-ink-variant">
-                {item.radical_char ? `${item.radical_char}（${item.radical_no}）` : '未收录'}
+                {item.radical_char ? `${item.radical_char}（${item.radical_no}）` : t('未收录')}
               </td>
               <td className="numeric px-2 py-2 text-ink">
                 {item.radical_strokes === null || item.residual_strokes === null
@@ -45,7 +47,7 @@ export function CharProvenanceTable({ chars }: CharProvenanceTableProps) {
                   : `${item.radical_strokes}+${item.residual_strokes}`}
               </td>
               <td className="numeric px-2 py-2 text-gold-bright">
-                {item.kangxi_strokes ?? '未收录'}
+                {item.kangxi_strokes ?? t('未收录')}
               </td>
               <td className="px-2 py-2 text-ink-variant">
                 {item.readings.length > 0

@@ -1027,6 +1027,21 @@ const zhHant: MessageDict = {
   '紫微斗数命盘': '紫微斗數命盤',
   '命宫 {{gz}} · {{ny}}': '命宮 {{gz}} · {{ny}}',
   '{{gz}}年 · {{dir}} · {{age}}岁起运': '{{gz}}年 · {{dir}} · {{age}}歲起運',
+  // Name deep components chrome (Phase 2.11 / p7 batch 3c)
+  '三才档位': '三才檔位',
+  '，按三对关系中「生 / 比」与「克」的计数划分（模型参数，非古籍定级）。': '，按三對關係中「生 / 比」與「克」的計數劃分（模型參數，非古籍定級）。',
+  '逐字康熙笔画核定': '逐字康熙筆畫核定',
+  '正体': '正體',
+  '康熙笔画': '康熙筆畫',
+  '拼音声调': '拼音聲調',
+  '未收录': '未收錄',
+  '姓名参玄研判': '姓名參玄研判',
+  '逐字以《康熙字典》部首体系核定笔画（由 Unihan 推导，非手抄），再依天、人、地、外、总五格配八十一数理吉凶与三才生克。': '逐字以《康熙字典》部首體系核定筆畫（由 Unihan 推導，非手抄），再依天、人、地、外、總五格配八十一數理吉凶與三才生克。',
+  '一简对多繁不代作主张：需点选正体字。': '一簡對多繁不代作主張：需點選正體字。',
+  '把当前姓名存入本地档案': '把當前姓名存入本地檔案',
+  '已指定正体：': '已指定正體：',
+  '以下字一简对多繁，笔画随正体而变，请指定：': '以下字一簡對多繁，筆畫隨正體而變，請指定：',
+  '姓名综合气象指数（五格加权）': '姓名綜合氣象指數（五格加權）',
 };
 
 const en: MessageDict = {
@@ -2175,6 +2190,31 @@ const en: MessageDict = {
   '紫微斗数命盘': 'Zi Wei Dou Shu natal board',
   '命宫 {{gz}} · {{ny}}': 'Life palace {{gz}} · {{ny}}',
   '{{gz}}年 · {{dir}} · {{age}}岁起运': '{{gz}} · {{dir}} · luck starts at age {{age}}',
+  // Name deep components chrome (Phase 2.11 / p7 batch 3c)
+  '数理 {{n}}': 'Numerology {{n}}',
+  '大吉': 'Great auspice',
+  '半吉': 'Half auspicious',
+  '三才档位': 'Three-talent tier',
+  '，按三对关系中「生 / 比」与「克」的计数划分（模型参数，非古籍定级）。': ' — graded by counting "generating / companion" versus "overcoming" across the three pairs (a model parameter, not an ancient-text grade).',
+  '逐字康熙笔画核定': 'Per-character Kangxi stroke verification',
+  '字': 'Char',
+  '正体': 'Traditional form',
+  '部首': 'Radical',
+  '算式': 'Formula',
+  '康熙笔画': 'Kangxi strokes',
+  '拼音声调': 'Pinyin tone',
+  '未收录': 'Not recorded',
+  '姓名参玄研判': 'Name Analysis',
+  '康熙 · 五格剖象': 'Kangxi · Five-Grid analysis',
+  '逐字以《康熙字典》部首体系核定笔画（由 Unihan 推导，非手抄），再依天、人、地、外、总五格配八十一数理吉凶与三才生克。': 'Each character\'s strokes are verified against the Kangxi Dictionary radical system (derived from Unihan, not hand-copied), then the five grids — Heaven, Human, Earth, Outer and Total — are matched with the 81 numerology grades and the three-talent generating/overcoming.',
+  '一简对多繁不代作主张：需点选正体字。': 'Where one simplified character maps to several traditional forms the system will not choose for you: pick the traditional character.',
+  '把当前姓名存入本地档案': 'Save the current name to a local profile',
+  '姓氏（1–2 字）': 'Surname (1–2 chars)',
+  '名字（1–3 字）': 'Given name (1–3 chars)',
+  '已指定正体：': 'Traditional set: ',
+  '清除': 'Clear',
+  '以下字一简对多繁，笔画随正体而变，请指定：': 'The characters below map to several traditional forms and their strokes change with the choice — please specify:',
+  '姓名综合气象指数（五格加权）': 'Name composite index (five-grid weighted)',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

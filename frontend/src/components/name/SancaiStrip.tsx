@@ -1,6 +1,7 @@
 import { PlainProse } from '../ui/PlainProse';
 import { SourceNote } from '../ui/SourceNote';
 import { wuxingBg, wuxingLabelEn, wuxingText } from '../../lib/wuxing';
+import { useI18n } from '../../i18n/context';
 import type { NameGrid, Sancai } from '../../types/name';
 
 const ORDER = ['tian', 'ren', 'di'] as const;
@@ -13,6 +14,7 @@ const ORDER = ['tian', 'ren', 'di'] as const;
  * 三才整块一段白话（`sancai.plain`）排在上方，逐对生克判语降为下方小字（spec §10 清单类）。
  */
 export function SancaiStrip({ sancai, grids }: { sancai: Sancai; grids: NameGrid[] }) {
+  const { t } = useI18n();
   const valueOf = (key: (typeof ORDER)[number]): number | null =>
     grids.find((grid) => grid.key === key)?.value ?? null;
 
@@ -57,8 +59,8 @@ export function SancaiStrip({ sancai, grids }: { sancai: Sancai; grids: NameGrid
       </ul>
 
       <p className="text-xs text-ink-muted">
-        三才档位 <span className="text-gold-soft">{sancai.tier}</span>
-        ，按三对关系中「生 / 比」与「克」的计数划分（模型参数，非古籍定级）。
+        {t('三才档位')} <span className="text-gold-soft">{sancai.tier}</span>
+        {t('，按三对关系中「生 / 比」与「克」的计数划分（模型参数，非古籍定级）。')}
       </p>
     </div>
   );
