@@ -898,3 +898,41 @@ def test_qimen_ju_name_and_branch_pairs_localize() -> None:
     assert localize("阴遁九局", "en") == "Yin Dun Ju 9"
     assert localize("丑寅", "en") == "Chou & Yin"
     assert localize("戌亥", "en") == "Xu & Hai"
+
+
+def test_star_door_god_nature_localize() -> None:
+    # p15：紫微十四主星 + 奇门九星/八门/八神 类象 nature 在 en 下全替换；繁简同形者 zh-Hant 透传。
+    import app.content.ziwei as Z
+    import app.content.qimen as Q
+
+    natures = (
+        {s.nature for s in Z.MAJOR_STARS.values()}
+        | {s.nature for s in Q.NINE_STARS}
+        | {d.nature for d in Q.EIGHT_DOORS}
+        | set(Q.GOD_NATURE.values())
+    )
+    assert len(natures) == 39
+    ziwei_payload = {
+        "birth_date": "2000-08-16", "birth_time": "12:00", "calendar": "solar",
+        "longitude": 116.4074, "gender": "male", "apply_true_solar_time": False,
+    }
+    with TestClient(app) as client:
+        zd = client.post("/api/v1/ziwei/chart", json=ziwei_payload)
+        ze = client.post("/api/v1/ziwei/chart?locale=en", json=ziwei_payload)
+        qd = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        qe = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+    assert zd.status_code == ze.status_code == qd.status_code == qe.status_code == 200
+    for d, el in ((zd, _walk_strings(ze.json())), (qd, _walk_strings(qe.json()))):
+        present = {s for s in _walk_strings(d.json()) if s in natures}
+        assert present, "排盘应至少落一个类象 nature 叶值"
+        for token in present:
+            assert token not in el, f"en 未替换 nature {token}"
+    # 直接单测：全族取到英译；字形有差者 zh-Hant 转形（冲->衝/发->發/贵->貴），同形者透传。
+    assert localize("帝座·尊贵领导", "en") == "Imperial Seat · Noble Leadership"
+    assert localize("左辅·诚信敦厚", "en") == "Left Assistant · Sincere Generosity"
+    assert localize("贵人首领·百恶不侵", "en") == "Noble Chief · Impervious to Evil"
+    assert localize("将星·冲劲肃杀", "zh-Hant") == "將星·衝勁肅殺"
+    assert localize("开通发达·求财赴任", "zh-Hant") == "開通發達·求財赴任"
+    assert localize("财库·稳重保守", "zh-Hant") == "財庫·穩重保守"
+    assert localize("福禄·温和享受", "zh-Hant") == "福禄·温和享受"
+    assert localize("和合婚姻·交易中介", "zh-Hant") == "和合婚姻·交易中介"
