@@ -576,3 +576,28 @@ def test_ganzhi_pillars_localize() -> None:
     assert localize("甲子", "en") == "Jia Zi"
     assert localize("癸亥", "en") == "Gui Hai"
     assert localize("甲子", "zh-Hant") == "甲子"
+
+
+def test_bazi_relation_enum_localize() -> None:
+    # p15：干支关系枚举名（合冲刑害会·伏反吟）在 en 下替换，繁体字形有差者同步。
+    from app.content.bazi_relations import RELATION_TABLES
+
+    names = set(RELATION_TABLES.keys())
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in names}
+    assert present, "bazi 命局应至少落一个干支关系枚举叶值"
+    for token in present:
+        assert token not in el, f"en 未替换关系枚举 {token}"
+    # 直接单测：全族枚举在两种语种都取到预期译文（不依赖本盘是否出现）。
+    assert localize("地支六冲", "en") == "Six Branch Clashes"
+    assert localize("伏吟", "en") == "Fu Yin Repetition"
+    assert localize("自刑", "en") == "Self Punishment"
+    assert localize("地支六冲", "zh-Hant") == "地支六沖"
+    assert localize("无恩之刑", "zh-Hant") == "無恩之刑"
+    # 繁简同形的枚举回落源文。
+    assert localize("三合", "zh-Hant") == "三合"

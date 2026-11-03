@@ -185,6 +185,9 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "炉中火": "爐中火", "剑锋金": "劍鋒金", "山头火": "山頭火", "城头土": "城頭土",
         "涧下水": "澗下水", "白蜡金": "白蠟金", "杨柳木": "楊柳木", "霹雳火": "霹靂火",
         "长流水": "長流水", "覆灯火": "覆燈火", "大驿土": "大驛土", "钗钏金": "釵釧金",
+        # 干支关系枚举繁体（与上同源）：仅登记字形有差者（六冲取沖，会/势/无/礼转形）。
+        "三会": "三會", "地支六冲": "地支六沖", "天干相冲": "天干相沖",
+        "恃势之刑": "恃勢之刑", "无恩之刑": "無恩之刑", "无礼之刑": "無禮之刑",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -523,6 +526,12 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "壬子": "Ren Zi", "癸丑": "Gui Chou", "甲寅": "Jia Yin", "乙卯": "Yi Mao",
         "丙辰": "Bing Chen", "丁巳": "Ding Si", "戊午": "Wu Wu", "己未": "Ji Wei",
         "庚申": "Geng Shen", "辛酉": "Xin You", "壬戌": "Ren Xu", "癸亥": "Gui Hai",
+        # 干支关系枚举名（`content/bazi_relations.RELATION_TABLES` keys）：合冲刑害会·伏反吟。
+        "三会": "Branch Directional Union", "三合": "Branch Triple Harmony", "伏吟": "Fu Yin Repetition",
+        "半合": "Half Harmony", "反吟": "Fan Yin Reverse", "地支六冲": "Six Branch Clashes",
+        "地支六合": "Six Branch Combinations", "地支六害": "Six Branch Harms", "地支六破": "Six Branch Breaks",
+        "天干五合": "Five Stem Combines", "天干相冲": "Stem Clashes", "恃势之刑": "Punishment by Power",
+        "无恩之刑": "Ungrateful Punishment", "无礼之刑": "Discourteous Punishment", "自刑": "Self Punishment",
     },
 }
 
