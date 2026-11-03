@@ -5,6 +5,7 @@ import {
   polarToCartesian,
   wheelAngle,
 } from '../../lib/astro';
+import { useI18n } from '../../i18n/context';
 import type { SynastryAspect } from '../../types/synastry';
 import type { WesternChart } from '../../types/western';
 
@@ -78,6 +79,7 @@ interface SynastryBiWheelProps {
  * from the ephemeris via the backend — nothing is invented here (PRD no-mock rule).
  */
 export function SynastryBiWheel({ chartA, chartB, aspects, nameA, nameB }: SynastryBiWheelProps) {
+  const { t } = useI18n();
   const ascA = chartA.axes.find((axis) => axis.name === 'ASC');
   const ascLon = ascA?.longitude ?? 0;
 
@@ -102,7 +104,7 @@ export function SynastryBiWheel({ chartA, chartB, aspects, nameA, nameB }: Synas
       viewBox="0 0 600 600"
       className="h-full w-full select-none"
       role="img"
-      aria-label={`合盘双轮盘：内圈${nameA}，外圈${nameB}`}
+      aria-label={t('合盘双轮盘：内圈{{a}}，外圈{{b}}', { a: nameA, b: nameB })}
     >
       <defs>
         <radialGradient id="synastryNebula" cx="50%" cy="50%" r="50%">

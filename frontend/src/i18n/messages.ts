@@ -1236,6 +1236,19 @@ const zhHant: MessageDict = {
   '北印盘': '北印盤',
   '南印盘 · SOUTH INDIAN': '南印盤 · SOUTH INDIAN',
   '平交点': '平交點',
+  // Synastry deep components chrome (Phase 2.11 / p7 batch 3f-ii)
+  '合盘双轮盘：内圈{{a}}，外圈{{b}}': '合盤雙輪盤：內圈{{a}}，外圈{{b}}',
+  '四档：≥75 相契甚深 · 60–74 和合互补 · 45–59 中和可处 · <45 磨合为宜': '四檔：≥75 相契甚深 · 60–74 和合互補 · 45–59 中和可處 · <45 磨合為宜',
+  '相契度账本（50 分起算）': '相契度賬本（50 分起算）',
+  '{{caption}}称谓': '{{caption}}稱謂',
+  '{{caption}}时区偏移（小时）': '{{caption}}時區偏移（小時）',
+  '生辰（公历，精准至分）': '生辰（公曆，精準至分）',
+  '把这一侧的输入存入本地档案（需生辰齐备）': '把這一側的輸入存入本地檔案（需生辰齊備）',
+  '西洋合盘 · 双人比较盘': '西洋合盤 · 雙人比較盤',
+  '两张本命盘同屏：人对人相位（合盘）、短弧中点组合盘（Composite）与相契度总分，每一条命中都落进可核对的赋分账本。示例：甲 1990-06-15 08:30 × 乙 1992-11-20 18:45 · 格林尼治 (51.4769, -0.0005) · UTC 0。': '兩張本命盤同屏：人對人相位（合盤）、短弧中點組合盤（Composite）與相契度總分，每一條命中都落進可核對的賦分賬本。示例：甲 1990-06-15 08:30 × 乙 1992-11-20 18:45 · 格林尼治 (51.4769, -0.0005) · UTC 0。',
+  '共用分宫制 / HOUSE SYSTEM': '共用分宮制 / HOUSE SYSTEM',
+  '时区留空时按各自出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。': '時區留空時按各自出生經度推算 UTC 偏移（每 15° ≈ 1 小時）。',
+  '与': '與',
 };
 
 const en: MessageDict = {
@@ -2664,6 +2677,24 @@ const en: MessageDict = {
   '南印盘 · SOUTH INDIAN': 'South Indian',
   '月亮': 'Moon',
   '平交点': 'Node',
+  // Synastry deep components chrome (Phase 2.11 / p7 batch 3f-ii)
+  '合盘双轮盘：内圈{{a}}，外圈{{b}}': 'Synastry bi-wheel: inner ring {{a}}, outer ring {{b}}',
+  '相契度 {{value}} 分，{{tier}}': 'Compatibility {{value}} / 100 — {{tier}}',
+  '四档：≥75 相契甚深 · 60–74 和合互补 · 45–59 中和可处 · <45 磨合为宜': 'Four tiers: ≥75 Deep bond · 60–74 Complementary · 45–59 Balanced · <45 Needs work',
+  '相契度账本（50 分起算）': 'Compatibility ledger (starting from 50)',
+  '{{caption}}称谓': '{{caption}} title',
+  '{{caption}}时区偏移（小时）': '{{caption}} UTC offset (hours)',
+  '生辰（公历，精准至分）': 'Birth date & time (solar calendar, to the minute)',
+  '把这一侧的输入存入本地档案（需生辰齐备）': 'Save this side\'s input to a local profile (requires full birth data)',
+  '西洋合盘 · 双人比较盘': 'Synastry · Two-person Composite',
+  '两张本命盘同屏：人对人相位（合盘）、短弧中点组合盘（Composite）与相契度总分，每一条命中都落进可核对的赋分账本。示例：甲 1990-06-15 08:30 × 乙 1992-11-20 18:45 · 格林尼治 (51.4769, -0.0005) · UTC 0。': 'Two natal charts on one screen: person-to-person aspects (synastry), a short-arc midpoint Composite chart and an overall compatibility score, with every match recorded in an auditable scoring ledger. Example: A 1990-06-15 08:30 × B 1992-11-20 18:45 · Greenwich (51.4769, -0.0005) · UTC 0.',
+  '共用分宫制 / HOUSE SYSTEM': 'Shared house system / HOUSE SYSTEM',
+  '时区留空时按各自出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。': 'When the timezone is left blank, the UTC offset is derived from each birth longitude (15° ≈ 1 hour).',
+  '与': ' and ',
+  '甲方': 'Person A',
+  '乙方': 'Person B',
+  '如：先生': 'e.g. Sir',
+  '如：女士': 'e.g. Madam',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

@@ -7,6 +7,7 @@ import { ChineseDateField, ChineseTimeField } from '../ui/DateTimeField';
 import { LocationField } from '../ui/LocationField';
 import type { LocationValue } from '../ui/LocationField';
 import { SelectMenu } from '../ui/SelectMenu';
+import { useI18n } from '../../i18n/context';
 import type { SynastryPerson, SynastryRequest } from '../../types/synastry';
 
 /** House systems the backend engine accepts (Swiss Ephemeris codes). */
@@ -50,19 +51,20 @@ function SideColumn({
   /** 提供时在列尾渲染「存入档案」：把这一列当前的输入交给页面持久化。 */
   onSaveProfile?: (() => void) | undefined;
 }) {
+  const { t } = useI18n();
   const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
     <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
 
-      <LabeledField label={`称谓（${caption}，仅回显）`}>
+      <LabeledField label={t('称谓（{{caption}}，仅回显）', { caption })}>
         <input
           value={state.name}
           onChange={(event) => onChange({ name: event.target.value })}
           maxLength={40}
           placeholder={placeholder}
           className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
-          aria-label={`${caption}称谓`}
+          aria-label={t('{{caption}}称谓', { caption })}
         />
       </LabeledField>
 
@@ -86,7 +88,7 @@ function SideColumn({
         <LocationField value={state.location} onChange={(next) => onChange({ location: next })} />
       </LabeledField>
 
-      <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">小时</span>}>
+      <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">{t('小时')}</span>}>
         <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
           <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
           <input
@@ -96,9 +98,9 @@ function SideColumn({
             step={0.5}
             value={state.utcOffset}
             onChange={(event) => onChange({ utcOffset: event.target.value })}
-            placeholder="自动（按经度）"
+            placeholder={t('自动（按经度）')}
             className="numeric w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-            aria-label={`${caption}时区偏移（小时）`}
+            aria-label={t('{{caption}}时区偏移（小时）', { caption })}
           />
         </div>
       </LabeledField>
@@ -108,11 +110,11 @@ function SideColumn({
           type="button"
           className="btn-ghost"
           disabled={!saveable}
-          title={`把这一侧的输入存入本地档案（需生辰齐备）`}
+          title={t('把这一侧的输入存入本地档案（需生辰齐备）')}
           onClick={onSaveProfile}
         >
           <Icon name="vault" size={16} />
-          存入档案
+          {t('存入档案')}
         </button>
       ) : null}
     </fieldset>
@@ -147,6 +149,7 @@ export function SynastryConsole({
   pending,
   onSubmit,
 }: SynastryConsoleProps) {
+  const { t } = useI18n();
   const [sideA, setSideA] = useState<SideState>(EMPTY_SIDE);
   const [sideB, setSideB] = useState<SideState>(EMPTY_SIDE);
   const [houseSystem, setHouseSystem] = useState('P');
@@ -165,8 +168,8 @@ export function SynastryConsole({
     state.location.longitude == null;
 
   const missing: string[] = [];
-  if (incomplete(sideA)) missing.push('甲方');
-  if (incomplete(sideB)) missing.push('乙方');
+  if (incomplete(sideA)) missing.push(t('甲方'));
+  if (incomplete(sideB)) missing.push(t('乙方'));
   const ready = missing.length === 0;
 
   function personOf(state: SideState): SynastryPerson {
@@ -203,28 +206,27 @@ export function SynastryConsole({
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                西洋合盘 · 双人比较盘
+                {t('西洋合盘 · 双人比较盘')}
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                瑞士星历
+                {t('瑞士星历')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              两张本命盘同屏：人对人相位（合盘）、短弧中点组合盘（Composite）与相契度总分，
-              每一条命中都落进可核对的赋分账本。示例：甲 1990-06-15 08:30 × 乙 1992-11-20 18:45 · 格林尼治 (51.4769, -0.0005) · UTC 0。
+              {t('两张本命盘同屏：人对人相位（合盘）、短弧中点组合盘（Composite）与相契度总分，每一条命中都落进可核对的赋分账本。示例：甲 1990-06-15 08:30 × 乙 1992-11-20 18:45 · 格林尼治 (51.4769, -0.0005) · UTC 0。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={!ready || pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '推演中…' : '开始合盘'}
+          {pending ? t('推演中…') : t('开始合盘')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <SideColumn
-          caption="甲方"
-          placeholder="如：先生"
+          caption={t('甲方')}
+          placeholder={t('如：先生')}
           state={sideA}
           onChange={(next) => setSideA((prev) => ({ ...prev, ...next }))}
           onSaveProfile={
@@ -232,8 +234,8 @@ export function SynastryConsole({
           }
         />
         <SideColumn
-          caption="乙方"
-          placeholder="如：女士"
+          caption={t('乙方')}
+          placeholder={t('如：女士')}
           state={sideB}
           onChange={(next) => setSideB((prev) => ({ ...prev, ...next }))}
           onSaveProfile={
@@ -248,22 +250,22 @@ export function SynastryConsole({
             variant="field"
             value={houseSystem}
             onChange={(next) => setHouseSystem(next)}
-            ariaLabel="分宫制"
-            options={HOUSE_SYSTEM_OPTIONS}
+            ariaLabel={t('分宫制')}
+            options={HOUSE_SYSTEM_OPTIONS.map((option) => ({ value: option.value, label: t(option.label) }))}
           />
         </LabeledField>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-ink-muted">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-gold" />
-            黄道基准：热带黄道 (Tropical)
+            {t('黄道基准：热带黄道 (Tropical)')}
           </span>
-          <span>时区留空时按各自出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。</span>
+          <span>{t('时区留空时按各自出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。')}</span>
         </div>
       </div>
 
       {!ready ? (
         <p className="label-caps text-ink-muted">
-          {missing.join('与')}的公历年月日、时间或经纬度未填齐 —— 合盘需要两张完整的本命盘。
+          {t('{{missing}}的公历年月日、时间或经纬度未填齐 —— 合盘需要两张完整的本命盘。', { missing: missing.join(t('与')) })}
         </p>
       ) : null}
     </form>

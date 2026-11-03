@@ -1,4 +1,5 @@
 import { ScoreLedger } from '../ui/ScoreLedger';
+import { useI18n } from '../../i18n/context';
 import type { ScoreValue } from '../../types/scoring';
 
 /**
@@ -33,6 +34,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
  * 50 分起算、每一条计入的合盘相位一行、`Σ delta == value`。环好看，账本可核。
  */
 export function SynastryScoreRing({ score }: { score: ScoreValue }) {
+  const { t } = useI18n();
   const look = synastryTierLook(score.tier);
   const percent = Math.min(100, Math.max(0, score.value));
   const center = SIZE / 2;
@@ -44,7 +46,7 @@ export function SynastryScoreRing({ score }: { score: ScoreValue }) {
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className="h-36 w-36"
           role="img"
-          aria-label={`相契度 ${score.value.toFixed(1)} 分，${score.tier}`}
+          aria-label={t('相契度 {{value}} 分，{{tier}}', { value: score.value.toFixed(1), tier: score.tier })}
         >
           <circle cx={center} cy={center} r={RADIUS} fill="none" stroke="#171C2B" strokeWidth={9} />
           <circle
@@ -70,13 +72,13 @@ export function SynastryScoreRing({ score }: { score: ScoreValue }) {
             {score.value.toFixed(1)}
           </text>
           <text x={center} y={center + 20} textAnchor="middle" fontSize="13" fill="#948C79">
-            百分制
+            {t('百分制')}
           </text>
         </svg>
         <div className="flex flex-col gap-1">
           <span className={`font-display text-2xl font-semibold ${look.text}`}>{score.tier}</span>
           <span className="text-xs text-ink-muted">
-            四档：≥75 相契甚深 · 60–74 和合互补 · 45–59 中和可处 · &lt;45 磨合为宜
+            {t('四档：≥75 相契甚深 · 60–74 和合互补 · 45–59 中和可处 · <45 磨合为宜')}
           </span>
         </div>
       </div>
