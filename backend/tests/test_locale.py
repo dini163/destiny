@@ -466,3 +466,34 @@ def test_ziwei_star_names_localize() -> None:
     # 繁体字形有差的星名在 zh-Hant 下也要被换掉。
     assert localize_str("巨门", "zh-Hant") == "巨門"
     assert localize_str("化禄", "zh-Hant") == "化祿"
+
+
+_BAZI_NATAL = {
+    "birth_date": "1990-06-15",
+    "birth_time": "08:30:00",
+    "city": "成都",
+    "gender": "male",
+    "calendar": "solar",
+    "apply_true_solar_time": True,
+}
+
+
+def test_bazi_ten_god_names_localize() -> None:
+    # p15：八字十神（shishen_gan/ten_god 叶值）在 en・zh-Hant 下替换，默认透传。
+    from app.content.bazi_shishen import TEN_GOD_MEANING
+
+    gods = set(TEN_GOD_MEANING) | {"日主"}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+        h = client.post("/api/v1/bazi/natal?locale=zh-Hant", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == h.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = {s for s in dl if s in gods}
+    assert present, "bazi 命局应至少落一个十神叶值"
+    for token in present:
+        assert token not in el, f"en 未替换十神 {token}"
+    for token in [s for s in present if s in LABELS["zh-Hant"]]:
+        assert token not in hl, f"zh-Hant 未替换十神 {token}"

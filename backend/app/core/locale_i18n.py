@@ -171,6 +171,8 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "廉贞": "廉貞", "巨门": "巨門", "破军": "破軍", "左辅": "左輔",
         "铃星": "鈴星", "陀罗": "陀羅", "天钺": "天鉞", "禄存": "祿存",
         "化禄": "化祿", "化权": "化權",
+        # 八字十神繁体（与上 en 十神同源）：仅登记字形有差者。
+        "劫财": "劫財", "伤官": "傷官", "偏财": "偏財", "正财": "正財", "七杀": "七殺",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -454,6 +456,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "水二局": "Water 2 Bureau", "木三局": "Wood 3 Bureau", "金四局": "Gold 4 Bureau",
         "土五局": "Earth 5 Bureau", "火六局": "Fire 6 Bureau",
         "紫微系": "Ziwei Group", "天府系": "Tianfu Group",
+        # 八字十神（bazi shishen_gan / ten_god 叶值，与 `content/bazi_shishen.TEN_GOD_MEANING` 同源）：
+        # 取拼音转写，与上面紫微星名同一口径（七杀已由紫微 Qisha 入表，同词同译，不重复）。
+        "比肩": "Bijian", "劫财": "Jiecai", "食神": "Shishen", "伤官": "Shangguan",
+        "偏财": "Piancai", "正财": "Zhengcai", "正官": "Zhengguan", "偏印": "Pianyin",
+        "正印": "Zhengyin", "日主": "Day Master",
     },
 }
 
