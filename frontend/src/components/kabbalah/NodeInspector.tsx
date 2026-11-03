@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import type { PathNode, SephirahNode } from '../../types/kabbalah';
 import { pillarAccent } from '../../lib/kabbalah';
 import { Icon } from '../ui/Icon';
@@ -13,9 +14,10 @@ export type Resolved =
 
 /** A caption + value row used across both inspector variants. */
 function Row({ label, children }: { label: string; children: ReactNode }) {
+  const { t } = useI18n();
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-rim-soft/60 py-1.5 last:border-0">
-      <span className="label-caps shrink-0 text-ink-muted">{label}</span>
+      <span className="label-caps shrink-0 text-ink-muted">{t(label)}</span>
       <span className="text-right text-sm text-ink-variant">{children}</span>
     </div>
   );
@@ -26,8 +28,9 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
  * Path (路径). Every field is read straight from the engine's curated content.
  */
 export function NodeInspector({ resolved }: { resolved: Resolved }) {
+  const { t } = useI18n();
   if (resolved === null) {
-    return <p className="text-sm text-ink-muted">点击生命之树上的原质或路径，查看其完整对应。</p>;
+    return <p className="text-sm text-ink-muted">{t('点击生命之树上的原质或路径，查看其完整对应。')}</p>;
   }
   return resolved.kind === 'sephirah' ? (
     <SephirahDetail node={resolved.node} />
@@ -37,6 +40,7 @@ export function NodeInspector({ resolved }: { resolved: Resolved }) {
 }
 
 function SephirahDetail({ node }: { node: SephirahNode }) {
+  const { t } = useI18n();
   const accent = pillarAccent(node.pillar);
   return (
     <div className="flex flex-col gap-4">
@@ -49,7 +53,7 @@ function SephirahDetail({ node }: { node: SephirahNode }) {
         </span>
         <div className="flex flex-col gap-1">
           <span className="label-caps" style={{ color: accent }}>
-            {node.is_hidden ? '隐藏原质 · DAATH' : `第 ${node.number} 原质 · SEPHIRAH`}
+            {node.is_hidden ? t('隐藏原质 · DAATH') : t('第 {{n}} 原质 · SEPHIRAH', { n: node.number })}
           </span>
           <span className="font-display text-2xl font-semibold text-ink">{node.name_zh}</span>
           <span className="text-sm text-ink-muted">
@@ -90,6 +94,7 @@ function SephirahDetail({ node }: { node: SephirahNode }) {
 }
 
 function PathDetail({ node }: { node: PathNode }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start gap-3.5">
@@ -97,7 +102,7 @@ function PathDetail({ node }: { node: PathNode }) {
           {node.letter}
         </span>
         <div className="flex flex-col gap-1">
-          <span className="label-caps text-gold-soft">第 {node.number} 路径 · PATH</span>
+          <span className="label-caps text-gold-soft">{t('第 {{n}} 路径 · PATH', { n: node.number })}</span>
           <span className="font-display text-2xl font-semibold text-ink">
             {node.tarot_zh} <span className="text-base text-ink-muted">{node.tarot_numeral}</span>
           </span>

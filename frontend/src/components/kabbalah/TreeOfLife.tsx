@@ -1,4 +1,5 @@
 import type { KabbalahTree, PillarInfo, SephirahNode } from '../../types/kabbalah';
+import { useI18n } from '../../i18n/context';
 import { TREE_VIEW, coordinateMap, pathLabelPositions, pillarAccent, toView, type Selection } from '../../lib/kabbalah';
 
 interface TreeOfLifeProps {
@@ -41,6 +42,7 @@ const PARCHMENT = '#F7F3E3';
  * ambient halo. All decorative gradients are derived from engine colours.
  */
 export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
+  const { t } = useI18n();
   const coords = coordinateMap(tree.sephiroth);
   const pathLabels = pathLabelPositions(tree.paths, tree.sephiroth);
   const selectedId = selection?.id ?? null;
@@ -51,7 +53,7 @@ export function TreeOfLife({ tree, selection, onSelect }: TreeOfLifeProps) {
       viewBox={`${minX} ${minY} ${width} ${height}`}
       className="kabbalah-tree-svg mx-auto h-auto w-full max-w-[720px] select-none"
       role="img"
-      aria-label={`卡巴拉生命之树：${tree.sephirah_count} 原质与 ${tree.path_count} 路径`}
+      aria-label={t('卡巴拉生命之树：{{sep}} 原质与 {{path}} 路径', { sep: tree.sephirah_count, path: tree.path_count })}
     >
       <defs>
         <radialGradient id="treeNebula" cx="50%" cy="30%" r="80%">

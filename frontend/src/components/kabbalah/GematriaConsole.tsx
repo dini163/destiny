@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import type { GematriaReading } from '../../types/kabbalah';
 import type { Selection } from '../../lib/kabbalah';
 import { Icon } from '../ui/Icon';
@@ -20,6 +21,7 @@ interface GematriaConsoleProps {
  * single text field. The server does the arithmetic; nothing is computed here.
  */
 export function GematriaConsole({ value, onChange, pending, onSubmit }: GematriaConsoleProps) {
+  const { t } = useI18n();
   function handleSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     if (pending || value.trim() === '') return;
@@ -35,20 +37,21 @@ export function GematriaConsole({ value, onChange, pending, onSubmit }: Gematria
             type="text"
             value={value}
             onChange={(event) => onChange(event.target.value)}
-            placeholder="输入一个拉丁词或名字，如 Metatron / Zohar"
+            placeholder={t('输入一个拉丁词或名字，如 Metatron / Zohar')}
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-            aria-label="gematria 输入词"
+            aria-label={t('gematria 输入词')}
             maxLength={64}
           />
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={pending || value.trim() === ''}>
           <Icon name="gauge" size={18} />
-          {pending ? '称量中…' : '称量折入'}
+          {pending ? t('称量中…') : t('称量折入')}
         </button>
       </div>
       <p className="text-xs leading-relaxed text-ink-muted">
-        以英文 ordinal（A=1…Z=26）逐字母求和，再折入固定的十原质与 22 路径。纯中文或无拉丁字母的输入会返回{' '}
-        <span className="text-gold-soft">gematria_no_latin_letters</span>，请改用拉丁拼写。
+        {t('以英文 ordinal（A=1…Z=26）逐字母求和，再折入固定的十原质与 22 路径。纯中文或无拉丁字母的输入会返回 ')}
+        <span className="text-gold-soft">gematria_no_latin_letters</span>
+        {t('，请改用拉丁拼写。')}
       </p>
     </form>
   );
@@ -56,10 +59,11 @@ export function GematriaConsole({ value, onChange, pending, onSubmit }: Gematria
 
 /** One gematria statistic (ordinal / reduction / digital root). */
 function Stat({ label, value }: { label: string; value: number }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col items-center gap-0.5 rounded-element border border-rim-soft bg-surface/50 px-3 py-2">
       <span className="numeric font-display text-2xl font-semibold text-gold">{value}</span>
-      <span className="label-caps text-ink-muted">{label}</span>
+      <span className="label-caps text-ink-muted">{t(label)}</span>
     </div>
   );
 }
@@ -76,13 +80,14 @@ export function GematriaResult({
   reading: GematriaReading;
   onSelect: (selection: Selection) => void;
 }) {
+  const { t } = useI18n();
   const { sephirah, path } = reading;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="label-caps text-ink-muted">称量</span>
+        <span className="label-caps text-ink-muted">{t('称量')}</span>
         <span className="font-display text-lg text-ink">{reading.normalized}</span>
-        <span className="text-xs text-ink-muted">（原文：{reading.text}）</span>
+        <span className="text-xs text-ink-muted">{t('（原文：{{text}}）', { text: reading.text })}</span>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
@@ -116,7 +121,7 @@ export function GematriaResult({
             {sephirah.number}
           </span>
           <span className="flex flex-col">
-            <span className="label-caps text-ink-muted">折入原质</span>
+            <span className="label-caps text-ink-muted">{t('折入原质')}</span>
             <span className="font-display text-base text-ink">{sephirah.name_zh}</span>
             <span className="text-xs text-ink-muted">{sephirah.sphere}</span>
           </span>
@@ -131,7 +136,7 @@ export function GematriaResult({
             {path.letter}
           </span>
           <span className="flex flex-col">
-            <span className="label-caps text-ink-muted">折入路径</span>
+            <span className="label-caps text-ink-muted">{t('折入路径')}</span>
             <span className="font-display text-base text-ink">
               {path.tarot_zh} <span className="text-xs text-ink-muted">{path.tarot_numeral}</span>
             </span>
