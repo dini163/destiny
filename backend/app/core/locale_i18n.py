@@ -507,6 +507,22 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "天河水": "Heavenly River Water", "大驿土": "Post-Station Earth", "钗钏金": "Hairpin Metal",
         "桑柘木": "Mulberry Wood", "大溪水": "Great Stream Water", "沙中土": "Sand Earth",
         "天上火": "Heavenly Fire", "石榴木": "Pomegranate Wood", "大海水": "Great Sea Water",
+        # 六十甲子干支柱（bazi pillar 合成叶值）：天干拼音 + 地支拼音，与上单字同口径；皆繁简同形，无需繁体。
+        "甲子": "Jia Zi", "乙丑": "Yi Chou", "丙寅": "Bing Yin", "丁卯": "Ding Mao",
+        "戊辰": "Wu Chen", "己巳": "Ji Si", "庚午": "Geng Wu", "辛未": "Xin Wei",
+        "壬申": "Ren Shen", "癸酉": "Gui You", "甲戌": "Jia Xu", "乙亥": "Yi Hai",
+        "丙子": "Bing Zi", "丁丑": "Ding Chou", "戊寅": "Wu Yin", "己卯": "Ji Mao",
+        "庚辰": "Geng Chen", "辛巳": "Xin Si", "壬午": "Ren Wu", "癸未": "Gui Wei",
+        "甲申": "Jia Shen", "乙酉": "Yi You", "丙戌": "Bing Xu", "丁亥": "Ding Hai",
+        "戊子": "Wu Zi", "己丑": "Ji Chou", "庚寅": "Geng Yin", "辛卯": "Xin Mao",
+        "壬辰": "Ren Chen", "癸巳": "Gui Si", "甲午": "Jia Wu", "乙未": "Yi Wei",
+        "丙申": "Bing Shen", "丁酉": "Ding You", "戊戌": "Wu Xu", "己亥": "Ji Hai",
+        "庚子": "Geng Zi", "辛丑": "Xin Chou", "壬寅": "Ren Yin", "癸卯": "Gui Mao",
+        "甲辰": "Jia Chen", "乙巳": "Yi Si", "丙午": "Bing Wu", "丁未": "Ding Wei",
+        "戊申": "Wu Shen", "己酉": "Ji You", "庚戌": "Geng Xu", "辛亥": "Xin Hai",
+        "壬子": "Ren Zi", "癸丑": "Gui Chou", "甲寅": "Jia Yin", "乙卯": "Yi Mao",
+        "丙辰": "Bing Chen", "丁巳": "Ding Si", "戊午": "Wu Wu", "己未": "Ji Wei",
+        "庚申": "Geng Shen", "辛酉": "Xin You", "壬戌": "Ren Xu", "癸亥": "Gui Hai",
     },
 }
 

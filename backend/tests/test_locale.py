@@ -552,3 +552,27 @@ def test_bazi_nayin_and_shensha_localize() -> None:
     assert localize("天乙贵人", "en") == "Celestial Noble"
     assert localize("天乙贵人", "zh-Hant") == "天乙貴人"
     assert localize("空亡", "en") == "Void"
+
+
+def test_ganzhi_pillars_localize() -> None:
+    # p15：六十甲子干支柱在 en 下替换（拼音），皆繁简同形故 zh-Hant 逐字节透传。
+    stems = "甲乙丙丁戊己庚辛壬癸"
+    branches = "子丑寅卯辰巳午未申酉戌亥"
+    gz60 = {stems[i % 10] + branches[i % 12] for i in range(60)}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=_BAZI_NATAL)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=_BAZI_NATAL)
+        h = client.post("/api/v1/bazi/natal?locale=zh-Hant", json=_BAZI_NATAL)
+    assert d.status_code == e.status_code == h.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = {s for s in dl if s in gz60}
+    assert present, "bazi 命局应至少落一个干支柱叶值"
+    for token in present:
+        assert token not in el, f"en 未替换干支柱 {token}"
+        # 繁简同形：zh-Hant 应保留原串（仍作为叶值出现）。
+        assert token in hl, f"zh-Hant 不应改动干支柱 {token}"
+    assert localize("甲子", "en") == "Jia Zi"
+    assert localize("癸亥", "en") == "Gui Hai"
+    assert localize("甲子", "zh-Hant") == "甲子"
