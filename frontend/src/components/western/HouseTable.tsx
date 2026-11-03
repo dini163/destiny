@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import type { HouseCusp } from '../../types/western';
 
 /** The four angular houses (1/4/7/10) — a fixed fact, given a gold accent. */
@@ -14,6 +15,7 @@ interface HouseTableProps {
  * four angular houses accented. House 1 always equals the Ascendant.
  */
 export function HouseTable({ houses }: HouseTableProps) {
+  const { t } = useI18n();
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
       {houses.map((cusp) => {
@@ -28,7 +30,7 @@ export function HouseTable({ houses }: HouseTableProps) {
             }
           >
             <span className={angular ? 'label-caps text-gold' : 'label-caps text-ink-muted'}>
-              第 {cusp.house} 宫
+              {t('第 {{house}} 宫', { house: cusp.house })}
             </span>
             <span className="text-sm text-ink">
               {cusp.sign_zh}

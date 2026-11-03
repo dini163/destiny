@@ -1,4 +1,5 @@
 import { formatSpan, grahaColor } from '../../lib/vedic';
+import { useI18n } from '../../i18n/context';
 import type { Vimshottari } from '../../types/vedic';
 
 interface DashaTimelineProps {
@@ -15,29 +16,30 @@ interface DashaTimelineProps {
  * derived from the Moon's exact longitude (PRD no-mock rule).
  */
 export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
+  const { t } = useI18n();
   const { current } = vimshottari;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-element border border-rim-soft bg-surface/60 px-3 py-2 text-sm">
         <span className="text-ink-muted">
-          生月宿{' '}
+          {t('生月宿')}{' '}
           <span className="text-gold-bright">{vimshottari.birth_nakshatra_zh}</span>
           <span className="numeric text-xs text-ink-muted"> ({vimshottari.birth_nakshatra})</span>
         </span>
         <span className="text-ink-muted">
-          起运主星 <span className="text-gold-bright">{vimshottari.birth_lord_zh}</span>
+          {t('起运主星')} <span className="text-gold-bright">{vimshottari.birth_lord_zh}</span>
         </span>
         <span className="text-ink-muted">
-          出生余额{' '}
+          {t('出生余额')}{' '}
           <span className="numeric text-gold-soft">{formatSpan(vimshottari.balance_at_birth_years)}</span>
         </span>
         {current ? (
           <span className="text-ink-muted">
-            <span className="numeric">{current.target_date}</span> 行{' '}
-            <span className="text-gold-bright">{current.mahadasha_lord_zh}</span> 大运
+            <span className="numeric">{current.target_date}</span> {t('行')}{' '}
+            <span className="text-gold-bright">{current.mahadasha_lord_zh}</span> {t('大运')}
             {current.antardasha_lord_zh ? (
               <>
-                {' '}· <span className="text-gold-soft">{current.antardasha_lord_zh}</span> 小运
+                {' '}· <span className="text-gold-soft">{current.antardasha_lord_zh}</span> {t('小运')}
               </>
             ) : null}
           </span>
@@ -58,11 +60,11 @@ export function DashaTimeline({ vimshottari }: DashaTimelineProps) {
                   {md.glyph}
                 </span>
                 <span className={`font-display ${md.is_current ? 'text-gold-bright' : 'text-ink'}`}>
-                  {md.lord_zh}大运
+                  {md.lord_zh}{t('大运')}
                 </span>
                 <span className="numeric text-xs text-ink-muted">{formatSpan(md.years)}</span>
                 {md.is_current ? (
-                  <span className="label-caps rounded bg-gold/20 px-1.5 text-[9px] text-gold-bright">现行</span>
+                  <span className="label-caps rounded bg-gold/20 px-1.5 text-[9px] text-gold-bright">{t('现行')}</span>
                 ) : null}
               </span>
               <span className="numeric text-xs text-ink-muted">

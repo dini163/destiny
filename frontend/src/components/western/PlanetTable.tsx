@@ -1,4 +1,5 @@
 import { formatDegreeInSign, planetColor } from '../../lib/astro';
+import { useI18n } from '../../i18n/context';
 import type { NodeInfo, PlanetPlacement } from '../../types/western';
 
 interface PlanetTableProps {
@@ -28,6 +29,7 @@ interface EphemerisRow {
  * engine does not compute them and inventing them would breach the no-mock rule.
  */
 export function PlanetTable({ planets, nodes }: PlanetTableProps) {
+  const { t } = useI18n();
   const rows: EphemerisRow[] = [
     ...planets.map((planet) => ({
       key: planet.name,
@@ -69,11 +71,11 @@ export function PlanetTable({ planets, nodes }: PlanetTableProps) {
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="label-caps border-b border-rim text-ink-muted">
-            <th className="pb-2 font-medium">星体</th>
-            <th className="pb-2 font-medium">星座落位</th>
-            <th className="pb-2 font-medium">度数</th>
-            <th className="pb-2 font-medium">分宫</th>
-            <th className="pb-2 text-right font-medium">状态</th>
+            <th className="pb-2 font-medium">{t('星体')}</th>
+            <th className="pb-2 font-medium">{t('星座落位')}</th>
+            <th className="pb-2 font-medium">{t('度数')}</th>
+            <th className="pb-2 font-medium">{t('分宫')}</th>
+            <th className="pb-2 text-right font-medium">{t('状态')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-rim-soft">
@@ -92,7 +94,7 @@ export function PlanetTable({ planets, nodes }: PlanetTableProps) {
                 <span className="ml-1 text-xs text-ink-muted">{row.sign}</span>
               </td>
               <td className="numeric py-2 text-gold-soft">{row.degree}</td>
-              <td className="numeric py-2 text-ink-variant">第 {row.house} 宫</td>
+              <td className="numeric py-2 text-ink-variant">{t('第 {{house}} 宫', { house: row.house })}</td>
               <td className="py-2 text-right">
                 <StatusTag status={row.status} />
               </td>
@@ -106,11 +108,12 @@ export function PlanetTable({ planets, nodes }: PlanetTableProps) {
 
 /** Retrograde / direct / node indicator for the status column. */
 function StatusTag({ status }: { status: EphemerisRow['status'] }) {
+  const { t } = useI18n();
   if (status === 'retrograde') {
-    return <span className="text-xs text-wuxing-fire">℞ 逆行</span>;
+    return <span className="text-xs text-wuxing-fire">℞ {t('逆行')}</span>;
   }
   if (status === 'node') {
-    return <span className="text-xs text-ink-muted">平交点</span>;
+    return <span className="text-xs text-ink-muted">{t('平交点')}</span>;
   }
-  return <span className="text-xs text-ink-muted">顺行</span>;
+  return <span className="text-xs text-ink-muted">{t('顺行')}</span>;
 }

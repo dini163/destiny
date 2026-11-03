@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import { aspectStyle, planetColor } from '../../lib/astro';
 import type { Aspect, PlanetPlacement } from '../../types/western';
 
@@ -23,6 +24,7 @@ function formatOrb(orb: number): string {
  * from the shared aspect style map; no aspect is added or interpreted here.
  */
 export function AspectMatrix({ planets, aspects }: AspectMatrixProps) {
+  const { t } = useI18n();
   const bodyByName = useMemo(() => {
     const map = new Map<string, PlanetPlacement>();
     planets.forEach((planet) => map.set(planet.name, planet));
@@ -30,7 +32,7 @@ export function AspectMatrix({ planets, aspects }: AspectMatrixProps) {
   }, [planets]);
 
   if (aspects.length === 0) {
-    return <p className="text-sm text-ink-muted">当前星盘未检测到容许度内的主要相位。</p>;
+    return <p className="text-sm text-ink-muted">{t('当前星盘未检测到容许度内的主要相位。')}</p>;
   }
 
   return (
@@ -57,7 +59,7 @@ export function AspectMatrix({ planets, aspects }: AspectMatrixProps) {
               <span className="numeric block text-xs" style={{ color: style.color }}>
                 {style.label} {aspect.angle}°
               </span>
-              <span className="numeric text-[11px] text-ink-muted">容许度 {formatOrb(aspect.orb)}</span>
+              <span className="numeric text-[11px] text-ink-muted">{t('容许度')} {formatOrb(aspect.orb)}</span>
             </div>
           </div>
         );

@@ -1,4 +1,5 @@
 import { SOUTH_CELLS, grahaColor, planetsInSign, rashiByIndex } from '../../lib/vedic';
+import { useI18n } from '../../i18n/context';
 import type { VedicChart } from '../../types/vedic';
 
 interface SouthIndianChartProps {
@@ -15,6 +16,7 @@ interface SouthIndianChartProps {
  * highlighted; nothing is invented on the client (PRD no-mock rule).
  */
 export function SouthIndianChart({ chart }: SouthIndianChartProps) {
+  const { t } = useI18n();
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[560px]">
       <div className="grid h-full w-full grid-cols-4 grid-rows-4 gap-px overflow-hidden rounded-element border border-rim-soft bg-rim-soft">
@@ -62,12 +64,12 @@ export function SouthIndianChart({ chart }: SouthIndianChartProps) {
           className="flex flex-col items-center justify-center gap-1 bg-[var(--field-bg)] p-2 text-center"
           style={{ gridRowStart: 2, gridRowEnd: 4, gridColumnStart: 2, gridColumnEnd: 4 }}
         >
-          <span className="label-caps text-ink-muted">南印盘 · SOUTH INDIAN</span>
+          <span className="label-caps text-ink-muted">{t('南印盘 · SOUTH INDIAN')}</span>
           <span className="font-display text-sm text-gold-bright text-glow-gold">
-            上升 {chart.lagna_sign_glyph} {chart.lagna_sign_zh}
+            {t('上升')} {chart.lagna_sign_glyph} {chart.lagna_sign_zh}
           </span>
           <span className="text-xs text-ink-variant">
-            月亮 {chart.moon_sign_zh} · {chart.moon_nakshatra_zh}
+            {t('月亮')} {chart.moon_sign_zh} · {chart.moon_nakshatra_zh}
           </span>
           <span className="numeric mt-1 text-[10px] text-ink-muted">
             Ayanamsa {chart.ayanamsa.toFixed(2)}°

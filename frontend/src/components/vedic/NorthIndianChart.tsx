@@ -8,6 +8,7 @@ import {
   toPointsAttr,
 } from '../../lib/vedic';
 import type { VedicChart } from '../../types/vedic';
+import { useI18n } from '../../i18n/context';
 
 interface NorthIndianChartProps {
   chart: VedicChart;
@@ -22,9 +23,10 @@ interface NorthIndianChartProps {
  * and planet is the backend's real sidereal computation (PRD no-mock rule).
  */
 export function NorthIndianChart({ chart }: NorthIndianChartProps) {
+  const { t } = useI18n();
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[560px] rounded-element border border-rim-soft bg-[#0b0e16] p-1">
-      <svg viewBox="0 0 400 400" className="h-full w-full" role="img" aria-label="北印盘">
+      <svg viewBox="0 0 400 400" className="h-full w-full" role="img" aria-label={t('北印盘')}>
         {NORTH_HOUSES.map((house) => {
           const signIndex = signIndexOfHouse(house.house, chart.lagna_index);
           const centroid = polygonCentroid(house.points);
@@ -47,7 +49,7 @@ export function NorthIndianChart({ chart }: NorthIndianChartProps) {
                   letterSpacing="1"
                   fill="#f2ca50"
                 >
-                  命 LAGNA
+                  {t('命 LAGNA')}
                 </text>
               ) : null}
               <text

@@ -1,4 +1,5 @@
 import { grahaColor } from '../../lib/vedic';
+import { useI18n } from '../../i18n/context';
 import type { VedicChart } from '../../types/vedic';
 
 interface GrahaTableProps {
@@ -14,19 +15,20 @@ interface GrahaTableProps {
  * values are the backend's real Lahiri-ayanamsa computation (PRD no-mock rule).
  */
 export function GrahaTable({ chart }: GrahaTableProps) {
+  const { t } = useI18n();
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="label-caps text-ink-muted">
-            <th className="px-2 py-2 text-left font-normal">行星 / Graha</th>
-            <th className="px-2 py-2 text-left font-normal">星座</th>
-            <th className="px-2 py-2 text-right font-normal">黄经度</th>
-            <th className="px-2 py-2 text-center font-normal">宫</th>
-            <th className="px-2 py-2 text-left font-normal">星宿 Nakshatra</th>
-            <th className="px-2 py-2 text-center font-normal">主星</th>
-            <th className="px-2 py-2 text-center font-normal">足</th>
-            <th className="px-2 py-2 text-center font-normal">逆</th>
+            <th className="px-2 py-2 text-left font-normal">{t('行星 / Graha')}</th>
+            <th className="px-2 py-2 text-left font-normal">{t('星座')}</th>
+            <th className="px-2 py-2 text-right font-normal">{t('黄经度')}</th>
+            <th className="px-2 py-2 text-center font-normal">{t('宫')}</th>
+            <th className="px-2 py-2 text-left font-normal">{t('星宿 Nakshatra')}</th>
+            <th className="px-2 py-2 text-center font-normal">{t('主星')}</th>
+            <th className="px-2 py-2 text-center font-normal">{t('足')}</th>
+            <th className="px-2 py-2 text-center font-normal">{t('逆')}</th>
           </tr>
         </thead>
         <tbody>

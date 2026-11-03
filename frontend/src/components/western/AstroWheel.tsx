@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import {
   SIGN_GLYPHS,
   aspectStyle,
@@ -45,6 +46,7 @@ interface AstroWheelProps {
  * overlap. Exact degrees live in the ephemeris table, keeping the wheel legible.
  */
 export function AstroWheel({ planets, axes, houses, aspects }: AstroWheelProps) {
+  const { t } = useI18n();
   const ascendant = axes.find((axis) => axis.name === 'ASC');
   const ascLon = ascendant?.longitude ?? 0;
 
@@ -77,7 +79,7 @@ export function AstroWheel({ planets, axes, houses, aspects }: AstroWheelProps) 
   }, [axes]);
 
   return (
-    <svg viewBox="0 0 600 600" className="h-full w-full select-none" role="img" aria-label="本命星盘轮图">
+    <svg viewBox="0 0 600 600" className="h-full w-full select-none" role="img" aria-label={t('本命星盘轮图')}>
       <defs>
         <radialGradient id="wheelNebula" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#282a30" stopOpacity="0.55" />
