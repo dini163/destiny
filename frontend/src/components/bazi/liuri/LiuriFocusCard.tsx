@@ -24,7 +24,6 @@ import type { TransitDayDetail } from '../../../types/baziLiuri';
 export function LiuriFocusCard({ detail, href }: { detail: TransitDayDetail; href?: string }) {
   return (
     <ResultCard
-      eyebrow="FOCUSED DAY"
       title={`${detail.ganzhi}日`}
       icon="sun"
       actions={

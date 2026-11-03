@@ -77,7 +77,6 @@ interface SectionSpec {
   id: string;
   label: string;
   title: string;
-  eyebrow: string;
   icon: IconName;
   body: ReactNode;
 }
@@ -92,7 +91,6 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
       id: 'chars',
       label: '字级溯源',
       title: '康熙笔画核定',
-      eyebrow: 'STROKE PROVENANCE',
       icon: 'search',
       body: <CharProvenanceTable chars={analysis.chars} />,
     },
@@ -100,7 +98,6 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
       id: 'grids',
       label: '五格',
       title: '五格剖象全景图谱',
-      eyebrow: 'FIVE GRIDS',
       icon: 'compass',
       body: (
         <>
@@ -117,7 +114,6 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
           id: 'sancai',
           label: '三才',
           title: '三才配置深度研判',
-          eyebrow: 'SANCAI · 生克关系',
           icon: 'seal',
           body: <SancaiStrip sancai={analysis.sancai} grids={analysis.grids} />,
         }
@@ -127,7 +123,6 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
           id: 'index',
           label: '综合指数',
           title: '姓名综合气象指数',
-          eyebrow: 'INDEX · 五格加权',
           icon: 'gauge',
           body: <NameSummaryScore score={analysis.score} />,
         }
@@ -164,7 +159,7 @@ function NameResults({ analysis }: { analysis: NameAnalysis }) {
       <div className="flex flex-col gap-6">
         {sections.map((section) => (
           <div key={section.id} id={section.id} className="scroll-mt-20">
-            <ResultCard title={section.title} eyebrow={section.eyebrow} icon={section.icon} elevated>
+            <ResultCard title={section.title} icon={section.icon} elevated>
               {section.body}
             </ResultCard>
           </div>

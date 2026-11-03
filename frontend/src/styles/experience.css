@@ -241,13 +241,6 @@ a svg {
   gap: 64px;
   padding-block: 57px 56px;
 }
-.eyebrow {
-  font-size: 10px;
-  letter-spacing: 0.13em;
-  font-weight: 500;
-  color: var(--ink-muted);
-  line-height: 1.8;
-}
 .line {
   width: 28px;
   height: 1px;
@@ -581,10 +574,6 @@ a svg {
   align-items: center;
   scroll-margin-top: 30px;
 }
-.action-block .eyebrow {
-  font-size: 9px;
-  color: var(--ink);
-}
 .action-block h2 {
   font-family: var(--serif);
   font-size: 22px;
@@ -846,9 +835,6 @@ dialog::backdrop {
     max-width: none;
     font-size: 11px;
   }
-  .discovery-heading .eyebrow {
-    font-size: 9px;
-  }
   .question-grid {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -924,7 +910,6 @@ dialog::backdrop {
     position: static;
     padding-top: 0;
   }
-  .reader-toc > .eyebrow,
   .reader-toc > h2,
   .reader-toc > .toc-note {
     display: none;
@@ -1010,9 +995,6 @@ dialog::backdrop {
   }
   .action-block h2 {
     font-size: 21px;
-  }
-  .action-block .eyebrow {
-    font-size: 8px;
   }
   .action-block p {
     font-size: 12px;

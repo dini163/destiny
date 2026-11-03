@@ -257,7 +257,7 @@ export function BaziLiushiPage() {
 
           <VerdictCard verdict={result.verdict} />
 
-          <ResultCard title="流时白话" eyebrow="OVERALL READING · DAY" icon="sparkle" elevated>
+          <ResultCard title="流时白话" icon="sparkle" elevated>
             <PlainSectionList sections={result.plain} />
           </ResultCard>
 
@@ -269,7 +269,6 @@ export function BaziLiushiPage() {
           />
 
           <ResultCard
-            eyebrow="QI WAVEFORM"
             title="一日真气"
             icon="timeline"
             actions={
@@ -286,7 +285,6 @@ export function BaziLiushiPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="HOUR LADDER"
             title={`${result.day_ganzhi}日十二时辰`}
             icon="clock"
             actions={<span className="label-caps text-ink-muted">点一格看该时辰详批</span>}
@@ -299,7 +297,7 @@ export function BaziLiushiPage() {
             />
           </ResultCard>
 
-          <ResultCard eyebrow="PEAK NOTE" title="峰值备忘录" icon="gauge">
+          <ResultCard title="峰值备忘录" icon="gauge">
             <LiushiPeakNote cell={result.hours[peak]} dayValue={result.day_score.value} />
           </ResultCard>
 

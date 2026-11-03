@@ -43,7 +43,6 @@ export function LiuriSegmentHeader({
   const [open, setOpen] = useState(false);
   return (
     <ResultCard
-      eyebrow="DAILY SEGMENT"
       title={`${result.year_ganzhi}年 ${result.month_ganzhi}月`}
       icon="calendar"
       actions={

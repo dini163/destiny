@@ -302,7 +302,6 @@ export function BaziHehunPage() {
       {result ? (
         <>
           <ResultCard
-            eyebrow="COMPATIBILITY SCORE"
             title="契合度总分"
             icon="gauge"
             actions={
@@ -315,12 +314,11 @@ export function BaziHehunPage() {
             <VerdictCard verdict={result.verdict} />
           </ResultCard>
 
-          <ResultCard title="合盘白话" eyebrow="OVERALL READING · COMPATIBILITY" icon="sparkle" elevated>
+          <ResultCard title="合盘白话" icon="sparkle" elevated>
             <PlainSectionList sections={annotatePlainSections(result.plain)} />
           </ResultCard>
 
           <ResultCard
-            eyebrow="TWO CHARTS"
             title="男女档案对位"
             icon="vault"
             actions={<span className="label-caps text-ink-muted">喜忌与五行分布直取各造本命盘</span>}
@@ -329,7 +327,6 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="PAIR MATRIX"
             title="四柱对冲矩阵"
             icon="compass"
             actions={<span className="label-caps text-ink-muted">16 格恒在 · 空格即「无」</span>}
@@ -338,7 +335,6 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="FIRED RULES"
             title="命中清单"
             icon="sparkle"
             actions={<span className="label-caps text-ink-muted">族序即账本序</span>}
@@ -347,7 +343,6 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="FIVE-ELEMENT COMPLEMENT"
             title="五行互补"
             icon="vault"
             actions={<span className="label-caps text-ink-muted">两视角各一张 2×2</span>}
@@ -356,7 +351,6 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="SYNCHRONY AXIS"
             title="同频演进轴"
             icon="timeline"
             actions={<span className="label-caps text-ink-muted">分数与岁运年表同一把尺</span>}
@@ -372,7 +366,6 @@ export function BaziHehunPage() {
           </ResultCard>
 
           <ResultCard
-            eyebrow="DIRECTIONS & SEASONS"
             title="宜忌"
             icon="sun"
             actions={<span className="label-caps text-ink-muted">唯一输入是两造喜用</span>}

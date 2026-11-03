@@ -40,7 +40,6 @@ export function PortalPage() {
       <section id="matrix-section" className="catalogue-section">
         <div className="discovery-heading">
           <div>
-            <p className="eyebrow">EXPLORE THE SYSTEMS</p>
             <h2>找到你熟悉的那一种视角。</h2>
           </div>
           <SegmentedControl

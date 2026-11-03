@@ -19,7 +19,6 @@ type NatalSummary = Pick<
 export function TransitNatalBar({ natal }: { natal: NatalSummary }) {
   return (
     <ResultCard
-      eyebrow="NATAL BASELINE"
       title="推演所据的命局"
       icon="compass"
       actions={

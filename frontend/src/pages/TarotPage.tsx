@@ -148,7 +148,6 @@ function TarotResults({
         <div className="xl:col-span-8">
           <ResultCard
             title="牌阵盘面"
-            eyebrow="SPREAD BOARD"
             icon="vault"
             elevated
             actions={
@@ -178,7 +177,6 @@ function TarotResults({
         <div className="xl:col-span-4">
           <ResultCard
             title="牌义详解"
-            eyebrow="CARD INSPECTOR"
             icon="sparkle"
             elevated
             className="xl:sticky xl:top-32"
@@ -188,12 +186,12 @@ function TarotResults({
         </div>
       </div>
 
-      {spread.contextual_reading?.length ? <ResultCard title="围绕你选择的主题" eyebrow="READING LENS" icon="compass">
+      {spread.contextual_reading?.length ? <ResultCard title="围绕你选择的主题" icon="compass">
         {spread.contextual_reading.map(line => <p key={line} className="text-base leading-loose text-ink-variant">{line}</p>)}
       </ResultCard> : null}
       <VerdictCard verdict={spread.verdict} />
 
-      <ResultCard title="综合解读" eyebrow="SYNTHESIS" icon="seal" elevated>
+      <ResultCard title="综合解读" icon="seal" elevated>
         <p className="whitespace-pre-line text-sm leading-relaxed text-ink-variant">{spread.synthesis}</p>
       </ResultCard>
     </>

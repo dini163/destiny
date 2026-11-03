@@ -243,12 +243,11 @@ export function BaziLiuriPage() {
             onShift={handleShift}
           />
 
-          <ResultCard title="流月白话" eyebrow="OVERALL READING · MONTH SEGMENT" icon="sparkle" elevated>
+          <ResultCard title="流月白话" icon="sparkle" elevated>
             <PlainSectionList sections={result.plain} />
           </ResultCard>
 
           <ResultCard
-            eyebrow="DAILY MATRIX"
             title={`${result.month_ganzhi}月逐日矩阵`}
             icon="calendar"
             actions={<span className="label-caps text-ink-muted">点一格看当日详批</span>}

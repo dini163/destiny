@@ -35,7 +35,6 @@ export function QuestionEntries() {
     <section id="questions" className="question-section">
       <div className="discovery-heading">
         <div>
-          <p className="eyebrow">START WITH WHAT MATTERS</p>
           <h2>此刻，你更想了解什么？</h2>
         </div>
         <p>不必先懂术语，从一个真实的关心开始。</p>

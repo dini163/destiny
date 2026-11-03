@@ -190,7 +190,6 @@ function TransitResults({ chart }: { chart: TransitChart }) {
         <div className="flex flex-col gap-6 xl:col-span-7">
           <ResultCard
             title="行运双轮盘"
-            eyebrow="TRANSIT BI-WHEEL"
             icon="compass"
             actions={<span className="label-caps text-gold-soft">{config.short}叠加本命</span>}
             elevated
@@ -203,7 +202,6 @@ function TransitResults({ chart }: { chart: TransitChart }) {
 
           <ResultCard
             title="移动层对本命相位"
-            eyebrow="CROSS ASPECTS"
             icon="sparkle"
             actions={<span className="label-caps text-ink-muted">{aspects.length} 条 · 按容许度排序</span>}
             elevated
@@ -215,7 +213,6 @@ function TransitResults({ chart }: { chart: TransitChart }) {
         <div className="flex flex-col gap-6 xl:col-span-5">
           <ResultCard
             title={`${config.short}行星位置`}
-            eyebrow="MOVING EPHEMERIS"
             icon="gauge"
             actions={<span className="label-caps text-ink-muted">落本命十二宫</span>}
             elevated
@@ -230,7 +227,6 @@ function TransitResults({ chart }: { chart: TransitChart }) {
 
       <ResultCard
         title="白话详解"
-        eyebrow="PLAIN READING"
         icon="sparkle"
         actions={<span className="label-caps text-ink-muted">五段 · 逐条转述已算出的相位与标志位</span>}
         elevated
@@ -277,7 +273,7 @@ function SummaryStrip({ chart }: { chart: TransitChart }) {
 /** Secondary-progression highlights: the progressed Moon and angles. */
 function ProgressionCard({ progression }: { progression: ProgressionBlock }) {
   return (
-    <ResultCard title="次限推运要点" eyebrow="SECONDARY PROGRESSION" icon="clock" elevated>
+    <ResultCard title="次限推运要点" icon="clock" elevated>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           <span className="flex items-center gap-2 rounded-element border border-rim-soft bg-surface/60 px-3 py-1.5">
@@ -312,7 +308,7 @@ function ProgressionCard({ progression }: { progression: ProgressionBlock }) {
 /** Solar-arc highlights: the directed arc and how to read it. */
 function SolarArcCard({ solarArc }: { solarArc: SolarArcBlock }) {
   return (
-    <ResultCard title="太阳弧推进" eyebrow="SOLAR ARC DIRECTION" icon="sun" elevated>
+    <ResultCard title="太阳弧推进" icon="sun" elevated>
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 rounded-element border border-rim-soft bg-surface/60 px-3 py-2">
           <span className="text-ink-muted">推进弧</span>

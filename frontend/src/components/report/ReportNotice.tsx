@@ -7,7 +7,6 @@ export function ReportNotice({ product }: { product?: ReportProduct }) {
   const entry = product ? REPORT_ENTRIES[product] : null;
   return (
     <section className="route-error">
-      <p className="eyebrow">START WITH YOUR CHART</p>
       <h1>{entry ? '还没有可用的测算输入' : '这份报告链接暂不可用'}</h1>
       <p>
         {entry

@@ -58,7 +58,6 @@ export function LiushiDayHeader({
   const yi = yiPreview(result.day_almanac.yi);
   return (
     <ResultCard
-      eyebrow="HOURS OF A DAY"
       title={`${result.year_ganzhi}年 ${result.month_ganzhi}月 · ${result.day_ganzhi}日`}
       icon="sun"
       actions={

@@ -75,13 +75,12 @@ function QimenResults({ chart }: { chart: QimenChart }) {
 
       <VerdictCard verdict={chart.verdict} />
 
-      <ResultCard title="全局白话" eyebrow="OVERALL READING · WHOLE BOARD" icon="sparkle" elevated>
+      <ResultCard title="全局白话" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
 
       <ResultCard
         title="洛书九宫盘"
-        eyebrow="天地人神 · 四盘交错"
         icon="gauge"
         elevated
         actions={
@@ -91,7 +90,7 @@ function QimenResults({ chart }: { chart: QimenChart }) {
         <QimenBoard chart={chart} />
       </ResultCard>
 
-      <ResultCard title="九宫白话" eyebrow="PLAIN READING · 9 PALACES" icon="sparkle" elevated>
+      <ResultCard title="九宫白话" icon="sparkle" elevated>
         <PlainSectionList
           sections={chart.palaces.map((palace) => ({
             title: `${palace.gua}${palace.number}宫 · ${palace.direction}`,

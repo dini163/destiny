@@ -88,7 +88,8 @@ it('the page wires chart.plain under 白话详解, the provenance block is remov
   const src = readFileSync(fileURLToPath(new URL(PAGE, import.meta.url)), 'utf8');
   expect(src).toContain('<PlainSectionList sections={chart.plain} />');
   expect(src).toContain('title="白话详解"');
-  expect(src).toContain('eyebrow="PLAIN READING"');
+  // 页头英文类目 kicker 已按"去掉 eyebrow"的设计决策整体移除；白话详解卡只留中文标题。
+  expect(src).not.toContain('eyebrow="PLAIN READING"');
   // 溯源块已按 2026-10-21 UI 需求移除：页面不得再出现 `<Provenance>` 组件（含共享面板的挂载）。
   expect(src).not.toContain('<Provenance');
   // 本轮上线的东西**就是**主观吉凶演绎（542 条自撰判语），这句留着就是页面上的假话（spec §1.1）。

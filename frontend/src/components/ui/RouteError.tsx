@@ -7,7 +7,6 @@ export function RouteError() {
     /dynamically imported|Loading chunk|module script/i.test(error.message);
   return (
     <main className="route-error" role="alert">
-      <p className="eyebrow">LET’S FIND THE WAY BACK</p>
       <h1>
         {missingChunk ? '页面刚刚更新，请重新载入。' : '这个页面暂时无法打开。'}
       </h1>

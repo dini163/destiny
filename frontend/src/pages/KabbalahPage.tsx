@@ -77,7 +77,7 @@ export function KabbalahPage() {
               </div>
 
               <div className="kabbalah-reveal" style={{ animationDelay: '0.18s' }}>
-                <ResultCard title="全树白话" eyebrow="OVERALL READING · TREE OF LIFE" icon="sparkle" elevated>
+                <ResultCard title="全树白话" icon="sparkle" elevated>
                   <PlainSectionList sections={tree.data.plain} />
                 </ResultCard>
               </div>
@@ -85,7 +85,6 @@ export function KabbalahPage() {
             <div className="min-w-0 lg:col-span-5 2xl:col-span-4">
               <ResultCard
                 title="原质 / 路径详解"
-                eyebrow="NODE INSPECTOR"
                 icon="search"
                 className="lg:sticky lg:top-36 lg:self-start"
               >
@@ -99,7 +98,7 @@ export function KabbalahPage() {
             </div>
           </div>
 
-          <ResultCard title="gematria 数理折入" eyebrow="GEMATRIA FOLD" icon="gauge">
+          <ResultCard title="gematria 数理折入" icon="gauge">
             <GematriaConsole value={word} onChange={setWord} pending={gematria.isPending} onSubmit={handleWeigh} />
             {gematria.error ? (
               <div className="flex items-start gap-2 rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-3 py-2 text-sm text-ink">
@@ -118,7 +117,7 @@ export function KabbalahPage() {
 /** Page intro: what the Tree is, plus the three pillars and four worlds as a legend. */
 function Intro() {
   return (
-    <ResultCard title="卡巴拉生命之树" eyebrow="KABBALAH · TREE OF LIFE" icon="compass" elevated>
+    <ResultCard title="卡巴拉生命之树" icon="compass" elevated>
       <p className="max-w-4xl text-sm leading-relaxed text-ink-variant sm:text-base">
         生命之树是卡巴拉的核心图示：神圣之光自<span className="text-gold-soft">王冠（Kether）</span>逐级降落，经十原质（Sephiroth）显化为物质世界的<span className="text-gold-soft">王国（Malkuth）</span>；十原质之间由 22 条路径相连，每条路径对应一个希伯来字母、一张塔罗大阿卡纳与一组行星／星座／元素。点选任意原质或路径，即可查其黄金黎明（Golden Dawn）体系下的完整对应。
       </p>

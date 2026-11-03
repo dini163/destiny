@@ -126,15 +126,15 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
 
       <VerdictCard verdict={chart.verdict} />
 
-      <ResultCard title="全盘白话" eyebrow="OVERALL READING · WHOLE CHART" icon="sparkle" elevated>
+      <ResultCard title="全盘白话" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
 
-      <ResultCard title="十二宫命盘" eyebrow="ZI WEI CHART · 4×4" icon="vault" elevated>
+      <ResultCard title="十二宫命盘" icon="vault" elevated>
         <ZiweiChartGrid chart={chart} />
       </ResultCard>
 
-      <ResultCard title="十二宫白话" eyebrow="PLAIN READING · 12 PALACES" icon="sparkle" elevated>
+      <ResultCard title="十二宫白话" icon="sparkle" elevated>
         <PlainSectionList
           sections={chart.palaces.map((palace) => ({ title: palace.name, text: palace.plain }))}
         />

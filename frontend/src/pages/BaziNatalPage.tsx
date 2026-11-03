@@ -163,7 +163,6 @@ interface SectionSpec {
   /** Short name in the sticky anchor nav. */
   label: string;
   title: string;
-  eyebrow: string;
   icon: IconName;
   body: ReactNode;
 }
@@ -193,7 +192,6 @@ function sectionsFor(
       id: 'pillars',
       label: '四柱',
       title: '四柱命造干支矩阵',
-      eyebrow: 'FOUR PILLARS MATRIX',
       icon: 'compass',
       body: (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -212,7 +210,6 @@ function sectionsFor(
           id: 'stems',
           label: '藏干十神',
           title: '地支藏干权重与十神',
-          eyebrow: 'HIDDEN STEMS',
           icon: 'seal',
           body: (
             <div className="flex flex-col gap-4">
@@ -226,7 +223,6 @@ function sectionsFor(
       id: 'wuxing',
       label: '五行',
       title: '五行能量量化分布',
-      eyebrow: 'WUXING',
       icon: 'sparkle',
       body: <WuxingBars scores={chart.wuxing} missing={chart.missing_elements} />,
     },
@@ -234,7 +230,6 @@ function sectionsFor(
       id: 'strength',
       label: '强弱格局',
       title: '日主强弱与格局',
-      eyebrow: 'STRENGTH & STRUCTURE',
       icon: 'gauge',
       body: (
         <div className="flex flex-col gap-4">
@@ -248,7 +243,6 @@ function sectionsFor(
           id: 'yongshen',
           label: '用神三法',
           title: '用神三法（扶抑 / 通关 / 调候）',
-          eyebrow: 'USEFUL GOD',
           icon: 'compass',
           body: <YongshenPanel yongshen={chart.yongshen} />,
         }
@@ -258,7 +252,6 @@ function sectionsFor(
           id: 'shensha',
           label: '神煞',
           title: '神煞命中',
-          eyebrow: 'SHENSHA',
           icon: 'vault',
           body: <ShenShaList entries={chart.shensha} />,
         }
@@ -268,7 +261,6 @@ function sectionsFor(
           id: 'relations',
           label: '刑冲合害',
           title: '刑冲合害破与合会局',
-          eyebrow: 'RELATIONS',
           icon: 'compass',
           body: <RelationChips relations={relations} groups={branchGroups} />,
         }
@@ -277,7 +269,6 @@ function sectionsFor(
       id: 'dayun',
       label: '大运',
       title: '大运流变时间轴',
-      eyebrow: 'DAYUN · 十年一步',
       icon: 'timeline',
       body: (
         <div className="flex flex-col gap-4">
@@ -308,7 +299,6 @@ function sectionsFor(
           id: 'dimensions',
           label: '六维详批',
           title: '六维详批',
-          eyebrow: 'SIX DIMENSIONS',
           icon: 'sparkle',
           body: <DimensionGrid reading={chart.interpretation} />,
         }
@@ -354,7 +344,6 @@ function BaziResults({
           <div key={section.id} id={section.id} className="scroll-mt-20">
             <ResultCard
               title={section.title}
-              eyebrow={section.eyebrow}
               icon={section.icon}
               elevated
             >

@@ -75,9 +75,6 @@
 .reader-companion > p {
   font-size: 14px;
 }
-.reader-companion .eyebrow {
-  font-size: 10px;
-}
 .reader-companion h2 {
   font-family: var(--serif);
   font-size: 24px;
@@ -164,7 +161,6 @@
   .reader-toc {
     position: static;
   }
-  .reader-toc .eyebrow,
   .reader-toc h2,
   .reader-toc-note {
     display: none;

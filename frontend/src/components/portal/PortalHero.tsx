@@ -4,7 +4,6 @@ export function PortalHero() {
   return (
     <section className="discovery-hero">
       <div>
-        <p className="eyebrow">ANCIENT WISDOM, PERSONAL PERSPECTIVE</p>
         <h1>
           把古老的智慧，
           <br />

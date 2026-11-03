@@ -199,7 +199,6 @@ export function FutharkCodex({ codex }: FutharkCodexProps) {
   return (
     <ResultCard
       title="全典 · Elder Futhark"
-      eyebrow="CODEX"
       icon="search"
       actions={
         <span className="numeric label-caps text-ink-muted">

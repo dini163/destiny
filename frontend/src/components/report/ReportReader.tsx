@@ -62,7 +62,6 @@ export function ReportReader({
   return (
     <div className="reader-layout">
       <aside className="reader-toc" aria-label="报告目录">
-        <p className="eyebrow">YOUR READING</p>
         <h2>{doc.title}</h2>
         <nav onClick={navigateWithinReport}>
           <a href="#report-overview">报告概览</a>
@@ -81,7 +80,6 @@ export function ReportReader({
           <ReportHeader doc={doc} />
         </div>
         <section className="reader-section" id="reading-insights">
-          <p className="eyebrow">01 / 先看重点</p>
           <h2>把注意力，放在真正有用的地方。</h2>
           <ol className="insight-list">
             {reportHighlights(doc).map((point, index) => {
@@ -100,7 +98,6 @@ export function ReportReader({
         </section>
         {action && (
           <section id="reading-action" className="action-block">
-            <p className="eyebrow">A SMALL STEP, STARTING TODAY</p>
             <h2>从一件可以试试的小事开始。</h2>
             <p>{action}</p>
             <label className="action-check">
@@ -113,7 +110,6 @@ export function ReportReader({
           历法排盘可以复算；传统解释不等于经过验证的性格测评或未来预测。请用现实经历判断它是否适合你。
         </p>
         <section className="reader-section" id="reading-full">
-          <p className="eyebrow">02 / 继续深入</p>
           <h2>按你的节奏，慢慢读完。</h2>
           <div className="report-chapters">
             {doc.sections.map((section, index) => (
@@ -127,7 +123,6 @@ export function ReportReader({
         </section>
       </article>
       <aside className="reader-companion">
-        <p className="eyebrow">留一点时间给自己</p>
         <h2>
           读完之后，
           <br />

@@ -162,7 +162,6 @@ function VedicResults({ chart }: { chart: VedicChart }) {
         <ResultCard
           className="xl:col-span-5"
           title={style === 'south' ? '南印本命盘' : '北印本命盘'}
-          eyebrow={style === 'south' ? 'SOUTH INDIAN RASHI' : 'NORTH INDIAN RASHI'}
           icon="compass"
           actions={
             <span className="label-caps text-gold-soft">
@@ -177,7 +176,6 @@ function VedicResults({ chart }: { chart: VedicChart }) {
         <ResultCard
           className="xl:col-span-7"
           title="九曜星历表"
-          eyebrow="NAVAGRAHA EPHEMERIS"
           icon="gauge"
           actions={<span className="label-caps text-ink-muted">恒星黄道 · 含星宿</span>}
           elevated
@@ -188,7 +186,6 @@ function VedicResults({ chart }: { chart: VedicChart }) {
 
       <ResultCard
         title="Vimshottari 大运时间轴"
-        eyebrow="DASHA TIMELINE · 120 YEARS"
         icon="timeline"
         actions={
           <span className="label-caps text-ink-muted">
@@ -202,7 +199,6 @@ function VedicResults({ chart }: { chart: VedicChart }) {
 
       <ResultCard
         title="白话详解"
-        eyebrow="PLAIN READING"
         icon="sparkle"
         actions={<span className="label-caps text-ink-muted">四段 · 逐条转述已算出的落座、落宫、宿与主事星</span>}
         elevated

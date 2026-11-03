@@ -99,20 +99,19 @@ function MeihuaResults({ cast }: { cast: MeihuaCast }) {
 
       <VerdictCard verdict={cast.verdict} />
 
-      <ResultCard title="卦象三盘" eyebrow="本 · 互 · 变" icon="seal" elevated>
+      <ResultCard title="卦象三盘" icon="seal" elevated>
         <HexagramTriad cast={cast} />
       </ResultCard>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <ResultCard title="体用生克" eyebrow="TI · YONG" icon="compass">
+          <ResultCard title="体用生克" icon="compass">
             <TiYongPanel cast={cast} />
           </ResultCard>
         </div>
         <div className="lg:col-span-5">
           <ResultCard
             title="吉凶指数"
-            eyebrow="FORTUNE INDEX"
             icon="gauge"
             className="lg:sticky lg:top-32"
           >
@@ -121,7 +120,7 @@ function MeihuaResults({ cast }: { cast: MeihuaCast }) {
         </div>
       </div>
 
-      <ResultCard title="互变推演" eyebrow="PROCESS · OUTCOME" icon="timeline">
+      <ResultCard title="互变推演" icon="timeline">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <AnalysisBlock label="互卦 · 事之中段" text={cast.hu_analysis} />
           <AnalysisBlock label="变卦 · 事之归宿" text={cast.bian_analysis} />

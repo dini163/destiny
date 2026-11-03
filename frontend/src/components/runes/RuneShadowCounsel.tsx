@@ -29,7 +29,7 @@ export function RuneShadowCounsel({ notes }: RuneShadowCounselProps) {
   if (notes === null || notes.length === 0) return null;
 
   return (
-    <ResultCard title="阴影参照" eyebrow="MERKSTAVE" icon="alert">
+    <ResultCard title="阴影参照" icon="alert">
       <p className="text-xs leading-relaxed text-ink-muted">
         只列本次抽到的可逆符，逐条标明它是参照还是本次结果。八枚对称符与空白符没有另一面，
         故不在这里 —— 判据全文在碑阵底下。

@@ -113,12 +113,12 @@ function LenormandResults({
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="lg:col-span-7">
-          <ResultCard title="组合直读透镜" eyebrow="COMBINATION LENS" icon="compass">
+          <ResultCard title="组合直读透镜" icon="compass">
             <CombinationLens reading={reading} />
           </ResultCard>
         </div>
         <div className="lg:col-span-5">
-          <ResultCard title="牌义详解" eyebrow="CARD INSPECTOR" icon="search" className="lg:sticky lg:top-32">
+          <ResultCard title="牌义详解" icon="search" className="lg:sticky lg:top-32">
             {activeCard ? (
               <CardInspector card={activeCard} onDeselect={() => onSelect(null)} />
             ) : (
@@ -130,7 +130,7 @@ function LenormandResults({
 
       <VerdictCard verdict={reading.verdict} />
 
-      <ResultCard title="综合判读" eyebrow="SYNTHESIS" icon="sparkle">
+      <ResultCard title="综合判读" icon="sparkle">
         <p className="font-display text-sm leading-relaxed text-ink-variant sm:text-base">{reading.synthesis}</p>
       </ResultCard>
     </>

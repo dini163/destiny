@@ -95,25 +95,25 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
 
       <VerdictCard verdict={cast.verdict} />
 
-      <ResultCard title="整卦白话" eyebrow="OVERALL READING · WHOLE HEXAGRAM" icon="sparkle" elevated>
+      <ResultCard title="整卦白话" icon="sparkle" elevated>
         <PlainSectionList sections={cast.plain} />
       </ResultCard>
 
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         <div className="lg:col-span-8">
-          <ResultCard title="纳甲六亲盘" eyebrow="NAJIA MATRIX" icon="seal" elevated>
+          <ResultCard title="纳甲六亲盘" icon="seal" elevated>
             <HexagramStack ben={ben} bian={bian} lines={lines} />
           </ResultCard>
         </div>
         <div className="lg:col-span-4">
-          <ResultCard title="起卦记录" eyebrow="CAST LEDGER" icon="timeline" className="lg:sticky lg:top-32">
+          <ResultCard title="起卦记录" icon="timeline" className="lg:sticky lg:top-32">
             <CastLedger lines={lines} />
           </ResultCard>
         </div>
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-2">
-        <ResultCard title="变卦" eyebrow="CHANGED · 之卦" icon="arrowRight">
+        <ResultCard title="变卦" icon="arrowRight">
           {bian ? (
             <HexagramCard hexagram={bian} moving={moving_positions} note="本卦动爻阴阳互变得变卦，示事之趋向。" />
           ) : (
@@ -122,12 +122,12 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
             </p>
           )}
         </ResultCard>
-        <ResultCard title="互卦" eyebrow="NUCLEAR · 互卦" icon="vault">
+        <ResultCard title="互卦" icon="vault">
           <HexagramCard hexagram={hu} note="取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。" />
         </ResultCard>
       </div>
 
-      <ResultCard title="卦爻辞" eyebrow="CLASSICAL TEXT · 周易通行本" icon="sparkle" elevated>
+      <ResultCard title="卦爻辞" icon="sparkle" elevated>
         <ClassicalText ben={ben} lines={lines} />
       </ResultCard>
     </>

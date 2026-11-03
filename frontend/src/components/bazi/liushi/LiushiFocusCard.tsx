@@ -18,7 +18,6 @@ import type { TransitHourDetail } from '../../../types/baziLiushi';
 export function LiushiFocusCard({ detail }: { detail: TransitHourDetail }) {
   return (
     <ResultCard
-      eyebrow="FOCUSED HOUR"
       title={`${detail.ganzhi}时`}
       icon="clock"
       actions={

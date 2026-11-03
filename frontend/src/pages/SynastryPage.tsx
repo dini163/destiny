@@ -135,7 +135,6 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
       <VerdictCard verdict={chart.verdict} />
 
       <ResultCard
-        eyebrow="COMPATIBILITY SCORE"
         title="相契度总分"
         icon="gauge"
         actions={
@@ -158,7 +157,6 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
         <div className="flex flex-col gap-6 xl:col-span-7">
           <ResultCard
             title="合盘双轮盘"
-            eyebrow="SYNASTRY BI-WHEEL"
             icon="compass"
             actions={<span className="label-caps text-gold-soft">内{chart.person_a_name} · 外{chart.person_b_name}</span>}
             elevated
@@ -177,7 +175,6 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
 
           <ResultCard
             title="人对人相位"
-            eyebrow="SYNASTRY ASPECTS"
             icon="sparkle"
             actions={<span className="label-caps text-ink-muted">共 {chart.synastry_aspects.length} 对</span>}
             elevated
@@ -189,7 +186,6 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
         <div className="flex flex-col gap-6 xl:col-span-5">
           <ResultCard
             title="组合中点盘"
-            eyebrow="COMPOSITE CHART"
             icon="sun"
             actions={<span className="label-caps text-ink-muted">{composite.method} · 短弧中点</span>}
             elevated
@@ -212,14 +208,14 @@ function SynastryResults({ chart }: { chart: SynastryChart }) {
             </div>
           </ResultCard>
 
-          <ResultCard title="组合盘元素与形态" eyebrow="COMPOSITE BALANCE" icon="seal" elevated>
+          <ResultCard title="组合盘元素与形态" icon="seal" elevated>
             <ElementBalance
               elementBalance={composite.element_balance}
               modalityBalance={composite.modality_balance}
             />
           </ResultCard>
 
-          <ResultCard title="组合盘十二宫头" eyebrow="COMPOSITE HOUSES" icon="timeline" elevated>
+          <ResultCard title="组合盘十二宫头" icon="timeline" elevated>
             <HouseTable houses={composite.houses} />
           </ResultCard>
         </div>

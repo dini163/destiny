@@ -37,7 +37,6 @@ export function ProfilesPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <ResultCard
         title="我的档案"
-        eyebrow="PROFILE VAULT · LOCAL ONLY"
         icon="vault"
         elevated
       >

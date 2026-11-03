@@ -37,7 +37,7 @@ export function RuneVaultPanel({ cast }: RuneVaultPanelProps) {
   }
 
   return (
-    <ResultCard title="神谕秘匣" eyebrow="ORACLE ARCHIVE" icon="vault">
+    <ResultCard title="神谕秘匣" icon="vault">
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={handleSave} className="btn-primary shrink-0">
           <Icon name="vault" size={18} />

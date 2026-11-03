@@ -300,12 +300,11 @@ export function BaziTransitPage() {
 
           <VerdictCard verdict={transit.data.verdict} />
 
-          <ResultCard title="岁运白话" eyebrow="OVERALL READING · YEAR RANGE" icon="sparkle" elevated>
+          <ResultCard title="岁运白话" icon="sparkle" elevated>
             <PlainSectionList sections={transit.data.plain} />
           </ResultCard>
 
           <ResultCard
-            eyebrow="ANNUAL LEDGER"
             title="流年区间账本"
             icon="timeline"
             actions={<RangeEcho result={transit.data} />}

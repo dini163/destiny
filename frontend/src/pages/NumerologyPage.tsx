@@ -93,7 +93,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
       <ChartSummary chart={chart} />
 
       <ResultCard
-        eyebrow="ASTRAL CORE MATRIX"
         title="核心本命数仪表盘"
         icon="gauge"
         actions={
@@ -118,7 +117,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
           窄屏自然叠成两行，各自仍是完整的两张表。 */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <ResultCard
-          eyebrow="NAME GRID"
           title="姓名天赋九宫"
           icon="search"
           actions={
@@ -131,7 +129,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
         </ResultCard>
 
         <ResultCard
-          eyebrow="LOSHU GRID"
           title="生辰洛书九宫"
           icon="compass"
           actions={
@@ -145,7 +142,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
       </div>
 
       <ResultCard
-        eyebrow="PINNACLES & CHALLENGES"
         title="顶峰与挑战阶梯"
         icon="timeline"
         actions={<span className="label-caps text-ink-muted">四程顶峰 · 四项挑战</span>}
@@ -154,7 +150,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
       </ResultCard>
 
       <ResultCard
-        eyebrow="PERSONAL CYCLES"
         title="个人年月日周期"
         icon="calendar"
         actions={
@@ -167,7 +162,6 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
       </ResultCard>
 
       <ResultCard
-        eyebrow="LETTER MAP"
         title="字母映射与逐字透视"
         icon="seal"
         actions={

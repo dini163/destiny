@@ -7,7 +7,6 @@ import { ROUTES } from '../nav';
 export function NotFoundPage() {
   return (
     <PagePlaceholder
-      eyebrow="404 · CHART NOT FOUND"
       title="迷失星域"
       summary="未找到该路径对应的秘术体系，请返回测算大厅重新起盘。"
       status="ERROR 404"

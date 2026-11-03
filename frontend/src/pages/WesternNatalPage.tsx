@@ -158,7 +158,6 @@ function WesternResults({ chart }: { chart: WesternChart }) {
         <div className="flex flex-col gap-6 xl:col-span-7">
           <ResultCard
             title="天球黄道命盘轮图"
-            eyebrow="NATAL ASTRO WHEEL"
             icon="compass"
             actions={<span className="label-caps text-ink-muted">{chart.house_system} · {chart.zodiac}</span>}
             elevated
@@ -174,31 +173,31 @@ function WesternResults({ chart }: { chart: WesternChart }) {
             <AspectLegend />
           </ResultCard>
 
-          <ResultCard title="元素与形态分布" eyebrow="BALANCE" icon="seal" elevated>
+          <ResultCard title="元素与形态分布" icon="seal" elevated>
             <ElementBalance elementBalance={chart.element_balance} modalityBalance={chart.modality_balance} />
           </ResultCard>
 
-          <ResultCard title="十二宫头" eyebrow="HOUSE CUSPS" icon="timeline" elevated>
+          <ResultCard title="十二宫头" icon="timeline" elevated>
             <HouseTable houses={chart.houses} />
           </ResultCard>
         </div>
 
         <div className="flex flex-col gap-6 xl:col-span-5">
-          <ResultCard title="本命三巨头核心图腾" eyebrow="NATAL TRINITY" icon="sun" elevated>
+          <ResultCard title="本命三巨头核心图腾" icon="sun" elevated>
             <BigThree planets={chart.planets} axes={chart.axes} />
           </ResultCard>
 
-          <ResultCard title="十大主星与交点" eyebrow="EPHEMERIS TABLE" icon="gauge" elevated>
+          <ResultCard title="十大主星与交点" icon="gauge" elevated>
             <PlanetTable planets={chart.planets} nodes={chart.nodes} />
           </ResultCard>
 
-          <ResultCard title="关键相位网格" eyebrow="MAJOR ASPECTS" icon="sparkle" elevated>
+          <ResultCard title="关键相位网格" icon="sparkle" elevated>
             <AspectMatrix planets={chart.planets} aspects={chart.aspects} />
           </ResultCard>
         </div>
       </div>
 
-      <ResultCard title="白话详解" eyebrow="PLAIN READING" icon="sparkle" elevated>
+      <ResultCard title="白话详解" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
       </ResultCard>
     </>

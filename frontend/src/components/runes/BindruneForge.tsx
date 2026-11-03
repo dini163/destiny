@@ -47,7 +47,7 @@ export function BindruneForge({ codex }: BindruneForgeProps) {
   }
 
   return (
-    <ResultCard title="Bindrune 组合符" eyebrow="FORGE" icon="compass">
+    <ResultCard title="Bindrune 组合符" icon="compass">
       <p className="text-sm leading-relaxed text-ink-muted">
         从全典挑 1–{MAX_SELECTED} 枚符文，并置成一条组合符。这里只做字形并置，不自动熔刻笔画；
         传统叠笔需手工刻写。
