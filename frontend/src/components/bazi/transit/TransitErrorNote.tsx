@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { Icon } from '../../ui/Icon';
 import { GENDER_LABEL } from '../../../lib/gender';
 import type { ApiError } from '../../../api/client';
@@ -25,6 +26,7 @@ export function TransitErrorNote({
   /** 域错误时补的一句"那该怎么办"，各页按自己的控件写。 */
   hint?: string;
 }) {
+  const { t } = useI18n();
   const isDomain =
     error.code.startsWith('transit_') ||
     error.code.startsWith('liuri_') ||
@@ -47,13 +49,13 @@ export function TransitErrorNote({
           <span className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-muted">
             {facts.map((fact) => (
               <span key={fact.label}>
-                {fact.label}
-                <span className="numeric ml-1 text-ink">{fact.value}</span>
+                {t(fact.label)}
+                <span className="numeric ml-1 text-ink">{t(fact.value)}</span>
               </span>
             ))}
           </span>
         ) : null}
-        {isDomain && hint ? <span className="text-xs text-ink-muted">{hint}</span> : null}
+        {isDomain && hint ? <span className="text-xs text-ink-muted">{t(hint)}</span> : null}
       </div>
     </div>
   );

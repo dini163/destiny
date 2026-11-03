@@ -27,7 +27,7 @@ const PAGES: ReadonlyArray<{ title: string; source: string; anchors: string[] }>
   { title: '岁运白话', source: 'src/pages/BaziTransitPage.tsx',
     anchors: ['<TransitNatalBar natal={transit.data} />', 'title="岁运白话"', 'sections={transit.data.plain}', 'title="流年区间账本"'] },
   { title: '流月白话', source: 'src/pages/BaziLiuriPage.tsx',
-    anchors: ['<LiuriSegmentHeader', 'title="流月白话"', 'sections={result.plain}', '月逐日矩阵`}'] },
+    anchors: ['<LiuriSegmentHeader', 'title="流月白话"', 'sections={result.plain}', '{{gz}}月逐日矩阵'] },
   { title: '流时白话', source: 'src/pages/BaziLiushiPage.tsx',
     anchors: ['<TransitNatalBar natal={result} />', 'title="流时白话"', 'sections={result.plain}', 'title="一日真气"'] },
   { title: '全树白话', source: 'src/pages/KabbalahPage.tsx',

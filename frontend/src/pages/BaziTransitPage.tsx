@@ -15,6 +15,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziTransit } from '../hooks/useBaziTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { useI18n } from '../i18n/context';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { buildLiuriHref, parseTransitLink } from '../lib/transitLink';
 import { reportEntryHref } from '../lib/reportEntry';
@@ -100,6 +101,7 @@ function parseYear(raw: string): number | null {
  * 直达门槛。
  */
 export function BaziTransitPage() {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const link = useMemo(() => parseTransitLink(searchParams), [searchParams]);
 
@@ -251,8 +253,8 @@ export function BaziTransitPage() {
                 step={1}
                 value={startYear}
                 onChange={(event) => setStartYear(event.target.value)}
-                placeholder="起始年（留空 = 参考年起）"
-                aria-label="起始年"
+                placeholder={t('起始年（留空 = 参考年起）')}
+                aria-label={t('起始年')}
               />
             </div>
             <SegmentedControl
@@ -262,7 +264,7 @@ export function BaziTransitPage() {
               onChange={(next) => setSpan(next)}
             />
             <p className="text-xs leading-relaxed text-ink-muted">
-              跨度只在填了起始年后生效：留空时区间由服务端按参考日取 5 年。
+              {t('跨度只在填了起始年后生效：留空时区间由服务端按参考日取 5 年。')}
             </p>
           </div>
         </LabeledField>
@@ -274,12 +276,12 @@ export function BaziTransitPage() {
             onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
             className="h-4 w-4 accent-[#d4af37]"
           />
-          真太阳时校正（推荐）
+          {t('真太阳时校正（推荐）')}
         </label>
       </InputBar>
 
       {showLinkNotice ? (
-        <p className="label-caps text-ink-muted">链接参数不完整，请手动填写后查询。</p>
+        <p className="label-caps text-ink-muted">{t('链接参数不完整，请手动填写后查询。')}</p>
       ) : null}
 
       {transit.error ? (
@@ -291,7 +293,7 @@ export function BaziTransitPage() {
       ) : null}
 
       {transit.isPending && !transit.data ? (
-        <p className="label-caps text-ink-muted">正在按本命喜忌结算岁运…</p>
+        <p className="label-caps text-ink-muted">{t('正在按本命喜忌结算岁运…')}</p>
       ) : null}
 
       {transit.data ? (
@@ -339,23 +341,26 @@ function focusYear(result: BaziTransitResult | undefined, collapsed: boolean): T
 
 /** 区间回显：端点与所跨运段都取自响应，本页不重复推算一遍。 */
 function RangeEcho({ result }: { result: BaziTransitResult }) {
+  const { t } = useI18n();
   return (
     <span className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
       <span className="flex items-center gap-1.5">
-        <span className="label-caps text-ink-muted">区间</span>
+        <span className="label-caps text-ink-muted">{t('区间')}</span>
         <span className="numeric text-ink">{`${result.start_year}—${result.end_year}`}</span>
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="label-caps text-ink-muted">所跨运段</span>
+        <span className="label-caps text-ink-muted">{t('所跨运段')}</span>
         <span className="numeric text-ink-variant">
           {result.dayun_covered
-            .map((step) => `${step.ganzhi || '未起运'}（${step.start_year}—${step.end_year}）`)
+            .map(
+              (step) => `${step.ganzhi || t('未起运')}（${step.start_year}—${step.end_year}）`,
+            )
             .join('、')}
         </span>
       </span>
       {result.focus_year !== null ? (
         <span className="flex items-center gap-1.5">
-          <span className="label-caps text-ink-muted">聚焦</span>
+          <span className="label-caps text-ink-muted">{t('聚焦')}</span>
           <span className="numeric text-gold-soft">{result.focus_year}</span>
         </span>
       ) : null}

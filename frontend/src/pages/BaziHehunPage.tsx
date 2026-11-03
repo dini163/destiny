@@ -19,6 +19,7 @@ import { buildHehunQuery, buildTransitHref, parseHehunLink } from '../lib/transi
 import type { HehunSideLink } from '../lib/transitLink';
 import { useBaziHehun } from '../hooks/useBaziHehun';
 import { useProfiles } from '../hooks/useProfiles';
+import { useI18n } from '../i18n/context';
 import { profileToBirthInput, type PersonProfile, type ProfileDraft } from '../lib/profiles';
 import { ProfileEditor } from '../components/profiles/ProfileEditor';
 import { ProfilePicker } from '../components/profiles/ProfilePicker';
@@ -128,6 +129,7 @@ function makeRequest(sides: CompleteSides, axis: AxisState): BaziHehunRequest {
  * 贵的是两造排盘，不是那几行轴。
  */
 export function BaziHehunPage() {
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const link = useMemo(() => parseHehunLink(searchParams), [searchParams]);
 
@@ -284,7 +286,7 @@ export function BaziHehunPage() {
       ) : null}
 
       {showLinkNotice ? (
-        <p className="label-caps text-ink-muted">链接参数不完整，请手动填写两造生辰后查询。</p>
+        <p className="label-caps text-ink-muted">{t('链接参数不完整，请手动填写两造生辰后查询。')}</p>
       ) : null}
 
       {hehun.error ? (
@@ -296,7 +298,7 @@ export function BaziHehunPage() {
       ) : null}
 
       {hehun.isPending && !result ? (
-        <p className="label-caps text-ink-muted">正在跨两张盘扫描关系、合局、互济与年命…</p>
+        <p className="label-caps text-ink-muted">{t('正在跨两张盘扫描关系、合局、互济与年命…')}</p>
       ) : null}
 
       {result ? (
@@ -306,7 +308,10 @@ export function BaziHehunPage() {
             icon="gauge"
             actions={
               <span className="label-caps text-ink-muted">
-                {result.fired.length} 条命中 · 账本 {result.score.factors.length} 行
+                {t('{{fired}} 条命中 · 账本 {{rows}} 行', {
+                  fired: result.fired.length,
+                  rows: result.score.factors.length,
+                })}
               </span>
             }
           >
@@ -321,7 +326,9 @@ export function BaziHehunPage() {
           <ResultCard
             title="男女档案对位"
             icon="vault"
-            actions={<span className="label-caps text-ink-muted">喜忌与五行分布直取各造本命盘</span>}
+            actions={
+              <span className="label-caps text-ink-muted">{t('喜忌与五行分布直取各造本命盘')}</span>
+            }
           >
             <HehunPartnerProfiles male={result.male} female={result.female} nayin={result.nayin} />
           </ResultCard>
@@ -329,7 +336,7 @@ export function BaziHehunPage() {
           <ResultCard
             title="四柱对冲矩阵"
             icon="compass"
-            actions={<span className="label-caps text-ink-muted">16 格恒在 · 空格即「无」</span>}
+            actions={<span className="label-caps text-ink-muted">{t('16 格恒在 · 空格即「无」')}</span>}
           >
             <HehunPairMatrix cells={result.matrix} />
           </ResultCard>
@@ -337,7 +344,7 @@ export function BaziHehunPage() {
           <ResultCard
             title="命中清单"
             icon="sparkle"
-            actions={<span className="label-caps text-ink-muted">族序即账本序</span>}
+            actions={<span className="label-caps text-ink-muted">{t('族序即账本序')}</span>}
           >
             <HehunFiredList rows={result.fired} />
           </ResultCard>
@@ -345,7 +352,7 @@ export function BaziHehunPage() {
           <ResultCard
             title="五行互补"
             icon="vault"
-            actions={<span className="label-caps text-ink-muted">两视角各一张 2×2</span>}
+            actions={<span className="label-caps text-ink-muted">{t('两视角各一张 2×2')}</span>}
           >
             <HehunComplementChart complement={result.complement} />
           </ResultCard>
@@ -353,7 +360,7 @@ export function BaziHehunPage() {
           <ResultCard
             title="同频演进轴"
             icon="timeline"
-            actions={<span className="label-caps text-ink-muted">分数与岁运年表同一把尺</span>}
+            actions={<span className="label-caps text-ink-muted">{t('分数与岁运年表同一把尺')}</span>}
           >
             <HehunAxisTimeline
               axis={result.axis}
@@ -368,7 +375,7 @@ export function BaziHehunPage() {
           <ResultCard
             title="宜忌"
             icon="sun"
-            actions={<span className="label-caps text-ink-muted">唯一输入是两造喜用</span>}
+            actions={<span className="label-caps text-ink-muted">{t('唯一输入是两造喜用')}</span>}
           >
             <HehunYiJiPanel yiJi={result.yi_ji} />
           </ResultCard>

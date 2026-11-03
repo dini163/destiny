@@ -18,6 +18,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiushi } from '../hooks/useBaziLiushi';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { useI18n } from '../i18n/context';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiuriHref, buildLiushiQuery, parseLiushiLink } from '../lib/transitLink';
@@ -79,6 +80,7 @@ function makeRequest(
  * 的下钻，无生辰即无意义（spec 决策 8 的延伸）。
  */
 export function BaziLiushiPage() {
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const link = useMemo(() => parseLiushiLink(searchParams), [searchParams]);
 
@@ -231,12 +233,12 @@ export function BaziLiushiPage() {
             onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
             className="h-4 w-4 accent-[#d4af37]"
           />
-          真太阳时校正（推荐）
+          {t('真太阳时校正（推荐）')}
         </label>
       </InputBar>
 
       {showLinkNotice ? (
-        <p className="label-caps text-ink-muted">链接参数不完整，请手动填写后查询。</p>
+        <p className="label-caps text-ink-muted">{t('链接参数不完整，请手动填写后查询。')}</p>
       ) : null}
 
       {liushi.error ? (
@@ -248,7 +250,7 @@ export function BaziLiushiPage() {
       ) : null}
 
       {liushi.isPending && !result ? (
-        <p className="label-caps text-ink-muted">正在按本命喜忌逐时辰结算…</p>
+        <p className="label-caps text-ink-muted">{t('正在按本命喜忌逐时辰结算…')}</p>
       ) : null}
 
       {result ? (
@@ -273,7 +275,10 @@ export function BaziLiushiPage() {
             icon="timeline"
             actions={
               <span className="label-caps text-ink-muted">
-                峰值 {result.hours[peak].ganzhi}·{Math.round(result.hours[peak].value)}
+                {t('峰值 {{ganzhi}}·{{value}}', {
+                  ganzhi: result.hours[peak].ganzhi,
+                  value: Math.round(result.hours[peak].value),
+                })}
               </span>
             }
           >
@@ -285,9 +290,9 @@ export function BaziLiushiPage() {
           </ResultCard>
 
           <ResultCard
-            title={`${result.day_ganzhi}日十二时辰`}
+            title={t('{{gz}}日十二时辰', { gz: result.day_ganzhi })}
             icon="clock"
-            actions={<span className="label-caps text-ink-muted">点一格看该时辰详批</span>}
+            actions={<span className="label-caps text-ink-muted">{t('点一格看该时辰详批')}</span>}
           >
             <LiushiHourLadder
               hours={result.hours}
@@ -305,7 +310,7 @@ export function BaziLiushiPage() {
             <LiushiFocusCard detail={result.focused} />
           ) : (
             <p className="label-caps text-ink-muted">
-              未聚焦任何时辰 —— 点十二格里任意一格即出该时辰详批。
+              {t('未聚焦任何时辰 —— 点十二格里任意一格即出该时辰详批。')}
             </p>
           )}
         </>

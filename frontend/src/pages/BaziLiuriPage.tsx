@@ -16,6 +16,7 @@ import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useBaziLiuri } from '../hooks/useBaziLiuri';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { useI18n } from '../i18n/context';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { shiftIso } from '../lib/isoDate';
 import { buildLiushiHref, buildTransitHref, parseLiuriLink } from '../lib/transitLink';
@@ -67,6 +68,7 @@ function makeRequest(
  * 无生辰即无意义，不是一新一大体系（spec 决策 8）。
  */
 export function BaziLiuriPage() {
+  const { t } = useI18n();
   const [searchParams] = useSearchParams();
   const link = useMemo(() => parseLiuriLink(searchParams), [searchParams]);
 
@@ -200,12 +202,12 @@ export function BaziLiuriPage() {
             onChange={(event) => setApplyTrueSolarTime(event.target.checked)}
             className="h-4 w-4 accent-[#d4af37]"
           />
-          真太阳时校正（推荐）
+          {t('真太阳时校正（推荐）')}
         </label>
       </InputBar>
 
       {showLinkNotice ? (
-        <p className="label-caps text-ink-muted">链接参数不完整，请手动填写后查询。</p>
+        <p className="label-caps text-ink-muted">{t('链接参数不完整，请手动填写后查询。')}</p>
       ) : null}
 
       {liuri.error ? (
@@ -217,7 +219,7 @@ export function BaziLiuriPage() {
       ) : null}
 
       {liuri.isPending && !result ? (
-        <p className="label-caps text-ink-muted">正在按本命喜忌逐日结算…</p>
+        <p className="label-caps text-ink-muted">{t('正在按本命喜忌逐日结算…')}</p>
       ) : null}
 
       {result ? (
@@ -248,9 +250,9 @@ export function BaziLiuriPage() {
           </ResultCard>
 
           <ResultCard
-            title={`${result.month_ganzhi}月逐日矩阵`}
+            title={t('{{gz}}月逐日矩阵', { gz: result.month_ganzhi })}
             icon="calendar"
-            actions={<span className="label-caps text-ink-muted">点一格看当日详批</span>}
+            actions={<span className="label-caps text-ink-muted">{t('点一格看当日详批')}</span>}
           >
             <LiuriMatrix
               days={result.days}
@@ -276,7 +278,7 @@ export function BaziLiuriPage() {
             />
           ) : (
             <p className="label-caps text-ink-muted">
-              未聚焦任何一天 —— 点矩阵里任意一格即出当日详批。
+              {t('未聚焦任何一天 —— 点矩阵里任意一格即出当日详批。')}
             </p>
           )}
         </>
