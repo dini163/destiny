@@ -1,4 +1,5 @@
 import { annotateGenderTerms } from '../../../lib/gender';
+import { useI18n } from '../../../i18n/context';
 import { wuxingChip } from '../../../lib/wuxing';
 import type { HehunYiJi } from '../../../types/baziHehun';
 
@@ -15,6 +16,7 @@ import type { HehunYiJi } from '../../../types/baziHehun';
  * 六组里可能有两组是空的），并如实标「无」——「查过了，这一组没有五行」也是结论。
  */
 export function HehunYiJiPanel({ yiJi }: { yiJi: HehunYiJi }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -22,7 +24,7 @@ export function HehunYiJiPanel({ yiJi }: { yiJi: HehunYiJi }) {
           <div key={group.kind} className="flex flex-col gap-2 rounded-element bg-[var(--field-bg)] p-3">
             <span className="label-caps text-gold">{annotateGenderTerms(group.kind)}</span>
             {group.items.length === 0 ? (
-              <span className="text-xs text-ink-muted">无</span>
+              <span className="text-xs text-ink-muted">{t('无')}</span>
             ) : (
               <ul className="flex flex-col gap-1.5">
                 {group.items.map((item) => (

@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 
 import { Icon } from '../../ui/Icon';
 import { LabeledField } from '../../ui/LabeledField';
+import { useI18n } from '../../../i18n/context';
 import { ChineseDateField, ChineseTimeField } from '../../ui/DateTimeField';
 import { LocationField } from '../../ui/LocationField';
 import type { LocationValue } from '../../ui/LocationField';
@@ -69,18 +70,19 @@ interface SideColumnProps {
 
 /** 一造的字段块。`side` 只作标题与 accessible name —— 造向是键位，不是字段。 */
 function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
+  const { t } = useI18n();
   const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const saveable = state.birthDate !== '' && state.birthTime !== '' && state.location.longitude != null;
   return (
     <fieldset className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <legend className="label-caps px-1 text-gold">{caption}</legend>
 
-      <LabeledField label={`称谓（${caption}，仅回显）`}>
+      <LabeledField label={t('称谓（{{caption}}，仅回显）', { caption })}>
         <input
           value={state.name}
           onChange={(event) => onChange({ name: event.target.value })}
           maxLength={40}
-          placeholder={side === 'male' ? '如：夫' : '如：妻'}
+          placeholder={side === 'male' ? t('如：夫') : t('如：妻')}
           className="w-full rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 text-sm text-ink outline-none focus:border-rim-strong"
         />
       </LabeledField>
@@ -89,7 +91,7 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
         label="生辰（精准至分）"
         hint={
           <SegmentedControl
-            ariaLabel={`${caption}历法`}
+            ariaLabel={t('{{caption}}历法', { caption })}
             options={CALENDAR_OPTIONS}
             value={state.calendar}
             onChange={(next) => onChange({ calendar: next })}
@@ -101,12 +103,12 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
             value={state.birthDate}
             onChange={(next) => onChange({ birthDate: next })}
             calendar={state.calendar}
-            ariaLabel={`${caption}出生`}
+            ariaLabel={t('{{caption}}出生', { caption })}
           />
           <ChineseTimeField
             value={state.birthTime}
             onChange={(next) => onChange({ birthTime: next })}
-            ariaLabel={`${caption}出生`}
+            ariaLabel={t('{{caption}}出生', { caption })}
           />
         </div>
       </LabeledField>
@@ -122,7 +124,7 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
           onChange={(event) => onChange({ applyTrueSolarTime: event.target.checked })}
           className="h-4 w-4 accent-[#d4af37]"
         />
-        真太阳时校正（各造一份）
+        {t('真太阳时校正（各造一份）')}
       </label>
 
       <TrueSolarTimeBadge
@@ -136,11 +138,11 @@ function SideColumn({ side, state, onChange, onSaveProfile }: SideColumnProps) {
           type="button"
           className="btn-ghost"
           disabled={!saveable}
-          title={`把这一造的输入存入本地档案（需生辰齐备）`}
+          title={t('把这一造的输入存入本地档案（需生辰齐备）')}
           onClick={onSaveProfile}
         >
           <Icon name="vault" size={16} />
-          存入档案
+          {t('存入档案')}
         </button>
       ) : null}
     </fieldset>
@@ -181,6 +183,7 @@ export function DualBirthConsole({
   pending,
   onSubmit,
 }: DualBirthConsoleProps) {
+  const { t } = useI18n();
   const [sides, setSides] = useState<Record<HehunSide, SideState>>({
     male: seedOf(initial.male),
     female: seedOf(initial.female),
@@ -235,22 +238,21 @@ export function DualBirthConsole({
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                八字合婚 · 双人合盘
+                {t('八字合婚 · 双人合盘')}
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                权威历算
+                {t('权威历算')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              两张盘同屏：跨造关系扫描、五行互补、年命纳音、同频演进轴与宜忌，一次推演给全，
-              每一条命中都落进可核对的账本。示例：{GENDER_LABEL.male} 1988-02-15 23:30 成都 ×{' '}
-              {GENDER_LABEL.female} 1985-07-22 14:30 上海。
+              {t('两张盘同屏：跨造关系扫描、五行互补、年命纳音、同频演进轴与宜忌，一次推演给全，每一条命中都落进可核对的账本。')}{t('示例：')}{GENDER_LABEL.male} 1988-02-15 23:30 {t('成都')} ×{' '}
+              {GENDER_LABEL.female} 1985-07-22 14:30 {t('上海')}。
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={missing.length > 0 || pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '推演中…' : '开始合婚'}
+          {pending ? t('推演中…') : t('开始合婚')}
         </button>
       </div>
 
@@ -275,8 +277,7 @@ export function DualBirthConsole({
 
       {missing.length > 0 ? (
         <p className="label-caps text-ink-muted">
-          {missing.map((side) => (side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female)).join('与')}
-          的生辰或定位未填齐 —— 合婚需要两张盘。
+          {t('{{a}}与{{b}}的生辰或定位未填齐 —— 合婚需要两张盘。', { a: GENDER_LABEL.male, b: GENDER_LABEL.female })}
         </p>
       ) : null}
     </form>

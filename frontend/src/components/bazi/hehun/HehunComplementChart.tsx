@@ -1,4 +1,5 @@
 import { annotateGenderTerms } from '../../../lib/gender';
+import { useI18n } from '../../../i18n/context';
 import { wuxingChip } from '../../../lib/wuxing';
 import type {
   HehunComplement,
@@ -42,11 +43,12 @@ export function HehunComplementChart({ complement }: { complement: HehunCompleme
 }
 
 function ViewBlock({ view }: { view: HehunComplementView }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2">
       <span className="label-caps text-gold">{annotateGenderTerms(view.label)}</span>
       <table className="w-full border-separate border-spacing-1 text-xs">
-        <caption className="sr-only">{`${annotateGenderTerms(view.label)}的五行互补四象限`}</caption>
+        <caption className="sr-only">{t('{{label}}的五行互补四象限', { label: annotateGenderTerms(view.label) })}</caption>
         <thead>
           <tr>
             <th scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">
@@ -54,7 +56,7 @@ function ViewBlock({ view }: { view: HehunComplementView }) {
             </th>
             {COLUMNS.map((column) => (
               <th key={column.theirs} scope="col" className="label-caps p-2 text-left font-normal text-ink-muted">
-                {column.caption}
+                {t(column.caption)}
               </th>
             ))}
           </tr>
@@ -63,7 +65,7 @@ function ViewBlock({ view }: { view: HehunComplementView }) {
           {ROWS.map((row) => (
             <tr key={row.mine}>
               <th scope="row" className="label-caps whitespace-nowrap p-2 text-left font-normal text-ink-variant">
-                {row.caption}
+                {t(row.caption)}
               </th>
               {COLUMNS.map((column) => (
                 <td key={column.theirs} className="p-0 align-top">
@@ -83,9 +85,10 @@ function ViewBlock({ view }: { view: HehunComplementView }) {
 }
 
 function QuadrantCell({ cell }: { cell: HehunComplementCell | undefined }) {
+  const { t } = useI18n();
   if (!cell) {
     // 契约恒 4 格；真缺了一格是后端违约，此时说得出缺的是哪一格，而不是画一个空格子。
-    return <p className="px-3 py-2 text-xs text-wuxing-fire">契约缺格</p>;
+    return <p className="px-3 py-2 text-xs text-wuxing-fire">{t('契约缺格')}</p>;
   }
   return (
     <div className="flex h-full flex-col gap-1.5 rounded-element bg-[var(--field-bg)] p-2.5">
@@ -96,7 +99,7 @@ function QuadrantCell({ cell }: { cell: HehunComplementCell | undefined }) {
         </span>
       </div>
       {cell.elements.length === 0 ? (
-        <span className="text-xs text-ink-muted">无</span>
+        <span className="text-xs text-ink-muted">{t('无')}</span>
       ) : (
         <ul className="flex flex-wrap gap-1.5">
           {cell.elements.map((element) => (

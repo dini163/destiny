@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { SourceNote } from '../../ui/SourceNote';
+import { useI18n } from '../../../i18n/context';
 import { GENDER_LABEL, GENDER_SHORT, annotateGenderTerms } from '../../../lib/gender';
 import { wuxingChip, wuxingText } from '../../../lib/wuxing';
 import type { HehunNayin, HehunPartner, HehunSide } from '../../../types/baziHehun';
@@ -27,22 +28,23 @@ export function HehunPartnerProfiles({
 }
 
 function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSide }) {
+  const { t } = useI18n();
   const caption = side === 'male' ? GENDER_LABEL.male : GENDER_LABEL.female;
   const current = partner.dayun.find((step) => step.is_current) ?? partner.dayun[0];
   return (
     <div className="flex flex-col gap-3 rounded-card border border-rim bg-[var(--field-bg)] p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="label-caps text-gold">{caption}</span>
-        <span className="text-sm text-ink-variant">{partner.name ?? '未署称谓'}</span>
+        <span className="text-sm text-ink-variant">{partner.name ?? t('未署称谓')}</span>
       </div>
 
       <p className="numeric font-display text-lg text-ink">{partner.four_pillars}</p>
 
       <dl className="flex flex-col gap-1.5 text-sm">
-        <Fact label="生肖">
+        <Fact label={t('生肖')}>
           <span className="text-ink">{partner.zodiac}</span>
         </Fact>
-        <Fact label="日主">
+        <Fact label={t('日主')}>
           <span className={`text-ink`}>
             {partner.day_master}
             <span className={`numeric ml-1 ${wuxingText(partner.day_master_element)}`}>
@@ -50,13 +52,13 @@ function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSid
             </span>
           </span>
         </Fact>
-        <Fact label="喜用">
+        <Fact label={t('喜用')}>
           <ChipRow items={partner.favorable_elements} />
         </Fact>
-        <Fact label="忌神">
+        <Fact label={t('忌神')}>
           <ChipRow items={partner.unfavorable_elements} />
         </Fact>
-        <Fact label="五行分布">
+        <Fact label={t('五行分布')}>
           <span className="flex flex-wrap gap-1.5">
             {partner.elements.map((row) => (
               <span
@@ -70,27 +72,26 @@ function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSid
           </span>
         </Fact>
         {current ? (
-          <Fact label={partner.dayun.some((step) => step.is_current) ? '当前大运' : '起运前'}>
+          <Fact label={partner.dayun.some((step) => step.is_current) ? t('当前大运') : t('起运前')}>
             <span className="numeric text-ink">
-              {current.ganzhi === '' ? '童限' : current.ganzhi} · {current.start_age}—
-              {current.end_age} 岁 · {current.start_year}—{current.end_year}
+              {current.ganzhi === '' ? t('童限') : current.ganzhi} · {t('{{a}}—{{b}} 岁', { a: current.start_age, b: current.end_age })} · {current.start_year}—{current.end_year}
             </span>
           </Fact>
         ) : null}
-        <Fact label="起柱时刻">
+        <Fact label={t('起柱时刻')}>
           <span className="numeric text-ink">
-            {partner.true_solar_time ?? '未校正（标准时直排）'}
+            {partner.true_solar_time ?? t('未校正（标准时直排）')}
           </span>
         </Fact>
       </dl>
 
       <table className="w-full text-xs">
-        <caption className="sr-only">{`${caption}四柱`}</caption>
+        <caption className="sr-only">{t('{{caption}}四柱', { caption })}</caption>
         <thead>
           <tr className="text-left text-ink-muted">
             {['柱', '干支', '十神', '纳音'].map((head) => (
               <th key={head} scope="col" className="font-normal">
-                {head}
+                {t(head)}
               </th>
             ))}
           </tr>
@@ -108,7 +109,7 @@ function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSid
       </table>
 
       <p className="text-xs text-ink-muted">
-        {partner.tst_applied ? '本柱按真太阳时校正后起' : '本柱按标准时直排'}
+        {partner.tst_applied ? t('本柱按真太阳时校正后起') : t('本柱按标准时直排')}
       </p>
     </div>
   );
@@ -116,9 +117,10 @@ function ProfileBlock({ partner, side }: { partner: HehunPartner; side: HehunSid
 
 /** 年命纳音：两造的取象原文并置，关系与那一行账同段给出（§7.2）。 */
 function NayinBlock({ nayin }: { nayin: HehunNayin }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2 rounded-card border border-rim bg-surface p-4">
-      <span className="label-caps text-ink-muted">年命纳音 · 宜忌之外的第三条轴</span>
+      <span className="label-caps text-ink-muted">{t('年命纳音 · 宜忌之外的第三条轴')}</span>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {([
           [GENDER_SHORT.male, nayin.male],
@@ -139,7 +141,7 @@ function NayinBlock({ nayin }: { nayin: HehunNayin }) {
       </div>
       <div className="flex flex-wrap items-baseline gap-2 text-sm">
         <span className="text-ink">{nayin.phrase}</span>
-        <span className="label-caps text-ink-muted">{nayin.relation}</span>
+        <span className="label-caps text-ink-muted">{t(nayin.relation)}</span>
         <span className={`numeric ${nayin.delta < 0 ? 'text-wuxing-fire' : 'text-wuxing-wood'}`}>
           {nayin.delta < 0 ? `-${Math.abs(nayin.delta).toFixed(1)}` : `+${nayin.delta.toFixed(1)}`}
         </span>
@@ -152,17 +154,19 @@ function NayinBlock({ nayin }: { nayin: HehunNayin }) {
 }
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-      <dt className="text-ink-muted">{label}</dt>
+      <dt className="text-ink-muted">{t(label)}</dt>
       <dd className="text-right">{children}</dd>
     </div>
   );
 }
 
 function ChipRow({ items }: { items: string[] }) {
+  const { t } = useI18n();
   if (items.length === 0) {
-    return <span className="text-xs text-ink-muted">该造本命盘未给出</span>;
+    return <span className="text-xs text-ink-muted">{t('该造本命盘未给出')}</span>;
   }
   return (
     <span className="flex flex-wrap gap-1.5">

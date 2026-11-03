@@ -1,3 +1,4 @@
+import { useI18n } from '../../../i18n/context';
 import { ScoreLedger } from '../../ui/ScoreLedger';
 import type { ScoreValue } from '../../../types/scoring';
 
@@ -36,6 +37,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
  * 环好看，账本可核 —— 缺了后半件这一页就只是一个吉凶断言。
  */
 export function HehunScoreRing({ score }: { score: ScoreValue }) {
+  const { t } = useI18n();
   const look = hehunTierLook(score.tier);
   const percent = Math.min(100, Math.max(0, score.value));
   const center = SIZE / 2;
@@ -47,7 +49,7 @@ export function HehunScoreRing({ score }: { score: ScoreValue }) {
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className="h-36 w-36"
           role="img"
-          aria-label={`契合度 ${score.value.toFixed(1)} 分，${score.tier}`}
+          aria-label={t('契合度 {{v}} 分，{{tier}}', { v: score.value.toFixed(1), tier: t(score.tier) })}
         >
           <circle cx={center} cy={center} r={RADIUS} fill="none" stroke="#171C2B" strokeWidth={9} />
           <circle
@@ -73,12 +75,12 @@ export function HehunScoreRing({ score }: { score: ScoreValue }) {
             {score.value.toFixed(1)}
           </text>
           <text x={center} y={center + 20} textAnchor="middle" fontSize="13" fill="#948C79">
-            百分制
+            {t('百分制')}
           </text>
         </svg>
         <div className="flex flex-col gap-1">
-          <span className={`font-display text-2xl font-semibold ${look.text}`}>{score.tier}</span>
-          <span className="text-xs text-ink-muted">四档：≥80 天作之合 · 65–79 相得益彰 · 45–64 中和可处 · &lt;45 欠和宜慎</span>
+          <span className={`font-display text-2xl font-semibold ${look.text}`}>{t(score.tier)}</span>
+          <span className="text-xs text-ink-muted">{t('四档：≥80 {{a}} · 65–79 {{b}} · 45–64 {{c}} · <45 {{d}}', { a: t('天作之合'), b: t('相得益彰'), c: t('中和可处'), d: t('欠和宜慎') })}</span>
         </div>
       </div>
 

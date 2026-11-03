@@ -1,4 +1,5 @@
 import { GENDER_SHORT, annotateGenderTerms } from '../../../lib/gender';
+import { useI18n } from '../../../i18n/context';
 import { formatDelta } from '../../../lib/scoring';
 import type { HehunFired } from '../../../types/baziHehun';
 
@@ -28,8 +29,9 @@ const DIRECTION_CAPTION: Record<string, string> = {
  * 变成要读文档才知道的默契，而并排摆出来一眼就看得出哪几条是两向的（§6.2）。
  */
 export function HehunFiredList({ rows }: { rows: HehunFired[] }) {
+  const { t } = useI18n();
   if (rows.length === 0) {
-    return <p className="text-sm text-ink-muted">两造之间未命中合婚规则表中的任何一条，账本只有基准一行。</p>;
+    return <p className="text-sm text-ink-muted">{t('两造之间未命中合婚规则表中的任何一条，账本只有基准一行。')}</p>;
   }
 
   const families: string[] = [];
@@ -47,10 +49,11 @@ export function HehunFiredList({ rows }: { rows: HehunFired[] }) {
 }
 
 function FamilyBlock({ family, rows }: { family: string; rows: HehunFired[] }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-1.5">
       <span className="label-caps text-ink-muted">
-        {FAMILY_CAPTION[family] ?? family} · {rows.length}条
+        {t(FAMILY_CAPTION[family] ?? family)} · {t('{{n}}条', { n: rows.length })}
       </span>
       <ul className="flex flex-col gap-1.5">
         {rows.map((row, index) => (

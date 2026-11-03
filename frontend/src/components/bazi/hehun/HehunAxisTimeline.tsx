@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../../i18n/context';
 import { tierClass } from '../liuri/tier';
 import { Icon } from '../../ui/Icon';
 import { SegmentedControl } from '../../ui/SegmentedControl';
@@ -56,6 +57,7 @@ export function HehunAxisTimeline({
   onYearsChange,
   onShift,
 }: HehunAxisTimelineProps) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -71,7 +73,7 @@ export function HehunAxisTimeline({
           onClick={() => onShift(-1)}
           className="btn-ghost"
         >
-          上一窗
+          {t('上一窗')}
         </button>
         <button
           type="button"
@@ -79,11 +81,11 @@ export function HehunAxisTimeline({
           onClick={() => onShift(1)}
           className="btn-ghost"
         >
-          下一窗
+          {t('下一窗')}
         </button>
         <span className="label-caps text-ink-muted">
-          {axis.start_year}—{axis.end_year} · {axis.rows.length}年
-          {busy ? ' · 推演中' : ''}
+          {t('{{a}}—{{b}} · {{n}}年', { a: axis.start_year, b: axis.end_year, n: axis.rows.length })}
+          {busy ? ` · ${t('推演中')}` : ''}
         </span>
       </div>
 
@@ -108,6 +110,7 @@ function SegmentBlock({
   axis: HehunAxis;
   hrefFor: ((side: HehunSide, year: number) => string) | null;
 }) {
+  const { t } = useI18n();
   const rows = axis.rows.filter(
     (row) => row.year >= segment.start_year && row.year <= segment.end_year,
   );
@@ -125,12 +128,12 @@ function SegmentBlock({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[40rem] text-xs">
           <caption className="sr-only">
-            {`${annotateGenderTerms(segment.label)} 内的逐年双造分数`}
+            {t('{{label}} 内的逐年双造分数', { label: annotateGenderTerms(segment.label) })}
           </caption>
           <thead>
             <tr className="text-left text-ink-muted">
               <th scope="col" className="font-normal">
-                流年
+                {t('流年')}
               </th>
               <th scope="col" className="font-normal">
                 {GENDER_SHORT.male}
@@ -139,7 +142,7 @@ function SegmentBlock({
                 {GENDER_SHORT.female}
               </th>
               <th scope="col" className="text-right font-normal">
-                分差
+                {t('分差')}
               </th>
             </tr>
           </thead>
@@ -161,12 +164,13 @@ function AxisRowBlock({
   row: HehunAxisRow;
   hrefFor: ((side: HehunSide, year: number) => string) | null;
 }) {
+  const { t } = useI18n();
   return (
     <tr className="border-t border-rim align-top">
       <th scope="row" className="py-2 pr-2 text-left font-normal">
         <span className="numeric text-ink">{row.year}</span>
         <span className="numeric ml-1 text-ink-muted">{row.ganzhi}</span>
-        <span className={`label-caps ml-2 ${SYNC_CAPTION[row.sync] ?? 'text-ink'}`}>{row.sync}</span>
+        <span className={`label-caps ml-2 ${SYNC_CAPTION[row.sync] ?? 'text-ink'}`}>{t(row.sync)}</span>
       </th>
       <td className="py-2 pr-2">
         <SideCell side="male" row={row} hrefFor={hrefFor} />
@@ -188,19 +192,20 @@ function SideCell({
   row: HehunAxisRow;
   hrefFor: ((side: HehunSide, year: number) => string) | null;
 }) {
+  const { t } = useI18n();
   const cell = side === 'male' ? row.male : row.female;
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
       <span className="numeric text-ink">{cell.value.toFixed(1)}</span>
-      <span className={`label-caps ${tierClass(cell.tier)}`}>{cell.tier}</span>
+      <span className={`label-caps ${tierClass(cell.tier)}`}>{t(cell.tier)}</span>
       <span className="numeric text-ink-muted">
-        {cell.dayun ?? '童限'}
-        {cell.dayun === null ? `（${cell.dayun_start_age} 岁起）` : ''}
+        {cell.dayun ?? t('童限')}
+        {cell.dayun === null ? t('（{{age}} 岁起）', { age: cell.dayun_start_age }) : ''}
       </span>
       {hrefFor ? (
         <Link to={hrefFor(side, row.year)} className="label-caps text-gold-soft hover:text-gold-bright">
           <Icon name="arrowRight" size={12} className="inline" />
-          {side === 'male' ? `${GENDER_SHORT.male}岁运` : `${GENDER_SHORT.female}岁运`}
+          {side === 'male' ? t('{{g}}岁运', { g: GENDER_SHORT.male }) : t('{{g}}岁运', { g: GENDER_SHORT.female })}
         </Link>
       ) : null}
     </div>
