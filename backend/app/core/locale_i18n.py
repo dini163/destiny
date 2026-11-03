@@ -536,6 +536,11 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "无恩之刑": "Ungrateful Punishment", "无礼之刑": "Discourteous Punishment", "自刑": "Self Punishment",
         # 八字结构化标签：用神三法（bazi_yongshen）、柱距力量档（bazi_rules STRENGTH_BY_DISTANCE）、岁运档位（顺/滞，平 已在结论档）、评分基准行。
         "扶抑": "Support-Suppress", "通关": "Mediation", "调候": "Climate Adjustment", "紧临": "Adjacent", "隔位": "Separated", "远位": "Distant", "顺": "Favorable", "滞": "Stagnant", "基准分": "Baseline Score",
+        # 周易六爻爻题（`content/zhouyi_text.line_name`）：本卦/变卦六爻位置名，皆繁简同形无需繁体。
+        "初九": "First Line (Yang)", "初六": "First Line (Yin)", "九二": "Second Line (Yang)",
+        "六二": "Second Line (Yin)", "九三": "Third Line (Yang)", "六三": "Third Line (Yin)",
+        "九四": "Fourth Line (Yang)", "六四": "Fourth Line (Yin)", "九五": "Fifth Line (Yang)",
+        "六五": "Fifth Line (Yin)", "上九": "Top Line (Yang)", "上六": "Top Line (Yin)",
     },
 }
 

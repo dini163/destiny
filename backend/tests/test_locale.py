@@ -629,3 +629,28 @@ def test_bazi_structured_labels_localize() -> None:
     assert localize("通关", "zh-Hant") == "通關"
     assert localize("滞", "zh-Hant") == "滯"
     assert localize("基准分", "zh-Hant") == "基準分"
+
+
+def test_zhouyi_yao_position_names_localize() -> None:
+    # p15：六爻爻题（初九/六二…上六）在 en 下替换；皆繁简同形，zh-Hant 逐字节透传。
+    from app.content.zhouyi_text import line_name
+
+    yao = {line_name(pos, yang) for pos in range(1, 7) for yang in (True, False)}
+    assert len(yao) == 12
+    with TestClient(app) as client:
+        d = client.post("/api/v1/zhouyi/cast", json=_ZHOUYI_CAST)
+        e = client.post("/api/v1/zhouyi/cast?locale=en", json=_ZHOUYI_CAST)
+        h = client.post("/api/v1/zhouyi/cast?locale=zh-Hant", json=_ZHOUYI_CAST)
+    assert d.status_code == e.status_code == h.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = {s for s in dl if s in yao}
+    assert present, "zhouyi 投盘应至少落一个爻题叶值"
+    for token in present:
+        assert token not in el, f"en 未替换爻题 {token}"
+        assert token in hl, f"zh-Hant 不应改动爻题 {token}"
+    assert localize("初六", "en") == "First Line (Yin)"
+    assert localize("九五", "en") == "Fifth Line (Yang)"
+    assert localize("上九", "en") == "Top Line (Yang)"
+    assert localize("九二", "zh-Hant") == "九二"
