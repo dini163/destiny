@@ -283,3 +283,17 @@ def test_rune_names_localize_only_when_requested() -> None:
     assert present, "runes 落宫应至少一个符文名叶值"
     for token in set(present):
         assert token not in el, f"en 未替换符文名 {token}"
+
+
+def test_name_endpoint_is_exempt_from_localization() -> None:
+    # 姓名分析把用户输入的汉字原样回显（NameChar.char）。“金/木”既是五行叶值，
+    # 也可能是人名；该路径必须恒透传，不能把人名里的同名汉字翻成五行。
+    assert "金" in LABELS["en"] and "木" in LABELS["en"]  # 前提：表里确有这些单字键
+    payload = {"surname": "王", "given": "金木"}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/name/analyze", json=payload)
+        e = client.post("/api/v1/name/analyze?locale=en", json=payload)
+        h = client.post("/api/v1/name/analyze?locale=zh-Hant", json=payload)
+    assert d.status_code == 200
+    assert d.content == e.content == h.content, "name 路径应逐字节透传，不参与本地化"
+    assert "金" in _walk_strings(d.json())  # 人名字符确实以叶值形式出现

@@ -19,6 +19,11 @@ from app.core.locale_i18n import ACTIVE_LOCALES, localize, resolve_locale
 
 Headers = list[tuple[bytes, bytes]]
 
+#: 回显用户自撰文本的路径永不做叶子翻译——姓名分析把用户输入的每个汉字原样
+#: 作为 `NameChar.char` 叶值返回，若走全局整串查表，会把人名里的「金」「木」
+#: 「心」等误翻成五行/牌名。这类路径恒透传（前端 chrome 客户端自译，后端数据不该动）。
+_PATH_EXEMPT: tuple[str, ...] = ("/api/v1/name",)
+
 
 class LocaleMiddleware:
     """按 `?locale=` 本地化 JSON 响应体；默认 locale 原样透传。"""
@@ -89,6 +94,8 @@ class LocaleMiddleware:
 
     @staticmethod
     def _active(scope: Scope) -> bool:
+        if scope.get("path", "").startswith(_PATH_EXEMPT):
+            return False
         return resolve_locale(LocaleMiddleware._locale_raw(scope)) in ACTIVE_LOCALES
 
     @staticmethod
