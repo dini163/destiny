@@ -798,3 +798,66 @@ def test_bazi_transit_rule_labels_localize() -> None:
     assert localize("半合忌", "zh-Hant") == "半合忌"
     assert localize("三会忌", "zh-Hant") == "三會忌"
     assert localize("大运", "zh-Hant") == "大運"
+
+
+def test_ziwei_qimen_meihua_aux_labels_localize() -> None:
+    # p15：紫微 kind/阴阳/顺逆行、奇门阳遁阴遁、梅花体用小节标签/体用关系/月令季节/旺衰档位。
+    from app.content.meihua import SEASON_BY_MONTH_ZHI, TIYONG_RELATIONS
+
+    ziwei_payload = {
+        "birth_date": "2000-08-16", "birth_time": "12:00", "calendar": "solar",
+        "longitude": 116.4074, "gender": "male", "apply_true_solar_time": False,
+    }
+    meihua_payload = {"method": "time", "birth_date": "1990-06-15", "birth_time": "08:30:00"}
+
+    ziwei_aux = {"主星", "煞", "禄马", "顺行", "逆行", "阳", "阴"}
+    qimen_dun = {"阳遁", "阴遁"}
+    relations = {r.name_zh for r in TIYONG_RELATIONS.values()}
+    seasons = set(SEASON_BY_MONTH_ZHI.values())
+    assert len(relations) == 5 and len(seasons) == 12
+
+    with TestClient(app) as client:
+        zd = client.post("/api/v1/ziwei/chart", json=ziwei_payload)
+        ze = client.post("/api/v1/ziwei/chart?locale=en", json=ziwei_payload)
+        qd = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        qe = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+        md = client.post("/api/v1/meihua/cast", json=meihua_payload)
+        me = client.post("/api/v1/meihua/cast?locale=en", json=meihua_payload)
+        mh = client.post("/api/v1/meihua/cast?locale=zh-Hant", json=meihua_payload)
+    assert all(r.status_code == 200 for r in (zd, ze, qd, qe, md, me, mh))
+
+    zpresent = {s for s in _walk_strings(zd.json()) if s in ziwei_aux}
+    assert zpresent, "ziwei 应至少落一个辅助显示名叶值"
+    zel = _walk_strings(ze.json())
+    for token in zpresent:
+        assert token not in zel, f"en 未替换紫微辅助名 {token}"
+
+    qpresent = {s for s in _walk_strings(qd.json()) if s in qimen_dun}
+    assert qpresent, "qimen 应至少落一个遁局叶值"
+    qel = _walk_strings(qe.json())
+    for token in qpresent:
+        assert token not in qel, f"en 未替换奇门遁局 {token}"
+
+    me_family = relations | seasons | {
+        "体用生克", "卦气旺衰", "互卦(过程)", "变卦(结局)", "上吉", "小吉", "中平", "大凶",
+    }
+    mpresent = {s for s in _walk_strings(md.json()) if s in me_family}
+    assert mpresent, "meihua 应至少落一个体用小节/关系/季节叶值"
+    mel = _walk_strings(me.json())
+    for token in mpresent:
+        assert token not in mel, f"en 未替换梅花标签 {token}"
+
+    # 直接单测：全族取到预期英译；字形有差者（体→體/气→氣/过→過/变→變/马→馬/阳→陽）zh-Hant 转形，同形者透传。
+    assert localize("主星", "en") == "Major Star"
+    assert localize("禄马", "en") == "Prosperity & Horse"
+    assert localize("阳遁", "en") == "Yang Dun"
+    assert localize("体用比和", "en") == "Ti & Yong Harmonious"
+    assert localize("季秋", "en") == "Late Autumn"
+    assert localize("互卦(过程)", "en") == "Nuclear Hexagram (Process)"
+    assert localize("禄马", "zh-Hant") == "祿馬"
+    assert localize("阳", "zh-Hant") == "陽"
+    assert localize("体用生克", "zh-Hant") == "體用生克"
+    assert localize("变卦(结局)", "zh-Hant") == "變卦(結局)"
+    assert localize("主星", "zh-Hant") == "主星"
+    assert localize("季秋", "zh-Hant") == "季秋"
+    assert localize("逆行", "zh-Hant") == "逆行"

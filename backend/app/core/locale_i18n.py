@@ -220,6 +220,12 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "适应": "適應", "银弓（财富之箭）": "銀弓（財富之箭）", "领导": "領導",
         # 二十四节气繁体（与上同源）：仅登记字形有差者（惊/蛰/种/满/处转形）。
         "处暑": "處暑", "小满": "小滿", "惊蛰": "驚蟄", "芒种": "芒種",
+        # 紫微乙级星 kind / 阴阳 / 顺逆行 + 奇门遁局 + 梅花体用小节/关系/旺衰档位（仅字形有差者登记，繁简同形回落源文）。
+        "禄马": "祿馬", "顺行": "順行", "阳": "陽",
+        "阴": "陰", "阳遁": "陽遁", "阴遁": "陰遁",
+        "体用生克": "體用生克", "卦气旺衰": "卦氣旺衰", "互卦(过程)": "互卦(過程)",
+        "变卦(结局)": "變卦(結局)", "用生体": "用生體", "体用比和": "體用比和",
+        "体克用": "體克用", "体生用": "體生用", "用克体": "用克體",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -621,6 +627,18 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "月": "Month", "日": "Day",
         # 月令旺相休囚死（`content/bazi_wangshuai.WANG_SHUAI_VALUE` keys）＋奇门三元（`content/qimen.YUAN_NAMES`）：均繁简同形，仅登 en（死复用十二长生 Death）。
         "旺": "Prosperous", "相": "Viable", "休": "Resting", "囚": "Imprisoned", "上元": "Upper Yuan", "中元": "Middle Yuan", "下元": "Lower Yuan",
+        # 紫微 kind/阴阳/顺逆行、奇门阳遁阴遁、梅花体用小节标签/体用关系/月令季节/旺衰档位（p15 有界专名族）。
+        "主星": "Major Star", "煞": "Malefic", "禄马": "Prosperity & Horse",
+        "顺行": "Forward Progression", "逆行": "Retrograde Progression", "阳": "Yang",
+        "阴": "Yin", "阳遁": "Yang Dun", "阴遁": "Yin Dun",
+        "体用生克": "Ti-Yong Interaction", "卦气旺衰": "Hexagram Qi Strength", "互卦(过程)": "Nuclear Hexagram (Process)",
+        "变卦(结局)": "Changed Hexagram (Outcome)", "上吉": "Supreme Fortune", "小吉": "Minor Fortune",
+        "大凶": "Great Misfortune", "用生体": "Yong Generates Ti", "体用比和": "Ti & Yong Harmonious",
+        "体克用": "Ti Controls Yong", "体生用": "Ti Generates Yong", "用克体": "Yong Controls Ti",
+        "孟春": "Early Spring", "仲春": "Mid Spring", "季春": "Late Spring",
+        "孟夏": "Early Summer", "仲夏": "Mid Summer", "季夏": "Late Summer",
+        "孟秋": "Early Autumn", "仲秋": "Mid Autumn", "季秋": "Late Autumn",
+        "孟冬": "Early Winter", "仲冬": "Mid Winter", "季冬": "Late Winter",
     },
 }
 
