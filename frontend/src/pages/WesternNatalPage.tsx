@@ -17,6 +17,7 @@ import { VerdictCard } from '../components/ui/VerdictCard';
 import { aspectStyle } from '../lib/astro';
 import { useWesternNatal } from '../hooks/useWesternNatal';
 import { useProfileFill } from '../hooks/useProfileFill';
+import { useI18n } from '../i18n/context';
 import type { WesternChart, WesternNatalRequest } from '../types/western';
 
 /** House systems the backend engine accepts (Swiss Ephemeris codes). */
@@ -50,6 +51,7 @@ const ASPECT_LEGEND: ReadonlyArray<{ type: string; angle: string }> = [
  * predictions are still omitted: this page shows the natal chart only.
  */
 export function WesternNatalPage() {
+  const { t } = useI18n();
   const [houseSystem, setHouseSystem] = useState('P');
   const [utcOffset, setUtcOffset] = useState('');
   const profile = useProfileFill();
@@ -94,10 +96,10 @@ export function WesternNatalPage() {
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1 rounded-element border border-rim-soft bg-surface px-3 py-2 text-xs text-ink-muted">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-gold" />
-              黄道基准：热带黄道 (Tropical)
+              {t('黄道基准：热带黄道 (Tropical)')}
             </span>
-            <span>时区留空时按出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。</span>
-            <span className="text-gold-soft">ASC 极敏感：约每 4 分钟误差 ≈ 1° 上升点。</span>
+            <span>{t('时区留空时按出生经度推算 UTC 偏移（每 15° ≈ 1 小时）。')}</span>
+            <span className="text-gold-soft">{t('ASC 极敏感：约每 4 分钟误差 ≈ 1° 上升点。')}</span>
           </div>
         }
       >
@@ -106,11 +108,11 @@ export function WesternNatalPage() {
             variant="field"
             value={houseSystem}
             onChange={(next) => setHouseSystem(next)}
-            ariaLabel="分宫制"
-            options={HOUSE_SYSTEM_OPTIONS}
+            ariaLabel={t('分宫制')}
+            options={HOUSE_SYSTEM_OPTIONS.map((opt) => ({ value: opt.value, label: t(opt.label) }))}
           />
         </LabeledField>
-        <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">小时</span>}>
+        <LabeledField label="时区 / UTC OFFSET" hint={<span className="text-ink-muted">{t('小时')}</span>}>
           <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <Icon name="clock" size={16} className="shrink-0 text-ink-muted" />
             <input
@@ -120,9 +122,9 @@ export function WesternNatalPage() {
               step={0.5}
               value={utcOffset}
               onChange={(event) => setUtcOffset(event.target.value)}
-              placeholder="自动（按经度）"
+              placeholder={t('自动（按经度）')}
               className="numeric w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
-              aria-label="UTC 时区偏移（小时）"
+              aria-label={t('UTC 时区偏移（小时）')}
             />
           </div>
         </LabeledField>
@@ -136,7 +138,7 @@ export function WesternNatalPage() {
       ) : null}
 
       {western.isPending && !western.data ? (
-        <p className="label-caps text-ink-muted">正在依瑞士星历重构本命天球…</p>
+        <p className="label-caps text-ink-muted">{t('正在依瑞士星历重构本命天球…')}</p>
       ) : null}
 
       {western.data ? <WesternResults chart={western.data} /> : null}
@@ -206,41 +208,46 @@ function WesternResults({ chart }: { chart: WesternChart }) {
 
 /** Headline strip: the trinity signs plus the chart's provenance metadata. */
 function ChartSummary({ chart }: { chart: WesternChart }) {
+  const { t } = useI18n();
   const houseLabel =
     HOUSE_SYSTEM_OPTIONS.find((option) => option.value === chart.house_system)?.label ?? chart.house_system;
   const offset = chart.utc_offset_hours;
   const offsetText = `UTC${offset >= 0 ? '+' : ''}${offset}`;
-  const offsetSource = chart.utc_offset_source === 'explicit' ? '显式输入' : '经度推算';
+  const offsetSource = chart.utc_offset_source === 'explicit' ? t('显式输入') : t('经度推算');
 
   return (
     <div className="panel flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">本命星盘 · NATAL CHART</span>
+          <span className="label-caps">{t('本命星盘 · NATAL CHART')}</span>
           <span className="font-display text-2xl font-bold tracking-wide text-gold-bright text-glow-gold sm:text-3xl">
-            日{chart.sun_sign_zh} · 月{chart.moon_sign_zh} · 升{chart.ascendant_sign_zh}
+            {t('日{{sun}} · 月{{moon}} · 升{{asc}}', {
+              sun: chart.sun_sign_zh,
+              moon: chart.moon_sign_zh,
+              asc: chart.ascendant_sign_zh,
+            })}
           </span>
         </div>
       </div>
       <div className="gold-rule" />
       <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-variant">
         <span>
-          当地时：<span className="numeric text-ink">{chart.local_datetime}</span>
+          {t('当地时：')}<span className="numeric text-ink">{chart.local_datetime}</span>
         </span>
         <span>
-          世界时：<span className="numeric text-ink">{chart.utc_datetime}</span>
+          {t('世界时：')}<span className="numeric text-ink">{chart.utc_datetime}</span>
         </span>
         <span>
-          儒略日：<span className="numeric text-ink">{chart.julian_day}</span>
+          {t('儒略日：')}<span className="numeric text-ink">{chart.julian_day}</span>
         </span>
         <span>
-          坐标：<span className="numeric text-ink">{chart.latitude.toFixed(3)}, {chart.longitude.toFixed(3)}</span>
+          {t('坐标：')}<span className="numeric text-ink">{chart.latitude.toFixed(3)}, {chart.longitude.toFixed(3)}</span>
         </span>
         <span className="text-gold-soft">
-          时区 {offsetText}（{offsetSource}）
+          {t('时区 {{offset}}（{{source}}）', { offset: offsetText, source: offsetSource })}
         </span>
         <span>
-          分宫制：<span className="text-ink">{houseLabel}</span>
+          {t('分宫制：')}<span className="text-ink">{t(houseLabel)}</span>
         </span>
       </div>
     </div>
@@ -249,15 +256,16 @@ function ChartSummary({ chart }: { chart: WesternChart }) {
 
 /** Colour legend for the aspect chords drawn inside the wheel. */
 function AspectLegend() {
+  const { t } = useI18n();
   return (
     <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 border-t border-rim-soft pt-3">
-      <span className="label-caps text-ink-muted">相位图例 / ASPECTS</span>
+      <span className="label-caps text-ink-muted">{t('相位图例 / ASPECTS')}</span>
       {ASPECT_LEGEND.map((item) => {
         const style = aspectStyle(item.type);
         return (
           <span key={item.type} className="flex items-center gap-1.5 text-xs text-ink-variant">
             <span className="h-0.5 w-4 rounded-full" style={{ backgroundColor: style.color }} />
-            {style.label} {item.angle}
+            {t(style.label)} {item.angle}
           </span>
         );
       })}
