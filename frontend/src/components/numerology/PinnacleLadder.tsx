@@ -1,5 +1,6 @@
 import { SourceNote } from '../ui/SourceNote';
 import { currentPinnacle, masterPair, pinnacleAgeLabel } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { Challenge, Pinnacle } from '../../types/numerology';
 
 interface PinnacleLadderProps {
@@ -23,6 +24,7 @@ interface PinnacleLadderProps {
  * 挑战值 0 是值域的真实成员而不是缺失，故照样给释义，不印成"无"。
  */
 export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
+  const { t } = useI18n();
   const current = currentPinnacle(pinnacles);
   const challengeOf = (index: number): Challenge | undefined =>
     challenges.find((item) => item.index === index);
@@ -32,13 +34,13 @@ export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
       <p className="text-xs text-ink-muted">
         {current ? (
           <>
-            <span className="label-caps text-gold">当前处于 </span>
+            <span className="label-caps text-gold">{t('当前处于')} </span>
             {current.label}（{pinnacleAgeLabel(current)}）
           </>
         ) : (
           <>
-            <span className="label-caps text-wuxing-fire">无当前段 </span>
-            基准日早于出生日，四段阶梯都不含这一天，故不高亮任何一段。
+            <span className="label-caps text-wuxing-fire">{t('无当前段')} </span>
+            {t('基准日早于出生日，四段阶梯都不含这一天，故不高亮任何一段。')}
           </>
         )}
       </p>
@@ -73,7 +75,7 @@ export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
                 </div>
                 {pinnacle.is_current ? (
                   <span className="label-caps shrink-0 rounded-element bg-gold px-1.5 py-0.5 font-semibold text-[var(--on-gold)]">
-                    当前激活
+                    {t('当前激活')}
                   </span>
                 ) : null}
               </header>
@@ -91,7 +93,7 @@ export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
                     <span className="numeric text-base text-gold">{pair.rootSuffix}</span>
                   ) : null}
                   <span className="label-caps text-ink-muted">
-                    {pinnacle.is_master ? '主数顶峰' : '顶峰数'}
+                    {pinnacle.is_master ? t('主数顶峰') : t('顶峰数')}
                   </span>
                 </div>
                 <span className="numeric text-[11px] text-ink-muted">{pinnacle.expression}</span>
@@ -118,7 +120,7 @@ export function PinnacleLadder({ pinnacles, challenges }: PinnacleLadderProps) {
                     <SourceNote source={challenge.source} />
                   </>
                 ) : (
-                  <span className="label-caps text-wuxing-fire">无对应挑战（index 配不上）</span>
+                  <span className="label-caps text-wuxing-fire">{t('无对应挑战（index 配不上）')}</span>
                 )}
               </div>
 

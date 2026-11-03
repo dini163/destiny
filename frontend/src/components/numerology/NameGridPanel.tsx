@@ -1,5 +1,6 @@
 import { SourceNote } from '../ui/SourceNote';
 import { arrangeGrid } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { NumberGrid } from '../../types/numerology';
 
 interface NameGridPanelProps {
@@ -23,14 +24,14 @@ interface NameGridPanelProps {
  * 后端保证 `cells` 覆盖 1..9 且 `layout` 是它的一个排列，正常到不了这一支，真到了就该看得见。
  */
 export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
+  const { t } = useI18n();
   const rows = arrangeGrid(grid.cells, grid.layout);
 
   return (
     <div className="flex flex-col gap-4">
       <p className="text-xs leading-relaxed text-ink-muted">
-        <span className="label-caps text-gold">来自姓名 </span>
-        {fullName} 的拉丁字母逐字计入；计数合计 {grid.total} 恒等于参与计算的字母数
-        （非字母字符由引擎跳过并另行如实报数）。
+        <span className="label-caps text-gold">{t('来自姓名')} </span>
+        {fullName} {t('的拉丁字母逐字计入；计数合计 {{total}} 恒等于参与计算的字母数（非字母字符由引擎跳过并另行如实报数）。', { total: grid.total })}
       </p>
 
       <div className="grid grid-cols-3 gap-2 rounded-card border border-rim bg-[var(--field-bg)] p-3">
@@ -42,7 +43,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
                   key={`hole-${rowIndex}-${colIndex}`}
                   className="flex h-24 items-center justify-center rounded-element border border-dashed border-wuxing-fire/40 text-xs text-wuxing-fire"
                 >
-                  契约缺格
+                  {t('契约缺格')}
                 </div>
               );
             }
@@ -58,7 +59,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
               >
                 <div className="flex items-center justify-between">
                   <span className={`label-caps ${absent ? 'text-wuxing-fire' : 'text-ink-muted'}`}>
-                    {absent ? `业力课缺 (${cell.digit})` : `数位 ${cell.digit}`}
+                    {absent ? t('业力课缺 ({{d}})', { d: cell.digit }) : t('数位 {{d}}', { d: cell.digit })}
                   </span>
                 </div>
                 <div className="flex items-end justify-between gap-1">
@@ -72,7 +73,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
                   <span
                     className={`numeric text-xs ${absent ? 'text-wuxing-fire' : 'text-ink-variant'}`}
                   >
-                    {absent ? '缺失 · 0 次' : `× ${cell.count} 次`}
+                    {absent ? t('缺失 · 0 次') : t('× {{n}} 次', { n: cell.count })}
                   </span>
                 </div>
                 <span className="numeric truncate text-[11px] text-ink-muted" title={cell.tokens.join('、')}>
@@ -92,7 +93,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
               className="flex flex-col gap-1 rounded-element border border-wuxing-fire/30 bg-wuxing-fire/5 p-3"
             >
               <span className="label-caps text-wuxing-fire">
-                业力课 {lesson.digit} · Karmic Lesson
+                {t('业力课 {{d}} · Karmic Lesson', { d: lesson.digit })}
               </span>
               <p className="text-xs leading-relaxed text-ink-variant">{lesson.meaning}</p>
               <SourceNote source={lesson.source} />
@@ -101,7 +102,7 @@ export function NameGridPanel({ grid, fullName }: NameGridPanelProps) {
         </ul>
       ) : (
         <p className="rounded-element border border-rim bg-surface-raised p-3 text-xs text-ink-variant">
-          无业力课：1–9 九个数位在这份姓名里都至少出现过一次。
+          {t('无业力课：1–9 九个数位在这份姓名里都至少出现过一次。')}
         </p>
       )}
 

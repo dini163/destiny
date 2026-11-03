@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
 import { ChineseDateField } from '../ui/DateTimeField';
+import { useI18n } from '../../i18n/context';
 import type { NumerologyChartRequest } from '../../types/numerology';
 
 /** 表单状态。与 `NumerologyChartRequest` 同义，只是各字段的形状跟着控件走。 */
@@ -57,6 +58,7 @@ interface NumerologyConsoleProps {
  * 一句"请先填生日"打断。
  */
 export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyConsoleProps) {
+  const { t } = useI18n();
   const [state, setState] = useState<ConsoleState>(EMPTY);
 
   function patch(next: Partial<ConsoleState>): void {
@@ -95,28 +97,28 @@ export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyCon
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">
-                数字命理全景矩阵
+                {t('数字命理全景矩阵')}
               </h1>
               <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-                pythagorean · 1–9 字母映射
+                {t('pythagorean · 1–9 字母映射')}
               </span>
             </div>
             <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">
-              六个核心数、四顶峰与四挑战、个人年月日、姓名天赋九宫与生辰洛书九宫，一次推演给全。
-              每个数都自带约简账本，拿计算器就能逐行复核 —— 本页不出综合评分，也不出均衡度百分比。
+              {t('六个核心数、四顶峰与四挑战、个人年月日、姓名天赋九宫与生辰洛书九宫，一次推演给全。')}
+              {t('每个数都自带约简账本，拿计算器就能逐行复核 —— 本页不出综合评分，也不出均衡度百分比。')}
             </p>
           </div>
         </div>
         <button type="submit" className="btn-primary shrink-0" disabled={incomplete || pending}>
           <Icon name="sparkle" size={18} />
-          {pending ? '推演中…' : '推演灵数'}
+          {pending ? t('推演中…') : t('推演灵数')}
         </button>
       </div>
 
       <p className="flex items-start gap-2 rounded-element border border-gold/40 bg-gold/10 px-3 py-2 text-xs leading-relaxed text-gold-soft">
         <Icon name="alert" size={14} className="mt-0.5 shrink-0" />
-        毕达哥拉斯映射定义在拉丁字母表上，请输入拼音或英文名（如 LU QINGXUAN）。
-        汉字没有权威的字母化口径，本系统不代作主张；中文名可另填，仅作回显。
+        {t('毕达哥拉斯映射定义在拉丁字母表上，请输入拼音或英文名（如 LU QINGXUAN）。')}
+        {t('汉字没有权威的字母化口径，本系统不代作主张；中文名可另填，仅作回显。')}
       </p>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -125,19 +127,19 @@ export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyCon
             value={state.fullName}
             onChange={(event) => patch({ fullName: event.target.value })}
             maxLength={80}
-            placeholder="如：LU QINGXUAN"
+            placeholder={t('如：LU QINGXUAN')}
             className="field"
-            aria-label="拉丁字母全名"
+            aria-label={t('拉丁字母全名')}
           />
         </LabeledField>
-        <LabeledField label="中文名（选填，仅回显）" hint={<span className="label-caps text-ink-muted">不参与计算</span>}>
+        <LabeledField label="中文名（选填，仅回显）" hint={<span className="label-caps text-ink-muted">{t('不参与计算')}</span>}>
           <input
             value={state.nameZh}
             onChange={(event) => patch({ nameZh: event.target.value })}
             maxLength={20}
-            placeholder="如：陆青玄"
+            placeholder={t('如：陆青玄')}
             className="field"
-            aria-label="中文名，仅回显"
+            aria-label={t('中文名，仅回显')}
           />
         </LabeledField>
         <LabeledField label="公历生日（必填）">
@@ -145,7 +147,7 @@ export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyCon
         </LabeledField>
         <LabeledField
           label="基准日（选填）"
-          hint={<span className="label-caps text-ink-muted">留空取今天</span>}
+          hint={<span className="label-caps text-ink-muted">{t('留空取今天')}</span>}
         >
           <ChineseDateField
             value={state.referenceDate}
@@ -163,17 +165,15 @@ export function NumerologyConsole({ pending, hasChart, onSubmit }: NumerologyCon
           className="mt-0.5 h-4 w-4 accent-[#d4af37]"
         />
         <span className="flex flex-col gap-0.5">
-          <span>把 Y 计入元音</span>
+          <span>{t('把 Y 计入元音')}</span>
           <span className="text-xs leading-relaxed text-ink-muted">
-            判据是这个 Y 在音节里当不当元音用：Lynn、Rhythm 的 Y 算元音，Yolanda、Young
-            的 Y 算辅音。音节切分无法判定，故默认按辅音；改动会同时移动灵魂冲动数与人格面具数，
-            表达数（全字母总和）不变。
+            {t('判据是这个 Y 在音节里当不当元音用：Lynn、Rhythm 的 Y 算元音，Yolanda、Young 的 Y 算辅音。音节切分无法判定，故默认按辅音；改动会同时移动灵魂冲动数与人格面具数，表达数（全字母总和）不变。')}
           </span>
         </span>
       </label>
 
       {incomplete ? (
-        <p className="label-caps text-ink-muted">拉丁字母全名与公历生日都填了才能推演。</p>
+        <p className="label-caps text-ink-muted">{t('拉丁字母全名与公历生日都填了才能推演。')}</p>
       ) : null}
     </form>
   );

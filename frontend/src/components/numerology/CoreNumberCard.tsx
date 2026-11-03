@@ -1,5 +1,6 @@
 import { SourceNote } from '../ui/SourceNote';
 import { masterPair } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { CoreNumber, CoreNumberKey } from '../../types/numerology';
 
 /**
@@ -37,6 +38,7 @@ interface CoreNumberCardProps {
  * 像"查过了，这个名字算不出这个数"。
  */
 export function CoreNumberCard({ card, className }: CoreNumberCardProps) {
+  const { t } = useI18n();
   const pair = masterPair(card.value, card.root, card.is_master);
 
   return (
@@ -45,7 +47,7 @@ export function CoreNumberCard({ card, className }: CoreNumberCardProps) {
     >
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="label-caps text-ink-muted">{DERIVATION[card.key]}</span>
+          <span className="label-caps text-ink-muted">{t(DERIVATION[card.key])}</span>
           <h3 className="font-display text-base font-semibold text-ink">{card.label}</h3>
         </div>
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-element border border-rim bg-surface-raised">
@@ -57,14 +59,14 @@ export function CoreNumberCard({ card, className }: CoreNumberCardProps) {
               ) : null}
             </span>
           ) : (
-            <span className="font-display text-sm text-ink-muted">缺</span>
+            <span className="font-display text-sm text-ink-muted">{t('缺')}</span>
           )}
         </span>
       </header>
 
       {card.is_master && card.master_title ? (
         <span className="label-caps w-fit rounded-element border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-gold-bright">
-          主数 · {card.master_title}
+          {t('主数 · {{title}}', { title: card.master_title })}
         </span>
       ) : null}
 
@@ -91,13 +93,13 @@ export function CoreNumberCard({ card, className }: CoreNumberCardProps) {
 
       {card.talent ? (
         <p className="text-[11px] leading-relaxed text-ink-muted">
-          <span className="label-caps text-gold">天赋 </span>
+          <span className="label-caps text-gold">{t('天赋')} </span>
           {card.talent}
         </p>
       ) : null}
       {card.challenge ? (
         <p className="text-[11px] leading-relaxed text-ink-muted">
-          <span className="label-caps text-wuxing-fire">阴影 </span>
+          <span className="label-caps text-wuxing-fire">{t('阴影')} </span>
           {card.challenge}
         </p>
       ) : null}

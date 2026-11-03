@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import type { ReductionStep } from '../../types/numerology';
 
 interface ReductionLadderProps {
@@ -27,13 +28,14 @@ interface ReductionLadderProps {
  * `unavailable_reason`，阶梯不该在此处印一句"无步骤"抢话。
  */
 export function ReductionLadder({ steps, caption, compact }: ReductionLadderProps) {
+  const { t } = useI18n();
   if (steps.length === 0) {
     return null;
   }
   const size = compact ? 'text-[11px]' : 'text-xs';
   return (
     <div className="flex flex-col gap-1.5">
-      {caption ? <span className="label-caps text-ink-muted">{caption}</span> : null}
+      {caption ? <span className="label-caps text-ink-muted">{t(caption)}</span> : null}
       <ol className="flex flex-col gap-1">
         {steps.map((step, index) => (
           // 同一 `label` 会连着出现多行（`年 1994→23` 之后还有 `年 23→5`），故 key 带序号。
@@ -47,12 +49,12 @@ export function ReductionLadder({ steps, caption, compact }: ReductionLadderProp
               →
             </span>
             <span className="numeric font-semibold text-gold-bright">{step.reduced}</span>
-            <span className="numeric ml-auto text-ink-muted" title="本行的算式">
+            <span className="numeric ml-auto text-ink-muted" title={t('本行的算式')}>
               {step.expression}
             </span>
             {step.karmic_debt ? (
               <span className="label-caps rounded-element border border-wuxing-fire/40 bg-wuxing-fire/10 px-1.5 py-0.5 text-wuxing-fire">
-                业力债
+                {t('业力债')}
               </span>
             ) : null}
           </li>

@@ -1,6 +1,7 @@
 import { ReductionLadder } from './ReductionLadder';
 import { SourceNote } from '../ui/SourceNote';
 import { masterPair } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { CoreNumber } from '../../types/numerology';
 
 const SIZE = 100;
@@ -19,17 +20,18 @@ const CENTER = SIZE / 2;
  * 不印 0、不印空环。
  */
 export function CoreNumberHero({ card }: { card: CoreNumber }) {
+  const { t } = useI18n();
   const pair = masterPair(card.value, card.root, card.is_master);
 
   return (
     <article className="panel-raised flex flex-col gap-5 p-5 sm:p-6">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">
-          核心最高显相
+          {t('核心最高显相')}
         </span>
         {card.is_master && card.master_title ? (
           <span className="label-caps rounded-element border border-gold/40 px-2 py-0.5 text-gold-bright">
-            主数 · {card.master_title}
+            {t('主数 · {{title}}', { title: card.master_title })}
           </span>
         ) : null}
       </header>
@@ -43,7 +45,7 @@ export function CoreNumberHero({ card }: { card: CoreNumber }) {
             aria-label={
               pair
                 ? `${card.label} ${pair.primary}${pair.rootSuffix ?? ''}`
-                : `${card.label} 算不出`
+                : t('{{label}} 算不出', { label: card.label })
             }
           >
             <circle cx={CENTER} cy={CENTER} r={44} fill="none" stroke="#171C2B" strokeWidth={6} />
@@ -69,7 +71,7 @@ export function CoreNumberHero({ card }: { card: CoreNumber }) {
                 ) : null}
               </>
             ) : (
-              <span className="font-display text-sm text-ink-muted">缺</span>
+              <span className="font-display text-sm text-ink-muted">{t('缺')}</span>
             )}
           </div>
         </div>
@@ -107,13 +109,13 @@ export function CoreNumberHero({ card }: { card: CoreNumber }) {
         <dl className="flex flex-col gap-1.5 text-xs leading-relaxed">
           {card.talent ? (
             <div className="flex gap-2">
-              <dt className="label-caps shrink-0 text-gold">天赋</dt>
+              <dt className="label-caps shrink-0 text-gold">{t('天赋')}</dt>
               <dd className="text-ink-variant">{card.talent}</dd>
             </div>
           ) : null}
           {card.challenge ? (
             <div className="flex gap-2">
-              <dt className="label-caps shrink-0 text-wuxing-fire">阴影</dt>
+              <dt className="label-caps shrink-0 text-wuxing-fire">{t('阴影')}</dt>
               <dd className="text-ink-variant">{card.challenge}</dd>
             </div>
           ) : null}

@@ -1,10 +1,12 @@
 import { ReductionLadder } from './ReductionLadder';
 import { SourceNote } from '../ui/SourceNote';
 import { masterPair, yearRounds } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { PersonalCycle, PersonalCycles } from '../../types/numerology';
 
 /** 一轮周期共用的读数块：大号数字 + 主数后缀 + 时段 + 释义。 */
 function CycleFigure({ cycle, emphasized }: { cycle: PersonalCycle; emphasized: boolean }) {
+  const { t } = useI18n();
   const pair = masterPair(cycle.value, cycle.root, cycle.is_master);
   return (
     <div className="flex flex-col gap-1">
@@ -22,7 +24,7 @@ function CycleFigure({ cycle, emphasized }: { cycle: PersonalCycle; emphasized: 
         <span className="numeric text-xs text-ink-muted">{cycle.period}</span>
         {cycle.is_master ? (
           <span className="label-caps rounded-element border border-gold/40 bg-gold/10 px-1.5 py-0.5 text-gold-bright">
-            主数
+            {t('主数')}
           </span>
         ) : null}
       </div>
@@ -49,6 +51,7 @@ function CycleFigure({ cycle, emphasized }: { cycle: PersonalCycle; emphasized: 
  * 前端再判一次"今天"就等于两处各有一个今天。
  */
 export function PersonalCyclePanel({ cycles }: { cycles: PersonalCycles }) {
+  const { t } = useI18n();
   const rounds = yearRounds(cycles);
 
   return (
@@ -97,7 +100,7 @@ export function PersonalCyclePanel({ cycles }: { cycles: PersonalCycles }) {
             >
               <span className={`label-caps ${current ? 'text-gold' : 'text-ink-muted'}`}>
                 {cycle.period}
-                {current ? ' (今)' : ''}
+                {current ? ` ${t('(今)')}` : ''}
               </span>
               <span
                 className={`numeric text-2xl font-semibold leading-none ${

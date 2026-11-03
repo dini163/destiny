@@ -1,4 +1,5 @@
 import { skippedCharsLabel } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { LetterMapGroup, LetterValue, NumerologyInput } from '../../types/numerology';
 
 interface LetterMapTableProps {
@@ -28,6 +29,7 @@ interface LetterMapTableProps {
  * 九列在窄屏上横向滚动而不是挤成不可读的一条，与 `HehunPairMatrix` 同一套做法。
  */
 export function LetterMapTable({ columns, letters, input }: LetterMapTableProps) {
+  const { t } = useI18n();
   const inName = new Set(letters.map((letter) => letter.char));
 
   return (
@@ -61,14 +63,14 @@ export function LetterMapTable({ columns, letters, input }: LetterMapTableProps)
       <div className="flex flex-col gap-2 rounded-card border border-rim bg-surface p-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="label-caps text-gold">
-            姓名逐字数理透视 · {input.full_name}
-            {input.name_zh ? `（${input.name_zh}，仅回显）` : ''}
+            {t('姓名逐字数理透视')} · {input.full_name}
+            {input.name_zh ? t('（{{name}}，仅回显）', { name: input.name_zh }) : ''}
           </span>
           <span className="numeric text-xs text-ink-variant">
-            共 {input.letter_count} 个字母计入
+            {t('共 {{n}} 个字母计入', { n: input.letter_count })}
             {input.skipped_count > 0
-              ? ` · 跳过 ${input.skipped_count} 个非字母字符（${skippedCharsLabel(input.skipped_chars)}）`
-              : ' · 无跳过字符'}
+              ? t(' · 跳过 {{n}} 个非字母字符（{{list}}）', { n: input.skipped_count, list: skippedCharsLabel(input.skipped_chars) })
+              : t(' · 无跳过字符')}
           </span>
         </div>
 
@@ -82,7 +84,7 @@ export function LetterMapTable({ columns, letters, input }: LetterMapTableProps)
                   ? 'border-gold/40 bg-gold/10'
                   : 'border-rim bg-surface-raised'
               }`}
-              title={letter.is_vowel ? '本次判定为元音' : '本次判定为辅音'}
+              title={letter.is_vowel ? t('本次判定为元音') : t('本次判定为辅音')}
             >
               <span className="numeric text-[11px] text-ink-muted">{letter.char}</span>
               <span
@@ -97,13 +99,9 @@ export function LetterMapTable({ columns, letters, input }: LetterMapTableProps)
         </ul>
 
         <p className="numeric text-[11px] leading-relaxed text-ink-muted">
-          元音和 {input.vowel_total} + 辅音和 {input.consonant_total} = 全字母和
-          {` ${input.letter_total}`}。
+          {t('元音和 {{vowel}} + 辅音和 {{consonant}} = 全字母和 {{total}}。', { vowel: input.vowel_total, consonant: input.consonant_total, total: input.letter_total })}
           <span className="ml-1 text-ink-variant">
-            这三个是<strong className="text-ink">约简前的总和</strong>，不是那三个数本身 ——
-            各自约简后才是灵魂冲动数、人格面具数与
-            表达数，约简过程印在对应卡片的账本里，此处不重算。金色为本次判定下的元音；
-            Y 的归属由输入台的开关决定，改动会让两个分和各移一笔而总和不动。
+            {t('这三个是')}<strong className="text-ink">{t('约简前的总和')}</strong>{t('，不是那三个数本身 —— 各自约简后才是灵魂冲动数、人格面具数与表达数，约简过程印在对应卡片的账本里，此处不重算。金色为本次判定下的元音；Y 的归属由输入台的开关决定，改动会让两个分和各移一笔而总和不动。')}
           </span>
         </p>
       </div>

@@ -1,5 +1,6 @@
 import { SourceNote } from '../ui/SourceNote';
 import { arrangeGrid } from '../../lib/numerology';
+import { useI18n } from '../../i18n/context';
 import type { LoshuGrid } from '../../types/numerology';
 
 interface LoshuGridPanelProps {
@@ -22,19 +23,20 @@ interface LoshuGridPanelProps {
  * `line_sums` 印出八条线各自的和，于是"这是真洛书"不只藏在后端单测里，响应自己就能被核对。
  */
 export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
+  const { t } = useI18n();
   const rows = arrangeGrid(grid.cells, grid.layout);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <p className="text-xs leading-relaxed text-ink-muted">
-          <span className="label-caps text-gold">来自生日 </span>
-          {birthDate} 的字面数字逐位计入；0 不是洛书的数位，故不计入合计，但个数如实报出。
+          <span className="label-caps text-gold">{t('来自生日')} </span>
+          {birthDate} {t('的字面数字逐位计入；0 不是洛书的数位，故不计入合计，但个数如实报出。')}
         </p>
         <p className="numeric text-xs text-ink-variant">
-          取出的数字：{grid.digits.join(' ')}
+          {t('取出的数字：')}{grid.digits.join(' ')}
           <span className="ml-2 text-ink-muted">
-            合计 {grid.total} 个非 0 数字 · 0 出现 {grid.zero_count} 次
+            {t('合计 {{total}} 个非 0 数字 · 0 出现 {{zero}} 次', { total: grid.total, zero: grid.zero_count })}
           </span>
         </p>
       </div>
@@ -48,7 +50,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
                   key={`hole-${rowIndex}-${colIndex}`}
                   className="flex h-24 items-center justify-center rounded-element border border-dashed border-wuxing-fire/40 text-xs text-wuxing-fire"
                 >
-                  契约缺格
+                  {t('契约缺格')}
                 </div>
               );
             }
@@ -63,7 +65,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
                 } ${cell.digit === 5 ? 'outline outline-1 outline-gold/40' : ''}`}
               >
                 <span className={`label-caps ${absent ? 'text-wuxing-fire' : 'text-ink-muted'}`}>
-                  {cell.digit === 5 ? `枢纽 (${cell.digit})` : absent ? `缺数 (${cell.digit})` : `数位 ${cell.digit}`}
+                  {cell.digit === 5 ? t('枢纽 ({{d}})', { d: cell.digit }) : absent ? t('缺数 ({{d}})', { d: cell.digit }) : t('数位 {{d}}', { d: cell.digit })}
                 </span>
                 <div className="flex items-end justify-between gap-1">
                   <span
@@ -76,7 +78,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
                   <span
                     className={`numeric text-xs ${absent ? 'text-wuxing-fire' : 'text-ink-variant'}`}
                   >
-                    {absent ? '缺失 · 0 次' : `× ${cell.count} 次`}
+                    {absent ? t('缺失 · 0 次') : t('× {{n}} 次', { n: cell.count })}
                   </span>
                 </div>
                 <span
@@ -92,7 +94,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
       </div>
 
       <p className="numeric text-[11px] text-ink-muted">
-        八条线各自的和：{grid.line_sums.join(' · ')}（恒为 15 —— 幻方性质在响应里就能核对）
+        {t('八条线各自的和：')}{grid.line_sums.join(' · ')}{t('（恒为 15 —— 幻方性质在响应里就能核对）')}
       </p>
 
       <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -118,7 +120,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
                 className={`numeric text-xs ${plane.complete ? 'text-gold' : 'text-wuxing-fire'}`}
               >
                 {plane.cells.join('-')}
-                {plane.complete ? ' 贯通' : ` 缺 ${plane.missing.join('、')}`}
+                {plane.complete ? ` ${t('贯通')}` : ` ${t('缺 {{m}}', { m: plane.missing.join('、') })}`}
               </span>
             </div>
             <p className="text-xs leading-relaxed text-ink-variant">{plane.text}</p>
@@ -134,7 +136,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
               key={item.digit}
               className="flex flex-wrap items-baseline gap-x-2 rounded-element border border-wuxing-fire/30 bg-wuxing-fire/5 px-3 py-2"
             >
-              <span className="label-caps shrink-0 text-wuxing-fire">缺 {item.digit}</span>
+              <span className="label-caps shrink-0 text-wuxing-fire">{t('缺 {{d}}', { d: item.digit })}</span>
               <span className="text-xs leading-relaxed text-ink-variant">{item.meaning}</span>
               <span className="ml-auto shrink-0">
                 <SourceNote source={item.source} />
@@ -144,7 +146,7 @@ export function LoshuGridPanel({ grid, birthDate }: LoshuGridPanelProps) {
         </ul>
       ) : (
         <p className="rounded-element border border-rim bg-surface-raised p-3 text-xs text-ink-variant">
-          无缺数：1–9 九个数位在这个生日里都至少出现过一次。
+          {t('无缺数：1–9 九个数位在这个生日里都至少出现过一次。')}
         </p>
       )}
 
