@@ -549,6 +549,46 @@ const zhHant: MessageDict = {
   '核定姓名 · RESOLVED': '核定姓名 · RESOLVED',
   '以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：':
     '以下字的康熙筆畫不在本語料範圍內，相關五格與指數不予推算：',
+
+  // Numerology page
+  出错字段: '出错字段',
+  '把姓名换成拼音或英文名后重新推演；中文名可填在选填格里，仅作回显、不参与计算。':
+    '把姓名換成拼音或英文名后重新推演；中文名可填在选填格裡，僅作回顯、不参与計算。',
+  '正在逐字取值、约简六个核心数并排布两张九宫…': '正在逐字取值、約簡六個核心數并排布兩张九宫…',
+  白话总论: '白話總論',
+  核心本命数仪表盘: '核心本命数仪表盘',
+  '六个核心数 · 各自带约简账本': '六個核心数 · 各自带約簡賬本',
+  姓名天赋九宫: '姓名天賦九宫',
+  '来自姓名 · 业力课 {{count}} 个': '來自姓名 · 業力課 {{count}} 個',
+  生辰洛书九宫: '生辰洛書九宫',
+  '来自生日 · 八平面贯通 {{count}} 条': '來自生日 · 八平面贯通 {{count}} 條',
+  顶峰与挑战阶梯: '顶峰與挑战階梯',
+  '四程顶峰 · 四项挑战': '四程顶峰 · 四項挑战',
+  个人年月日周期: '個人年月日周期',
+  '基准日 {{date}}': '基準日 {{date}}',
+  字母映射与逐字透视: '字母映射與逐字透视',
+  '{{mapCols}} 列映射 · 姓名 {{letters}} 个字母': '{{mapCols}} 列映射 · 姓名 {{letters}} 個字母',
+  公历生日: '公曆生日',
+  '数字命理是西方体系，公历是其原生输入（spec §4.2）': '數字命理是西方体系，公曆是其原生輸入（spec §4.2）',
+  基准日周岁: '基準日周岁',
+  '基准日早于生日': '基準日早于生日',
+  '基准日早于生日时如实留空，不填负数或 0': '基準日早于生日時如實留空，不填負数或 0',
+  参与字母: '参与字母',
+  跳过字符: '跳过字符',
+  字母值总和: '字母值總和',
+  '恒等于元音和 + 辅音和': '恆等于元音和 + 辅音和',
+  '{{count}} 个': '{{count}} 個',
+  '推演对象 · SUBJECT': '推演對象 · SUBJECT',
+  'Y 元音判定 · 计入元音': 'Y 元音判定 · 計入元音',
+  'Y 元音判定 · 计为辅音': 'Y 元音判定 · 計為辅音',
+  '元音和 {{vowel}} + 辅音和 {{consonant}} = 全字母和 {{total}}。这三个是约简前的总和，各自约简后才是灵魂冲动数、人格面具数与表达数，约简过程印在对应卡片的账本里。':
+    '元音和 {{vowel}} + 辅音和 {{consonant}} = 全字母和 {{total}}。這三個是約簡前的總和，各自約簡後才是灵魂推動数、人格面具数與表达数，約簡過程印在對應卡片的賬本裡。',
+  '有 {{count}} 个字符不参与计算（去重后：': '有 {{count}} 個字符不参与計算（去重後：',
+  '）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如实报出、不折算成 0（决策 8）。':
+    '）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如實报出、不折算成 0（決策 8）。',
+  '生命灵数的相加行未落在 13 / 14 / 16 / 19 上，故无业力债。只有相加行会判：年份逐位约简的途中也会路过 19，那里多报一个就是报出来源本人也没报的债（spec §6.8）。':
+    '生命灵数的相加行未落在 13 / 14 / 16 / 19 上，故无业力债。只有相加行会判：年份逐位約簡的途中也会路过 19，那裡多报一个就是报出來源本人也没报的债（spec §6.8）。',
+  '业力债 · KARMIC DEBT': '业力债 · KARMIC DEBT',
 };
 
 const en: MessageDict = {
@@ -1082,6 +1122,46 @@ const en: MessageDict = {
   '核定姓名 · RESOLVED': 'RESOLVED NAME',
   '以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：':
     'Kangxi stroke counts for the following characters are outside this corpus; the related grids and index are withheld:',
+
+  // Numerology page
+  出错字段: 'Offending field',
+  '把姓名换成拼音或英文名后重新推演；中文名可填在选填格里，仅作回显、不参与计算。':
+    'Retry with the name in pinyin or an English form; the optional Chinese name is only echoed back and does not enter the computation.',
+  '正在逐字取值、约简六个核心数并排布两张九宫…': 'Deriving per-letter values, reducing the six core numbers and laying out the two nine-palace grids…',
+  白话总论: 'Plain Overview',
+  核心本命数仪表盘: 'Core Number Dashboard',
+  '六个核心数 · 各自带约简账本': 'Six core numbers · each with its own reduction ledger',
+  姓名天赋九宫: 'Name Talent Nine-Palace',
+  '来自姓名 · 业力课 {{count}} 个': 'From the name · {{count}} karmic lessons',
+  生辰洛书九宫: 'Birth Lo-Shu Nine-Palace',
+  '来自生日 · 八平面贯通 {{count}} 条': 'From the birthday · {{count}} of eight planes completed',
+  顶峰与挑战阶梯: 'Pinnacles & Challenges Ladder',
+  '四程顶峰 · 四项挑战': 'Four pinnacles · four challenges',
+  个人年月日周期: 'Personal Year / Month / Day',
+  '基准日 {{date}}': 'Reference date {{date}}',
+  字母映射与逐字透视: 'Letter map & per-character view',
+  '{{mapCols}} 列映射 · 姓名 {{letters}} 个字母': '{{mapCols}} mapped columns · {{letters}} letters in the name',
+  公历生日: 'Solar birthday',
+  '数字命理是西方体系，公历是其原生输入（spec §4.2）': 'Numerology is a Western system; the solar calendar is its native input (spec §4.2).',
+  基准日周岁: 'Age at reference date',
+  '基准日早于生日': 'Reference date precedes the birthday',
+  '基准日早于生日时如实留空，不填负数或 0': 'Left blank when the reference date precedes the birthday — never a negative or 0.',
+  参与字母: 'Letters used',
+  跳过字符: 'Skipped characters',
+  字母值总和: 'Letter-value total',
+  '恒等于元音和 + 辅音和': 'Always equals vowel sum + consonant sum.',
+  '{{count}} 个': '{{count}}',
+  '推演对象 · SUBJECT': 'SUBJECT',
+  'Y 元音判定 · 计入元音': 'Y handling · counted as a vowel',
+  'Y 元音判定 · 计为辅音': 'Y handling · counted as a consonant',
+  '元音和 {{vowel}} + 辅音和 {{consonant}} = 全字母和 {{total}}。这三个是约简前的总和，各自约简后才是灵魂冲动数、人格面具数与表达数，约简过程印在对应卡片的账本里。':
+    'Vowel sum {{vowel}} + consonant sum {{consonant}} = full letter sum {{total}}. These are the pre-reduction totals; their reduced forms are Soul Urge, Personality and Expression, each printed in the matching card’s ledger.',
+  '有 {{count}} 个字符不参与计算（去重后：': '{{count}} characters do not enter the calculation (deduplicated: ',
+  '）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如实报出、不折算成 0（决策 8）。':
+    '). The Pythagorean map is defined only for the Latin alphabet; other characters are reported as they are, not folded to 0 (decision 8).',
+  '生命灵数的相加行未落在 13 / 14 / 16 / 19 上，故无业力债。只有相加行会判：年份逐位约简的途中也会路过 19，那里多报一个就是报出来源本人也没报的债（spec §6.8）。':
+    'The Life Path addition row did not land on 13 / 14 / 16 / 19, so no karmic debt. Only the addition row is judged: the digit-wise reduction of the year also passes through 19, and flagging it there would invent a debt the source itself does not report (spec §6.8).',
+  '业力债 · KARMIC DEBT': 'KARMIC DEBT',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

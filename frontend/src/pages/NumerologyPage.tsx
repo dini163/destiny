@@ -12,6 +12,7 @@ import { PlainProse } from '../components/ui/PlainProse';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SourceNote } from '../components/ui/SourceNote';
 import { useNumerology } from '../hooks/useNumerology';
+import { useI18n } from '../i18n/context';
 import { skippedCharsLabel } from '../lib/numerology';
 import type { KarmicDebt, NumerologyChart } from '../types/numerology';
 
@@ -42,6 +43,7 @@ const CONTEXT_LABEL: Record<string, string> = { field: '出错字段' };
  * 先例是 `NamePage` 的 `NameSummary`。
  */
 export function NumerologyPage() {
+  const { t } = useI18n();
   const chart = useNumerology();
 
   return (
@@ -56,12 +58,12 @@ export function NumerologyPage() {
         <TransitErrorNote
           error={chart.error}
           captions={CONTEXT_LABEL}
-          hint="把姓名换成拼音或英文名后重新推演；中文名可填在选填格里，仅作回显、不参与计算。"
+          hint={t('把姓名换成拼音或英文名后重新推演；中文名可填在选填格里，仅作回显、不参与计算。')}
         />
       ) : null}
 
       {chart.isPending && !chart.data ? (
-        <p className="label-caps text-ink-muted">正在逐字取值、约简六个核心数并排布两张九宫…</p>
+        <p className="label-caps text-ink-muted">{t('正在逐字取值、约简六个核心数并排布两张九宫…')}</p>
       ) : null}
 
       {chart.data ? <NumerologyResults chart={chart.data} /> : null}
@@ -76,6 +78,7 @@ export function NumerologyPage() {
  * 才把"哪张是大卡"这件事写在页面上，而不是藏在一份数组顺序的约定里。
  */
 function NumerologyResults({ chart }: { chart: NumerologyChart }) {
+  const { t } = useI18n();
   const lifePath = chart.core.find((card) => card.key === 'life_path');
   const others = chart.core.filter((card) => card.key !== 'life_path');
   const planesComplete = chart.loshu_grid.planes.filter((plane) => plane.complete).length;
@@ -86,7 +89,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
           全站唯一有六张结果卡却一句总论都没有的，补的正是那一句合并叙述。文本由引擎装配，
           本页不组句、不折行、不补连接词（`PlainProse` 只固定「怎么读」）。 */}
       <div className="panel flex flex-col gap-2 p-5">
-        <span className="label-caps text-ink-muted">白话总论</span>
+        <span className="label-caps text-ink-muted">{t('白话总论')}</span>
         <PlainProse text={chart.plain_summary} />
       </div>
 
@@ -97,7 +100,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
         icon="gauge"
         actions={
           <span className="label-caps text-ink-muted">
-            六个核心数 · 各自带约简账本
+            {t('六个核心数 · 各自带约简账本')}
           </span>
         }
         elevated
@@ -121,7 +124,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
           icon="search"
           actions={
             <span className="label-caps text-ink-muted">
-              来自姓名 · 业力课 {chart.name_grid.karmic_lessons.length} 个
+              {t('来自姓名 · 业力课 {{count}} 个', { count: chart.name_grid.karmic_lessons.length })}
             </span>
           }
         >
@@ -133,7 +136,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
           icon="compass"
           actions={
             <span className="label-caps text-ink-muted">
-              来自生日 · 八平面贯通 {planesComplete} 条
+              {t('来自生日 · 八平面贯通 {{count}} 条', { count: planesComplete })}
             </span>
           }
         >
@@ -144,7 +147,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
       <ResultCard
         title="顶峰与挑战阶梯"
         icon="timeline"
-        actions={<span className="label-caps text-ink-muted">四程顶峰 · 四项挑战</span>}
+        actions={<span className="label-caps text-ink-muted">{t('四程顶峰 · 四项挑战')}</span>}
       >
         <PinnacleLadder pinnacles={chart.pinnacles} challenges={chart.challenges} />
       </ResultCard>
@@ -154,7 +157,7 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
         icon="calendar"
         actions={
           <span className="label-caps text-ink-muted">
-            基准日 <span className="numeric">{chart.provenance.reference_date}</span>
+            {t('基准日 {{date}}', { date: chart.provenance.reference_date })}
           </span>
         }
       >
@@ -166,7 +169,10 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
         icon="seal"
         actions={
           <span className="label-caps text-ink-muted">
-            {chart.letter_map.length} 列映射 · 姓名 {chart.letters.length} 个字母
+            {t('{{mapCols}} 列映射 · 姓名 {{letters}} 个字母', {
+              mapCols: chart.letter_map.length,
+              letters: chart.letters.length,
+            })}
           </span>
         }
       >
@@ -184,25 +190,26 @@ function NumerologyResults({ chart }: { chart: NumerologyChart }) {
  * 可对账的起点。档案号取自 `provenance.badge` 而不是写死在页面里，它才会跟着后端一起变。
  */
 function ChartSummary({ chart }: { chart: NumerologyChart }) {
+  const { t } = useI18n();
   const { input, provenance } = chart;
 
   const facts: Array<{ label: string; value: string; title?: string }> = [
-    { label: '公历生日', value: input.birth_date, title: '数字命理是西方体系，公历是其原生输入（spec §4.2）' },
+    { label: t('公历生日'), value: input.birth_date, title: t('数字命理是西方体系，公历是其原生输入（spec §4.2）') },
     {
-      label: '基准日周岁',
-      value: input.age_at_reference === null ? '基准日早于生日' : String(input.age_at_reference),
-      title: '基准日早于生日时如实留空，不填负数或 0',
+      label: t('基准日周岁'),
+      value: input.age_at_reference === null ? t('基准日早于生日') : String(input.age_at_reference),
+      title: t('基准日早于生日时如实留空，不填负数或 0'),
     },
-    { label: '参与字母', value: `${input.letter_count} 个` },
-    { label: '跳过字符', value: `${input.skipped_count} 个` },
-    { label: '字母值总和', value: String(input.letter_total), title: '恒等于元音和 + 辅音和' },
+    { label: t('参与字母'), value: t('{{count}} 个', { count: input.letter_count }) },
+    { label: t('跳过字符'), value: t('{{count}} 个', { count: input.skipped_count }) },
+    { label: t('字母值总和'), value: String(input.letter_total), title: t('恒等于元音和 + 辅音和') },
   ];
 
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">推演对象 · SUBJECT</span>
+          <span className="label-caps">{t('推演对象 · SUBJECT')}</span>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-display text-2xl font-semibold text-gold-bright text-glow-gold sm:text-3xl">
               {input.full_name}
@@ -218,7 +225,7 @@ function ChartSummary({ chart }: { chart: NumerologyChart }) {
           </div>
         </div>
         <span className="label-caps text-ink-muted">
-          Y 元音判定 · {input.y_as_vowel ? '计入元音' : '计为辅音'}
+          {input.y_as_vowel ? t('Y 元音判定 · 计入元音') : t('Y 元音判定 · 计为辅音')}
         </span>
       </div>
 
@@ -236,19 +243,20 @@ function ChartSummary({ chart }: { chart: NumerologyChart }) {
       </dl>
 
       <p className="numeric text-xs leading-relaxed text-ink-muted">
-        元音和 {input.vowel_total} + 辅音和 {input.consonant_total} = 全字母和{' '}
-        {input.letter_total}
-        。这三个是约简前的总和，各自约简后才是灵魂冲动数、人格面具数与表达数，
-        约简过程印在对应卡片的账本里。
+        {t('元音和 {{vowel}} + 辅音和 {{consonant}} = 全字母和 {{total}}。这三个是约简前的总和，各自约简后才是灵魂冲动数、人格面具数与表达数，约简过程印在对应卡片的账本里。', {
+          vowel: input.vowel_total,
+          consonant: input.consonant_total,
+          total: input.letter_total,
+        })}
       </p>
 
       {input.skipped_count > 0 ? (
         <p className="flex items-start gap-2 text-sm text-wuxing-fire">
           <Icon name="alert" size={16} className="mt-0.5 shrink-0" />
           <span>
-            有 {input.skipped_count} 个字符不参与计算（去重后：
+            {t('有 {{count}} 个字符不参与计算（去重后：', { count: input.skipped_count })}
             <span className="numeric">{skippedCharsLabel(input.skipped_chars)}</span>
-            ）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如实报出、不折算成 0（决策 8）。
+            {t('）。毕达哥拉斯映射只定义在拉丁字母表上，其余字符如实报出、不折算成 0（决策 8）。')}
           </span>
         </p>
       ) : null}
@@ -268,18 +276,18 @@ function ChartSummary({ chart }: { chart: NumerologyChart }) {
  * 19→10→1 四条链的中间量没有一个还落在 {13,14,16,19} 里，故一份账本至多报出一个业力债。
  */
 function KarmicDebtStrip({ debts }: { debts: readonly KarmicDebt[] }) {
+  const { t } = useI18n();
   if (debts.length === 0) {
     return (
       <p className="text-sm leading-relaxed text-ink-muted">
-        生命灵数的相加行未落在 13 / 14 / 16 / 19 上，故无业力债。只有相加行会判：
-        年份逐位约简的途中也会路过 19，那里多报一个就是报出来源本人也没报的债（spec §6.8）。
+        {t('生命灵数的相加行未落在 13 / 14 / 16 / 19 上，故无业力债。只有相加行会判：年份逐位约简的途中也会路过 19，那里多报一个就是报出来源本人也没报的债（spec §6.8）。')}
       </p>
     );
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="label-caps text-wuxing-fire">业力债 · KARMIC DEBT</span>
+      <span className="label-caps text-wuxing-fire">{t('业力债 · KARMIC DEBT')}</span>
       {debts.map((debt) => (
         <div key={debt.number} className="panel flex flex-col gap-2 p-4">
           <div className="flex flex-wrap items-baseline gap-3">
