@@ -99,6 +99,19 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "迁移": "遷移",
         "仆役": "僕役",
         "官禄": "官祿",
+        # 奇门八门 / 方位（qimen door、direction 叶值）：仅登记字形有差者。
+        "休门": "休門",
+        "死门": "死門",
+        "伤门": "傷門",
+        "杜门": "杜門",
+        "开门": "開門",
+        "惊门": "驚門",
+        "生门": "生門",
+        "景门": "景門",
+        "东": "東",
+        "东南": "東南",
+        "东北": "東北",
+        "中宫": "中宮",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -232,6 +245,20 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "己": "Ji", "庚": "Geng", "辛": "Xin", "壬": "Ren", "癸": "Gui",
         "子": "Zi", "丑": "Chou", "寅": "Yin", "卯": "Mao", "辰": "Chen", "巳": "Si",
         "午": "Wu", "未": "Wei", "申": "Shen", "酉": "You", "戌": "Xu", "亥": "Hai",
+        # 奇门九星（name 叶值，与 `content/qimen.NINE_STARS` 同源）：取拼音转写。
+        "天蓬": "Tianpeng", "天芮": "Tianrui", "天冲": "Tianchong", "天辅": "Tianfu",
+        "天禽": "Tianqin", "天心": "Tianxin", "天柱": "Tianzhu", "天任": "Tianren", "天英": "Tianying",
+        # 奇门八门（与 `content/qimen.EIGHT_DOORS` 同源）。
+        "休门": "Rest Door", "死门": "Death Door", "伤门": "Harm Door", "杜门": "Block Door",
+        "开门": "Open Door", "惊门": "Fear Door", "生门": "Life Door", "景门": "View Door",
+        # 奇门八神（与 `content/qimen.EIGHT_GODS` 同源；螣蛇/白虎/玄武沿用六神译，太阴沿用九曜 Moon）。
+        "值符": "Chief Deity", "六合": "Six Harmony", "九地": "Nine Earth", "九天": "Nine Heaven",
+        # 洛书方位（direction 叶值）。
+        "东": "East", "南": "South", "西": "West", "北": "North",
+        "东北": "Northeast", "东南": "Southeast", "西南": "Southwest", "西北": "Northwest",
+        "中": "Center", "中宫": "Center Palace",
+        # 奇门吉凶档（luck 叶值；吉/凶沿用结论档位）。
+        "中平": "Balanced",
     },
 }
 

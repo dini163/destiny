@@ -45,6 +45,8 @@ _ZHOUYI_CAST = {
     "birth_time": "08:30:00",
 }
 
+_QIMEN_CAST = {"cast_time": "2024-05-15T10:30:00"}
+
 
 def _walk_strings(value: object) -> list[str]:
     out: list[str] = []
@@ -237,3 +239,26 @@ def test_stems_and_branches_localize_only_when_requested() -> None:
     assert present, "zhouyi 纳甲应至少落一个天干/地支单字叶值"
     for token in set(present):
         assert token not in el, f"en 未替换干支叶值 {token}"
+
+
+def test_qimen_stars_doors_directions_localize() -> None:
+    # p15-f：奇门九星/八门/方位叶值在 en・zh-Hant 下替换，默认透传。
+    from app.content.qimen import EIGHT_DOORS, NINE_STARS
+
+    names = {s.name for s in NINE_STARS} | {d.name for d in EIGHT_DOORS}
+    with TestClient(app) as client:
+        d = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        e = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+        h = client.post("/api/v1/qimen/chart?locale=zh-Hant", json=_QIMEN_CAST)
+    assert d.status_code == e.status_code == h.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = [s for s in dl if s in names]
+    assert present, "qimen 应至少落一个星/门叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换星/门叶值 {token}"
+    # 八门含“门”字形差，zh-Hant 下也要被换掉。
+    for token in [s for s in set(present) if s in LABELS["zh-Hant"]]:
+        assert token not in hl, f"zh-Hant 未替换星/门叶值 {token}"
