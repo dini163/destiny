@@ -15,6 +15,7 @@ import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useNameAnalysis } from '../hooks/useNameAnalysis';
 import { useProfiles } from '../hooks/useProfiles';
+import { useI18n } from '../i18n/context';
 import { nameSliceOf, type ProfileDraft, type ProfileName } from '../lib/profiles';
 import type { NameAnalysis } from '../types/name';
 
@@ -27,6 +28,7 @@ import type { NameAnalysis } from '../types/name';
  * 一律不做——它们没有可署名的规则（spec §2.5、决策七），宁可页面少一块。
  */
 export function NamePage() {
+  const { t } = useI18n();
   const [preset, setPreset] = useState<ProfileName | null>(null);
   const [draftPrefill, setDraftPrefill] = useState<ProfileDraft | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
@@ -56,7 +58,7 @@ export function NamePage() {
       />
 
       {name.isPending && !name.data ? (
-        <p className="label-caps text-ink-muted">正在核定康熙笔画并推演五格…</p>
+        <p className="label-caps text-ink-muted">{t('正在核定康熙笔画并推演五格…')}</p>
       ) : null}
 
       {name.data ? <NameResults analysis={name.data} /> : null}
@@ -133,6 +135,7 @@ function sectionsFor(analysis: NameAnalysis): SectionSpec[] {
 }
 
 function NameResults({ analysis }: { analysis: NameAnalysis }) {
+  const { t } = useI18n();
   const sections = sectionsFor(analysis);
 
   return (
@@ -142,7 +145,7 @@ function NameResults({ analysis }: { analysis: NameAnalysis }) {
       {analysis.verdict ? <VerdictCard verdict={analysis.verdict} /> : null}
 
       <nav
-        aria-label="姓名学分区"
+        aria-label={t('姓名学分区')}
         className="sticky top-0 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-rim bg-void/85 py-2 backdrop-blur"
       >
         {sections.map((section) => (
@@ -151,7 +154,7 @@ function NameResults({ analysis }: { analysis: NameAnalysis }) {
             href={`#${section.id}`}
             className="label-caps text-ink-muted hover:text-gold-soft"
           >
-            {section.label}
+            {t(section.label)}
           </a>
         ))}
       </nav>
@@ -171,13 +174,14 @@ function NameResults({ analysis }: { analysis: NameAnalysis }) {
 
 /** 姓名 + 正体 + 模态公式：让"用了哪条分支"在最上面就能核对（spec §6.2）。 */
 function NameSummary({ analysis }: { analysis: NameAnalysis }) {
+  const { t } = useI18n();
   const { input, warnings } = analysis;
 
   return (
     <div className="panel-raised flex flex-col gap-4 p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <span className="label-caps">核定姓名 · RESOLVED</span>
+          <span className="label-caps">{t('核定姓名 · RESOLVED')}</span>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-display text-2xl font-semibold text-gold-bright text-glow-gold sm:text-3xl">
               {input.surname}
@@ -202,7 +206,7 @@ function NameSummary({ analysis }: { analysis: NameAnalysis }) {
         <p className="flex items-start gap-2 text-sm text-wuxing-fire">
           <Icon name="alert" size={16} className="mt-0.5 shrink-0" />
           <span>
-            以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：
+            {t('以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：')}
             {warnings.map((code) => code.split(':')[1]).join('、')}
           </span>
         </p>

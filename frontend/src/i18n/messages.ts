@@ -514,6 +514,41 @@ const zhHant: MessageDict = {
   编辑: '編輯',
   确认删除: '確認刪除',
   删除: '刪除',
+
+  // Kabbalah page
+  '正在展开生命之树…': '正在展開生命之樹…',
+  'TREE OF LIFE · {{sep}} 原质 · {{path}} 路径': 'TREE OF LIFE · {{sep}} 原質 · {{path}} 路徑',
+  '点选原质或路径，展开象征对应': '點選原質或路徑，展開象徵對應',
+  生命之树: '生命之樹',
+  全树白话: '全樹白話',
+  '原质 / 路径详解': '原質 / 路徑詳解',
+  'gematria 数理折入': 'gematria 數理折入',
+  '十原质 · SEPHIROTH': '十原質 · SEPHIROTH',
+  '22 路径 · PATHS': '22 路徑 · PATHS',
+  '生命之树是卡巴拉的核心图示：神圣之光自': '生命之樹是卡巴拉的核心圖示：神聖之光自',
+  '王冠（Kether）': '王冠（Kether）',
+  '逐级降落，经': '逐級降落，經',
+  '十原质（Sephiroth）': '十原質（Sephiroth）',
+  '显化为物质世界的': '顯化為物質世界的',
+  '王国（Malkuth）': '王國（Malkuth）',
+  '；十原质之间由 22 条路径相连，每条路径对应一个希伯来字母、一张塔罗大阿卡纳与一组行星／星座／元素。点选任意原质或路径，即可查其黄金黎明（Golden Dawn）体系下的完整对应。':
+    '；十原質之間由 22 條路徑相連，每條路徑对应一個希伯來字母、一張塔羅大阿卡納與一組行星／星座／元素。點選任意原質或路徑，即可查其黄金黎明（Golden Dawn）體系下的完整對應。',
+
+  // Name page
+  选档案填姓名: '選檔案填姓名',
+  '正在核定康熙笔画并推演五格…': '正在核定康熙筆畫並推演五格…',
+  字级溯源: '字級溯源',
+  五格: '五格',
+  三才: '三才',
+  综合指数: '綜合指數',
+  康熙笔画核定: '康熙筆畫核定',
+  五格剖象全景图谱: '五格剖象全景圖譜',
+  三才配置深度研判: '三才配置深度研判',
+  姓名综合气象指数: '姓名綜合氣象指數',
+  姓名学分区: '姓名學分區',
+  '核定姓名 · RESOLVED': '核定姓名 · RESOLVED',
+  '以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：':
+    '以下字的康熙筆畫不在本語料範圍內，相關五格與指數不予推算：',
 };
 
 const en: MessageDict = {
@@ -1011,6 +1046,42 @@ const en: MessageDict = {
   编辑: 'Edit',
   确认删除: 'Confirm delete',
   删除: 'Delete',
+
+  // Kabbalah page
+  '正在展开生命之树…': 'Unfurling the Tree of Life…',
+  'TREE OF LIFE · {{sep}} 原质 · {{path}} 路径': 'TREE OF LIFE · {{sep}} Sephiroth · {{path}} Paths',
+  '点选原质或路径，展开象征对应': 'Click a Sephirah or Path to reveal its symbol set.',
+  生命之树: 'Tree of Life',
+  全树白话: 'Whole-Tree Plain Read',
+  '原质 / 路径详解': 'Sephirah / Path in depth',
+  'gematria 数理折入': 'Gematria fold-in',
+  '十原质 · SEPHIROTH': 'Ten Sephiroth',
+  '22 路径 · PATHS': '22 Paths',
+  '生命之树是卡巴拉的核心图示：神圣之光自':
+    'The Tree of Life is Kabbalah\u2019s central diagram: divine light descends from ',
+  '王冠（Kether）': 'the Crown (Kether)',
+  '逐级降落，经': ', stepping through ',
+  '十原质（Sephiroth）': 'the ten Sephiroth',
+  '显化为物质世界的': ', into the material ',
+  '王国（Malkuth）': 'Kingdom (Malkuth)',
+  '；十原质之间由 22 条路径相连，每条路径对应一个希伯来字母、一张塔罗大阿卡纳与一组行星／星座／元素。点选任意原质或路径，即可查其黄金黎明（Golden Dawn）体系下的完整对应。':
+    '; the ten are joined by 22 Paths, each tied to a Hebrew letter, a Tarot trump and a set of planetary / zodiacal / elemental correspondences. Click any Sephirah or Path to reveal its full Golden Dawn attribution.',
+
+  // Name page
+  选档案填姓名: 'Pick a profile for the name',
+  '正在核定康熙笔画并推演五格…': 'Verifying Kangxi stroke counts and deriving the five grids…',
+  字级溯源: 'Per-character provenance',
+  五格: 'Five grids',
+  三才: 'Three powers',
+  综合指数: 'Overall index',
+  康熙笔画核定: 'Kangxi stroke verification',
+  五格剖象全景图谱: 'Five-Grid Panorama',
+  三才配置深度研判: 'Three-Powers configuration in depth',
+  姓名综合气象指数: 'Name overall meteoric index',
+  姓名学分区: 'Name-analysis sections',
+  '核定姓名 · RESOLVED': 'RESOLVED NAME',
+  '以下字的康熙笔画不在本语料范围内，相关五格与指数不予推算：':
+    'Kangxi stroke counts for the following characters are outside this corpus; the related grids and index are withheld:',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

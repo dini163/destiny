@@ -8,6 +8,7 @@ import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ResultCard } from '../components/ui/ResultCard';
 import { useGematria } from '../hooks/useGematria';
 import { useKabbalahTree } from '../hooks/useKabbalahTree';
+import { useI18n } from '../i18n/context';
 import { DEFAULT_SELECTION, pillarAccent, resolveSelection, type Selection } from '../lib/kabbalah';
 import type { KabbalahTree } from '../types/kabbalah';
 
@@ -24,6 +25,7 @@ import type { KabbalahTree } from '../types/kabbalah';
  * —— 这一上一下不许调换，也不许在前端补一句领起：白话在上就是那一层存在的全部理由。
  */
 export function KabbalahPage() {
+  const { t } = useI18n();
   const tree = useKabbalahTree();
   const [selection, setSelection] = useState<Selection>(DEFAULT_SELECTION);
   const [word, setWord] = useState('');
@@ -48,7 +50,7 @@ export function KabbalahPage() {
         </div>
       ) : null}
 
-      {tree.isLoading ? <p className="label-caps text-ink-muted">正在展开生命之树…</p> : null}
+      {tree.isLoading ? <p className="label-caps text-ink-muted">{t('正在展开生命之树…')}</p> : null}
 
       {tree.data ? (
         <>
@@ -57,14 +59,17 @@ export function KabbalahPage() {
               <div className="kabbalah-reveal" style={{ animationDelay: '0.1s' }}>
                 <ResultCard
                   title="生命之树"
-                  eyebrow={`TREE OF LIFE · ${tree.data.sephirah_count} 原质 · ${tree.data.path_count} 路径`}
+                  eyebrow={t('TREE OF LIFE · {{sep}} 原质 · {{path}} 路径', {
+                    sep: tree.data.sephirah_count,
+                    path: tree.data.path_count,
+                  })}
                   icon="compass"
                   elevated
                 >
                   <div className="kabbalah-atlas">
                     <div className="kabbalah-atlas-heading">
                       <span className="label-caps text-gold-soft">ILLUSTRATED MAP · GOLDEN DAWN</span>
-                      <span className="text-xs text-ink-variant">点选原质或路径，展开象征对应</span>
+                      <span className="text-xs text-ink-variant">{t('点选原质或路径，展开象征对应')}</span>
                     </div>
                     <TreeOfLife tree={tree.data} selection={selection} onSelect={setSelection} />
                   </div>
@@ -116,10 +121,17 @@ export function KabbalahPage() {
 
 /** Page intro: what the Tree is, plus the three pillars and four worlds as a legend. */
 function Intro() {
+  const { t } = useI18n();
   return (
     <ResultCard title="卡巴拉生命之树" icon="compass" elevated>
       <p className="max-w-4xl text-sm leading-relaxed text-ink-variant sm:text-base">
-        生命之树是卡巴拉的核心图示：神圣之光自<span className="text-gold-soft">王冠（Kether）</span>逐级降落，经十原质（Sephiroth）显化为物质世界的<span className="text-gold-soft">王国（Malkuth）</span>；十原质之间由 22 条路径相连，每条路径对应一个希伯来字母、一张塔罗大阿卡纳与一组行星／星座／元素。点选任意原质或路径，即可查其黄金黎明（Golden Dawn）体系下的完整对应。
+        {t('生命之树是卡巴拉的核心图示：神圣之光自')}
+        <span className="text-gold-soft">{t('王冠（Kether）')}</span>
+        {t('逐级降落，经')}
+        <span className="text-gold-soft">{t('十原质（Sephiroth）')}</span>
+        {t('显化为物质世界的')}
+        <span className="text-gold-soft">{t('王国（Malkuth）')}</span>
+        {t('；十原质之间由 22 条路径相连，每条路径对应一个希伯来字母、一张塔罗大阿卡纳与一组行星／星座／元素。点选任意原质或路径，即可查其黄金黎明（Golden Dawn）体系下的完整对应。')}
       </p>
     </ResultCard>
   );
@@ -135,10 +147,11 @@ function SephirahIndex({
   selection: Selection;
   onSelect: (selection: Selection) => void;
 }) {
+  const { t } = useI18n();
   const nodes = tree.daath ? [...tree.sephiroth, tree.daath] : [...tree.sephiroth];
   return (
     <div className="flex flex-col gap-2">
-      <span className="label-caps text-ink-muted">十原质 · SEPHIROTH</span>
+      <span className="label-caps text-ink-muted">{t('十原质 · SEPHIROTH')}</span>
       <div className="flex flex-wrap gap-1.5">
         {nodes.map((node) => {
           const active = selection?.id === node.id;
@@ -177,9 +190,10 @@ function PathIndex({
   selection: Selection;
   onSelect: (selection: Selection) => void;
 }) {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-2">
-      <span className="label-caps text-ink-muted">22 路径 · PATHS</span>
+      <span className="label-caps text-ink-muted">{t('22 路径 · PATHS')}</span>
       <div className="flex flex-wrap gap-1.5">
         {tree.paths.map((path) => {
           const active = selection?.id === path.id;
