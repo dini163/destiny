@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/context';
 import { Icon } from './Icon';
 import type { Verdict } from '../../types/common';
 
@@ -9,6 +10,7 @@ import type { Verdict } from '../../types/common';
  * 任何系统的词表。挂载点在各系统详批区顶部（结论先行）；体量纪律见 AGENTS §2 不变式 6。
  */
 export function VerdictCard({ verdict }: { verdict: Verdict }) {
+  const { t } = useI18n();
   const tone =
     verdict.stars >= 4 ? 'text-gold-bright' : verdict.stars === 3 ? 'text-ink' : 'text-wuxing-fire';
   const stars = '★★★★★'.slice(0, verdict.stars) + '☆☆☆☆☆'.slice(0, 5 - verdict.stars);
@@ -17,12 +19,12 @@ export function VerdictCard({ verdict }: { verdict: Verdict }) {
     <section className="flex flex-col gap-3 rounded-card border border-gold/25 bg-gradient-to-br from-surface-raised to-[var(--field-bg)] p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-baseline gap-3">
-          <span className="label-caps">综合结论</span>
+          <span className="label-caps">{t('综合结论')}</span>
           <span className={`font-display text-3xl font-bold tracking-wide ${tone}`}>{verdict.grade}</span>
         </div>
         <span
           className="numeric text-lg tracking-widest text-gold-soft"
-          aria-label={`${verdict.stars} 星`}
+          aria-label={`${verdict.stars} ${t('星')}`}
         >
           {stars}
         </span>

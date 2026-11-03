@@ -1,3 +1,5 @@
+import { useI18n } from '../../i18n/context';
+
 interface SegmentedOption<T extends string> {
   value: T;
   label: string;
@@ -21,6 +23,8 @@ interface SegmentedControlProps<T extends string> {
  *
  * Uses real radiogroup semantics for accessibility while presenting the
  * observatory's pill-group styling; the active segment is filled with brass gold.
+ * Option labels and the group aria-name flow through `t()` so callers keep
+ * authoring them in source Chinese.
  */
 export function SegmentedControl<T extends string>({
   options,
@@ -29,10 +33,11 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
   className,
 }: SegmentedControlProps<T>) {
+  const { t } = useI18n();
   return (
     <div
       role="radiogroup"
-      aria-label={ariaLabel}
+      aria-label={t(ariaLabel)}
       className={`inline-flex shrink-0 rounded-element border border-rim bg-[var(--field-bg)] p-0.5 ${className ?? ''}`}
     >
       {options.map((option) => {
@@ -50,7 +55,7 @@ export function SegmentedControl<T extends string>({
                 : 'whitespace-nowrap rounded-[3px] px-3 py-1.5 text-sm text-ink-muted transition hover:text-ink'
             }
           >
-            {option.label}
+            {t(option.label)}
           </button>
         );
       })}

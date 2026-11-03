@@ -1213,6 +1213,7 @@ body {
   align-items: center;
   gap: 9px;
   min-height: 44px;
+  white-space: nowrap;
 }
 .theme-toggle,
 .catalogue-toggle {

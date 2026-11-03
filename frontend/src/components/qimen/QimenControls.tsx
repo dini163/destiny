@@ -2,7 +2,7 @@ import type { FormEvent } from 'react';
 
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
-import { ChineseDateTimeField } from '../ui/DateTimeField';
+import { ChineseDateTimeField } from '../ui/DateTimeFieldCombined';
 
 interface QimenControlsProps {
   /** Optional divination question (占问事项, free text). */

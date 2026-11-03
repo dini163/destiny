@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import type { CalendarType, Gender } from '../../types/common';
 import type { ProfileDraft } from '../../lib/profiles';
 import { ChineseDateField, ChineseTimeField } from '../ui/DateTimeField';
@@ -40,6 +41,7 @@ interface ProfileEditorProps {
  * be partial (e.g. a name without a birth date, for the name consoles).
  */
 export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) {
+  const { t } = useI18n();
   const editing = Boolean(initial?.id);
   const [label, setLabel] = useState(initial?.label ?? '');
   const [surname, setSurname] = useState(initial?.surname ?? '');
@@ -86,11 +88,11 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-label={editing ? '编辑档案' : '新建档案'}
+      aria-label={editing ? t('编辑档案') : t('新建档案')}
     >
       <button
         type="button"
-        aria-label="关闭"
+        aria-label={t('关闭')}
         className="absolute inset-0 cursor-default bg-void/70 backdrop-blur-sm"
         onClick={onClose}
       />
@@ -105,31 +107,31 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
             </span>
             <div className="flex flex-col gap-1">
               <h2 className="font-display text-xl font-semibold text-ink">
-                {editing ? '编辑档案' : '新建档案'}
+                {editing ? t('编辑档案') : t('新建档案')}
               </h2>
               <p className="text-sm text-ink-muted">
-                仅保存在本机浏览器，不上传服务器，可随时编辑或删除。
+                {t('仅保存在本机浏览器，不上传服务器，可随时编辑或删除。')}
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="关闭"
+            aria-label={t('关闭')}
             className="shrink-0 rounded-element border border-rim bg-surface/60 p-1.5 text-ink-muted transition hover:text-ink"
           >
             <Icon name="close" size={16} />
           </button>
         </div>
 
-        <LabeledField label="档案名（必填）" hint="如 我自己 / 父亲 / 长子">
+        <LabeledField label="档案名（必填）" hint={t('如 我自己 / 父亲 / 长子')}>
           <div className="flex items-center gap-2 rounded-element border border-rim bg-[var(--field-bg)] px-3 py-2 transition focus-within:border-rim-strong">
             <input
               className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
               value={label}
               onChange={(event) => setLabel(event.target.value)}
-              placeholder="给自己起个称呼"
-              aria-label="档案名"
+              placeholder={t('给自己起个称呼')}
+              aria-label={t('档案名')}
             />
           </div>
         </LabeledField>
@@ -141,8 +143,8 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={surname}
                 onChange={(event) => setSurname(event.target.value)}
-                placeholder="如 陸"
-                aria-label="姓氏"
+                placeholder={t('如 陸')}
+                aria-label={t('姓氏')}
               />
             </div>
           </LabeledField>
@@ -152,8 +154,8 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
                 className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
                 value={given}
                 onChange={(event) => setGiven(event.target.value)}
-                placeholder="如 青玄"
-                aria-label="名字"
+                placeholder={t('如 青玄')}
+                aria-label={t('名字')}
               />
             </div>
           </LabeledField>
@@ -193,11 +195,11 @@ export function ProfileEditor({ initial, onSave, onClose }: ProfileEditorProps) 
 
         <div className="flex items-center justify-end gap-3">
           <button type="button" onClick={onClose} className="btn-ghost">
-            取消
+            {t('取消')}
           </button>
           <button type="submit" className="btn-primary" disabled={!labelOk}>
             <Icon name="check" size={18} />
-            {editing ? '保存修改' : '存入档案'}
+            {editing ? t('保存修改') : t('存入档案')}
           </button>
         </div>
       </form>

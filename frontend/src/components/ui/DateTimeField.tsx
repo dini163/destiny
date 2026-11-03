@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import type { CalendarType } from '../../types/common';
 import { Icon } from './Icon';
 import { SelectMenu } from './SelectMenu';
@@ -110,6 +111,7 @@ export function ChineseDateField({
   maxYear = defaultMaxYear(),
   ariaLabel = '出生',
 }: ChineseDateFieldProps) {
+  const { t } = useI18n();
   const seeded = splitDate(value);
   const [year, setYear] = useState<number | ''>(seeded.y);
   const [month, setMonth] = useState<number | ''>(seeded.m);
@@ -168,33 +170,33 @@ export function ChineseDateField({
       <SelectMenu
         value={year === '' ? '' : String(year)}
         onChange={pickYear}
-        ariaLabel={`${ariaLabel}年`}
+        ariaLabel={`${t(ariaLabel)}${t('年')}`}
         options={[
           { value: '', label: '----' },
           ...years.map((y) => ({ value: String(y), label: String(y) })),
         ]}
       />
-      <span className={UNIT_CLASS}>年</span>
+      <span className={UNIT_CLASS}>{t('年')}</span>
       <SelectMenu
         value={month === '' ? '' : String(month)}
         onChange={pickMonth}
-        ariaLabel={`${ariaLabel}月`}
+        ariaLabel={`${t(ariaLabel)}${t('月')}`}
         options={[
           { value: '', label: '--' },
           ...MONTHS.map((m) => ({ value: String(m), label: pad2(m) })),
         ]}
       />
-      <span className={UNIT_CLASS}>月</span>
+      <span className={UNIT_CLASS}>{t('月')}</span>
       <SelectMenu
         value={day === '' ? '' : String(day)}
         onChange={pickDay}
-        ariaLabel={`${ariaLabel}日`}
+        ariaLabel={`${t(ariaLabel)}${t('日')}`}
         options={[
           { value: '', label: '--' },
           ...buildRange(1, maxDay).map((d) => ({ value: String(d), label: pad2(d) })),
         ]}
       />
-      <span className={UNIT_CLASS}>日</span>
+      <span className={UNIT_CLASS}>{t('日')}</span>
     </div>
   );
 }
@@ -209,6 +211,7 @@ interface ChineseTimeFieldProps {
 
 /** 时 / 分 dropdowns emitting an `HH:MM` string, with the 时辰 hinted once set. */
 export function ChineseTimeField({ value, onChange, ariaLabel = '出生' }: ChineseTimeFieldProps) {
+  const { t } = useI18n();
   const seeded = splitTime(value);
   const [hour, setHour] = useState<number | ''>(seeded.h);
   const [minute, setMinute] = useState<number | ''>(seeded.min);
@@ -241,23 +244,23 @@ export function ChineseTimeField({ value, onChange, ariaLabel = '出生' }: Chin
       <SelectMenu
         value={hour === '' ? '' : String(hour)}
         onChange={pickHour}
-        ariaLabel={`${ariaLabel}时`}
+        ariaLabel={`${t(ariaLabel)}${t('时')}`}
         options={[
           { value: '', label: '--' },
           ...HOURS.map((h) => ({ value: String(h), label: pad2(h) })),
         ]}
       />
-      <span className={UNIT_CLASS}>时</span>
+      <span className={UNIT_CLASS}>{t('时')}</span>
       <SelectMenu
         value={minute === '' ? '' : String(minute)}
         onChange={pickMinute}
-        ariaLabel={`${ariaLabel}分`}
+        ariaLabel={`${t(ariaLabel)}${t('分')}`}
         options={[
           { value: '', label: '--' },
           ...MINUTES.map((m) => ({ value: String(m), label: pad2(m) })),
         ]}
       />
-      <span className={UNIT_CLASS}>分</span>
+      <span className={UNIT_CLASS}>{t('分')}</span>
       {hour !== '' ? (
         <span className="ml-auto shrink-0 text-xs text-gold-soft">{shichenOf(hour)}</span>
       ) : null}
@@ -269,74 +272,4 @@ export function ChineseTimeField({ value, onChange, ariaLabel = '出生' }: Chin
 function clamp(day: number | '', max: number): number | '' {
   if (day === '') return '';
   return day > max ? max : day;
-}
-
-/** `'yyyy-mm-ddTHH:MM'` → `{ date, time }`; either half is `''` when absent. */
-function splitDateTimeLocal(value: string): { date: string; time: string } {
-  if (!value) return { date: '', time: '' };
-  const [date, time] = value.split('T');
-  return { date: date ?? '', time: (time ?? '').slice(0, 5) };
-}
-
-interface ChineseDateTimeFieldProps {
-  /** Current `datetime-local` value (`yyyy-mm-ddTHH:MM`), or `''` when incomplete. */
-  value: string;
-  onChange: (next: string) => void;
-  /** Inclusive earliest selectable year. Defaults to 1900. */
-  minYear?: number;
-  /** Inclusive latest selectable year. Defaults to the current year. */
-  maxYear?: number;
-  /** Accessible-name prefix for the selects. Defaults to 出生. */
-  ariaLabel?: string;
-}
-
-/**
- * 年月日 + 时分 dropdowns emitting a `datetime-local` (`yyyy-mm-ddTHH:MM`) string — the
- * Chinese counterpart to `<input type="datetime-local">`, used for a 用事 / 起卦时刻
- * that stays empty (→ “now” on the backend) until a full date and a time are chosen.
- */
-export function ChineseDateTimeField({
-  value,
-  onChange,
-  minYear,
-  maxYear,
-  ariaLabel = '出生',
-}: ChineseDateTimeFieldProps) {
-  const seeded = splitDateTimeLocal(value);
-  const [date, setDate] = useState(seeded.date);
-  const [time, setTime] = useState(seeded.time);
-
-  // Adopt an externally completed value part by part (never clobber a partial pick).
-  useEffect(() => {
-    const next = splitDateTimeLocal(value);
-    if (next.date !== '') setDate(next.date);
-    if (next.time !== '') setTime(next.time);
-  }, [value]);
-
-  function emit(nextDate: string, nextTime: string): void {
-    onChange(nextDate !== '' && nextTime !== '' ? `${nextDate}T${nextTime}` : '');
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <ChineseDateField
-        value={date}
-        onChange={(next) => {
-          setDate(next);
-          emit(next, time);
-        }}
-        minYear={minYear}
-        maxYear={maxYear}
-        ariaLabel={ariaLabel}
-      />
-      <ChineseTimeField
-        value={time}
-        onChange={(next) => {
-          setTime(next);
-          emit(date, next);
-        }}
-        ariaLabel={ariaLabel}
-      />
-    </div>
-  );
 }

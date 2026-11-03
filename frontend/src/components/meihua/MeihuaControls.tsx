@@ -4,7 +4,7 @@ import type { MeihuaMethod } from '../../types/meihua';
 import { MEIHUA_METHODS } from '../../lib/meihua';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
-import { ChineseDateTimeField } from '../ui/DateTimeField';
+import { ChineseDateTimeField } from '../ui/DateTimeFieldCombined';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 interface MeihuaControlsProps {

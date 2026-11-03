@@ -35,12 +35,12 @@ export function LocaleSwitcher() {
             onClick={() => setLocale(code)}
             className={
               active
-                ? 'rounded-element bg-gold/15 px-2 py-1 text-xs text-gold transition'
-                : 'rounded-element px-2 py-1 text-xs text-ink-muted transition hover:text-ink'
+                ? 'rounded-element bg-gold/15 px-2 py-1 text-xs text-gold transition whitespace-nowrap'
+                : 'rounded-element px-2 py-1 text-xs text-ink-muted transition hover:text-ink whitespace-nowrap'
             }
           >
-            <span className="hidden sm:inline">{LABEL[code].long}</span>
-            <span className="sm:hidden">{LABEL[code].short}</span>
+            <span className="hidden sm:inline whitespace-nowrap">{LABEL[code].long}</span>
+            <span className="sm:hidden whitespace-nowrap">{LABEL[code].short}</span>
           </button>
         );
       })}

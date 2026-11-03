@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import type { CalendarType } from '../../types/common';
 import { ChineseDateField, ChineseTimeField } from './DateTimeField';
 import { Icon } from './Icon';
@@ -90,6 +91,7 @@ export function InputBar({
   pending = false,
   onSubmit,
 }: InputBarProps) {
+  const { t } = useI18n();
   const [birthDate, setBirthDate] = useState(initial?.birth_date ?? '');
   const [birthTime, setBirthTime] = useState(initial?.birth_time ?? '');
   const [calendar, setCalendar] = useState<CalendarType>(initial?.calendar ?? 'solar');
@@ -146,13 +148,13 @@ export function InputBar({
           </span>
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{title}</h1>
+              <h1 className="font-display text-xl font-semibold text-ink sm:text-2xl">{t(title)}</h1>
               {badge ? (
-                <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">{badge}</span>
+                <span className="label-caps rounded-element bg-gold/15 px-2 py-0.5 text-gold">{t(badge)}</span>
               ) : null}
             </div>
             {subtitle ? (
-              <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">{subtitle}</p>
+              <p className="max-w-2xl text-sm leading-relaxed text-ink-muted">{t(subtitle)}</p>
             ) : null}
           </div>
         </div>
@@ -163,16 +165,16 @@ export function InputBar({
               type="button"
               className="btn-ghost shrink-0"
               disabled={!birthDate || !birthTime}
-              title={birthDate && birthTime ? '把当前生辰与出生地存入本地档案' : '填写生辰后即可存入档案'}
+              title={birthDate && birthTime ? t('把当前生辰与出生地存入本地档案') : t('填写生辰后即可存入档案')}
               onClick={() => onSaveProfile(buildValues())}
             >
               <Icon name="vault" size={18} />
-              存入档案
+              {t('存入档案')}
             </button>
           ) : null}
           <button type="submit" className="btn-primary hidden shrink-0 sm:flex" disabled={!ready || pending}>
             <Icon name="sparkle" size={18} />
-            {submitLabel}
+            {t(submitLabel)}
           </button>
         </div>
       </div>
@@ -219,15 +221,15 @@ export function InputBar({
       {!ready ? (
         <p className="label-caps text-ink-muted">
           {requireLatitude
-            ? '填写出生日期、时间并完成经纬度定位后即可排盘。'
-            : '填写出生日期、时间并完成定位后即可排盘。'}
+            ? t('填写出生日期、时间并完成经纬度定位后即可排盘。')
+            : t('填写出生日期、时间并完成定位后即可排盘。')}
         </p>
       ) : null}
 
       {/* The header action row stacks above the fields on small screens, so repeat the primary submit at the end of the form; a mobile user finishes the last field and submits without scrolling back up. */}
       <button type="submit" className="btn-primary mt-1 w-full sm:hidden" disabled={!ready || pending}>
         <Icon name="sparkle" size={18} />
-        {submitLabel}
+        {t(submitLabel)}
       </button>
     </form>
   );

@@ -235,6 +235,133 @@ const zhHant: MessageDict = {
     '已儲存的本機檔案不會因此刪除。你可以重試，或回到首頁繼續探索。',
   重新载入: '重新載入',
   回到首页: '回到首頁',
+
+  // --- Phase 2.1 · shared UI chrome ---
+  // InputBar internals
+  公历: '公曆',
+  农历: '農曆',
+  历法: '曆法',
+  '把当前生辰与出生地存入本地档案': '把當前生辰與出生地存入本機檔案',
+  填写生辰后即可存入档案: '填寫生辰後即可存入檔案',
+  存入档案: '存入檔案',
+  '生辰（精准至分）': '生辰（精準至分）',
+  '出生基准地（全球坐标）': '出生基準地（全球座標）',
+  '填写出生日期、时间并完成经纬度定位后即可排盘。':
+    '填寫出生日期、時間並完成經緯度定位後即可排盤。',
+  '填写出生日期、时间并完成定位后即可排盘。':
+    '填寫出生日期、時間並完成定位後即可排盤。',
+
+  // LocationField
+  '搜索城市，或下方直接填写经纬度': '搜尋城市，或於下方直接填寫經緯度',
+  出生城市搜索: '出生城市搜尋',
+  清除地点: '清除地點',
+  '城市查询服务暂时不可用，请检查后端服务是否启动，或在下方手动填写经纬度。':
+    '城市查詢服務暫時無法使用，請檢查後端服務是否啟動，或於下方手動填寫經緯度。',
+  重试查询: '重試查詢',
+  '未匹配到「{{term}}」，请在下方手动填写经纬度。':
+    '未匹配到「{{term}}」，請於下方手動填寫經緯度。',
+  纬度: '緯度',
+  经度: '經度',
+  手动坐标: '手動座標',
+
+  // DateTimeField unit labels + aria default
+  年: '年',
+  月: '月',
+  日: '日',
+  时: '時',
+  分: '分',
+  出生: '出生',
+
+  // TrueSolarTimeBadge
+  '填写出生日期、时间并定位后，此处按经度与均时差显示真太阳时校准。':
+    '填寫出生日期、時間並定位後，此處依經度與均時差顯示真太陽時校準。',
+  真太阳时校准定盘: '真太陽時校準定盤',
+  标准时: '標準時',
+  '正在按经度与均时差推算…': '正在依經度與均時差推算…',
+  '真太阳时服务暂不可用。': '真太陽時服務暫不可用。',
+  '等待计算…': '等待計算…',
+  校正: '校正',
+
+  // VerdictCard
+  综合结论: '綜合結論',
+  星: '星',
+
+  // ProfilePicker
+  选择档案: '選擇檔案',
+  男: '男',
+  女: '女',
+  未填生辰: '未填生辰',
+  '不使用档案（清空）': '不使用檔案（清空）',
+  管理档案: '管理檔案',
+  '还没有档案。先去建一个，测算时就能一键填充。':
+    '還沒有檔案。先建一個，測算時就能一鍵填充。',
+  去创建档案: '去建立檔案',
+
+  // ProfileEditor dialog
+  编辑档案: '編輯檔案',
+  新建档案: '新建檔案',
+  关闭: '關閉',
+  '仅保存在本机浏览器，不上传服务器，可随时编辑或删除。':
+    '僅儲存在本機瀏覽器，不上傳伺服器，可隨時編輯或刪除。',
+  '档案名（必填）': '檔案名（必填）',
+  '如 我自己 / 父亲 / 长子': '如 我自己 / 父親 / 長子',
+  给自己起个称呼: '給自己取個稱呼',
+  档案名: '檔案名',
+  '姓氏（供姓名学拆分）': '姓氏（供姓名學拆分）',
+  '如 陸': '如 陸',
+  姓氏: '姓氏',
+  名字: '名字',
+  '如 青玄': '如 青玄',
+  性别: '性別',
+  出生日期: '出生日期',
+  出生时间: '出生時間',
+  '出生地（全球坐标）': '出生地（全球座標）',
+  保存修改: '儲存修改',
+
+  // Page-level InputBar titles / badges / common chrome (shared across bazi-style pages)
+  权威历算: '權威曆算',
+  恒星黄道: '恆星黃道',
+  排盘中: '排盤中',
+  开始排盘: '開始排盤',
+  '造向（性别）': '造向（性別）',
+  '命主称谓（可选，仅回显）': '命主稱謂（選填，僅回顯）',
+  '如：示例命主': '如：示例命主',
+  '真太阳时校正（推荐）': '真太陽時校正（建議）',
+  '正在依据真太阳时排定四柱…': '正在依據真太陽時排定四柱…',
+  本命使用说明书: '本命使用說明書',
+  四柱八字精算排盘: '四柱八字精算排盤',
+  '真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造（男）。':
+    '真太陽時經度校正與節氣精確交節，一次排定干支、十神、藏干、納音、身強身弱與大運流年。示例：1988-02-15 23:30 · 成都 · 乾造（男）。',
+  四柱命造干支矩阵: '四柱命造干支矩陣',
+  四柱: '四柱',
+  地支藏干权重与十神: '地支藏干權重與十神',
+  '藏干十神': '藏干十神',
+  五行能量量化分布: '五行能量量化分佈',
+  五行: '五行',
+  日主强弱与格局: '日主強弱與格局',
+  强弱格局: '強弱格局',
+  '用神三法（扶抑 / 通关 / 调候）': '用神三法（扶抑 / 通關 / 調候）',
+  '用神三法': '用神三法',
+  神煞命中: '神煞命中',
+  神煞: '神煞',
+  '刑冲合害破与合会局': '刑沖合害破與合會局',
+  刑冲合害: '刑沖合害',
+  大运流变时间轴: '大運流變時間軸',
+  大运: '大運',
+  六维详批: '六維詳批',
+  命盘分区: '命盤分區',
+  推演此造岁运流年: '推演此造歲運流年',
+  以此造合婚: '以此造合婚',
+  '当前大运 ·': '當前大運 ·',
+  '此运与四柱之间未构成伏吟或反吟。': '此運與四柱之間未構成伏吟或反吟。',
+  岁: '歲',
+  四柱命造: '四柱命造',
+  生肖: '生肖',
+  日元: '日元',
+  命宫: '命宮',
+  胎元: '胎元',
+  参照日: '參照日',
+  农历用: '農曆',
 };
 
 const en: MessageDict = {
@@ -454,6 +581,131 @@ const en: MessageDict = {
     'Your saved local profiles are not deleted by this. Retry, or head back home to keep exploring.',
   重新载入: 'Reload',
   回到首页: 'Back to home',
+
+  // --- Phase 2.1 · shared UI chrome ---
+  // InputBar internals
+  公历: 'Solar',
+  农历: 'Lunar',
+  历法: 'Calendar',
+  '把当前生辰与出生地存入本地档案': 'Save the current birth data and location to a local profile',
+  填写生辰后即可存入档案: 'Fill in the birth data to save it as a profile',
+  存入档案: 'Save profile',
+  '生辰（精准至分）': 'Birth date & time (to the minute)',
+  '出生基准地（全球坐标）': 'Birth location (global coordinates)',
+  '填写出生日期、时间并完成经纬度定位后即可排盘。':
+    'Complete the birth date, time, and coordinates to cast the chart.',
+  '填写出生日期、时间并完成定位后即可排盘。':
+    'Complete the birth date, time, and location to cast the chart.',
+
+  // LocationField
+  '搜索城市，或下方直接填写经纬度': 'Search a city, or enter latitude/longitude below',
+  出生城市搜索: 'Birth-city search',
+  清除地点: 'Clear location',
+  '城市查询服务暂时不可用，请检查后端服务是否启动，或在下方手动填写经纬度。':
+    'The city lookup service is unavailable — check the backend, or enter coordinates manually below.',
+  重试查询: 'Retry lookup',
+  '未匹配到「{{term}}」，请在下方手动填写经纬度。':
+    'No match for “{{term}}” — enter coordinates manually below.',
+  纬度: 'Latitude',
+  经度: 'Longitude',
+  手动坐标: 'Manual coordinates',
+
+  // DateTimeField unit labels + aria default
+  年: 'Y',
+  月: 'M',
+  日: 'D',
+  时: 'h',
+  分: 'm',
+  出生: 'Birth',
+
+  // TrueSolarTimeBadge
+  '填写出生日期、时间并定位后，此处按经度与均时差显示真太阳时校准。':
+    'Once birth date, time, and location are set, the true-solar-time correction appears here (from longitude offset and equation of time).',
+  真太阳时校准定盘: 'True Solar Time calibrated',
+  标准时: 'Standard time',
+  '正在按经度与均时差推算…': 'Deriving from longitude and equation of time…',
+  '真太阳时服务暂不可用。': 'True solar time service is unavailable.',
+  '等待计算…': 'Awaiting calculation…',
+  校正: 'Offset',
+
+  // VerdictCard
+  综合结论: 'Overall verdict',
+  星: 'star',
+
+  // ProfilePicker
+  选择档案: 'Pick a profile',
+  男: 'M',
+  女: 'F',
+  未填生辰: 'No birth data yet',
+  '不使用档案（清空）': 'Do not use a profile (clear)',
+  管理档案: 'Manage profiles',
+  '还没有档案。先去建一个，测算时就能一键填充。':
+    'No profiles yet. Create one and future readings will fill in with a single click.',
+  去创建档案: 'Create a profile',
+
+  // ProfileEditor dialog
+  编辑档案: 'Edit profile',
+  新建档案: 'New profile',
+  关闭: 'Close',
+  '仅保存在本机浏览器，不上传服务器，可随时编辑或删除。':
+    'Stored only in this browser — never uploaded. Edit or delete at any time.',
+  '档案名（必填）': 'Profile name (required)',
+  '如 我自己 / 父亲 / 长子': 'e.g. Me / Father / Eldest son',
+  给自己起个称呼: 'Give yourself a nickname',
+  档案名: 'Profile name',
+  '姓氏（供姓名学拆分）': 'Surname (for name numerology)',
+  '如 陸': 'e.g. Lu',
+  姓氏: 'Surname',
+  名字: 'Given name',
+  '如 青玄': 'e.g. Qingxuan',
+  性别: 'Gender',
+  出生日期: 'Birth date',
+  出生时间: 'Birth time',
+  '出生地（全球坐标）': 'Birth location (global coordinates)',
+  保存修改: 'Save changes',
+
+  // Page-level InputBar chrome (badges, submit states)
+  权威历算: 'Authoritative calendar',
+  排盘中: 'Casting…',
+  开始排盘: 'Cast the chart',
+  '造向（性别）': 'Direction (gender)',
+  '命主称谓（可选，仅回显）': 'Chart owner (optional, display only)',
+  '如：示例命主': 'e.g. Sample subject',
+  '真太阳时校正（推荐）': 'True solar time correction (recommended)',
+  '正在依据真太阳时排定四柱…': 'Deriving the four pillars from true solar time…',
+  本命使用说明书: 'Owner\'s Manual for This Chart',
+  四柱八字精算排盘: 'Four Pillars BaZi — Precision Chart',
+  '真太阳时经度校正与节气精确交节，一次排定干支、十神、藏干、纳音、身强身弱与大运流年。示例：1988-02-15 23:30 · 成都 · 乾造（男）。':
+    'Longitude-corrected true solar time and precise solar-term boundaries resolve stems, branches, Ten-Gods, hidden stems, nayin, strong/weak daymaster, and luck cycles in one cast. Example: 1988-02-15 23:30 · Chengdu · Male.',
+  四柱命造干支矩阵: 'Four-Pillars Stems-and-Branches Matrix',
+  四柱: 'Four Pillars',
+  地支藏干权重与十神: 'Branch Hidden-Stem Weights & Ten-Gods',
+  '藏干十神': 'Hidden Stems',
+  五行能量量化分布: 'Five-Phase Energy Distribution',
+  五行: 'Five Phases',
+  日主强弱与格局: 'Daymaster Strength & Structure',
+  强弱格局: 'Strength & Structure',
+  '用神三法（扶抑 / 通关 / 调候）': 'Yongshen Three Methods (Support/Control · Bridge · Climate)',
+  '用神三法': 'Yongshen (Useful God)',
+  神煞命中: 'Shen-Sha Hits',
+  神煞: 'Shen-Sha',
+  '刑冲合害破与合会局': 'Punishment/Clash/Combination/Harm/Destruction & Branch Frames',
+  刑冲合害: 'Relations',
+  大运流变时间轴: 'Luck Pillars Timeline',
+  大运: 'Luck Pillars',
+  六维详批: 'Six-Dimension Deep Read',
+  命盘分区: 'Chart sections',
+  推演此造岁运流年: 'Run annual cycles for this chart',
+  以此造合婚: 'Use this chart for marriage matching',
+  '当前大运 ·': 'Current luck pillar ·',
+  '此运与四柱之间未构成伏吟或反吟。': 'This pillar forms neither fu-yin nor fan-yin with the four pillars.',
+  岁: ' yrs',
+  四柱命造: 'Four-Pillar Chart',
+  生肖: 'Zodiac',
+  日元: 'Day Master',
+  命宫: 'Life Palace',
+  胎元: 'Conception Pillar',
+  参照日: 'Reference date',
 };
 
 export const MESSAGES: Partial<Record<AppLocale, MessageDict>> = {

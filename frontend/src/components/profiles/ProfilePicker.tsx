@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useI18n } from '../../i18n/context';
 import type { PersonProfile } from '../../lib/profiles';
 import { Icon } from '../ui/Icon';
 import { ROUTES } from '../../nav';
@@ -15,14 +16,14 @@ interface ProfilePickerProps {
 }
 
 /** Short birth-data summary shown under the profile label in the menu. */
-function summarize(profile: PersonProfile): string {
+function summarize(profile: PersonProfile, lunarLabel: string, unsetLabel: string): string {
   const parts: string[] = [];
   if (profile.birth_date) {
-    parts.push(profile.calendar === 'lunar' ? `农历 ${profile.birth_date}` : profile.birth_date);
+    parts.push(profile.calendar === 'lunar' ? `${lunarLabel} ${profile.birth_date}` : profile.birth_date);
     if (profile.birth_time) parts.push(profile.birth_time);
   }
   if (profile.city) parts.push(profile.city);
-  if (parts.length === 0) parts.push('未填生辰');
+  if (parts.length === 0) parts.push(unsetLabel);
   return parts.join(' · ');
 }
 
@@ -34,6 +35,7 @@ function summarize(profile: PersonProfile): string {
  * aware, pointing straight at the profiles page to create the first entry.
  */
 export function ProfilePicker({ profiles, onPick, label = '选择档案' }: ProfilePickerProps) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -52,12 +54,12 @@ export function ProfilePicker({ profiles, onPick, label = '选择档案' }: Prof
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-element border border-rim bg-surface/60 px-3 py-1.5 text-sm text-ink-variant transition hover:border-rim-strong hover:text-ink"
+        className="flex items-center gap-2 whitespace-nowrap rounded-element border border-rim bg-surface/60 px-3 py-1.5 text-sm text-ink-variant transition hover:border-rim-strong hover:text-ink"
         aria-haspopup="menu"
         aria-expanded={open}
       >
         <Icon name="vault" size={16} className="text-gold" />
-        {label}
+        {t(label)}
         <Icon name="chevronDown" size={14} className="text-ink-muted" />
       </button>
 
@@ -86,11 +88,11 @@ export function ProfilePicker({ profiles, onPick, label = '选择档案' }: Prof
                       ) : null}
                       {profile.gender ? (
                         <span className="ml-1.5 text-xs text-gold-soft">
-                          {profile.gender === 'male' ? '男' : '女'}
+                          {profile.gender === 'male' ? t('男') : t('女')}
                         </span>
                       ) : null}
                     </span>
-                    <span className="text-xs text-ink-muted">{summarize(profile)}</span>
+                    <span className="text-xs text-ink-muted">{summarize(profile, t('农历'), t('未填生辰'))}</span>
                   </button>
                 </li>
               ))}
@@ -104,7 +106,7 @@ export function ProfilePicker({ profiles, onPick, label = '选择档案' }: Prof
                   }}
                   className="w-full px-3 py-2 text-left text-sm text-ink-muted transition hover:bg-gold/10 hover:text-ink"
                 >
-                  不使用档案（清空）
+                  {t('不使用档案（清空）')}
                 </button>
               </li>
               <li role="none" className="border-t border-rim/60">
@@ -114,20 +116,20 @@ export function ProfilePicker({ profiles, onPick, label = '选择档案' }: Prof
                   className="flex w-full items-center gap-1.5 px-3 py-2 text-sm text-gold transition hover:bg-gold/10"
                 >
                   <Icon name="arrowRight" size={14} />
-                  管理档案
+                  {t('管理档案')}
                 </Link>
               </li>
             </>
           ) : (
             <li role="none" className="flex flex-col gap-2 px-3 py-3">
-              <span className="text-sm text-ink-muted">还没有档案。先去建一个，测算时就能一键填充。</span>
+              <span className="text-sm text-ink-muted">{t('还没有档案。先去建一个，测算时就能一键填充。')}</span>
               <Link
                 to={ROUTES.profiles}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-1.5 text-sm text-gold transition hover:text-gold-bright"
               >
                 <Icon name="arrowRight" size={14} />
-                去创建档案
+                {t('去创建档案')}
               </Link>
             </li>
           )}

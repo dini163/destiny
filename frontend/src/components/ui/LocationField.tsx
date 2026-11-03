@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useI18n } from '../../i18n/context';
 import { useCities } from '../../hooks/useCities';
 import { Icon } from './Icon';
 
@@ -34,6 +35,7 @@ function formatLatitude(latitude: number): string {
  * bundled snapshot is a curated subset (PRD: city DB + manual lat/lon).
  */
 export function LocationField({ value, onChange }: LocationFieldProps) {
+  const { t } = useI18n();
   const [term, setTerm] = useState('');
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -88,20 +90,20 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
             className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink-muted"
             type="text"
             value={term}
-            placeholder={value.city ?? '搜索城市，或下方直接填写经纬度'}
+            placeholder={value.city ? value.city : t('搜索城市，或下方直接填写经纬度')}
             onChange={(event) => {
               setTerm(event.target.value);
               setOpen(true);
             }}
             onFocus={() => setOpen(true)}
-            aria-label="出生城市搜索"
+            aria-label={t('出生城市搜索')}
           />
           {hasCoords || value.city ? (
             <button
               type="button"
               onClick={clear}
               className="shrink-0 text-ink-muted transition hover:text-ink"
-              aria-label="清除地点"
+              aria-label={t('清除地点')}
             >
               <Icon name="close" size={16} />
             </button>
@@ -134,23 +136,23 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
 
         {searching && !isFetching && isError ? (
           <div role="alert" className="absolute z-20 mt-1 w-full rounded-element border border-rim bg-surface-raised px-3 py-2 text-sm text-ink shadow-xl">
-            <p>城市查询服务暂时不可用，请检查后端服务是否启动，或在下方手动填写经纬度。</p>
+            <p>{t('城市查询服务暂时不可用，请检查后端服务是否启动，或在下方手动填写经纬度。')}</p>
             <button type="button" className="mt-1 min-h-11 text-gold underline" onClick={() => void refetch()}>
-              重试查询
+              {t('重试查询')}
             </button>
           </div>
         ) : null}
 
         {searching && !isFetching && !isError && data && results.length === 0 ? (
           <p className="absolute z-20 mt-1 w-full rounded-element border border-rim bg-surface-raised/95 px-3 py-2 text-xs text-ink-muted backdrop-blur-xl">
-            未匹配到「{term.trim()}」，请在下方手动填写经纬度。
+            {t('未匹配到「{{term}}」，请在下方手动填写经纬度。', { term: term.trim() })}
           </p>
         ) : null}
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <label className="flex min-h-11 items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 transition focus-within:border-rim-strong">
-          <span className="label-caps shrink-0">纬度</span>
+          <span className="label-caps shrink-0">{t('纬度')}</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
             type="number"
@@ -161,11 +163,11 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
             placeholder="30.5728"
             value={value.latitude ?? ''}
             onChange={(event) => editCoordinate('latitude', event.target.value)}
-            aria-label="纬度"
+            aria-label={t('纬度')}
           />
         </label>
         <label className="flex min-h-11 items-center gap-1.5 rounded-element border border-rim bg-[var(--field-bg)] px-2.5 transition focus-within:border-rim-strong">
-          <span className="label-caps shrink-0">经度</span>
+          <span className="label-caps shrink-0">{t('经度')}</span>
           <input
             className="numeric w-full bg-transparent text-right text-sm text-ink outline-none placeholder:text-ink-muted"
             type="number"
@@ -176,7 +178,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
             placeholder="104.0668"
             value={value.longitude ?? ''}
             onChange={(event) => editCoordinate('longitude', event.target.value)}
-            aria-label="经度"
+            aria-label={t('经度')}
           />
         </label>
       </div>
@@ -184,7 +186,7 @@ export function LocationField({ value, onChange }: LocationFieldProps) {
       {hasCoords ? (
         <p className="numeric flex items-center gap-1.5 text-xs text-gold-soft">
           <Icon name="check" size={14} className="shrink-0" />
-          {value.city ? `${value.city} · ` : '手动坐标 · '}
+          {value.city ? `${value.city} · ` : `${t('手动坐标')} · `}
           {formatLongitude(value.longitude as number)}, {formatLatitude(value.latitude as number)}
         </p>
       ) : null}

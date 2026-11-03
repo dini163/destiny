@@ -5,7 +5,7 @@ import { CAST_METHODS, coinLabel, lineValueMeta } from '../../lib/zhouyi';
 import type { CoinFace } from '../../lib/zhouyi';
 import { Icon } from '../ui/Icon';
 import { LabeledField } from '../ui/LabeledField';
-import { ChineseDateTimeField } from '../ui/DateTimeField';
+import { ChineseDateTimeField } from '../ui/DateTimeFieldCombined';
 import { SegmentedControl } from '../ui/SegmentedControl';
 
 interface CastControlsProps {
