@@ -226,6 +226,12 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "官禄": "Career",
         "田宅": "Property",
         "福德": "Blessing",
+        # 十天干 / 十二地支（单字 stem/branch 叶值，najia・八字・奇门共用）：取拼音转写。
+        # 地支「丑」作支名繁简同形（≠醜），天干地支均无字形差，zh-Hant 无需登记。
+        "甲": "Jia", "乙": "Yi", "丙": "Bing", "丁": "Ding", "戊": "Wu",
+        "己": "Ji", "庚": "Geng", "辛": "Xin", "壬": "Ren", "癸": "Gui",
+        "子": "Zi", "丑": "Chou", "寅": "Yin", "卯": "Mao", "辰": "Chen", "巳": "Si",
+        "午": "Wu", "未": "Wei", "申": "Shen", "酉": "You", "戌": "Xu", "亥": "Hai",
     },
 }
 

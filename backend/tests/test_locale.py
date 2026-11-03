@@ -218,3 +218,22 @@ def test_ziwei_palace_names_localize_only_when_requested() -> None:
     hl = _walk_strings(h.json())
     for token in [s for s in set(present) if s in LABELS["zh-Hant"]]:
         assert token not in hl, f"zh-Hant 未替换宫名 {token}"
+
+
+def test_stems_and_branches_localize_only_when_requested() -> None:
+    # p15-e：天干地支单字叶值（najia 装卦）在 en 下被拼音转写替换，默认透传。
+    stems = "甲乙丙丁戊己庚辛壬癸"
+    branches = "子丑寅卯辰巳午未申酉戌亥"
+    atomic = set(stems) | set(branches)
+
+    with TestClient(app) as client:
+        d = client.post("/api/v1/zhouyi/cast", json=_ZHOUYI_CAST)
+        e = client.post("/api/v1/zhouyi/cast?locale=en", json=_ZHOUYI_CAST)
+    assert d.status_code == e.status_code == 200
+
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = [s for s in dl if s in atomic]
+    assert present, "zhouyi 纳甲应至少落一个天干/地支单字叶值"
+    for token in set(present):
+        assert token not in el, f"en 未替换干支叶值 {token}"
