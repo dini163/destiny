@@ -226,6 +226,13 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "体用生克": "體用生克", "卦气旺衰": "卦氣旺衰", "互卦(过程)": "互卦(過程)",
         "变卦(结局)": "變卦(結局)", "用生体": "用生體", "体用比和": "體用比和",
         "体克用": "體克用", "体生用": "體生用", "用克体": "用克體",
+        # 奇门局名（阳遁/阴遁 × 一..九局，仅阳->陽/阴->陰转形）；旬空/宫位地支二支对繁简同形，回落源文。
+        "阳遁一局": "陽遁一局", "阳遁二局": "陽遁二局", "阳遁三局": "陽遁三局",
+        "阳遁四局": "陽遁四局", "阳遁五局": "陽遁五局", "阳遁六局": "陽遁六局",
+        "阳遁七局": "陽遁七局", "阳遁八局": "陽遁八局", "阳遁九局": "陽遁九局",
+        "阴遁一局": "陰遁一局", "阴遁二局": "陰遁二局", "阴遁三局": "陰遁三局",
+        "阴遁四局": "陰遁四局", "阴遁五局": "陰遁五局", "阴遁六局": "陰遁六局",
+        "阴遁七局": "陰遁七局", "阴遁八局": "陰遁八局", "阴遁九局": "陰遁九局",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -639,6 +646,16 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "孟夏": "Early Summer", "仲夏": "Mid Summer", "季夏": "Late Summer",
         "孟秋": "Early Autumn", "仲秋": "Mid Autumn", "季秋": "Late Autumn",
         "孟冬": "Early Winter", "仲冬": "Mid Winter", "季冬": "Late Winter",
+        # 奇门局名（Yang/Yin Dun Ju 1-9）＋宫位/旬空地支二支对（pinyin，与单支同表派生）。
+        "丑寅": "Chou & Yin", "午未": "Wu & Wei", "子丑": "Zi & Chou",
+        "寅卯": "Yin & Mao", "戌亥": "Xu & Hai", "未申": "Wei & Shen",
+        "申酉": "Shen & You", "辰巳": "Chen & Si", "阳遁一局": "Yang Dun Ju 1",
+        "阳遁二局": "Yang Dun Ju 2", "阳遁三局": "Yang Dun Ju 3", "阳遁四局": "Yang Dun Ju 4",
+        "阳遁五局": "Yang Dun Ju 5", "阳遁六局": "Yang Dun Ju 6", "阳遁七局": "Yang Dun Ju 7",
+        "阳遁八局": "Yang Dun Ju 8", "阳遁九局": "Yang Dun Ju 9", "阴遁一局": "Yin Dun Ju 1",
+        "阴遁二局": "Yin Dun Ju 2", "阴遁三局": "Yin Dun Ju 3", "阴遁四局": "Yin Dun Ju 4",
+        "阴遁五局": "Yin Dun Ju 5", "阴遁六局": "Yin Dun Ju 6", "阴遁七局": "Yin Dun Ju 7",
+        "阴遁八局": "Yin Dun Ju 8", "阴遁九局": "Yin Dun Ju 9",
     },
 }
 

@@ -861,3 +861,40 @@ def test_ziwei_qimen_meihua_aux_labels_localize() -> None:
     assert localize("主星", "zh-Hant") == "主星"
     assert localize("季秋", "zh-Hant") == "季秋"
     assert localize("逆行", "zh-Hant") == "逆行"
+
+
+def test_qimen_ju_name_and_branch_pairs_localize() -> None:
+    # p15：奇门局名（阳遁/阴遁 × 一..九局）与宫位/旬空地支二支对在 en 下替换；局名 zh-Hant 仅阳/阴转形，地支对同形透传。
+    import app.content.qimen as C
+    import app.engines.qimen as Q
+
+    ju = {f"{dun}{Q._cn_number(n)}局" for dun in ("阳遁", "阴遁") for n in range(1, 10)}
+    pairs = {p.zhi for p in C.LUOSHU.values() if len(p.zhi) == 2} | {
+        v for v in C.XUNKONG_BY_XUNSHOU.values() if len(v) == 2
+    }
+    assert len(ju) == 18
+    family = ju | pairs
+    with TestClient(app) as client:
+        d = client.post("/api/v1/qimen/chart", json=_QIMEN_CAST)
+        e = client.post("/api/v1/qimen/chart?locale=en", json=_QIMEN_CAST)
+        h = client.post("/api/v1/qimen/chart?locale=zh-Hant", json=_QIMEN_CAST)
+    assert d.status_code == e.status_code == h.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    hl = _walk_strings(h.json())
+    present = {s for s in dl if s in family}
+    assert present, "qimen 应至少落一个局名或地支对叶值"
+    for token in present:
+        assert token not in el, f"en 未替换奇门局名/地支对 {token}"
+    # 地支二支对繁简同形：zh-Hant 逐字节透传（局名转形不在此断言，取固定单测）。
+    for token in present & pairs:
+        assert token in hl, f"zh-Hant 不应改动地支对 {token}"
+    # 局名 zh-Hant 仅阳/阴转形（遁/局/数字同形）；地支对繁简同形透传。
+    assert localize("阳遁四局", "zh-Hant") == "陽遁四局"
+    assert localize("阴遁一局", "zh-Hant") == "陰遁一局"
+    assert localize("戌亥", "zh-Hant") == "戌亥"
+    # 直接单测：全族取到预期英译（局名 Yang/Yin Dun Ju N；地支对沿用单支 pinyin）。
+    assert localize("阳遁一局", "en") == "Yang Dun Ju 1"
+    assert localize("阴遁九局", "en") == "Yin Dun Ju 9"
+    assert localize("丑寅", "en") == "Chou & Yin"
+    assert localize("戌亥", "en") == "Xu & Hai"
