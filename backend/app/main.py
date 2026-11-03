@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.core.config import get_settings
 from app.core.errors import register_error_handlers
+from app.core.locale_middleware import LocaleMiddleware
 
 API_DESCRIPTION = (
     "Cross-civilization divination computation API. All results are produced by "
@@ -36,6 +37,10 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Outermost: default `zh-Hans` requests pass straight through byte-for-byte; only an
+    # explicit `?locale=zh-Hant|en` buffers the JSON and swaps structured labels.
+    app.add_middleware(LocaleMiddleware)
 
     register_error_handlers(app)
     app.include_router(api_router)

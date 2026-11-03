@@ -10,6 +10,8 @@
  * or FastAPI's 422 `{ detail }` validation shape, so callers handle a single type.
  */
 
+import { DEFAULT_LOCALE, detectLocale } from '../lib/locale';
+
 /** Relative base path of the versioned API. */
 export const API_BASE = '/api/v1';
 
@@ -93,16 +95,22 @@ export function apiPost<T>(path: string, body: unknown, signal?: AbortSignal): P
   return apiFetch<T>(path, { method: 'POST', body, signal });
 }
 
-/** Build a `/api/v1`-relative URL, appending defined query params. */
+/** Build a `/api/v1`-relative URL, appending defined query params plus the active locale. */
 function buildUrl(path: string, query?: QueryParams): string {
   const url = `${API_BASE}${path}`;
-  if (!query) return url;
-
   const search = new URLSearchParams();
-  for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined && value !== null) {
-      search.set(key, String(value));
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null) {
+        search.set(key, String(value));
+      }
     }
+  }
+  // The backend localizes structured labels only when an explicit non-default locale is
+  // requested; sending `zh-Hans` (or nothing) keeps the default byte-for-byte pass-through.
+  const locale = detectLocale();
+  if (locale !== DEFAULT_LOCALE) {
+    search.set('locale', locale);
   }
   const qs = search.toString();
   return qs ? `${url}?${qs}` : url;
