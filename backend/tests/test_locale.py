@@ -445,3 +445,24 @@ def test_nakshatras_and_outer_planets_localize() -> None:
     assert present_planets == planets, f"western 应落三颗外行星，实得 {present_planets}"
     for token in present_planets:
         assert token not in we, f"en 未替换行星名 {token}"
+
+
+def test_ziwei_star_names_localize() -> None:
+    # p15：紫微星名（主/乙级）与四化在 en・zh-Hant 下替换，默认透传。
+    from app.content.ziwei import MAJOR_STARS, MINOR_STARS, SIHUA_LABELS
+    from app.core.locale_i18n import localize_str
+
+    star_names = set(MAJOR_STARS) | set(MINOR_STARS) | set(SIHUA_LABELS)
+    with TestClient(app) as client:
+        d = client.post("/api/v1/ziwei/chart", json=_ZIWEI)
+        e = client.post("/api/v1/ziwei/chart?locale=en", json=_ZIWEI)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in star_names}
+    assert present, "ziwei 应至少落一个星名/四化叶值"
+    for token in present:
+        assert token not in el, f"en 未替换星名/四化 {token}"
+    # 繁体字形有差的星名在 zh-Hant 下也要被换掉。
+    assert localize_str("巨门", "zh-Hant") == "巨門"
+    assert localize_str("化禄", "zh-Hant") == "化祿"

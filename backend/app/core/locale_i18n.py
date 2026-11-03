@@ -167,6 +167,10 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "晋": "晉", "损": "損", "渐": "漸", "归妹": "歸妹", "丰": "豐", "涣": "渙",
         "节": "節", "小过": "小過", "既济": "既濟", "未济": "未濟",
         "本宫": "本宮", "归魂": "歸魂",
+        # 紫微星名 / 四化繁体（与上 en 星名同源）：仅登记字形有差者。
+        "廉贞": "廉貞", "巨门": "巨門", "破军": "破軍", "左辅": "左輔",
+        "铃星": "鈴星", "陀罗": "陀羅", "天钺": "天鉞", "禄存": "祿存",
+        "化禄": "化祿", "化权": "化權",
     },
     "en": {
         # 结论卡片档位词（与 `engines/verdict.GRADE_BANDS` 同源五档）。
@@ -436,6 +440,20 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         # 三颗外行星（western/transit/synastry 行星中文名叶值，与 `engines/western.PLANETS` 同源）：
         # 日/月/水/金/火/木/土已由九曜入表，此处只补三颗天王/海王/冥王（繁体同形，不登 zh-Hant）。
         "天王星": "Uranus", "海王星": "Neptune", "冥王星": "Pluto",
+        # 紫微十四主星（ziwei major star name 叶值，与 `content/ziwei.MAJOR_STARS.id` 同源）：
+        # en 取同一表自带拼音 id（首字母大写）。太阳/太阴/火星已由九曜入表（同词同译），此处不重复。
+        "紫微": "Ziwei", "天机": "Tianji", "武曲": "Wuqu", "天同": "Tiantong",
+        "廉贞": "Lianzhen", "天府": "Tianfu", "贪狼": "Tanlang", "巨门": "Jumen",
+        "天相": "Tianxiang", "天梁": "Tianliang", "七杀": "Qisha", "破军": "Pojun",
+        # 紫微乙级星（minor star name 叶值，与 `content/ziwei.MINOR_STARS` 同源）：取拼音转写。
+        "左辅": "Zuofu", "右弼": "Youbi", "文昌": "Wenchang", "文曲": "Wenqu",
+        "天魁": "Tiankui", "天钺": "Tianyue", "禄存": "Lucun", "天马": "Tianma",
+        "擎羊": "Qingyang", "陀罗": "Tuoluo", "铃星": "Lingxing", "地空": "Dikong", "地劫": "Dijie",
+        # 生年四化（SIHUA_LABELS 叶值）与五行局（WUXING_JU）/星系标签：取拼音/直译。
+        "化禄": "Hua Lu", "化权": "Hua Quan", "化科": "Hua Ke", "化忌": "Hua Ji",
+        "水二局": "Water 2 Bureau", "木三局": "Wood 3 Bureau", "金四局": "Gold 4 Bureau",
+        "土五局": "Earth 5 Bureau", "火六局": "Fire 6 Bureau",
+        "紫微系": "Ziwei Group", "天府系": "Tianfu Group",
     },
 }
 
