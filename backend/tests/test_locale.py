@@ -727,3 +727,43 @@ def test_wangshuai_grades_and_sanyuan_localize() -> None:
     assert localize("下元", "en") == "Lower Yuan"
     assert localize("旺", "zh-Hant") == "旺"
     assert localize("中元", "zh-Hant") == "中元"
+
+
+def test_numerology_display_names_localize() -> None:
+    # p15：数理显示名（核心/顶峰/挑战/周期标签、洛书八平面、核心数关键词）在 en 下替换。
+    import app.engines.numerology as N
+    import app.content.numerology_loshu as L
+    from app.content.numerology_meanings import CORE_MEANINGS
+
+    payload = {"birth_date": "1990-06-15", "full_name": "John Smith"}
+    kw = {k for cm in CORE_MEANINGS.values() for k in cm.keywords}
+    planes = {p.name_zh for p in L.PLANES}
+    labels = (
+        set(N.CORE_LABELS.values())
+        | set(N.PINNACLE_LABELS.values())
+        | set(N.CHALLENGE_LABELS.values())
+        | set(N.CYCLE_LABELS.values())
+    )
+    tokens = kw | planes | labels
+    with TestClient(app) as client:
+        d = client.post("/api/v1/numerology/chart", json=payload)
+        e = client.post("/api/v1/numerology/chart?locale=en", json=payload)
+    assert d.status_code == e.status_code == 200
+    dl = _walk_strings(d.json())
+    el = _walk_strings(e.json())
+    present = {s for s in dl if s in tokens}
+    assert present, "numerology 应至少落一个显示名叶值"
+    for token in present:
+        assert token not in el, f"en 未替换数理显示名 {token}"
+    # 直接单测：双语卡标签取英文尾；平面取权威 name_en；关键词取英译。
+    assert localize("生命灵数 Life Path", "en") == "Life Path"
+    assert localize("主挑战 Main Challenge", "en") == "Main Challenge"
+    assert localize("心智平面", "en") == "Mental Plane"
+    assert localize("银弓（财富之箭）", "en") == "Silver Yog"
+    assert localize("乐观", "en") == "Optimistic"
+    # zh-Hant：权威全串转形；繁简同形透传；含一对多歧义字者（实干）透传。
+    assert localize("灵魂冲动数 Soul Urge", "zh-Hant") == "靈魂衝動數 Soul Urge"
+    assert localize("实务平面", "zh-Hant") == "實務平面"
+    assert localize("乐观", "zh-Hant") == "樂觀"
+    assert localize("心智平面", "zh-Hant") == "心智平面"
+    assert localize("实干", "zh-Hant") == "实干"
