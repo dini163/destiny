@@ -234,11 +234,13 @@ a svg {
 .archive-link span {
   margin-left: 12px;
 }
+/* Two-column hero: equal tracks plus a tightened gap so the observatory art reads
+   larger horizontally without growing the card vertically. */
 .discovery-hero {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  gap: 64px;
+  gap: 44px;
   padding-block: 57px 56px;
 }
 .line {
@@ -279,12 +281,14 @@ a svg {
   min-height: 44px;
   font-size: 12px;
 }
+/* Trust tagline under the hero CTAs; sized up to sit with the body copy instead of
+   reading as a footnote. */
 .trust-line {
   display: flex;
   align-items: center;
   gap: 12px;
   color: var(--ink-muted);
-  font-size: 10px;
+  font-size: 13px;
   margin-top: 27px;
 }
 .trust-line i {
@@ -342,8 +346,9 @@ a svg {
   stroke-width: 1;
   fill: none;
 }
+/* Card kicker label; bumped for legibility against the card body text. */
 .question-kicker {
-  font-size: 11px;
+  font-size: 13px;
   color: var(--ink-muted);
 }
 .question-card h3 {
@@ -686,7 +691,7 @@ dialog::backdrop {
 }
 @media (min-width: 1600px) {
   .discovery-hero {
-    gap: 85px;
+    gap: 52px;
   }
   .discovery-hero h1 {
     font-size: 58px;
@@ -697,8 +702,8 @@ dialog::backdrop {
     padding-inline: 46px;
   }
   .discovery-hero {
-    gap: 40px;
-    grid-template-columns: 1.18fr 1fr;
+    gap: 34px;
+    grid-template-columns: 1fr 1fr;
   }
   .discovery-hero h1 {
     font-size: 48px;
@@ -729,7 +734,7 @@ dialog::backdrop {
   }
   .trust-line {
     margin-top: 20px;
-    font-size: 9px;
+    font-size: 11px;
     gap: 9px;
   }
   .reader-layout {
@@ -817,7 +822,7 @@ dialog::backdrop {
   }
   .trust-line {
     justify-content: center;
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 12px;
     gap: 10px;
   }
@@ -864,7 +869,7 @@ dialog::backdrop {
     margin-top: 18px;
   }
   .question-kicker {
-    font-size: 10px;
+    font-size: 11px;
   }
   .discovery-method {
     margin-top: 29px;
@@ -1302,6 +1307,8 @@ body {
   font-size: 16px;
   line-height: 2;
 }
+/* Observatory art card: height stays fixed; its width is driven by the hero grid
+   column, so enlargement happens horizontally only. */
 .observatory-art {
   position: relative;
   overflow: hidden;
