@@ -20,6 +20,7 @@ def connect(path: str):
     location.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(location, timeout=10)
     connection.execute("PRAGMA busy_timeout=10000")
+    connection.execute("PRAGMA journal_mode=WAL")
     connection.execute("""CREATE TABLE IF NOT EXISTS report_deliveries (
         delivery_id TEXT PRIMARY KEY, product TEXT NOT NULL,
         token_hash TEXT NOT NULL, expires_at TEXT NOT NULL,

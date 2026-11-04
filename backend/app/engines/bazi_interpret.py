@@ -103,7 +103,8 @@ class ChartSignals:
         return self.group_element(name) in self.favourable
 
     def is_unfavourable(self, name: str) -> bool:
-        return self.group_element(name) in self.unfavourable
+        el = self.group_element(name)
+        return el in self.unfavourable and el not in self.favourable
 
     def star(self, name: str) -> bool:
         return name in self.shensha

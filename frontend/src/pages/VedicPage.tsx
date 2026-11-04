@@ -17,6 +17,7 @@ import { useVedic } from '../hooks/useVedic';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { useI18n } from '../i18n/context';
 import { CHART_STYLES } from '../lib/vedic';
+import { isChinaCoordinate } from '../lib/civilTime';
 import type { ChartStyle } from '../lib/vedic';
 import type { VedicChart, VedicNatalRequest } from '../types/vedic';
 
@@ -49,7 +50,7 @@ export function VedicPage() {
       city: values.city,
       latitude: values.latitude,
       longitude: values.longitude,
-      utc_offset_hours: utcOffset === '' ? undefined : Number(utcOffset),
+      utc_offset_hours: utcOffset === '' ? (isChinaCoordinate(values.longitude, values.latitude) ? 8 : undefined) : Number(utcOffset),
       target_date: targetDate || todayISO(),
     };
     vedic.mutate(request);

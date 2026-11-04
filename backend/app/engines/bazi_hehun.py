@@ -657,9 +657,10 @@ def _one_view_facts(
     ratios = element_ratios(other)
     theirs = _vigor_from_ratios(ratios)
     facts: list[YongshenFact] = []
+    fav_set = set(me.analysis.favorable_elements)
     for favorable, elements in (
         (True, me.analysis.favorable_elements),
-        (False, me.analysis.unfavorable_elements),
+        (False, [e for e in me.analysis.unfavorable_elements if e not in fav_set]),
     ):
         for element in elements:
             vigor = theirs[element]
@@ -1200,14 +1201,18 @@ def yi_ji(pair: HehunChartPair) -> HehunYiJi:
     """
     mine = pair.male.analysis
     theirs = pair.female.analysis
+    male_fav = set(mine.favorable_elements)
+    female_fav = set(theirs.favorable_elements)
+    male_unfav = [e for e in mine.unfavorable_elements if e not in male_fav]
+    female_unfav = [e for e in theirs.unfavorable_elements if e not in female_fav]
     return HehunYiJi(
         groups=[
             _yiji_group("同宜", _shared(mine.favorable_elements, theirs.favorable_elements)),
             _yiji_group("乾独宜", _only(mine.favorable_elements, theirs.favorable_elements)),
             _yiji_group("坤独宜", _only(theirs.favorable_elements, mine.favorable_elements)),
-            _yiji_group("同忌", _shared(mine.unfavorable_elements, theirs.unfavorable_elements)),
-            _yiji_group("乾独忌", _only(mine.unfavorable_elements, theirs.unfavorable_elements)),
-            _yiji_group("坤独忌", _only(theirs.unfavorable_elements, mine.unfavorable_elements)),
+            _yiji_group("同忌", _shared(male_unfav, female_unfav)),
+            _yiji_group("乾独忌", _only(male_unfav, female_unfav)),
+            _yiji_group("坤独忌", _only(female_unfav, male_unfav)),
         ],
         declaration=HEHUN_YIJI_DECLARATION,
     )

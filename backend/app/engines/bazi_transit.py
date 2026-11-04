@@ -265,9 +265,9 @@ def _on_star(name: str) -> Predicate:
 _PREDICATES: tuple[tuple[str, Predicate], ...] = (
     # --- yongshen（4）：喜忌集来自 `select_yongshen`，此处只问落不落在里头
     ("yongshen.gan_favourable", lambda j: j.gan_element in j.favourable),
-    ("yongshen.gan_unfavourable", lambda j: j.gan_element in j.unfavourable),
+    ("yongshen.gan_unfavourable", lambda j: j.gan_element in j.unfavourable and j.gan_element not in j.favourable),
     ("yongshen.zhi_favourable", lambda j: j.ben_qi_element in j.favourable),
-    ("yongshen.zhi_unfavourable", lambda j: j.ben_qi_element in j.unfavourable),
+    ("yongshen.zhi_unfavourable", lambda j: j.ben_qi_element in j.unfavourable and j.ben_qi_element not in j.favourable),
     # --- taisui（6）：只论年支，岁专属
     ("taisui.chong", lambda j: "地支六冲" in j.kinds_with("year")),
     ("taisui.value", lambda j: j.zhi == j.year_zhi),

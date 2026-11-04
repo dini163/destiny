@@ -16,6 +16,7 @@ import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { aspectStyle } from '../lib/astro';
+import { isChinaCoordinate } from '../lib/civilTime';
 import { useWesternNatal } from '../hooks/useWesternNatal';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { useI18n } from '../i18n/context';
@@ -66,7 +67,7 @@ export function WesternNatalPage() {
       latitude: values.latitude,
       longitude: values.longitude,
       house_system: houseSystem,
-      utc_offset_hours: utcOffset === '' ? undefined : Number(utcOffset),
+      utc_offset_hours: utcOffset === '' ? (isChinaCoordinate(values.longitude, values.latitude) ? 8 : undefined) : Number(utcOffset),
     };
     western.mutate(request);
   }

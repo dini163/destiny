@@ -113,3 +113,13 @@ export function localClock(now: Date): LocalClock {
     sameAsBeijing: offsetMinutes === BEIJING_OFFSET_MINUTES,
   };
 }
+
+/** Determine whether coordinates fall within China's civil timezone boundary (UTC+8). */
+export function isChinaCoordinate(longitude: number, latitude?: number): boolean {
+  if (latitude !== undefined && (latitude < 18 || latitude > 54)) {
+    return false;
+  }
+  return longitude >= 73 && longitude <= 135;
+}
+  };
+}

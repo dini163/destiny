@@ -17,6 +17,7 @@ import { useTransit } from '../hooks/useTransit';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { useI18n } from '../i18n/context';
 import { aspectStyle } from '../lib/astro';
+import { isChinaCoordinate } from '../lib/civilTime';
 import { TRANSIT_MODES, formatAgeYears, modeConfig, modeData } from '../lib/transit';
 import type { TransitMode } from '../lib/transit';
 import type { ProgressionBlock, SolarArcBlock, TransitChart, TransitRequest } from '../types/transit';
@@ -70,7 +71,7 @@ export function TransitPage() {
       latitude: values.latitude,
       longitude: values.longitude,
       house_system: houseSystem,
-      utc_offset_hours: utcOffset === '' ? undefined : Number(utcOffset),
+      utc_offset_hours: utcOffset === '' ? (isChinaCoordinate(values.longitude, values.latitude) ? 8 : undefined) : Number(utcOffset),
       target_date: targetDate || todayISO(),
     };
     transit.mutate(request);

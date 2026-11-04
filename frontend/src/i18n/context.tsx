@@ -9,8 +9,10 @@
  * - `t()` interpolates `{{name}}` placeholders using the supplied vars object,
  *   which covers the small number of parameterised strings in phase 1
  *   (e.g. `t('探索全部 {{count}} 个体系', { count: 15 })`).
- * - The value is memoised on `locale` alone; changing locale re-renders every
- *   consumer, which is exactly what we want for a chrome-wide language switch.
+ * - For default Simplified Chinese (`zh-Hans`), translations are pure identity
+ *   with zero dictionary bundle payload. The ~186KB `zh-Hant` and `en` dictionaries
+ *   in `messages.ts` are dynamically loaded on-demand only when a non-default
+ *   locale is requested, keeping the initial client bundle lightweight.
  */
 import {
   createContext,
@@ -29,7 +31,7 @@ import {
   saveLocale,
   type AppLocale,
 } from '../lib/locale';
-import { MESSAGES } from './messages';
+import type { MessageDict } from './messages';
 
 type Vars = Readonly<Record<string, string | number>>;
 
@@ -52,21 +54,37 @@ function interpolate(raw: string, vars?: Vars): string {
 const FALLBACK: I18nValue = {
   locale: DEFAULT_LOCALE,
   setLocale: () => undefined,
-  // Identity for the string itself, but placeholders are still filled — a
-  // parameterised key (e.g. `{{label}}的赋分账本`) has no user-facing meaning
-  // left unsubstituted, and zh-Hans carries no dict so this is its render path.
   t: (key, vars) => interpolate(key, vars),
 };
 
-function buildTranslator(locale: AppLocale): (key: string, vars?: Vars) => string {
-  const dict = MESSAGES[locale];
-  return (key, vars) => interpolate(dict?.[key] ?? key, vars);
+function buildTranslator(dict: MessageDict): (key: string, vars?: Vars) => string {
+  return (key, vars) => interpolate(dict[key] ?? key, vars);
 }
+
+let cachedMessages: Partial<Record<AppLocale, MessageDict>> | null = null;
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>(() => detectLocale());
+  const [dict, setDict] = useState<MessageDict>(() => {
+    const loc = detectLocale();
+    if (loc === 'zh-Hans' || !cachedMessages) return {};
+    return cachedMessages[loc] ?? {};
+  });
+
   useEffect(() => {
     applyLocale(locale);
+    if (locale === 'zh-Hans') {
+      setDict({});
+      return;
+    }
+    if (cachedMessages) {
+      setDict(cachedMessages[locale] ?? {});
+      return;
+    }
+    import('./messages').then((mod) => {
+      cachedMessages = mod.MESSAGES;
+      setDict(mod.MESSAGES[locale] ?? {});
+    });
   }, [locale]);
 
   const setLocale = useCallback((next: AppLocale) => {
@@ -74,7 +92,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     saveLocale(next);
   }, []);
 
-  const t = useMemo(() => buildTranslator(locale), [locale]);
+  const t = useMemo(() => buildTranslator(dict), [dict]);
   const value = useMemo<I18nValue>(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
