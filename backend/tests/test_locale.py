@@ -1094,12 +1094,16 @@ def test_judgment_prose_localize_en() -> None:
     # 上升 Ascendant/天顶 Midheaven/北交点 North Node、元素 fire/earth/air/water 与模式
     # cardinal/fixed/mutable、逆行 retrograde、五类相位 conjunct/sextile/square/trine/opposite 皆取
     # 标准英文术语，行星 Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto、
-    # 宫位 the first house…the twelfth house。每完成一个系统即扩 done 名单。
+    # 宫位 the first house…the twelfth house。transit 过运判语 Transit <body> <aspect> natal
+    # <target> 同行运十星 Sun…Pluto、本命十二点含上升 Ascendant/天顶 Midheaven、五相位 conjunct/
+    # sextile/square/trine/opposite，以及月亮过十二星座 The Moon moving through <Sign>、月亮入本命宫
+    # The Moon moving into your <ordinal> house、上升/天顶挪宫 The Ascendant/Midheaven shifting into
+    # <Sign> 皆取标准英文占星术语。每完成一个系统即扩 done 名单。
     import app.engines.plain_corpora as PC
     from app.core.locale_i18n import LABELS
 
     en = LABELS["en"]
-    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand", "vedic", "zhouyi", "western"}
+    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand", "vedic", "zhouyi", "western", "transit"}
     corpora = {
         c.system: c
         for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
@@ -1115,4 +1119,4 @@ def test_judgment_prose_localize_en() -> None:
             assert got.isascii(), f"{sysname} 判语英文应为纯 ASCII：{v[:16]}"
             assert localize(v, "zh-Hans") == v
             n += 1
-    assert n >= 1620, n
+    assert n >= 2268, n
