@@ -1003,3 +1003,39 @@ def test_prose_fixed_lines_localize() -> None:
     assert dleaf.split("\n")[0] in (openers | closers), "首行应是已登记的固定开篇句"
     assert eleaf.split("\n")[0] != dleaf.split("\n")[0], "en 未本地化开篇句行"
     assert eleaf.split("\n")[0].isascii(), f"en 开篇句行仍含非 ASCII：{eleaf.split(chr(10))[0]!r}"
+
+
+def test_prose_fixed_lines_localize_zh_hant() -> None:
+    # p16：有界固定行（开篇句 / 档位收尾句）的繁体转换——合成段落里命中的固定行被转成
+    # 繁体，未登记的逐条判语原样逐字节保留；默认 zh-Hans 路径透传不动。逐行经 OpenCC
+    # s2tw 短语级转换后校对；本语料内地支「丑」与吉凶档「凶」各自只有一义，已把
+    # s2tw 的 醜 / 兇 误转回 丑 / 凶。
+    import app.content.bazi_plain as B
+    from app.core.locale_i18n import LABELS
+
+    openers = set(B.DIMENSION_OPENERS.values()) | set(B.TIER_CLOSERS.values())
+    ht = LABELS["zh-Hant"]
+    assert all(k in ht for k in openers), "87 固定行的繁体须全登记"
+    joined = "".join(ht.values())
+    assert "醜" not in joined and "兇" not in joined, "地支丑/吉凶档 被误转为 醜/兇"
+
+    payload = {
+        "birth_date": "1990-06-15", "birth_time": "08:30:00", "city": "成都",
+        "gender": "male", "calendar": "solar", "apply_true_solar_time": True,
+    }
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=payload)
+        h = client.post("/api/v1/bazi/natal?locale=zh-Hant", json=payload)
+    assert d.status_code == h.status_code == 200
+
+    opener = next(iter(set(B.DIMENSION_OPENERS.values())))
+    composed = f"{opener}\n你命里的某条判语。"
+    localized = localize(composed, "zh-Hant")
+    assert localized != composed, "zh-Hant 应换掉合成段落里的开篇句那一行"
+    assert localized.endswith("\n你命里的某条判语。"), "未登记的条目行必须逐字节保留"
+    assert localize(opener, "zh-Hans") == opener, "默认 locale 不得动合成段落"
+
+    dleaf = d.json()["interpretation"]["six_dimensions"][0]["plain"]
+    hleaf = h.json()["interpretation"]["six_dimensions"][0]["plain"]
+    assert dleaf.split("\n")[0] != hleaf.split("\n")[0], "zh-Hant 未本地化开篇句行"
+    assert dleaf.split("\n")[1] == hleaf.split("\n")[1], "未登记判语行须与默认逐字节相同"
