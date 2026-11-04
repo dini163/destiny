@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any, Final
 
 #: 源简体的规范拼写；命中这些之外的 locale 值一律走原样返回路径。
@@ -67,6 +68,10 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "值使门线": "值使門線",
         "时干落宫": "時干落宮",
         "旬空与驿马": "旬空與驛馬",
+        # 奇门九星 standalone 名（作 {star} 槽值，也作盘上 star.name 字段）：九枚里只登记
+        # 与简体字形有别的两枚，余七枚繁简同形，回落源文即已是正体（同 §LABELS 头注口径）。
+        "天冲": "天衝",
+        "天辅": "天輔",
         # 紫微小节标题
         "全盘气象": "全盤氣象",
         "命宫与三方四正": "命宮與三方四正",
@@ -5465,6 +5470,39 @@ LABELS: Final[dict[str, dict[str, str]]] = {
 }
 
 
+#: 帧模板本地化：synastry 五相位与 qimen 四总论里含 `{slot}` 的 9 条框架句。
+#: 合成器 `compose_template` 在响应里留下的是**填充后的整句**，帧本身不出现，故不能像固定
+#: 判语那样把整行当 key 登记（点义 × 相位的组合数会爆炸）。这里改把「源帧」当正则模板：
+#: `{name}` 编译成命名捕获组，对填充行做 `fullmatch`，命中后逐槽走 `localize_str`（槽值是有界
+#: 显示名，早已登记于 `LABELS`），再灌回目标语言里**同名 `{name}`** 的帧。目标帧保留 `{slot}`
+#: 标记不译，只译框架自身的固定文字。规矩 ②「整串精确」在这一层仍是整帧精确——槽边界由帧里
+#: 的固定邻接文字锚定，不是任意子串替换。
+FRAME_TEMPLATES: Final[dict[str, dict[str, str]]] = {
+    "zh-Hant": {
+        "你的{a}，与对方的{b}叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，两股力气是从同一处使出去的。": "你的{a}，與對方的{b}疊在圓環的同一處，兩股東西並成一股來用，你在這一段上分不太清哪一半是自己，兩股力氣是從同一處使出去的。",
+        "你的{a}，与对方的{b}相隔六十度，两不相抢也接得上手，你在这一段上读到的是表里那条和谐，顺得起来却不逼人气。": "你的{a}，與對方的{b}相隔六十度，兩不相搶也接得上手，你在這一段上讀到的是表裡那條和諧，順得起來卻不逼人氣。",
+        "你的{a}，与对方的{b}相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，和谐是这一格自己的口径。": "你的{a}，與對方的{b}相隔一百二十度，氣性本屬一路，流過去不費力，你在這一段上很少遇到阻力，和諧是這一格自己的口徑。",
+        "你的{a}，与对方的{b}成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。": "你的{a}，與對方的{b}成九十度直角，兩股力氣互相頂著走，你在這一段上要不斷調整姿勢才站得穩，彆扭是它本來的形狀，不是誰做錯了什麼。",
+        "你的{a}，与对方的{b}落在圆环的两头，隔着一百八十度彼此拉扯，你在这一段上要来回对齐几趟才看得全，费劲是它本来的形状，不是谁做错了什么。": "你的{a}，與對方的{b}落在圓環的兩頭，隔著一百八十度彼此拉扯，你在這一段上要來回對齊幾趟才看得全，費勁是它本來的形狀，不是誰做錯了什麼。",
+        "值符{star}落在{number}宫，这条主线讲的是你这一局里最要紧的那股力量从哪一格推动全局，先认准它再往下看。": "值符{star}落在{number}宮，這條主線講的是你這一局裡最要緊的那股力量從哪一格推動全局，先認準它再往下看。",
+        "值使{door}落在{number}宫，这条门线讲的是你这一局里事情实际怎么走、从哪一格开合，落点就在这一门。": "值使{door}落在{number}宮，這條門線講的是你這一局裡事情實際怎麼走、從哪一格開合，落點就在這一門。",
+        "时干{gan}落在{number}宫，这一格是你当下所问之事在盘上的落点，读盘时先从这里入手，再对照其他宫位。": "時干{gan}落在{number}宮，這一格是你當下所問之事在盤上的落點，讀盤時先從這裡入手，再對照其他宮位。",
+        "旬空落在{kong}，驿马在{ma}，这两样讲的是你这一局里哪一处暂时使不上力、哪一处已经动起来，读盘时先把这两笔放在一边。": "旬空落在{kong}，驛馬在{ma}，這兩樣講的是你這一局裡哪一處暫時使不上力、哪一處已經動起來，讀盤時先把這兩筆放在一邊。",
+    },
+    "en": {
+        "你的{a}，与对方的{b}叠在圆环的同一处，两股东西并成一股来用，你在这一段上分不太清哪一半是自己，两股力气是从同一处使出去的。": "Your {a} and their {b} land on the same point of the ring, the two spent together as one stream; on this stretch you can hardly tell which half is you, both forces going out from the one same place.",
+        "你的{a}，与对方的{b}相隔六十度，两不相抢也接得上手，你在这一段上读到的是表里那条和谐，顺得起来却不逼人气。": "Your {a} and their {b} sit sixty degrees apart, neither seizing the other yet both within reach; on this stretch you read the harmony between surface and depth, flowing easy yet not pressing anyone.",
+        "你的{a}，与对方的{b}相隔一百二十度，气性本属一路，流过去不费力，你在这一段上很少遇到阻力，和谐是这一格自己的口径。": "Your {a} and their {b} sit one hundred twenty degrees apart, of one temper by nature, passing over without strain; on this stretch you meet little resistance, the ease being the measure of this angle itself.",
+        "你的{a}，与对方的{b}成九十度直角，两股力气互相顶着走，你在这一段上要不断调整姿势才站得稳，别扭是它本来的形状，不是谁做错了什么。": "Your {a} and their {b} form a right angle of ninety degrees, the two forces bracing against each other as they go; on this stretch you must keep adjusting your stance to stand steady, the awkwardness being its own shape, not anyone doing something wrong.",
+        "你的{a}，与对方的{b}落在圆环的两头，隔着一百八十度彼此拉扯，你在这一段上要来回对齐几趟才看得全，费劲是它本来的形状，不是谁做错了什么。": "Your {a} and their {b} fall at the two ends of the ring, a hundred eighty degrees apart, pulling on each other; on this stretch you must align back and forth several times to see it whole, the strain being its own shape, not anyone doing something wrong.",
+        "值符{star}落在{number}宫，这条主线讲的是你这一局里最要紧的那股力量从哪一格推动全局，先认准它再往下看。": "The Talisman on duty, the star {star}, falls in palace {number}; this main line is about which square, in this board, drives the whole situation with its most pressing force, so mark it well before you read down.",
+        "值使{door}落在{number}宫，这条门线讲的是你这一局里事情实际怎么走、从哪一格开合，落点就在这一门。": "The Door on duty, the door {door}, falls in palace {number}; this door line is about how matters actually run in this board and from which square they open and close, the landing point being just this door.",
+        "时干{gan}落在{number}宫，这一格是你当下所问之事在盘上的落点，读盘时先从这里入手，再对照其他宫位。": "The Hour Stem {gan} falls in palace {number}; this square is where the matter you ask about right now lands on the board, so begin reading here, then set it against the other palaces.",
+        "旬空落在{kong}，驿马在{ma}，这两样讲的是你这一局里哪一处暂时使不上力、哪一处已经动起来，读盘时先把这两笔放在一边。": "The Void falls in {kong} and the Horse in {ma}; these two mark which spot in this board cannot yet be put to use and which has already begun to move, so lay these two strokes aside before you read.",
+    },
+}
+
+
 def resolve_locale(raw: str | None) -> str:
     """把请求带来的 locale 串归一到受支持值；None / 未知一律回 `zh-Hans`（透传）。"""
     if raw is None:
@@ -5481,22 +5519,76 @@ def localize_str(source: str, locale: str) -> str:
     return table.get(source, source)
 
 
-def _localize_leaf(value: str, table: dict[str, str]) -> str:
-    """字符串叶子的本地化：整串命中优先；未命中且含换行则逐行精确查表后拼回。
+_FRAME_INDEX: dict[str, list[tuple[re.Pattern[str], list[str], str]]] = {}
+
+
+def _compile_frame(src: str) -> tuple[re.Pattern[str], list[str]]:
+    """源帧（含 `{name}`）→ `(整帧正则, 槽名顺序)`。`{name}` 之外的文字逐字 `re.escape`。"""
+    names: list[str] = []
+    parts: list[str] = []
+    cursor = 0
+    for m in re.finditer(r"\{(\w+)\}", src):
+        parts.append(re.escape(src[cursor:m.start()]))
+        names.append(m.group(1))
+        parts.append(f"(?P<{m.group(1)}>.+?)")
+        cursor = m.end()
+    parts.append(re.escape(src[cursor:]))
+    return re.compile("".join(parts)), names
+
+
+def _frame_index(locale: str) -> list[tuple[re.Pattern[str], list[str], str]]:
+    """按 locale 惰性编译帧索引（帧集有界、跨请求复用，故缓存）。"""
+    index = _FRAME_INDEX.get(locale)
+    if index is None:
+        index = []
+        for src, target in FRAME_TEMPLATES.get(locale, {}).items():
+            rx, names = _compile_frame(src)
+            index.append((rx, names, target))
+        _FRAME_INDEX[locale] = index
+    return index
+
+
+def _match_frame(line: str, locale: str) -> str | None:
+    """整帧匹配一条填充行：命中则逐槽本地化后灌回目标帧，未命中返回 None。
+
+    用 `fullmatch` 而非 `search`：整行必须是那一帧填上槽，否则不动。槽值走 `localize_str`
+    精确查表（点义、星名、门名、干支等都有界显示名，早已登记），未登记的槽回落源文。
+    """
+    for rx, names, target in _frame_index(locale):
+        m = rx.fullmatch(line)
+        if m:
+            slots = {name: localize_str(m.group(name), locale) for name in names}
+            return target.format(**slots)
+    return None
+
+
+def _localize_leaf(value: str, table: dict[str, str], locale: str) -> str:
+    """字符串叶子的本地化：整串命中优先；未命中且含换行则逐行处理后再拼回。
 
     合成段落（`plain_compose.compose` 以 `\n` 连接开篇句 / 条目 / 收尾句）作为一个叶子出现，
-    整串不可能是固定 key；行级仍是**整行精确匹配**（一行必须逐字等于某个 key），不是子串替换，
-    所以机制规矩 ② 不变。没有任何一行命中时原样返回——保证未登记的段落一个字节都不动。
+    整串不可能是固定 key；行级仍是**整行精确匹配**（一行必须逐字等于某个 key，或整帧命中一个
+    带槽模板），不是子串替换，所以机制规矩 ② 不变。没有任何一行命中时原样返回——保证未登记的
+    段落一个字节都不动。
     """
     hit = table.get(value)
     if hit is not None:
         return hit
     if "\n" in value:
         lines = value.split("\n")
-        mapped = [table.get(line, line) for line in lines]
+        mapped = [_localize_line(line, table, locale) for line in lines]
         if mapped != lines:
             return "\n".join(mapped)
-    return value
+        return value
+    return _localize_line(value, table, locale)
+
+
+def _localize_line(line: str, table: dict[str, str], locale: str) -> str:
+    """单行本地化：整串精确查表优先，未命中再试帧模板匹配，都落空则原样返回。"""
+    hit = table.get(line)
+    if hit is not None:
+        return hit
+    framed = _match_frame(line, locale)
+    return line if framed is None else framed
 
 
 def localize(value: Any, locale: str) -> Any:
@@ -5510,7 +5602,7 @@ def localize(value: Any, locale: str) -> Any:
     if not table:
         return value
     if isinstance(value, str):
-        return _localize_leaf(value, table)
+        return _localize_leaf(value, table, locale)
     if isinstance(value, dict):
         return {k: localize(v, locale) for k, v in value.items()}
     if isinstance(value, list):

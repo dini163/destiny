@@ -1120,3 +1120,55 @@ def test_judgment_prose_localize_en() -> None:
             assert localize(v, "zh-Hans") == v
             n += 1
     assert n >= 2268, n
+
+
+def test_template_frame_localization() -> None:
+    # p16 收尾：9 条含 {slot} 的模板帧经 slot 感知机制本地化。合成器把 {slot} 填成有界显示名
+    # 后才落到响应里，`_localize_leaf` 用源帧编译的正则整帧 fullmatch，逐槽 localize_str 再灌回
+    # 目标语言的同名帧（目标帧里 {slot} 标记不译，只译框架固定文字）。zh-Hans 仍逐字节透传。
+    import re
+    import app.engines.plain_corpora as PC
+    from app.core.locale_i18n import LABELS, localize
+    from app.engines.plain_compose import compose_template
+
+    frames = [
+        v
+        for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
+        for v in c.entries.values()
+        if "{" in v or "}" in v
+    ]
+    assert len(frames) == 9, len(frames)
+
+    # 槽值取自有界显示名表（点义 / 九星 / 八门 / 十干 / 旬空对 / 驿马），须已登记英文
+    slot_values = {
+        "a": "自我与生命方向",
+        "b": "情绪与安全感",
+        "star": "天冲",
+        "number": "3",
+        "door": "休门",
+        "gan": "甲",
+        "kong": "戌亥",
+        "ma": "寅",
+    }
+    en = LABELS["en"]
+    for name, val in slot_values.items():
+        if name != "number":
+            assert val in en, f"槽值未登记英文：{name}={val}"
+
+    for frame in frames:
+        slots = {m: slot_values[m] for m in re.findall(r"\{(\w+)\}", frame)}
+        filled = compose_template(frame, slots)
+        assert localize(filled, "zh-Hans") == filled
+        got_en = localize(filled, "en")
+        assert got_en != filled and got_en.isascii(), frame[:20]
+        assert "{" not in got_en and "}" not in got_en, frame[:20]
+        got_ht = localize(filled, "zh-Hant")
+        assert got_ht != filled, frame[:20]
+        assert "{" not in got_ht and "}" not in got_ht, frame[:20]
+
+    # 关键回归：值符星天冲作 {star} 槽，繁体须作天衝（非简体天冲），英文作 Tianchong
+    zhifu = next(f for f in frames if "{star}" in f)
+    filled = compose_template(zhifu, {"star": "天冲", "number": "3"})
+    assert "天衝" in localize(filled, "zh-Hant")
+    assert "天冲" not in localize(filled, "zh-Hant")
+    assert "Tianchong" in localize(filled, "en")
