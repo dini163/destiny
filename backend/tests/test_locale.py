@@ -1086,12 +1086,13 @@ def test_judgment_prose_localize_en() -> None:
     # （纯 ASCII），默认 zh-Hans 逐字节透传；术语按命理通行英译固定（Officer / Seven Killings /
     # Eating God / Hurting Officer / Resource / Day Master / favorable / unfavorable /
     # Spouse Palace / Void / Wenchang / Celestial Noble；name 八十一数理、meihua 体用与八卦取象
-    # 逐句人工转译）。每完成一个系统即扩 done 名单。
+    # 逐句人工转译；vedic 九曜=the Sun/Moon/Mars/Mercury/Jupiter/Venus/Saturn/Rahu/Ketu、
+    # 十二宫星座英名、27 星宿梵文转写、大运 a period ruled by X）。每完成一个系统即扩 done 名单。
     import app.engines.plain_corpora as PC
     from app.core.locale_i18n import LABELS
 
     en = LABELS["en"]
-    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand"}
+    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand", "vedic"}
     corpora = {
         c.system: c
         for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
@@ -1107,4 +1108,4 @@ def test_judgment_prose_localize_en() -> None:
             assert got.isascii(), f"{sysname} 判语英文应为纯 ASCII：{v[:16]}"
             assert localize(v, "zh-Hans") == v
             n += 1
-    assert n >= 312, n
+    assert n >= 564, n
