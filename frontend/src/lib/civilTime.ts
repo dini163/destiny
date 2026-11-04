@@ -115,11 +115,12 @@ export function localClock(now: Date): LocalClock {
 }
 
 /** Determine whether coordinates fall within China's civil timezone boundary (UTC+8). */
-export function isChinaCoordinate(longitude: number, latitude?: number): boolean {
-  if (latitude !== undefined && (latitude < 18 || latitude > 54)) {
+export function isChinaCoordinate(longitude?: number | null, latitude?: number | null): boolean {
+  if (longitude == null) {
+    return false;
+  }
+  if (latitude != null && (latitude < 18 || latitude > 54)) {
     return false;
   }
   return longitude >= 73 && longitude <= 135;
-}
-  };
 }
