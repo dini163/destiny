@@ -1091,7 +1091,7 @@ def test_judgment_prose_localize_en() -> None:
     from app.core.locale_i18n import LABELS
 
     en = LABELS["en"]
-    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei"}
+    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand"}
     corpora = {
         c.system: c
         for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
@@ -1107,4 +1107,4 @@ def test_judgment_prose_localize_en() -> None:
             assert got.isascii(), f"{sysname} 判语英文应为纯 ASCII：{v[:16]}"
             assert localize(v, "zh-Hans") == v
             n += 1
-    assert n >= 240, n
+    assert n >= 312, n
