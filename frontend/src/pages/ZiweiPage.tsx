@@ -7,6 +7,7 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
@@ -110,7 +111,7 @@ export function ZiweiPage() {
       ) : null}
 
       {ziwei.isPending && !ziwei.data ? (
-        <p className="label-caps text-ink-muted">{t('正在安星排盘，布列十二宫垣…')}</p>
+        <ObservatoryLoading message={t('正在安星排盘，布列十二宫垣…')} />
       ) : null}
 
       {ziwei.data ? <ZiweiResults chart={ziwei.data} /> : null}

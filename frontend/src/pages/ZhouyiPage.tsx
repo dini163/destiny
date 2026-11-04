@@ -8,6 +8,7 @@ import { HexagramCard } from '../components/zhouyi/HexagramCard';
 import { HexagramStack } from '../components/zhouyi/HexagramStack';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useZhouyiCast } from '../hooks/useZhouyiCast';
@@ -70,7 +71,7 @@ export function ZhouyiPage() {
       ) : null}
 
       {zhouyi.isPending && !zhouyi.data ? (
-        <p className="label-caps text-ink-muted">{t('正在起卦排盘，推演纳甲六亲…')}</p>
+        <ObservatoryLoading message={t('正在起卦排盘，推演纳甲六亲…')} />
       ) : null}
 
       {zhouyi.data ? <ZhouyiResults cast={zhouyi.data} /> : null}

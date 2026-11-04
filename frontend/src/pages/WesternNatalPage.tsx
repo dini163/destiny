@@ -12,6 +12,7 @@ import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { SelectMenu } from '../components/ui/SelectMenu';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { aspectStyle } from '../lib/astro';
@@ -138,7 +139,7 @@ export function WesternNatalPage() {
       ) : null}
 
       {western.isPending && !western.data ? (
-        <p className="label-caps text-ink-muted">{t('正在依瑞士星历重构本命天球…')}</p>
+        <ObservatoryLoading message={t('正在依瑞士星历重构本命天球…')} />
       ) : null}
 
       {western.data ? <WesternResults chart={western.data} /> : null}

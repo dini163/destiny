@@ -8,7 +8,7 @@
  */
 export function PlainProse({ text, className = '' }: { text: string; className?: string }) {
   return (
-    <p className={`whitespace-pre-line font-display text-sm leading-relaxed text-ink ${className}`}>
+    <p className={`whitespace-pre-line font-display text-[15px] leading-[1.85] text-ink ${className}`}>
       {text}
     </p>
   );

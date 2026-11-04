@@ -66,7 +66,7 @@ export function RuneStone({ stone }: RuneStoneProps) {
 
       <div className="relative flex justify-center py-1">
         <div
-          className="relative flex h-52 w-40 shrink-0 flex-col items-center justify-center rounded-card bg-[#0c0e14] transition-transform duration-500 group-hover:scale-[1.03]"
+          className="relative flex h-52 w-40 shrink-0 flex-col items-center justify-center rounded-card border border-rim/60 bg-[#0e121a] transition-transform duration-500 group-hover:scale-[1.03]"
           style={{
             boxShadow:
               '0 14px 34px -14px rgba(0,0,0,0.92), inset 0 1px 0 rgba(245,215,127,0.14)',

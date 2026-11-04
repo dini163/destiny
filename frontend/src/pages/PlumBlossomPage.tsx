@@ -6,6 +6,7 @@ import { MeihuaControls } from '../components/meihua/MeihuaControls';
 import { MeihuaScoreLedger } from '../components/meihua/MeihuaScoreLedger';
 import { TiYongPanel } from '../components/meihua/TiYongPanel';
 import { Icon } from '../components/ui/Icon';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useMeihua } from '../hooks/useMeihua';
@@ -66,7 +67,7 @@ export function PlumBlossomPage() {
       ) : null}
 
       {meihua.isPending && !meihua.data ? (
-        <p className="label-caps text-ink-muted">{t('正在起卦，推演体用互变…')}</p>
+        <ObservatoryLoading message={t('正在起卦，推演体用互变…')} />
       ) : null}
 
       {meihua.data ? <MeihuaResults cast={meihua.data} /> : null}

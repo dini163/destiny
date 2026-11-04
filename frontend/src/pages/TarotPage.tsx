@@ -6,6 +6,7 @@ import { SpreadBoard } from '../components/tarot/SpreadBoard';
 import { SpreadControls } from '../components/tarot/SpreadControls';
 import { SpreadSummary } from '../components/tarot/SpreadSummary';
 import { Icon } from '../components/ui/Icon';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { VerdictCard } from '../components/ui/VerdictCard';
 import { useTarotSpread } from '../hooks/useTarotSpread';
@@ -104,7 +105,7 @@ export function TarotPage() {
       ) : null}
 
       {tarot.isPending && !tarot.data ? (
-        <p className="label-caps text-ink-muted">{t('正在洗牌布阵…')}</p>
+        <ObservatoryLoading message={t('正在洗牌布阵…')} />
       ) : null}
 
       {tarot.data ? (
@@ -189,14 +190,43 @@ function TarotResults({
         </div>
       </div>
 
-      {spread.contextual_reading?.length ? <ResultCard title="围绕你选择的主题" icon="compass">
-        {spread.contextual_reading.map(line => <p key={line} className="text-base leading-loose text-ink-variant">{line}</p>)}
-      </ResultCard> : null}
-      <VerdictCard verdict={spread.verdict} />
+      {revealed.size === 0 ? (
+        <ResultCard title="总评与全篇综合解读" icon="sparkle" elevated>
+          <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+            <Icon name="sparkle" size={28} className="text-gold-soft animate-pulse" />
+            <p className="text-sm text-ink-muted">
+              {t('牌阵现已推演就绪。请逐一点击上方牌面翻开启示，或直接点击盘面右上角「翻开全部」解锁总评与综合解读。')}
+            </p>
+            <button
+              type="button"
+              onClick={onRevealAll}
+              className="btn-primary mt-1 text-xs"
+            >
+              <Icon name="sparkle" size={14} />
+              {t('一键揭晓全盘')}
+            </button>
+          </div>
+        </ResultCard>
+      ) : (
+        <>
+          {spread.contextual_reading?.length ? (
+            <ResultCard title="围绕你选择的主题" icon="compass">
+              {spread.contextual_reading.map((line) => (
+                <p key={line} className="text-base leading-loose text-ink-variant">
+                  {line}
+                </p>
+              ))}
+            </ResultCard>
+          ) : null}
+          <VerdictCard verdict={spread.verdict} />
 
-      <ResultCard title="综合解读" icon="seal" elevated>
-        <p className="whitespace-pre-line text-sm leading-relaxed text-ink-variant">{spread.synthesis}</p>
-      </ResultCard>
+          <ResultCard title="综合解读" icon="seal" elevated>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-ink-variant">
+              {spread.synthesis}
+            </p>
+          </ResultCard>
+        </>
+      )}
     </>
   );
 }

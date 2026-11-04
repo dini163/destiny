@@ -20,6 +20,8 @@ import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
 import { LabeledField } from '../components/ui/LabeledField';
 import { ResultCard } from '../components/ui/ResultCard';
+import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
+import { VerdictCard } from '../components/ui/VerdictCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { buildHehunPrefillHref, buildTransitHref } from '../lib/transitLink';
@@ -143,7 +145,7 @@ export function BaziNatalPage() {
       ) : null}
 
       {bazi.isPending && !bazi.data ? (
-        <p className="label-caps text-ink-muted">{t('正在依据真太阳时排定四柱…')}</p>
+        <ObservatoryLoading message={t('正在依据真太阳时排定四柱…')} />
       ) : null}
 
       {bazi.data ? (
@@ -327,6 +329,10 @@ function BaziResults({
   return (
     <>
       <ChartSummary chart={chart} />
+
+      {chart.interpretation ? (
+        <VerdictCard verdict={chart.interpretation.verdict} />
+      ) : null}
 
       <nav
         aria-label={t('命盘分区')}

@@ -86,10 +86,10 @@ export function TarotCard({ card, revealed, selected, hint = false, onSelect }: 
                   </div>
 
                   <div className="relative z-10 flex flex-col gap-0.5">
-                    <span className="truncate font-display text-[14px] font-semibold leading-tight text-ink">
+                    <span className="truncate font-display text-[14px] font-semibold leading-tight text-[#ede9dd]">
                       {card.name_zh}
                     </span>
-                    <span className="truncate text-[9px] uppercase leading-tight tracking-wide text-ink-muted">
+                    <span className="truncate text-[9px] uppercase leading-tight tracking-wide text-[#adb6a6]">
                       {card.name}
                     </span>
                   </div>

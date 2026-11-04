@@ -60,12 +60,12 @@ export function LenormandCard({ card, compact, selected, onSelect }: LenormandCa
 
         <div className={`flex flex-1 flex-col items-center justify-center gap-0.5 text-center ${compact ? '' : 'gap-1'}`}>
           {compact ? (
-            <span className="font-display text-[13px] font-semibold leading-tight text-ink">{card.name_zh}</span>
+            <span className="font-display text-[13px] font-semibold leading-tight text-[#ede9dd]">{card.name_zh}</span>
           ) : (
             <>
               <CardEmblem color={accent} />
-              <span className="font-display text-[15px] font-semibold leading-tight text-ink">{card.name_zh}</span>
-              <span className="text-[8px] uppercase leading-tight tracking-wide text-ink-muted">{card.name}</span>
+              <span className="font-display text-[15px] font-semibold leading-tight text-[#ede9dd]">{card.name_zh}</span>
+              <span className="text-[8px] uppercase leading-tight tracking-wide text-[#adb6a6]">{card.name}</span>
             </>
           )}
         </div>
@@ -73,7 +73,7 @@ export function LenormandCard({ card, compact, selected, onSelect }: LenormandCa
         {compact ? null : (
           <div className="flex flex-col items-center gap-0.5">
             <span className="font-display text-[10px] leading-tight text-gold-soft">{card.essence}</span>
-            <span className="line-clamp-1 text-[8px] leading-tight text-ink-muted">{card.keywords.join(' · ')}</span>
+            <span className="line-clamp-1 text-[8px] leading-tight text-[#adb6a6]">{card.keywords.join(' · ')}</span>
           </div>
         )}
 
