@@ -1081,17 +1081,17 @@ def test_template_frames_excluded_from_line_keys() -> None:
         assert v not in ht, f"模板帧不应作整行键：{v[:16]}"
 
 
-def test_judgment_prose_localize_en_batch1() -> None:
-    # p16 英文逐条判语·第一批（bazi / hehun / bazi_transit）：非模板判语行在 en 下整行
-    # 精确换为人工转译的英文（纯 ASCII），默认 zh-Hans 逐字节透传；术语按命理通行英译固定
-    # （Officer / Seven Killings / Eating God / Hurting Officer / Resource / Day Master /
-    # favorable / unfavorable / Spouse Palace / Void / Wenchang / Celestial Noble 等）。
-    # 英文判语按系统分批登记，每完成一个系统即扩 done 名单。
+def test_judgment_prose_localize_en() -> None:
+    # p16 英文逐条判语·逐系统登记：非模板判语行在 en 下整行精确换为人工转译的英文
+    # （纯 ASCII），默认 zh-Hans 逐字节透传；术语按命理通行英译固定（Officer / Seven Killings /
+    # Eating God / Hurting Officer / Resource / Day Master / favorable / unfavorable /
+    # Spouse Palace / Void / Wenchang / Celestial Noble；name 八十一数理、meihua 体用与八卦取象
+    # 逐句人工转译）。每完成一个系统即扩 done 名单。
     import app.engines.plain_corpora as PC
     from app.core.locale_i18n import LABELS
 
     en = LABELS["en"]
-    done = {"bazi", "hehun", "bazi_transit"}
+    done = {"bazi", "hehun", "bazi_transit", "name", "meihua"}
     corpora = {
         c.system: c
         for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
@@ -1107,4 +1107,4 @@ def test_judgment_prose_localize_en_batch1() -> None:
             assert got.isascii(), f"{sysname} 判语英文应为纯 ASCII：{v[:16]}"
             assert localize(v, "zh-Hans") == v
             n += 1
-    assert n >= 49, n
+    assert n >= 154, n
