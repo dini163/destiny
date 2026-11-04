@@ -1038,4 +1038,44 @@ def test_prose_fixed_lines_localize_zh_hant() -> None:
     dleaf = d.json()["interpretation"]["six_dimensions"][0]["plain"]
     hleaf = h.json()["interpretation"]["six_dimensions"][0]["plain"]
     assert dleaf.split("\n")[0] != hleaf.split("\n")[0], "zh-Hant 未本地化开篇句行"
-    assert dleaf.split("\n")[1] == hleaf.split("\n")[1], "未登记判语行须与默认逐字节相同"
+    assert dleaf.split("\n")[1] != hleaf.split("\n")[1], "逐条判语行在 zh-Hant 下已本地化"
+
+
+def test_judgment_prose_localize_zh_hant() -> None:
+    # p16：逐条判语（compose 逐字搬运的各系统条目白话）的繁体登记——判语行在 zh-Hant
+    # 下被整行精确换为繁体，未含换行的单条判语走整串精确匹配；含 {} 槽位的模板帧不登记
+    # （合成后不等于任何整行）；默认 zh-Hans 逐字节透传。转换经 OpenCC s2tw 后按本语料
+    # 术语校正（地支丑/吉凶档/咸卦/面(皮)/回(音)/合(眼缘) 不被误转）。
+    import app.engines.plain_corpora as PC
+    from app.core.locale_i18n import LABELS
+
+    ht = LABELS["zh-Hant"]
+    corpora = [x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus"]
+    registered = 0
+    for c in corpora:
+        for v in c.entries.values():
+            if "{" in v or "}" in v:
+                continue
+            assert v in ht, f"{c.system} 逐条判语未登记繁体：{v[:16]}"
+            assert localize(v, "zh-Hant") != v, f"{c.system} 判语繁体应与原文不同：{v[:16]}"
+            assert localize(v, "zh-Hans") == v
+            registered += 1
+    assert registered > 2000, registered
+    # 术语回退在整表层面无残留
+    joined = "".join(ht.values())
+    for bad in ("醜", "兇", "鹹", "麵", "閤", "迴"):
+        assert bad not in joined, f"术语误转残留：{bad}"
+    assert "紫微在丑" in joined and "咸卦的卦辭" in joined
+
+
+def test_template_frames_excluded_from_line_keys() -> None:
+    # p16：含 {} 槽位的模板帧不作整行键（合成后 filled 值不等于任何整行，行级匹配跳过）。
+    import app.engines.plain_corpora as PC
+    from app.core.locale_i18n import LABELS
+
+    ht = LABELS["zh-Hant"]
+    corpora = [x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus"]
+    templates = [v for c in corpora for v in c.entries.values() if "{" in v or "}" in v]
+    assert templates, "expected template-brace frames to exist"
+    for v in templates:
+        assert v not in ht, f"模板帧不应作整行键：{v[:16]}"
