@@ -973,3 +973,33 @@ def test_zodiac_animals_localize() -> None:
     assert localize("牛", "zh-Hant") == "牛"
     assert localize("蛇", "en") == "Snake"
     assert localize("狗", "en") == "Dog"
+
+
+def test_prose_fixed_lines_localize() -> None:
+    # p16：合成段落（compose 以 \n 连接开篇句/条目/收尾句）在 en 下按**整行精确匹配**本地化，
+    # 命中的固定行被换、未登记的逐条判语原样保留；默认 zh-Hans 路径逐字节透传不动。
+    import app.content.bazi_plain as B
+
+    openers = set(B.DIMENSION_OPENERS.values())
+    closers = set(B.TIER_CLOSERS.values())
+    payload = {
+        "birth_date": "1990-06-15", "birth_time": "08:30:00", "city": "成都",
+        "gender": "male", "calendar": "solar", "apply_true_solar_time": True,
+    }
+    with TestClient(app) as client:
+        d = client.post("/api/v1/bazi/natal", json=payload)
+        e = client.post("/api/v1/bazi/natal?locale=en", json=payload)
+    assert d.status_code == e.status_code == 200
+    # 直接单测：合成串里命中的固定行被换，其余行原样；未含换行的长句不误伤。
+    opener = next(iter(openers))
+    composed = f"{opener}\n你命里的某条判语。"
+    localized = localize(composed, "en")
+    assert localized != composed, "en 应换掉合成段落里的开篇句那一行"
+    assert localized.endswith("\n你命里的某条判语。"), "未登记的条目行必须逐字节保留"
+    assert localize(opener, "zh-Hans") == opener, "默认 locale 不得动合成段落"
+    # 端到端：某维 plain 的首行（开篇句）在 en 下变英、默认路径不变。
+    dleaf = d.json()["interpretation"]["six_dimensions"][0]["plain"]
+    eleaf = e.json()["interpretation"]["six_dimensions"][0]["plain"]
+    assert dleaf.split("\n")[0] in (openers | closers), "首行应是已登记的固定开篇句"
+    assert eleaf.split("\n")[0] != dleaf.split("\n")[0], "en 未本地化开篇句行"
+    assert eleaf.split("\n")[0].isascii(), f"en 开篇句行仍含非 ASCII：{eleaf.split(chr(10))[0]!r}"

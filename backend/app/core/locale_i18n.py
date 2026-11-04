@@ -1,9 +1,10 @@
 """后端响应文案的本地化层（cross-cutting，`core/` 底层，任何层可引）。
 
 形状与前端 `i18n/messages.ts` 一致：**源简体字符串当 key**，命中即替换，未命中回落源文。
-区别只在挂载点——判语正文是引擎现拼的长句，做不了 key，所以这一层今天只覆盖**有界、高复用
-的结构化标签**：结论卡片的五档档位词、白话块的小节标题。深判语与卡牌/星曜等专名词表是后续
-内容批次，往 `LABELS` 里加键即可，不改机制。
+挂载点是已序列化的 JSON 响应叶子，做两层精确匹配（`localize`→`_localize_leaf`）：整串命中优先；
+未命中且该串含 `\n`（`plain_compose` 用换行把开篇句/条目/收尾句拼成一段），则**逐行**精确查表后
+拼回——合成段落里的每一行仍要求逐字等于某个 key，不是子串替换。这一层覆盖有界、高复用的结构化
+标签（档位词、小节标题、专名词表），深判语则是把这些固定行与逐条转述句登记进 `LABELS` 的内容批次。
 
 三条立身规矩（对齐 AGENTS.md）：
 ① `zh-Hans`（默认）与任何未知 locale 一律原样返回，一个字节都不动——`tests/` 的 HTTP golden
@@ -737,6 +738,94 @@ LABELS: Final[dict[str, dict[str, str]]] = {
         "鼠": "Rat", "牛": "Ox", "虎": "Tiger", "兔": "Rabbit",
         "龙": "Dragon", "马": "Horse", "羊": "Goat", "猴": "Monkey",
         "鸡": "Rooster", "猪": "Pig",
+        # p16 深判语·有界固定行（各系统小节开篇句 / 档位收尾句，compose 以 \n 拼段）英译。
+        "事业看的是你的位置和担当：责任压不压身、位置稳不稳，都在这一个维度里说。": "Career reads your position and the weight you carry: whether responsibility presses down and whether your standing holds is all told in this single dimension.",
+        "财运看的是你担不担得住钱、钱从哪里来：进得来又留得住，才是好配置。": "Wealth reads whether you can hold money and where it comes from: only what flows in and stays in makes a good configuration.",
+        "婚姻看的是你的配偶星和配偶宫：星强宫稳，感情的基本盘就好。": "Marriage reads your spouse star and spouse palace: a strong star and a steady palace mean a sound foundation for your relationships.",
+        "健康看的是你盘里五行的分布和流转：气顺不偏，精力就耐用。": "Health reads how the five elements are spread and circulate in your chart: when the qi runs even and unbiased, your energy lasts.",
+        "学业看的是你的吸收和输出：学得进、用得出，两头都强才占便宜。": "Studies read your intake and your output: taking in well and applying well - strong at both ends is where the advantage lies.",
+        "人际看的是你身边的贵人和同气：肯帮你的人多、消耗你的人少，就是好圈子。": "Relations read the noble helpers and kindred spirits around you: many who lift you, few who drain you - that is a good circle.",
+        "这一维是你的优势项：机会给得起，你也接得住，按自己的节奏往前推进就行。": "This dimension is your strength: opportunity is offered and you can take it - simply advance at your own pace.",
+        "这一维不功不过：有利的和吃力的基本相抵，你稳着走不会出大问题，想再进一步就得在细节上多用功。": "This dimension is neither credit nor fault: the favorable and the strained largely offset, so moving steadily brings no big trouble; to advance further, put more work into the details.",
+        "这一维是你的短板：急不来，把该补的补扎实再谈提速，比硬冲划算得多。": "This dimension is your weak spot: it cannot be rushed - shore up what needs mending before speaking of speed, which pays far better than forcing a charge.",
+        "天格看的是你与长辈、门第这一段的关系，它由姓的那一端算出来，是你出生时就带着的部分。": "The Heaven Grid reads your bond with elders and family standing; it is computed from the surname side and is the part you carry from birth.",
+        "人格是五格里最贴近当下你自己的那一格，你办事时别人感受到的，多半是这一格的数。": "The Person Grid is the cell closest to who you are right now; what others sense when you act is mostly the number of this cell.",
+        "地格由名的笔画合成，看的是你脚下一段的基础与早年的际遇，你从什么地方起步由它说。": "The Earth Grid is built from the strokes of the given name and reads the foundation beneath your feet and your early fortunes - it tells where you set off from.",
+        "外格算的是总格与人格之差再加一，你在自家圈子之外怎么被人接住，看的是这一格。": "The Outer Grid is the Total minus the Person, plus one; how you are received beyond your own circle is read in this cell.",
+        "总格是全部笔画之和，你走完一圈之后落在什么气象上，五格里由它负责那个整体。": "The Total Grid is the sum of all strokes; the tenor you land on after a full round is its charge among the five cells - it governs the whole.",
+        "三才配置看天、人、地三格五行之间谁生谁克，这一段说的是你身上三股力气处得顺不顺。": "The Three Talents configuration reads which of the Heaven, Person, and Earth cells generate or restrain one another in the five elements; this passage tells whether the three forces in you get along.",
+        "把五格合起来看，你手上的顺与吃力就有了次序，这一段按两侧重排一遍已经说过的话。": "Taken together, the five cells give an order to the smooth and the strained you hold; this passage rearranges what was already said into the two sides.",
+        "你这份五格配置在姓名学里属上等一档，表的措辞在这一档偏向顺遂，读的时候以这一档的气象为主，哪一格自己写着难处，仍以它那句为准。": "Your five-grid configuration falls in the upper tier of name numerology; the table's wording in this tier leans toward smoothness - read it with this tier's tenor as the frame, yet whichever cell itself notes a difficulty still stands by its own sentence.",
+        "你这份配置落在中上档，表的措辞以顺为主而留着余地，不必拿单格那句短处重估全盘，也不必让这一档替五格作保。": "Your configuration falls in the upper-middle tier; the table's wording is mostly smooth but leaves room - there is no need to rejudge the whole by one cell's shortcoming, nor to let this tier vouch for all five cells.",
+        "你这份配置属中档，表的措辞在这一档是平的，顺与吃力两句都读得进去，轻重由那五格自己说，不由这个档位替你定。": "Your configuration belongs to the middle tier; the table's wording here is even, and both the smooth and the strained sentences read true - the weight is told by those five cells themselves, not set for you by this tier.",
+        "你这份配置偏中下档，表的措辞在这一档偏重吃力的那一面，它说的是气象分布，不是你该改什么，也不替你判人。": "Your configuration leans to the lower-middle tier; the table's wording here stresses the strained side. It speaks of how the tenor is distributed, not of what you should change, and it does not pass judgment on people for you.",
+        "你这份配置落在下档，表的措辞在这一档最重，读这段时把它当气象分布看，别当作对个人的判词。": "Your configuration falls in the lower tier, where the table's wording is at its heaviest; read this passage as a distribution of tenor, not as a verdict on the person.",
+        "三对关系全是生与比，你身上的三股力气彼此扶持，内部不打架是这一段最实在的形容。": "All three pairings are generation and kinship: the three forces in you support one another, and 'no fighting inside' is this passage's truest description.",
+        "三对里顺的多而克的一少，你的配置大体走得通，只在某一对上还留着要绕过去的地方。": "Among the three pairs the smooth outnumber the restraining, so your configuration largely works; only one pair still leaves a spot to route around.",
+        "三对里克的多而生的少，你这一段上的难处来自互相牵制，不是来自缺少机会。": "Among the three pairs the restraining outnumber the generating, so the difficulty in this stretch comes from mutual restraint, not from a lack of opportunity.",
+        "三对皆克，表把抑塞写在明处，它说的是配置之间的气路，不是你本人的成色。": "When all three pairs restrain, the table sets the blockage out in the open; it speaks of the qi-paths between the configurations, not of your own caliber.",
+        "把账本里命中的核心羁绊合起来看，你这段关系最要紧的几条轴各落在顺的一侧还是费劲的一侧，下面按两侧重排一遍。": "Taken together, the core bonds struck in the ledger show whether the most critical axes of this relationship land on the smooth side or the effortful side; the two sides are rearranged below.",
+        "这一盘没有检到计入账本的核心羁绊，所以这一段不逐条重排，只把档位那一句给你，两侧的相处仍按账本条目自己那句读。": "This chart found no core bond counted in the ledger, so this passage does not rearrange item by item; it gives you only the tier's sentence, and how the two sides get along is still read by each ledger entry's own line.",
+        "你这一份相契度落在最深的一档，表的措辞在这一档偏向顺遂，读它的方式是把整段当气象看，哪一条相位自己写着费劲，仍以它那句为准。": "Your degree of attunement falls in the deepest tier; the table's wording here leans toward smoothness - read the whole passage as tenor, yet whichever aspect itself notes effort still stands by its own sentence.",
+        "你这一份相契度属和合互补，表的措辞在这一档以合为主而留着余地，不必拿单独一条相位的短处重估全盘，也不必让这一档替这段关系作保。": "Your attunement is one of harmony and complementarity; the table's wording stresses union while leaving room - no need to rejudge the whole by a single aspect's shortcoming, nor to let this tier vouch for the relationship.",
+        "你这一份相契度落在中和可处，表的措辞在这一档是平的，顺与费劲两边都读得进去，轻重由那几条相位自己说，不由这个档位替你定。": "Your attunement falls in a balanced, workable middle; the table's wording here is even, and both the smooth and the effortful sides read true - the weight is told by those aspects themselves, not set for you by this tier.",
+        "你这一份相契度偏磨合为宜，表的措辞在这一档偏重费劲的那一面，它讲配置的次序，不讲这段关系该不该继续。": "Your attunement leans toward grinding into step; the table's wording here stresses the effortful side. It speaks of the order of the configuration, not of whether this relationship should continue.",
+        "把这一卦按体、用两侧各读一遍：先说体用之间的生克，再顺着你这一侧的取象与卦气，然后是对方那一侧的，两侧同为一卦时只说一遍。": "Read this hexagram once on each side, Ti and Yong: first the generation and restraint between them, then the imagery and hexagram-qi on your side, then on the other's; when both sides are the same hexagram, it is said only once.",
+        "合起来读，你这一卦的指数落在最上的一档，表的措辞在这一档最顺，读时以这一卦的整体气象为主，条目里若还写着费力的那几句，它们不因这一档消失。": "Read together, the index of your hexagram falls in the highest tier, where the table's wording is at its smoothest; read it with the hexagram's overall tenor as the frame, yet any effortful lines left in the entries do not vanish because of this tier.",
+        "合起来读，你这一卦属吉的一档，表的措辞在这一档偏向顺，条目里若写着吃力，不拿它反推这一档，也不拿这一档抹掉它。": "Read together, your hexagram belongs to the auspicious tier, where the wording leans toward smoothness; if an entry notes strain, do not use it to overturn the tier, nor use the tier to erase it.",
+        "合起来读，你这一卦是小吉，表的措辞在这一档是成而有限度，你读到的顺带着边界，与上吉那一档差的是力度不是方向。": "Read together, your hexagram is minor fortune; the table's wording here is success-with-limits - the smoothness you read comes with a boundary, and it differs from the supreme-fortune tier in force, not direction.",
+        "合起来读，你这一卦落在中平，表的措辞在这一档不给你取向，顺与吃力都按条目自己那句读，这一档不替你判哪一边更重。": "Read together, your hexagram falls in even-plain; the wording here gives you no lean - smooth and strained alike are read by each entry's own line, and this tier does not judge for you which side weighs more.",
+        "合起来读，你这一卦偏小凶，表的措辞在这一档偏重吃力的一面，它说的是这一卦当前的气象，不是对这件事的永久判词。": "Read together, your hexagram leans toward minor misfortune; the wording here stresses the strained side. It speaks of the hexagram's present tenor, not a permanent verdict on the matter.",
+        "合起来读，你这一卦落在凶这一档，表的措辞在这一档最硬，读它时把它当作这一卦当前的阻力分布，不是说这件事永远不行。": "Read together, your hexagram falls in the misfortune tier, where the wording is at its hardest; read it as the hexagram's present distribution of resistance, not as saying the matter can never work.",
+        "命宫这一格讲的是你这个人本身，你的底色、脾气与做事的起手式都先看这里。": "The Life Palace cell is about you yourself - your base tone, temperament, and the way you begin things all start with a reading here.",
+        "兄弟宫这一格讲的是你和同辈手足之间的来往，也包括一路同行的伙伴。": "The Siblings Palace cell reads your dealings with same-generation kin, and it includes the companions who walk the road with you.",
+        "夫妻宫这一格讲的是你和伴侣相处的方式，感情落到婚姻上的那份质感在这里看。": "The Spouse Palace cell reads how you and your partner get along; the texture your feelings take when they land in marriage is seen here.",
+        "子女宫这一格讲的是你和子女、晚辈之间的缘分与相处方式。": "The Children Palace cell reads the bond and the way you relate to children and the younger generation.",
+        "财帛宫这一格讲的是你怎么挣钱与用钱，钱财进出的格局在这里看。": "The Wealth Palace cell reads how you earn and spend; the pattern of money flowing in and out is seen here.",
+        "疾厄宫这一格讲的是你身体素质的倾向，也就是盘上认为你更容易积累负荷的地方。": "The Illness Palace cell reads the tendency of your physical constitution - the places the chart thinks you are likelier to accumulate strain.",
+        "迁移宫这一格讲的是你离开熟悉环境之后怎么被外界接住，出门在外的际遇在这里看。": "The Travel Palace cell reads how the outside world receives you once you leave familiar ground; the fortunes of being away from home are seen here.",
+        "仆役宫这一格讲的是你和下属、朋友、合作方之间谁在为你出力。": "The Servants Palace cell reads, among your subordinates, friends, and partners, who is actually exerting themselves for you.",
+        "官禄宫这一格讲的是你在事业这条路上的格局，做事的路子与能被看见的成果都看这里。": "The Career Palace cell reads the pattern of your road through work - how you get things done and the results others can see are both read here.",
+        "田宅宫这一格讲的是你和家宅田产的关系，你安身的那个地方是什么样子。": "The Property Palace cell reads your relation to home and land - what the place where you settle yourself looks like.",
+        "福德宫这一格讲的是你内在的享受与精神生活的质地，心里安不安稳在这里看。": "The Fortune-Virtue Palace cell reads your inner enjoyment and the texture of your spiritual life; whether your heart feels steady is seen here.",
+        "父母宫这一格讲的是你和父母长辈的缘分与相处，也讲到你能从长辈那里接住多少庇护。": "The Parents Palace cell reads your bond and dealings with parents and elders, and how much shelter you can receive from them.",
+        "巽四宫在盘上占东南一角，卦名巽、五行属木，地支管辰巳，你在这格看到的组合都归东南这个方位。": "The Xun (4th) Palace holds the southeast corner of the chart: hexagram Xun, element Wood, earthly branches Chen and Si under its charge - every combination you see in this cell belongs to the southeast.",
+        "离九宫在正南，卦名离、属火，地支为午，你在这一格读到的是南面那一片天地怎么落子。": "The Li (9th) Palace sits due south: hexagram Li, element Fire, branch Wu - what you read in this cell is how that southern stretch of sky and ground plays its pieces.",
+        "坤二宫在西南，卦名坤、属土，地支管未申，天禽也寄在这一格，你读到的是西南这一方的布置。": "The Kun (2nd) Palace lies southwest: hexagram Kun, element Earth, branches Wei and Shen, and the star Tianqin also lodges here - what you read is the arrangement of the southwest quarter.",
+        "震三宫在正东，卦名震、属木，地支为卯，你在这一格看到的是东面这一方的动静。": "The Zhen (3rd) Palace lies due east: hexagram Zhen, element Wood, branch Mao - what you see in this cell is the stir of the eastern quarter.",
+        "中五宫落在盘的正中央，卦名写作中、属土，按这派安法它不坐星、不配门也不配神，你在盘上看到的是这一格被留空。": "The Center (5th) Palace falls at the chart's very middle: its hexagram is written Center, element Earth; by this school's placement it seats no star, is matched with no door and no deity - so what you see on the chart is this cell left blank.",
+        "兑七宫在正西，卦名兑、属金，地支为酉，你在这一格读到的是西面这一方的布置。": "The Dui (7th) Palace lies due west: hexagram Dui, element Metal, branch You - what you read in this cell is the arrangement of the western quarter.",
+        "艮八宫在东北，卦名艮、属土，地支管丑寅，你读到的是东北这一方的安排。": "The Gen (8th) Palace lies northeast: hexagram Gen, element Earth, branches Chou and Yin - what you read is the arrangement of the northeast quarter.",
+        "坎一宫在正北，卦名坎、属水，地支为子，你在这一格看到的是北面这一方的动静与去处。": "The Kan (1st) Palace lies due north: hexagram Kan, element Water, branch Zi - what you see in this cell is the stir and the going-forth of the northern quarter.",
+        "乾六宫在西北，卦名乾、属金，地支管戌亥，你在这一格读到的是西北这一方的格局。": "The Qian (6th) Palace lies northwest: hexagram Qian, element Metal, branches Xu and Hai - what you read in this cell is the pattern of the northwest quarter.",
+        "这一盘只发单张牌，你读的是它给出的一句话提点，不必往前后找搭配。": "This spread deals a single card: you read the one line of guidance it gives, with no need to look before or after for pairings.",
+        "三张线性是把三张牌读成一句话，前一张是主词、后一张给它添形容，你按位置一路往下走。": "The Three-Card Line reads three cards as one sentence: the first is the subject, the next adds its description - follow the positions straight along.",
+        "五行线阵是一条时间线，中间那张是你的核心现状，左边两张讲来路，右边两张讲去处。": "The Five-Element Line is a timeline: the middle card is your core present, the two on the left tell where you came from, the two on the right tell where you are heading.",
+        "九宫阵把牌摆成三乘三，中心是你的核心，四周八格是环绕它的影响，读中心与每一方的搭配。": "The Nine-Palace Spread lays cards in three-by-three: the center is your core, the eight cells around it are the influences encircling it - read the center against each quarter's pairing.",
+        "大桌把三十六张牌全铺开，以你的指示牌为中心，看它同行前后与同列上下，读的是整张盘的俯瞰。": "The Grand Tableau spreads all thirty-six cards, with your significator at the center: look at what shares its row before and after and its column above and below - you read an overview of the whole board.",
+        "先说十颗星各自落在哪个星座，这一段讲的是你那十股力气各自习惯用什么方式出手。": "First, which constellation each of the ten stars sits in: this passage tells how each of your ten forces is in the habit of making its move.",
+        "再说十颗星各自落在第几宫，宫位是舞台，这一段说的是你的这些力气主要在生活中哪一块使上劲。": "Next, which house each of the ten stars sits in - the house is the stage: this passage says in which area of life these forces chiefly exert themselves.",
+        "接着看星与星之间成的相位，相位是你盘上几股力气之间的实际关系，这一段逐条说它们怎么配合或怎么拉扯。": "Then the aspects formed between stars: an aspect is the actual relation among several forces in your chart - this passage tells, line by line, how they cooperate or tug against each other.",
+        "这张盘上十颗星之间没有达到经典容许度的主要相位，这一段今天没有可逐条说的关系句，落座与落宫仍是你盘的事实。": "On this chart no major aspect among the ten stars reaches the classic orb, so today this passage has no relation-lines to state item by item; the signs and houses are still the facts of your chart.",
+        "再看逆行，逆行只说明从地球上看这颗星在往回走，它给你的是一种反复、内转的节奏，不是残缺。": "Then retrograde: retrograde only means that, seen from Earth, this star appears to move backward. It gives you a rhythm of revisiting and turning inward, not a deficiency.",
+        "十颗行星在你盘上都不逆行，这一段没有要逐条解释的逆行节奏，你的十股力气都是直接朝外用的。": "None of the ten planets is retrograde in your chart, so this passage has no retrograde rhythm to explain item by item; your ten forces are all directed straight outward.",
+        "上升与天顶是你这张盘立起来的两根轴，一个是对外的入口，一个是对上的方向。": "The Ascendant and the Midheaven are the two axes your chart stands on: one is your entry to the outside, the other your direction upward.",
+        "北交点在盘上只有一个点，传统把它读作你后半程要往那边走的方向，这里按它落的座与宫逐条说。": "The North Node is a single point in the chart; tradition reads it as the direction you are to move toward in the second half of the road, and here it is told line by line by the sign and house it falls in.",
+        "十二宫各管生活中的一块，这一段按宫序把十二块各自管什么说清楚，好让你读前面那些落宫时有对照。": "The twelve houses each govern an area of life; in house order this passage makes clear what each of the twelve governs, so you have a reference when reading the house placements above.",
+        "最后是四元素与三形态在你这十颗星上的分布，它说的是整张盘的底色偏向哪一种运作方式，不是缺了什么。": "At last, the distribution of the four elements and three modalities across your ten stars: it tells which way of operating the whole chart's tone leans toward, not what is missing.",
+        "先说行运这一层：目标日那天的十颗星此刻压在你本命盘的哪些点上，下面逐条说的是那一天哪股力气被外面的天带动。": "First the transit layer: on the target day, which points of your natal chart the ten stars are pressing on right now - what follows tells, line by line, which of your forces is stirred by the sky outside on that day.",
+        "行运这一层在目标日没有任何一条达到经典容许度的相位，这一段没有可逐条说的话，你本命盘的落座与宫位仍是它的事实。": "The transit layer forms no aspect reaching the classic orb on the target day, so this passage has nothing to say line by item; the signs and houses of your natal chart remain its facts.",
+        "再看次限这一层，它看的是把出生后的一天当一年推出来的那张盘，下面逐条说的是这张盘上的星与你的本命点成什么相。": "Then the secondary-direction layer: it reads the chart derived by counting one day after birth as one year - what follows tells, line by line, what aspects this chart's stars make with your natal points.",
+        "次限这一层在目标日没有达到经典容许度的相位，这一段没有可逐条说的关系句，你推运盘上的落座与宫位仍是它的事实。": "The secondary-direction layer reaches no classic-orb aspect on the target day, so this passage has no relation-lines to state item by item; the signs and houses in your progressed chart remain its facts.",
+        "太阳弧这一层把你本命每一颗星往前推同一段弧度，它说的是推前之后的那张盘与本命的关系，读的时候要连着前两段一起看。": "The solar-arc layer advances every natal star by the same arc: it speaks of the relation between the chart after that advance and your natal chart, so read it together with the two passages before it.",
+        "太阳弧这一层在目标日没有达到经典容许度的相位，这一段没有可逐条说的话，你本命每一颗星被推进同一段弧度这件事仍是事实。": "The solar-arc layer reaches no classic-orb aspect on the target day, so this passage has nothing to say line by item; that every natal star has been advanced by the same arc is still a fact.",
+        "次限的月亮是这张推运盘上最好读的一格，它在星座与你的本命宫之间慢慢挪，走到哪一格，生活里哪一块就近了些。": "The progressed Moon is the easiest cell to read on this chart: it drifts slowly among the signs and your natal houses, and whichever cell it reaches, that area of life comes a little closer.",
+        "次限上升与次限天顶是你推运盘的两根轴，它们不由出生时刻锁死，会随年月一点点挪，这两格讲的是方向上的变化。": "The progressed Ascendant and progressed Midheaven are the two axes of your progressed chart: not locked by the moment of birth, they shift bit by bit with the years - these two cells tell of changes in direction.",
+        "先说九曜落座这一层：九颗星各自停在哪个星座，决定了它们把你的力气往哪一处使，下面逐颗说的是你可以先认下的底色。": "First the layer of the nine grahas by sign: which constellation each of the nine stars rests in decides where each puts your force; what follows speaks star by star of the base tone you can first take in.",
+        "再看九曜落宫这一层：整宫制把十二个星座依次安在十二个宫位上，星落在第几宫，说的就是它在你的生活里偏向哪一块。": "Then the nine grahas by house: the whole-sign system sets the twelve constellations in turn into the twelve houses, and which house a star falls in tells which area of your life it leans toward.",
+        "最后看星宿这一层：九曜与上升各自落在二十七宿的哪一宿，下面把这些宿的底色逐条说给你听，同一宿只讲一次。": "At last the nakshatra layer: which of the twenty-seven mansions each of the nine grahas and the Ascendant falls in - their base tones are told to you line by line below, each mansion spoken only once.",
+        "最后看现行的大运与小运：两层主星各自带着一段时期的底色，下面把这两颗主事星各说一句，你可以对着上面的时间轴读。": "At last the current major and minor periods: the ruling stars of the two layers each carry the tone of a span of time; the two presiding stars are each given one line below, and you can read them against the timeline above.",
+        "目标日已经落在这一百二十年的运程之外，这张盘的时间轴没有当下正在走的大运与小运，这一段就没有可说的主事星，你仍可以按上面的顺序回看每一段。": "The target day already falls outside this one-hundred-and-twenty-year cycle of periods; the chart's timeline has no major or minor period being walked right now, so this passage has no presiding star to speak of, yet you can still review each span in the order above.",
     },
 }
 
@@ -757,17 +846,36 @@ def localize_str(source: str, locale: str) -> str:
     return table.get(source, source)
 
 
+def _localize_leaf(value: str, table: dict[str, str]) -> str:
+    """字符串叶子的本地化：整串命中优先；未命中且含换行则逐行精确查表后拼回。
+
+    合成段落（`plain_compose.compose` 以 `\n` 连接开篇句 / 条目 / 收尾句）作为一个叶子出现，
+    整串不可能是固定 key；行级仍是**整行精确匹配**（一行必须逐字等于某个 key），不是子串替换，
+    所以机制规矩 ② 不变。没有任何一行命中时原样返回——保证未登记的段落一个字节都不动。
+    """
+    hit = table.get(value)
+    if hit is not None:
+        return hit
+    if "\n" in value:
+        lines = value.split("\n")
+        mapped = [table.get(line, line) for line in lines]
+        if mapped != lines:
+            return "\n".join(mapped)
+    return value
+
+
 def localize(value: Any, locale: str) -> Any:
-    """递归遍历已序列化的 JSON 载荷，对每个字符串叶子做精确查表替换。
+    """递归遍历已序列化的 JSON 载荷，对每个字符串叶子做精确查表替换（整串→行级回退）。
 
     结构（dict/list 的键与形状、数字、布尔、null）一概不动，只换字符串叶子的值——所以
-    snake_case 契约（AGENTS §3）与字段名不受影响，前端照旧原样消费。
+    snake_case 契约（AGENTS §3）与字段名不受影响，前端照旧原样消费。`table` 为空（`zh-Hans` /
+    未知 locale）时直接透传，绝不进入替换路径。
     """
     table = LABELS.get(locale)
     if not table:
         return value
     if isinstance(value, str):
-        return table.get(value, value)
+        return _localize_leaf(value, table)
     if isinstance(value, dict):
         return {k: localize(v, locale) for k, v in value.items()}
     if isinstance(value, list):
