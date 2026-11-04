@@ -1090,12 +1090,16 @@ def test_judgment_prose_localize_en() -> None:
     # 十二宫星座英名、27 星宿梵文转写、大运 a period ruled by X；zhouyi 周易六十四卦逐爻今译
     # 与大象，卦名取拼音加Wilhelm英释、阳爻=yang line/阴爻=yin line、世爻=the ruling line/应爻=
     # the corresponding line、断词 吉=good fortune 凶=misfortune 悔=regret 吝=humiliation 厉=danger
-    # 咎=fault、"咎前带无字"=the 'fault' carries the 'no' before it）。每完成一个系统即扩 done 名单。
+    # 咎=fault、"咎前带无字"=the 'fault' carries the 'no' before it；western 占星行星落星座/落宫、
+    # 上升 Ascendant/天顶 Midheaven/北交点 North Node、元素 fire/earth/air/water 与模式
+    # cardinal/fixed/mutable、逆行 retrograde、五类相位 conjunct/sextile/square/trine/opposite 皆取
+    # 标准英文术语，行星 Sun/Moon/Mercury/Venus/Mars/Jupiter/Saturn/Uranus/Neptune/Pluto、
+    # 宫位 the first house…the twelfth house。每完成一个系统即扩 done 名单。
     import app.engines.plain_corpora as PC
     from app.core.locale_i18n import LABELS
 
     en = LABELS["en"]
-    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand", "vedic", "zhouyi"}
+    done = {"bazi", "hehun", "bazi_transit", "name", "meihua", "synastry", "qimen", "ziwei", "kabbalah", "lenormand", "vedic", "zhouyi", "western"}
     corpora = {
         c.system: c
         for c in (x for x in vars(PC).values() if type(x).__name__ == "PlainCorpus")
@@ -1111,4 +1115,4 @@ def test_judgment_prose_localize_en() -> None:
             assert got.isascii(), f"{sysname} 判语英文应为纯 ASCII：{v[:16]}"
             assert localize(v, "zh-Hans") == v
             n += 1
-    assert n >= 1078, n
+    assert n >= 1620, n
