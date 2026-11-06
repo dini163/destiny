@@ -41,7 +41,7 @@ function DimensionCard({ dimension }: { dimension: DimensionReading }) {
         <LineList tone="cautions" items={dimension.cautions} />
       ) : null}
       <PlainProse text={dimension.plain} />
-      <p className="text-xs leading-relaxed text-ink-variant">{dimension.narrative}</p>
+      <p className="font-body text-sm leading-relaxed text-ink-variant">{dimension.narrative}</p>
       <span className="self-end">
         <SourceNote source={dimension.source} />
       </span>

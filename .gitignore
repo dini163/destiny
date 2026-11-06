@@ -28,6 +28,7 @@ $RECYCLE.BIN/
 *.swn
 *~
 .qoder/
+.codex/
 
 # --- Environment & secrets (never commit credentials) -----------------------
 .env
