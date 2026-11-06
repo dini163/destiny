@@ -6,6 +6,7 @@ import { CastLedger } from '../components/zhouyi/CastLedger';
 import { ClassicalText } from '../components/zhouyi/ClassicalText';
 import { HexagramCard } from '../components/zhouyi/HexagramCard';
 import { HexagramStack } from '../components/zhouyi/HexagramStack';
+import { YangzhaiCard } from '../components/zhouyi/YangzhaiCard';
 import { Icon } from '../components/ui/Icon';
 import { PlainSectionList } from '../components/ui/PlainSectionList';
 import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
@@ -130,6 +131,10 @@ function ZhouyiResults({ cast }: { cast: ZhouyiCast }) {
           <HexagramCard hexagram={hu} note={t('取本卦二三四爻为下卦、三四五爻为上卦，得互卦，示事之中段。')} />
         </ResultCard>
       </div>
+
+      <ResultCard title="阳宅六十四卦化命取象" icon="compass" elevated>
+        <YangzhaiCard hexagramName={ben.full_name_zh} />
+      </ResultCard>
 
       <ResultCard title="卦爻辞" icon="sparkle" elevated>
         <ClassicalText ben={ben} lines={lines} />

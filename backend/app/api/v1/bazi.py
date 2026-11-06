@@ -2,13 +2,19 @@
 
 from fastapi import APIRouter
 
+from app.content.bazi_zangfu import get_bazi_zangfu_guidance
 from app.core.chart_input import chart_longitude
 from app.engines.bazi import compute_bazi_chart
 from app.engines.bazi_hehun import compute_hehun
 from app.engines.bazi_liuri import compute_liuri_matrix
 from app.engines.bazi_liushi import compute_liushi_day
 from app.engines.bazi_transit import compute_transit
-from app.schemas.bazi import BaziChart, BaziNatalRequest
+from app.schemas.bazi import (
+    BaziChart,
+    BaziNatalRequest,
+    BaziZangfuRequest,
+    BaziZangfuResponse,
+)
 from app.schemas.bazi_hehun import BaziHehunRequest, BaziHehunResult
 from app.schemas.bazi_liuri import BaziLiuriRequest, BaziLiuriResult
 from app.schemas.bazi_liushi import BaziLiushiRequest, BaziLiushiResult
@@ -142,3 +148,14 @@ async def bazi_hehun(request: BaziHehunRequest) -> BaziHehunResult:
         axis_start_year=request.axis_start_year,
         axis_years=request.axis_years,
     )
+
+
+@router.post(
+    "/zangfu",
+    response_model=BaziZangfuResponse,
+    summary="八字地支子午流注与经络脏腑健康调护导引",
+)
+async def bazi_zangfu(request: BaziZangfuRequest) -> BaziZangfuResponse:
+    """根据八字四柱地支刑冲及偏旺，推导经方子午流注对应的脏腑经络养生要点。"""
+    guidance = get_bazi_zangfu_guidance(request.branches)
+    return BaziZangfuResponse(items=guidance)

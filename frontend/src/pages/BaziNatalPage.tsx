@@ -14,6 +14,7 @@ import { StrengthDial } from '../components/bazi/StrengthDial';
 import { TenGodList } from '../components/bazi/TenGodList';
 import { WuxingBars } from '../components/bazi/WuxingBars';
 import { YongshenPanel } from '../components/bazi/YongshenPanel';
+import { ZangfuGuideCard } from '../components/bazi/ZangfuGuideCard';
 import { Icon } from '../components/ui/Icon';
 import type { IconName } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
@@ -308,6 +309,13 @@ function sectionsFor(
           body: <DimensionGrid reading={chart.interpretation} />,
         }
       : null,
+    {
+      id: 'zangfu',
+      label: '子午流注',
+      title: '经方脏腑经络导引（子午流注）',
+      icon: 'sparkle',
+      body: <ZangfuGuideCard branches={chart.pillars.map((p) => p.zhi)} />,
+    },
   ];
 
   return specs.filter((spec): spec is SectionSpec => spec !== null);

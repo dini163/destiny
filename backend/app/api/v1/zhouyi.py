@@ -4,8 +4,14 @@ from datetime import datetime
 
 from fastapi import APIRouter
 
+from app.content.zhouyi_yangzhai import get_yangzhai_hexagram_meaning
 from app.engines.zhouyi import cast_hexagram
-from app.schemas.zhouyi import ZhouyiCast, ZhouyiCastRequest
+from app.schemas.zhouyi import (
+    ZhouyiCast,
+    ZhouyiCastRequest,
+    ZhouyiYangzhaiRequest,
+    ZhouyiYangzhaiResponse,
+)
 
 router = APIRouter(prefix="/zhouyi")
 
@@ -24,3 +30,14 @@ async def zhouyi_cast(request: ZhouyiCastRequest) -> ZhouyiCast:
         question=request.question,
         cast_time=request.cast_time or datetime.now(),
     )
+
+
+@router.post(
+    "/yangzhai",
+    response_model=ZhouyiYangzhaiResponse,
+    summary="周易卦象与阳宅后天八卦化命方位取象解析",
+)
+async def zhouyi_yangzhai(request: ZhouyiYangzhaiRequest) -> ZhouyiYangzhaiResponse:
+    """解析周易六十四卦对应的文王后天八卦家庭角色与居所方位化命取象。"""
+    meaning = get_yangzhai_hexagram_meaning(request.hexagram_name)
+    return ZhouyiYangzhaiResponse(hexagram_name=request.hexagram_name, meaning=meaning)

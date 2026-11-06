@@ -5,6 +5,7 @@ the frontend can consume responses without a mapping layer.
 """
 
 from datetime import date
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -167,3 +168,15 @@ class BaziChart(BaseModel):
     provenance: Provenance | None = None
 
     engine: str = Field(default="lunar-python", description="Authoritative computation engine")
+
+
+class BaziZangfuRequest(BaseModel):
+    """请求查询四柱地支子午流注脏腑经络导引。"""
+
+    branches: list[str] = Field(description="八字地支列表，如 ['子', '午', '寅', '申']")
+
+
+class BaziZangfuResponse(BaseModel):
+    """八字地支子午流注与经络脏腑健康调护导引响应。"""
+
+    items: list[dict[str, Any]] = Field(default_factory=list)

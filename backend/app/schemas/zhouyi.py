@@ -13,6 +13,7 @@ the 62 hexagrams that have no 用九/用六.
 
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -145,3 +146,16 @@ class ZhouyiCast(BaseModel):
 
     rng: str = Field(default="secrets", description="Randomness source for coin/time casting (CSPRNG).")
     engine: str = Field(default="liuyao-najia", description="Derivation engine name.")
+
+
+class ZhouyiYangzhaiRequest(BaseModel):
+    """请求查询卦象在后天八卦阳宅九宫中的化命方位取象。"""
+
+    hexagram_name: str = Field(description="卦名，如 地天泰、泰、天火同人")
+
+
+class ZhouyiYangzhaiResponse(BaseModel):
+    """周易六十四卦阳宅化命方位取象解析响应。"""
+
+    hexagram_name: str
+    meaning: dict[str, Any] | None = None
