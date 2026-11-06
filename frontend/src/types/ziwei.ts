@@ -105,3 +105,13 @@ export interface ZiweiChart {
   engine: string;
   provenance: ZiweiProvenance;
 }
+
+export interface ZiweiAnalysisRequest extends ZiweiRequest {
+  topic?: string | null;
+}
+
+export interface ZiweiAnalysisResponse {
+  chart: ZiweiChart;
+  analysis: Record<string, string>;
+}
+

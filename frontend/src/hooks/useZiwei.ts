@@ -1,6 +1,6 @@
-import { computeZiwei } from '../api/ziwei';
+import { computeZiwei, computeZiweiAnalysis } from '../api/ziwei';
 import type { ApiError } from '../api/client';
-import type { ZiweiChart, ZiweiRequest } from '../types/ziwei';
+import type { ZiweiAnalysisRequest, ZiweiAnalysisResponse, ZiweiChart, ZiweiRequest } from '../types/ziwei';
 import { useLastSuccessMutation } from './useLastSuccessMutation';
 
 /**
@@ -16,3 +16,9 @@ import { useLastSuccessMutation } from './useLastSuccessMutation';
 export function useZiwei() {
   return useLastSuccessMutation<ZiweiChart, ApiError, ZiweiRequest>(computeZiwei);
 }
+
+/** Compute a 紫微斗数 chart + 13-dimension deep analysis on demand. */
+export function useZiweiAnalysis() {
+  return useLastSuccessMutation<ZiweiAnalysisResponse, ApiError, ZiweiAnalysisRequest>(computeZiweiAnalysis);
+}
+

@@ -129,3 +129,17 @@ class ZiweiChart(BaseModel):
 
     engine: str = Field(default="ziwei-deterministic")
     provenance: ZiweiProvenance
+
+
+class ZiweiAnalysisRequest(ZiweiRequest):
+    """Request for Ziwei 13-dimension deep analysis."""
+
+    topic: str | None = Field(default=None, description="可选指定 13 维度之一，为空则返回全部 13 维。")
+
+
+class ZiweiAnalysisResponse(BaseModel):
+    """13-dimension deep analysis response."""
+
+    chart: ZiweiChart = Field(description="底盘数据")
+    analysis: dict[str, str] = Field(description="13 维度详批 Markdown 文本")
+

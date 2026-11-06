@@ -3,7 +3,8 @@
 from fastapi import APIRouter
 
 from app.engines.ziwei import compute_ziwei_chart
-from app.schemas.ziwei import ZiweiChart, ZiweiRequest
+from app.engines.ziwei_analysis import generate_all_topics_analysis, generate_topic_analysis
+from app.schemas.ziwei import ZiweiAnalysisRequest, ZiweiAnalysisResponse, ZiweiChart, ZiweiRequest
 from app.solar.geo import resolve_longitude
 from app.solar.true_solar_time import STANDARD_MERIDIAN_CN
 
@@ -34,3 +35,27 @@ async def ziwei_chart(request: ZiweiRequest) -> ZiweiChart:
         apply_true_solar_time=request.apply_true_solar_time,
         name=request.name,
     )
+
+
+@router.post("/analysis", response_model=ZiweiAnalysisResponse, summary="Compute Ziwei 13-dimension deep analysis")
+async def ziwei_analysis(request: ZiweiAnalysisRequest) -> ZiweiAnalysisResponse:
+    """Compute 13-dimension deep interpretation for a Zi Wei Dou Shu chart.
+
+    Based on 14 major stars × 13 palaces (182 entries), 24 dual-star combos,
+    37 classical patterns, 168 star-aux matrix, Sanfang Sizheng and Quanshu Juan 2.
+    """
+    chart = compute_ziwei_chart(
+        birth_date=request.birth_date,
+        birth_time=request.birth_time,
+        calendar=request.calendar,
+        longitude=_chart_longitude(request),
+        gender=request.gender,
+        apply_true_solar_time=request.apply_true_solar_time,
+        name=request.name,
+    )
+    if request.topic:
+        analysis = {request.topic: generate_topic_analysis(chart, request.topic)}
+    else:
+        analysis = generate_all_topics_analysis(chart)
+    return ZiweiAnalysisResponse(chart=chart, analysis=analysis)
+
