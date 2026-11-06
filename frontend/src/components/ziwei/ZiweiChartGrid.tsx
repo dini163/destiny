@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 
 import type { Palace, StarPlacement, ZiweiChart } from '../../types/ziwei';
 import {
@@ -13,6 +13,10 @@ import { useI18n } from '../../i18n/context';
 interface ZiweiChartGridProps {
   /** The complete chart — twelve palaces plus the summary facts for the centre. */
   chart: ZiweiChart;
+  /** Optionally selected palace name for highlighting. */
+  selectedPalace?: string | null;
+  /** Callback when user clicks a palace cell. */
+  onSelectPalace?: (palaceName: string) => void;
 }
 
 /**
@@ -23,7 +27,34 @@ interface ZiweiChartGridProps {
  * 大限 range and the stars with their 四化 marks. The 命宫 is gilded and the 身宫
  * badged; nothing is placed that the backend did not compute (PRD no-mock rule).
  */
-export function ZiweiChartGrid({ chart }: ZiweiChartGridProps) {
+export function ZiweiChartGrid({ chart, selectedPalace: propSelected, onSelectPalace }: ZiweiChartGridProps) {
+  const [activePalace, setActivePalace] = useState<string | null>(propSelected ?? null);
+
+  useEffect(() => {
+    if (propSelected !== undefined) {
+      setActivePalace(propSelected);
+    }
+  }, [propSelected]);
+
+  useEffect(() => {
+    const handleEvent = (event: Event) => {
+      const custom = event as CustomEvent<string>;
+      if (custom.detail) {
+        setActivePalace(custom.detail);
+      }
+    };
+    window.addEventListener('destiny-select-palace', handleEvent);
+    return () => window.removeEventListener('destiny-select-palace', handleEvent);
+  }, []);
+
+  const handleClick = (name: string) => {
+    setActivePalace(name);
+    window.dispatchEvent(new CustomEvent('destiny-select-palace', { detail: name }));
+    if (onSelectPalace) {
+      onSelectPalace(name);
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <div
@@ -31,7 +62,13 @@ export function ZiweiChartGrid({ chart }: ZiweiChartGridProps) {
         style={{ gridTemplateRows: 'repeat(4, minmax(132px, auto))' }}
       >
         {chart.palaces.map((palace) => (
-          <PalaceCell key={palace.index} palace={palace} style={palaceGridStyle(palace.index)} />
+          <PalaceCell
+            key={palace.index}
+            palace={palace}
+            style={palaceGridStyle(palace.index)}
+            isSelected={activePalace === palace.name}
+            onClick={() => handleClick(palace.name)}
+          />
         ))}
         <ChartCenter chart={chart} />
       </div>
@@ -40,15 +77,33 @@ export function ZiweiChartGrid({ chart }: ZiweiChartGridProps) {
 }
 
 /** One 地支 palace cell: name + 大限 + 干支 header over its seated stars. */
-function PalaceCell({ palace, style }: { palace: Palace; style: CSSProperties }) {
+function PalaceCell({
+  palace,
+  style,
+  isSelected,
+  onClick,
+}: {
+  palace: Palace;
+  style: CSSProperties;
+  isSelected?: boolean;
+  onClick?: () => void;
+}) {
   const { t } = useI18n();
   return (
     <div
       style={style}
-      className={`flex min-h-[132px] flex-col gap-1.5 rounded-card border p-2 ${
-        palace.is_ming ? 'border-gold/50 bg-gold/[0.07]' : 'border-rim bg-surface/50'
+      onClick={onClick}
+      className={`flex min-h-[132px] flex-col gap-1.5 rounded-card border p-2 transition-all ${
+        onClick ? 'cursor-pointer hover:border-gold/60' : ''
+      } ${
+        isSelected
+          ? 'border-gold-bright ring-2 ring-gold/40 bg-gold/15'
+          : palace.is_ming
+          ? 'border-gold/50 bg-gold/[0.07]'
+          : 'border-rim bg-surface/50'
       }`}
     >
+
       <div className="flex items-start justify-between gap-1">
         <div className="flex items-center gap-1">
           <span

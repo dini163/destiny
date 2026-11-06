@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useI18n } from '../i18n/context';
 import { ZiweiChartGrid } from '../components/ziwei/ZiweiChartGrid';
+import { ZiweiDeepAnalysisCard } from '../components/ziwei/ZiweiDeepAnalysisCard';
 import { Icon } from '../components/ui/Icon';
 import { InputBar } from '../components/ui/InputBar';
 import type { BirthInputValues } from '../components/ui/InputBar';
@@ -11,12 +12,28 @@ import { ObservatoryLoading } from '../components/ui/ObservatoryLoading';
 import { ResultCard } from '../components/ui/ResultCard';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { VerdictCard } from '../components/ui/VerdictCard';
-import { useZiwei } from '../hooks/useZiwei';
+import { useZiweiAnalysis } from '../hooks/useZiwei';
 import { useProfileFill } from '../hooks/useProfileFill';
 import { GENDER_OPTIONS } from '../lib/gender';
 import { calendarLabel, genderLabel } from '../lib/ziwei';
 import type { Gender } from '../types/common';
-import type { ZiweiChart, ZiweiRequest } from '../types/ziwei';
+import type { ZiweiChart, ZiweiAnalysisRequest } from '../types/ziwei';
+
+const PALACE_TO_TOPIC: Record<string, string> = {
+  '命宫': 'mingGong',
+  '兄弟': 'xiongDi',
+  '夫妻': 'fuQi',
+  '子女': 'ziNv',
+  '财帛': 'caiBo',
+  '疾厄': 'jiE',
+  '迁移': 'qianYi',
+  '仆役': 'jiaoYou',
+  '交友': 'jiaoYou',
+  '官禄': 'guanLu',
+  '田宅': 'tianZhai',
+  '福德': 'fuDe',
+  '父母': 'fuMu',
+};
 
 /**
  * 紫微斗数 chart page (Zi Wei Dou Shu).
@@ -33,15 +50,31 @@ export function ZiweiPage() {
   const [gender, setGender] = useState<Gender>('male');
   const [applyTrueSolarTime, setApplyTrueSolarTime] = useState(true);
   const [name, setName] = useState('');
+  const [activeTopic, setActiveTopic] = useState('mingGong');
+
+  useEffect(() => {
+    const handlePalaceSelect = (event: Event) => {
+      const custom = event as CustomEvent<string>;
+      if (custom.detail) {
+        const matched = PALACE_TO_TOPIC[custom.detail];
+        if (matched) {
+          setActiveTopic(matched);
+        }
+      }
+    };
+    window.addEventListener('destiny-select-palace', handlePalaceSelect);
+    return () => window.removeEventListener('destiny-select-palace', handlePalaceSelect);
+  }, []);
+
   const profile = useProfileFill({
     onPick: (picked) => {
       if (picked?.gender) setGender(picked.gender);
     },
   });
-  const ziwei = useZiwei();
+  const ziwei = useZiweiAnalysis();
 
   function handleSubmit(values: BirthInputValues): void {
-    const request: ZiweiRequest = {
+    const request: ZiweiAnalysisRequest = {
       ...values,
       gender,
       apply_true_solar_time: applyTrueSolarTime,
@@ -54,8 +87,8 @@ export function ZiweiPage() {
     <div className="mx-auto flex w-full max-w-[1536px] flex-col gap-6 px-gutter py-8">
       <InputBar
         title="紫微斗数命盘"
-        badge="权威历算"
-        subtitle="以农历生月生时定命身二宫，纳音定五行局，安紫微天府十四主星与左辅右弼、禄马魁钺、羊陀火铃空劫诸曜，起生年四化与大限。示例：1988-02-15 23:30 · 成都 · 乾造（男）。"
+        badge="权威历算 · 十三维详批"
+        subtitle="以农历生月生时定命身二宫，纳音定五行局，安十四主星与辅煞禄马诸曜，起生年四化与大限。内置182篇四段式断语、24组双星同宫、37个古典格局及168主辅煞组合矩阵。"
         showCalendar
         preset={profile.preset}
         profilePicker={profile.picker}
@@ -71,7 +104,7 @@ export function ZiweiPage() {
             longitude: values.longitude,
           })
         }
-        submitLabel={ziwei.isPending ? '排盘中…' : '排定命盘'}
+        submitLabel={ziwei.isPending ? '排盘推演中…' : '排定命盘与深度详批'}
         pending={ziwei.isPending}
         onSubmit={handleSubmit}
       >
@@ -111,23 +144,48 @@ export function ZiweiPage() {
       ) : null}
 
       {ziwei.isPending && !ziwei.data ? (
-        <ObservatoryLoading message={t('正在安星排盘，布列十二宫垣…')} />
+        <ObservatoryLoading message={t('正在安星排盘，生成十三维深度断语…')} />
       ) : null}
 
-      {ziwei.data ? <ZiweiResults chart={ziwei.data} /> : null}
+      {ziwei.data ? (
+        <ZiweiResults
+          chart={ziwei.data.chart}
+          analysis={ziwei.data.analysis}
+          activeTopic={activeTopic}
+          onSelectTopic={setActiveTopic}
+        />
+      ) : null}
 
       {profile.editor}
     </div>
   );
 }
 
+interface ZiweiResultsProps {
+  chart: ZiweiChart;
+  analysis: Record<string, string>;
+  activeTopic: string;
+  onSelectTopic: (topic: string) => void;
+}
+
 /** The full chart composition rendered once a real result is available. */
-function ZiweiResults({ chart }: { chart: ZiweiChart }) {
+function ZiweiResults({
+  chart,
+  analysis,
+  activeTopic,
+  onSelectTopic,
+}: ZiweiResultsProps) {
   return (
     <>
       <ChartSummary chart={chart} />
 
       <VerdictCard verdict={chart.verdict} />
+
+      <ZiweiDeepAnalysisCard
+        analysis={analysis}
+        activeTopic={activeTopic}
+        onSelectTopic={onSelectTopic}
+      />
 
       <ResultCard title="全盘白话" icon="sparkle" elevated>
         <PlainSectionList sections={chart.plain} />
@@ -145,6 +203,7 @@ function ZiweiResults({ chart }: { chart: ZiweiChart }) {
     </>
   );
 }
+
 
 /** Headline strip: 命宫 / 五行局 / 命主身主 / 紫微天府落宫 plus the birth facts. */
 function ChartSummary({ chart }: { chart: ZiweiChart }) {
