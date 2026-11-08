@@ -29,6 +29,9 @@ $RECYCLE.BIN/
 *~
 .qoder/
 .codex/
+# WorkBuddy stores session memory and daily work logs here: machine-local
+# agent state, not source code. Keep the folder on disk, never track it.
+.workbuddy/
 
 # --- Environment & secrets (never commit credentials) -----------------------
 .env
