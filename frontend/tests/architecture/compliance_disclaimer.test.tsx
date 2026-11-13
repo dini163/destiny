@@ -7,15 +7,14 @@
  * ②数据腿——全部路由都嵌在这**一条**布局路由里，而不是它的兄弟。将来有人加一条
  * 顶层路由（独立报表页、弹层页）漏在 shell 外面，第②条即红；走查看不到这种页，
  * 因为它还不存在。
- * 逐字性的基准取自 PRD 文件本身而不是测试里再抄一遍：改一个字要么连 PRD 一起改（合法），
- * 要么这条红（悄悄漂移）。为什么不钉 `SiteFooter` 里那三张印鉴的文案：那是设计稿参照物，
- * 不是契约（合婚 spec §12 教训），PRD 只约束这一句合规文案。
+ * 逐字性的基准是下方 `DISCLAIMER` 常量：PRD 文档属于本地工作资料、不随公开仓库分发，
+ * 因此基准直接钉在测试里，clone 后无需额外文件即可独立运行。改文案必须同时改本常量与
+ * `SiteFooter`，否则这条红（悄悄漂移）。为什么不钉 `SiteFooter` 里那三张印鉴的文案：
+ * 那是设计稿参照物，不是契约（合婚 spec §12 教训），PRD 只约束这一句合规文案。
  *
  * 复测口径（2026-09-27 全绿，3 项）：
  *   cd frontend && npx vitest run tests/architecture/compliance_disclaimer.test.tsx
  */
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -28,17 +27,13 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-/** PRD §4.3 正文那一行（blockquote 内），逐字基准的权威来源。 */
-function prdDisclaimer(): string {
-  //  specifier 先成变量再交给 new URL：本文件走 jsdom，字面量会被 Vite 的
-  //  import-analysis 改写成 http: 资源 URL（陷阱实录见 tests/lib/readFixture.ts:12-23）。
-  const specifier = '../../../prd/destiny_prd_v2.0_detailed.md';
-  const line = readFileSync(fileURLToPath(new URL(specifier, import.meta.url)), 'utf8')
-    .split('\n')
-    .find((l) => l.startsWith('> 本平台所有命理排盘'));
-  if (!line) throw new Error('PRD §4.3 的免责声明行找不到：基准本身变了，先读 PRD 再改测');
-  return line.slice('> '.length).trimEnd();
-}
+/**
+ * PRD §4.3 的合规免责声明，逐字基准。
+ * Kept as a test-local constant so the public repo runs this suite without
+ * depending on the locally archived PRD documents.
+ */
+const DISCLAIMER =
+  '本平台所有命理排盘、星历计算及推演结果均基于数理模型与民俗哲学古籍整理，结果仅供娱乐与文化参考，不构成任何医疗、法律、财务或重大人生命运决策建议。';
 
 /** jsdom 未实现 `window.scrollTo`；AppShell 的滚动复位不是本测判据。 */
 function stubScroll(): void {
@@ -60,7 +55,7 @@ interface RouteShape {
 }
 
 describe('合规免责声明（PRD §4.3）', () => {
-  it('全站唯一渲染点 SiteFooter 印的就是 PRD 那一行，一字不差', () => {
+  it('全站唯一渲染点 SiteFooter 印的就是合规免责声明那一行，一字不差', () => {
     stubScroll();
     render(
       <MemoryRouter initialEntries={['/bazi-natal']}>
@@ -72,7 +67,7 @@ describe('合规免责声明（PRD §4.3）', () => {
       </MemoryRouter>,
     );
     expect(screen.getByText('占位页面')).toBeInTheDocument();
-    expect(screen.getByText(prdDisclaimer())).toBeInTheDocument();
+    expect(screen.getByText(DISCLAIMER)).toBeInTheDocument();
   });
 
   it('路由表只有一个顶层路由，且它的 element 就是 AppShell', () => {

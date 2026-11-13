@@ -2,9 +2,9 @@
 
 > *「Astral Observatory —— 把四大文明的神秘学，装进同一座严谨的天文台。」*
 
-![Destiny](docs/assets/destiny-readme-hero.png)
+![Destiny](assets/destiny-readme-hero.png)
 
-[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](backend/pyproject.toml) [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com) [![React 18](https://img.shields.io/badge/React-18.3-61DAFB)](frontend/package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6)](frontend/package.json) [![Docker](https://img.shields.io/badge/Docker-compose%20ready-2496ED)](docker-compose.yml) [![Tests 16.8k+](https://img.shields.io/badge/tests-16.8k%2B-brightgreen)](scripts/verify.sh)
+[![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue)](backend/pyproject.toml) [![FastAPI](https://img.shields.io/badge/FastAPI-0.115%2B-009688)](https://fastapi.tiangolo.com) [![React 18](https://img.shields.io/badge/React-18.3-61DAFB)](frontend/package.json) [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6)](frontend/package.json) [![Docker](https://img.shields.io/badge/Docker-compose%20ready-2496ED)](docker-compose.yml) [![Tests 16.8k+](https://img.shields.io/badge/tests-16.8k%2B-brightgreen)](#测试)
 
 **一座聚合中华古典术数、西方占星、印度吠陀与北欧符文的全息推演平台。**
 所有排盘由权威计算库（`lunar-python` 干支节气 / `pyswisseph` 星历（默认 Moshier，可配置 Swiss 数据文件））与自建考据语料产出，**绝对禁止 LLM 手搓核心算法，全栈零 mock**。
@@ -23,12 +23,12 @@
 | 全国都按东经 120° 北京时间算 | 真实经纬度城市库（`backend/data/cities.json`），逐人生**真太阳时** |
 | 结果是一大段没有依据的模板话 | 响应带 `provenance.tables` 出处清单——端点实际读了哪几张语料表就列哪几张，宁缺勿多 |
 | 抽牌结果用 `random` 生成，可预测 | 抽牌/起卦引擎只用密码学安全随机源 `secrets.SystemRandom` |
-| 前端拿到假数据开发，上线全走形 | 前端测试夹具全部由脚本打真实后端录制（`scripts/record_frontend_fixtures.py`），零 mock |
-| 界面花哨但口径混乱 | 统一设计系统 `Celestial Obsidian`（曜石暗金），全站 App Shell 同一导航与状态栏 |
+| 前端拿到假数据开发，上线全走形 | 前端测试夹具全部由录制脚本打真实后端生成，零 mock |
+| 界面花哨但口径混乱 | 统一设计系统：暖纸白 / 曜石深色双主题，全站 App Shell 同一导航与阅读层级 |
 
-**测算大厅（首页）** —— 顶部双文明圈导航 + 实时真太阳时授时卡 + 16 格体系聚合矩阵（15 个已上线）：
+**发现（首页）** —— 从关心的问题出发，按视角探索 15 个已上线体系，暖纸白 / 曜石深色可切换：
 
-![测算大厅首页](docs/assets/screenshot-portal.png)
+![发现首页](assets/screenshot-portal.png)
 
 ## 快速开始
 
@@ -83,7 +83,7 @@ flowchart LR
 
 ## 体系矩阵
 
-测算大厅共 16 个体系条目，其中 15 个已上线；下表按体系聚合（八字五页并作一行，行运/合盘、卡巴拉/数字学各占一行），并列入 1 个 Phase-2 路线图。
+首页体系矩阵共 16 个条目，其中 15 个已上线；下表按体系聚合（八字五页并作一行，行运/合盘、卡巴拉/数字学各占一行），并列入 1 个 Phase-2 路线图。
 
 | 文明圈 | 系统 | API 组 | 前端路由 | 权威数据源 |
 |---|---|---|---|---|
@@ -104,24 +104,24 @@ flowchart LR
 
 ### 实拍图廊
 
-以下均为本地真实运行的计算结果（示例生辰见各页头注），非设计稿：
+以下均为 2026-11 曜石深色主题下、本地真实运行的计算结果（示例生辰见各页头注），非设计稿：
 
 <table>
   <tr>
-    <td width="50%"><b>四柱八字精算排盘</b><br>真太阳时校正 → 干支/十神/藏干/纳音 → 身强身弱得分 → 用神三层 → 大运时间轴 → 命格/格局/运势详批 → 数据溯源账本<br><img src="docs/assets/screenshot-bazi.png" alt="八字排盘结果页" width="100%"></td>
-    <td width="50%"><b>本命星盘与时空推运</b><br>pyswisseph 天球黄道命盘轮图（Placidus 分宫）→ 本命三巨头 → 十大主星与交点历表 → 元素/形态分布 → 关键相位网格<br><img src="docs/assets/screenshot-western.png" alt="西洋本命星盘结果页" width="100%"></td>
+    <td width="50%"><b>四柱八字精算排盘</b><br>真太阳时校正 → 干支/十神/藏干/纳音 → 身强身弱得分 → 用神三层 → 大运时间轴 → 命格/格局/运势详批 → 数据溯源账本<br><img src="assets/screenshot-bazi.png" alt="八字排盘结果页" width="100%"></td>
+    <td width="50%"><b>本命星盘与时空推运</b><br>pyswisseph 天球黄道命盘轮图（Placidus 分宫）→ 本命三巨头 → 十大主星与交点历表 → 元素/形态分布 → 关键相位网格<br><img src="assets/screenshot-western.png" alt="西洋本命星盘结果页" width="100%"></td>
   </tr>
 </table>
 
 ## 工程铁律
 
-六条全部有机器检查或代码证据（详见 [AGENTS.md](AGENTS.md)）：
+六条全部有机器检查或代码证据：
 
 | 铁律 | 落点 |
 |---|---|
 | **禁 LLM 手搓排盘**：干支/节气/行星位置只取权威库，引擎不自算历法 | `pyproject.toml` 依赖 + PRD §10.2 |
 | **抽签类只准 `secrets`**：tarot/lenormand/runes/zhouyi 禁 `import random` | `test_architecture.py::test_draw_engines_use_csprng` |
-| **零 mock**：生产代码与测试都不引假数据，前端夹具唯一来源是打真实 `:8000` 录制 | `scripts/record_frontend_fixtures.py` |
+| **零 mock**：生产代码与测试都不引假数据，前端夹具唯一来源是打真实 `:8000` 录制 | 录制脚本生成的真实响应快照 |
 | **出处诚实**：`provenance.tables` 只列端点真读过的表，按系统分开维护 | `app/content/__init__.py` |
 | **分层单向 import**：content → schemas → engines → api，六对反向全禁且实测为零 | `backend/tests/test_architecture.py` |
 | **snake_case 端到端**：响应不重命名，前端类型照响应形状直通 | `frontend/src/api/client.ts` |
@@ -146,10 +146,11 @@ curl -s http://localhost:8000/api/v1/numerology/chart \
 
 ## 测试
 
-唯一全栈门禁是 `scripts/verify.sh`：后端 pytest → 前端 typecheck → vitest → build，再跑测试清单对账与夹具漂移检查，一次跑齐。
+各层可独立复跑：后端 `pytest`、前端 `npm run typecheck` / `npm test` / `npm run build`。全栈门禁另串起测试清单对账与夹具漂移检查，一次跑齐。
 
 ```bash
-bash scripts/verify.sh
+cd backend  && python -m pytest -q
+cd frontend && npm run typecheck && npm test && npm run build
 ```
 
 | 层 | 手段 | 规模（2026-10-23 实测） |
@@ -179,11 +180,9 @@ destiny/
 │   │   ├── hooks/  api/  types/   接线层 / 类型化客户端 / snake_case 直通类型
 │   │   └── lib/            文案印刷形状集中处（scoring.ts）
 │   └── tests/              vitest 测试 + 真实录制夹具
-├── design/<系统>/code.html 高保真设计稿（视觉参照，不是契约）
-├── prd/                    产品需求文档 v2.0
-├── docs/superpowers/       各功能的 findings / plans / specs 过程记录
-├── scripts/                verify.sh 全栈门禁 + 前端夹具录制
-└── docker-compose.yml      backend :8000 + frontend(nginx) :8080
+├── assets/                 README 图示与截图
+├── docker-compose.yml      backend :8000 + frontend(nginx) :8080
+└── docker-compose.production.yml  生产叠加配置（回环绑定 / 持久卷 / 日志限额）
 ```
 
 ## 免责声明
@@ -199,4 +198,4 @@ destiny/
 
 首页按问题引导，暖纸白和曜石深色可切换。报告支持公开真实样例、条件化解释、行动实验与打印；R3 按起始日滚动十二个月，R1 的时间章节明确为年度上下文。
 
-人工交付与生产权限见 [交付说明](docs/operations/manual-delivery.md)，部署与授权验收见 [发布说明](docs/operations/release-readiness.md)。支付渠道尚未接入。
+人工交付与生产权限、部署与授权验收另有内部文档，未随公开仓库分发。支付渠道尚未接入。

@@ -1,9 +1,10 @@
 # ---------------------------------------------------------------------------
 # Destiny — .gitignore
 # Covers: OS cruft, editor/IDE files, secrets, Python (lunar-python/pyswisseph/
-# skyfield compute layer), Node/frontend build output, logs, temp, local data.
-# NOTE: design assets (*.html, *.png, *.md) and prd/*.md are intentionally
-#       TRACKED — do not add broad image/html ignores here.
+# skyfield compute layer), Node/frontend build output, logs, temp, local data,
+# and the machine-local working materials listed below.
+# NOTE: public assets live in assets/ and must stay trackable — do not add
+#       broad image/html ignore patterns here.
 # ---------------------------------------------------------------------------
 
 # --- Operating system -------------------------------------------------------
@@ -32,6 +33,25 @@ $RECYCLE.BIN/
 # WorkBuddy stores session memory and daily work logs here: machine-local
 # agent state, not source code. Keep the folder on disk, never track it.
 .workbuddy/
+
+# --- Machine-local working materials (never published) ---------------------
+# Design drafts, product specs, review evidence, engineering conventions and
+# helper scripts stay on disk for local work, but they are internal working
+# material and must not appear in the public repository or its history.
+/.creative-design/
+/design/
+/prd/
+/scripts/
+/docs/
+/.gitattributes
+/AGENTS.md
+# README illustrations live in assets/ (a separate root dir) and stay public.
+
+# --- Local deployment kit (machine-local, never published) -----------------
+# deploy-local/ holds the LAN host addresses, deploy scripts and compose
+# overlays for the Raspberry Pi / PV Box. Its name is deliberately tool-neutral
+# so any agent can use it locally, but it must never reach the public repo.
+/deploy-local/
 
 # --- Environment & secrets (never commit credentials) -----------------------
 .env
@@ -160,7 +180,6 @@ tests/golden/.cache/
 *.zip
 *.tar.gz
 *.rar
-!design/**/*.zip
 
 # --- Design-tool source cruft (keep exported png/html, drop editable bins) --
 *.psd
@@ -172,7 +191,6 @@ tests/golden/.cache/
 *.stitch/
 
 # --- Monorepo build/test extras --------------------------------------------
-# (design/ and prd/ remain TRACKED; only generated artifacts are ignored)
 frontend/coverage/
 backend/coverage/
 .eslintcache
@@ -181,8 +199,7 @@ backend/coverage/
 
 # --- Browser-walkthrough screenshots ---------------------------------------
 # Verification evidence captured while walking a slice through the browser.
-# Kept on disk -- the plan's walkthrough record cites these files by name --
-# but never tracked. Deliberately narrow and root-anchored: the header note
-# above keeps design/*.png TRACKED, so no broad image pattern belongs here.
+# Kept on disk but never tracked. Narrow and root-anchored so assets/*.png,
+# which is published with the README, stays trackable.
 /.verify-*.png
 /.refix-*.png
